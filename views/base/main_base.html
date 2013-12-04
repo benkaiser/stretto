@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>{% block title %}Desktop Command Remote{% endblock %}</title>
+
+  <script type="text/javascript" src="/static/js/libs/head.load.min.js"></script>
+
+  <script type="text/javascript">
+  // head.load(
+  //   "/static/css/lib/bootstrap.min.css",
+  //   "/static/css/lib/font-awesome.min.css",
+  //   "/static/css/main.css"
+  //   );
+  </script>
+  {% block head %}
+  {% endblock %}
+</head>
+<body>
+  {% block content %}
+  {% endblock %}
+  <script type="text/javascript">
+    // head.js(
+    //   "/static/js/libs/jquery.min.js",
+    //   "/static/js/libs/bootstrap.min.js"
+    //   );
+  </script>
+  {% block scripts %}
+  {% endblock %}
+</body>
+</html>
