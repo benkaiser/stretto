@@ -9,6 +9,8 @@ var path = require('path');
 
 var app = express();
 app.http().io();
+// attach the db to the app
+require(__dirname + '/db.js')(app);
 
 // all environments
 app.set('port', process.env.PORT || 2000);
@@ -19,18 +21,22 @@ app.use(express.favicon());
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
-app.use(express.cookieParser('maisecret'));
+app.use(express.cookieParser());
 app.use(express.bodyParser());
-app.use(express.session());
+app.use(express.session({secret: 'maisecret'}));
 app.use(app.router);
-app.use('/static', express.static(path.join(__dirname, 'static')));
+app.use('/static', express.static(__dirname + '/static'));
 
 // development only
 if ('development' == app.get('env')) {
+  // uncomment to nuke songs database
+  app.db.songs.remove({}, { multi: true }, function(err, numRemoved){
+    console.log(numRemoved + " songs removed");
+  })
   app.use(express.errorHandler());
 }
 
-require('./routes').createRoutes(app);
+require(__dirname + '/routes').createRoutes(app);
 
 app.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

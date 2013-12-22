@@ -1,5 +1,6 @@
 var util = require(__dirname + '/../util.js');
-var config = require(__dirname + '/../config').config;
+var lib_func = require(__dirname + '/../library_functions.js');
+var config = require(__dirname + '/../config').config();
 /*
  * GET home page.
  */
@@ -7,6 +8,13 @@ var config = require(__dirname + '/../config').config;
 exports.createRoutes = function(app){
   app.get('/', musicRoute);
   app.get('/scan', scanRoute);
+  app.io.route('scan_page_connected', function(req){
+    req.io.join('scanners');
+  })
+  app.io.route('start_scan', function(req){
+    lib_func.scanLibrary(app);
+  });
+
 };
 
 function musicRoute(req, res){

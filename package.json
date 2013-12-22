@@ -7,6 +7,8 @@
   },
   "dependencies": {
     "express.io": "*",
-    "swig": "*"
+    "swig": "*",
+    "musicmetadata": "*",
+    "nedb": "*"
   }
 }
