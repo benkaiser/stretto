@@ -3,9 +3,29 @@
 {% block title %}Music{% endblock %}
 
 {% block content %}
-<div class="text-left">
-  <h1>Home of Music...</h1>
+<div class='content-body'>
+  <h1>Music</h1>
+  <table class='table table-hover song_table'>
+    <thead>
+      <th>Title</th>
+      <th>Artist</th>
+      <th>Cover</th>
+    </thead>
+    <tbody class='song_body'>
+      
+    </tbody>
+  </table>
 </div>
+<audio class='audio_elem'></audio>
 {% endblock %}
 {% block scripts %}
+<script type="text/javascript">
+  head.js(
+    "/static/js/libs/underscore-min.js",
+    "/static/js/libs/backbone-min.js",
+    "/static/js/libs/backbone.marionette.min.js",
+    "/static/js/libs/socket.io.min.js",
+    "/static/js/home.js"
+    );
+</script>
 {% endblock %}

@@ -8,8 +8,17 @@ socket.on('update', function(data){
   console.log(data);
   var progress = data.completed / data.count * 100.00;
   $(".progress-bar").css('width', progress + '%');
+  $(".scan_details").html(data.details);
 });
 
+var on = false;
 $("#start_scan").click(function(){
-  socket.emit('start_scan');
+  if(on){
+    socket.emit('stop_scan');
+    $(this).text("Start Scan");
+  } else {
+    socket.emit('start_scan');
+    $(this).text("Stop Scan");
+  }
+  on = !on;
 });

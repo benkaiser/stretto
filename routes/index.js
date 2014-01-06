@@ -5,20 +5,36 @@ var config = require(__dirname + '/../config').config();
  * GET home page.
  */
 
-exports.createRoutes = function(app){
+app = null;
+
+exports.createRoutes = function(app_ref){
+  app = app_ref;
   app.get('/', musicRoute);
   app.get('/scan', scanRoute);
-  app.io.route('scan_page_connected', function(req){
-    req.io.join('scanners');
-  })
-  app.io.route('start_scan', function(req){
-    lib_func.scanLibrary(app);
-  });
+  app.get('/songs/:id', sendSong);
+  app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
+  app.io.route('start_scan', function(req){ lib_func.scanLibrary(app); });
+  app.io.route('stop_scan', function(req){ lib_func.stopScan(app); });
+  app.io.route('fetch_songs', returnSongs);
 
 };
 
 function musicRoute(req, res){
   res.render('index');
+}
+
+function sendSong(req, res){
+  app.db.songs.findOne({_id: req.params.id}, function(err, song){
+    res.sendfile(song.location, {'root': '/'});
+  });
+}
+
+function returnSongs(req){
+  app.db.songs.find({}, function(err, docs){
+    if(!err){
+      req.io.emit('songs', {"songs": docs});
+    }
+  });
 }
 
 function scanRoute(req, res){

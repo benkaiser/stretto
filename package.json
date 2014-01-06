@@ -9,6 +9,7 @@
     "express.io": "*",
     "swig": "*",
     "musicmetadata": "*",
-    "nedb": "*"
+    "nedb": "*",
+    "MD5": "*"
   }
 }

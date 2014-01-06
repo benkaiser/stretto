@@ -30,9 +30,9 @@ app.use('/static', express.static(__dirname + '/static'));
 // development only
 if ('development' == app.get('env')) {
   // uncomment to nuke songs database
-  app.db.songs.remove({}, { multi: true }, function(err, numRemoved){
-    console.log(numRemoved + " songs removed");
-  })
+  // app.db.songs.remove({}, { multi: true }, function(err, numRemoved){
+  //   console.log(numRemoved + " songs removed");
+  // })
   app.use(express.errorHandler());
 }
 

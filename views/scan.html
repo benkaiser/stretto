@@ -8,12 +8,11 @@
   <p class="text-muted">The directory to scan for music can be configured in the config.js file as the <code>music_dir</code> option.</p>
   <p>Currently your music dir is <code>{{dir}}</code> and contains <code>{{num_items}}</code> items.</p>
   <a class='btn btn-primary' id='start_scan'>Start Scan</a>
-  <p>
-    <div class="progress progress-striped active">
-      <div class="progress-bar" role="progressbar">
-      </div>
+  <div class="progress progress-striped active">
+    <div class="progress-bar" role="progressbar">
     </div>
-  </p>
+  </div>
+  <p class="scan_details"></p>
 </div>
 {% endblock %}
 {% block scripts %}

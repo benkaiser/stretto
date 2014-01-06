@@ -1,18 +1,19 @@
 var fs = require('fs');
 var mm = require('musicmetadata');
+var md5 = require('MD5');
 
 var util = require(__dirname + '/util.js');
 var config = require(__dirname + '/config').config();
 
-var local_app = null;
+var running = false;
+var app = null;
 var cnt = 0;
 var song_list = [];
 
 function findNextSong(){
-  if(cnt < song_list.length){
-    findSong(song_list[cnt], function(err){
+  if(cnt < song_list.length && running){
+    findSong(song_list[cnt], function(err, title){
       cnt++;
-      local_app.io.room('scanners').broadcast('update', {err: err, count: song_list.length, completed: cnt});
       findNextSong();
     });
   } else {
@@ -22,13 +23,45 @@ function findNextSong(){
 
 function findSong(item, callback){
   console.log("looking for item...");
-  local_app.db.songs.findOne({location: item}, function(err, doc){
+  app.db.songs.findOne({location: item}, function(err, doc){
     if(doc == null){
       // insert the new song
       var parser = new mm(fs.createReadStream(item));
 
       parser.on('metadata', function(result){
-        // console.log(result);
+        // add the location
+        song = {
+          title: result.title,
+          album: result.album,
+          artist: result.artist,
+          albumartist: result.albumartist,
+          genre: result.genre,
+          year: result.year,
+          location: item
+        };
+        // write the cover photo as an md5 string
+        if(result.picture.length > 0){
+          pic = result.picture[0];
+          filename = __dirname + '/dbs/covers/' + md5(pic['data']) + "." + pic["format"];
+          song.cover_location = filename;
+          fs.exists(filename, function(exists){
+            if(!exists){
+              fs.writeFile(filename, pic['data'], function(err){
+                if(err) console.log(err);
+                console.log("Wrote file!");
+              });
+            }
+          })
+        }
+        // insert the song
+        app.db.songs.insert(song, function (err, newDocs){
+          // update the browser the song has been added
+          broadcast("update", {
+            count: song_list.length,
+            completed: cnt,
+            details: "Added: " + newDocs["title"] + " - " + newDocs["albumartist"]
+          });
+        });
       });
 
       parser.on('done', function (err) {
@@ -43,8 +76,8 @@ function findSong(item, callback){
   })
 }
 
-exports.scanLibrary = function(app){
-  local_app = app;
+exports.scanLibrary = function(app_ref){
+  app = app_ref;
   util.walk(config.music_dir, function(err, list){
     if(err){
       console.log(err);
@@ -54,4 +87,13 @@ exports.scanLibrary = function(app){
     findNextSong();
 
   });
+  running = true;
+}
+
+exports.stopScan = function(app){
+  running = false;
+}
+
+function broadcast(id, message){
+  app.io.room('scanners').broadcast(id, message);
 }
