@@ -3,7 +3,50 @@ body, html{
 body{
   padding-top: 32px;
 }
-
-.content-body{
+#content{
+  margin-left: 200px;
   padding: 20px;
+}
+#sidebar{
+  margin-top: 10px;
+  padding-left: 10px;
+  width: 200px;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  box-shadow: 0 0 20px #ccc;
+}
+#bottom_bar{
+  position: fixed;
+  bottom: 0;
+  height: 60px;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 0 30px #555;
+}
+.song_table{
+  table-layout: fixed;
+}
+.song_table tbody > tr > td{
+  padding: 0 !important;
+  line-height: 40px;
+  vertical-align: middle;
+  overflow: hidden;
+}
+.cover{
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+#bottom_bar{
+  text-align: center;
+}
+.controls{
+  margin-left: auto;
+  margin-right: auto;
+}
+.controls .fa{
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
 }

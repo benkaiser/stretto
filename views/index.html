@@ -3,20 +3,58 @@
 {% block title %}Music{% endblock %}
 
 {% block content %}
-<div class='content-body'>
+<div id="wrapper">
+  <div id='sidebar'>
+  </div>
+  <div id='content'>
+  </div>
+</div>
+<div id='bottom_bar'>
+  <div id="current_info">
+
+  </div>
+  <div class="controls">
+    <i class="fa fa-fast-backward fa-3x"></i>
+    <i class="fa fa-play fa-3x"></i>
+    <i class="fa fa-fast-forward fa-3x"></i>
+  </div>
+</div>
+<audio id='current_track'></audio>
+<audio id='fade_track'></audio>
+{% raw %}
+<script type="text/swig" id='sidebar_template'>
+  <h3>{{title}}</h3>
+  <ul class="nav">
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#">Shortcuts</a></li>
+    <li><a href="#">Overview</a></li>
+    <li><a href="#">Events</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</script>
+<script type='text/swig' id='song_template'>
   <h1>Music</h1>
   <table class='table table-hover song_table'>
     <thead>
-      <th>Title</th>
-      <th>Artist</th>
-      <th>Cover</th>
+      <th class='title_th'>Title</th>
+      <th class='artist_th'>Artist</th>
+      <th class='album_th'>Album</th>
     </thead>
     <tbody class='song_body'>
-      
+    {% for song in songs %}
+      <tr id="{{song._id}}">
+        <td><img class='cover' src='/cover/{{song._id}}'/>{{song.title}}</td>
+        <td>{{song.artist}}</td>
+        <td>{{song.album}}</td>
+      </tr>
+    {% endfor %}
     </tbody>
   </table>
-</div>
-<audio class='audio_elem'></audio>
+</script>
+{% endraw %}
+
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
@@ -25,6 +63,8 @@
     "/static/js/libs/backbone-min.js",
     "/static/js/libs/backbone.marionette.min.js",
     "/static/js/libs/socket.io.min.js",
+    "/static/js/libs/swig.min.js",
+    "/static/js/libs/tablesort.min.js",
     "/static/js/home.js"
     );
 </script>
