@@ -10,13 +10,14 @@
   </div>
 </div>
 <div id='bottom_bar'>
-  <div id="current_info">
-
-  </div>
+  <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
+  <div id="current_info">&nbsp;</div>
   <div class="controls">
-    <i class="fa fa-fast-backward fa-3x"></i>
-    <i class="fa fa-play fa-3x"></i>
-    <i class="fa fa-fast-forward fa-3x"></i>
+    <i id="repeat" class="fa fa-retweet fa-3x"></i> <!-- Possible: fa-refresh -->
+    <i id="prev" class="fa fa-fast-backward fa-3x"></i>
+    <i id="playpause" class="fa fa-play fa-3x"></i>
+    <i id="next" class="fa fa-fast-forward fa-3x"></i>
+    <i id="shuffle" class="fa fa-random fa-3x"></i>
   </div>
 </div>
 <audio id='current_track'></audio>
@@ -36,7 +37,7 @@
 </script>
 <script type='text/swig' id='song_template'>
   <h1>Music</h1>
-  <table class='table table-hover song_table'>
+  <table class='table song_table'>
     <thead>
       <th class='title_th'>Title</th>
       <th class='artist_th'>Artist</th>
@@ -45,13 +46,25 @@
     <tbody class='song_body'>
     {% for song in songs %}
       <tr id="{{song._id}}">
-        <td><img class='cover' src='/cover/{{song._id}}'/>{{song.title}}</td>
+        <td>
+          {% if song.no_cover %}
+            <img class='cover' src='/static/images/unknown.png'/>
+          {% else %}
+            <img class='cover' src='/cover/{{song._id}}'/>
+          {% endif %}
+          {{song.title}}
+        </td>
         <td>{{song.artist}}</td>
         <td>{{song.album}}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
+</script>
+<script type="text/swig" id="current_info_template">
+  <img class='info_cover' src='/cover/{{_id}}'/>
+  <p class="info_title">{{title}}</p>
+  <p class="info_detail">{{artist}} - {{album}}</p>
 </script>
 {% endraw %}
 
@@ -62,6 +75,7 @@
     "/static/js/libs/underscore-min.js",
     "/static/js/libs/backbone-min.js",
     "/static/js/libs/backbone.marionette.min.js",
+    "/static/js/libs/bootstrap-slider.js",
     "/static/js/libs/socket.io.min.js",
     "/static/js/libs/swig.min.js",
     "/static/js/libs/tablesort.min.js",

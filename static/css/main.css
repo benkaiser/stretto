@@ -23,6 +23,7 @@ body{
   width: 100%;
   background-color: white;
   box-shadow: 0 0 30px #555;
+  padding-top: 4px;
 }
 .song_table{
   table-layout: fixed;
@@ -33,20 +34,69 @@ body{
   vertical-align: middle;
   overflow: hidden;
 }
+tr:hover{
+  background-color: #eeeeee;
+}
+.light-blue:hover{
+  background-color: #DDEEFF;
+}
 .cover{
   width: 40px;
   height: 40px;
   margin-right: 10px;
 }
-#bottom_bar{
-  text-align: center;
-}
 .controls{
-  margin-left: auto;
-  margin-right: auto;
+  float: left;
+  width: 323px;
+  height: 100%;
+  margin: 0;
+  margin-left: -161px;
+  padding: 0;
 }
 .controls .fa{
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 10px;
+  height: 100%;
+}
+.controls .fa:hover{
+  background-color: #ddd;
+}
+#scrub_bar_slider{
+  width: 100%;
+  position: fixed;
+  bottom: 51px;
+  left: 0px;
+}
+.slider-track{
+  background: #ddd;
+}
+#current_info{
+  float: left;
+  width: 50%;
+  text-align: left;
+}
+.info_cover{
+  float: left;
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
+}
+.info_title{
+  margin-bottom: 0;
+  font-size: 22px;
+  font-weight: lighter;
+}
+.info_detail{
+  font-size: 15px;
+  color: #666;
+}
+.slider-handle{
+  opacity: 1;
+}
+.blue{
+  color: #4BF;
+}
+.light-blue{
+  background-color: #DDEEFF;
 }

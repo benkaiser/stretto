@@ -36,7 +36,7 @@ function sendSong(req, res){
 
 function sendCover(req, res){
   app.db.songs.findOne({_id: req.params.id}, function(err, song){
-    if(!song.hasOwnProperty("cover_location")){
+    if(!song || !song.hasOwnProperty("cover_location")){
       res.sendfile("/static/images/unknown.png", {root: __dirname + "/../"});
     } else {
       res.sendfile(song.cover_location, {'root': '/'});
@@ -47,6 +47,11 @@ function sendCover(req, res){
 function returnSongs(req){
   app.db.songs.find({}, function(err, docs){
     if(!err){
+      for(var i = 0; i < docs.length; i++){
+        if(!docs[i].hasOwnProperty("cover_location")){
+          docs[i].no_cover = true;
+        }
+      }
       req.io.emit('songs', {"songs": docs});
     }
   });
