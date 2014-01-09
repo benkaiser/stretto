@@ -13,7 +13,8 @@
   <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
   <div id="current_info">&nbsp;</div>
   <div class="controls">
-    <i id="repeat" class="fa fa-retweet fa-3x"></i> <!-- Possible: fa-refresh -->
+    <i id="repeat" class="fa fa-retweet fa-3x blue"></i> <!-- Possible: fa-refresh -->
+    <span id="repeat_badge" class="badge hidden">1</span>
     <i id="prev" class="fa fa-fast-backward fa-3x"></i>
     <i id="playpause" class="fa fa-play fa-3x"></i>
     <i id="next" class="fa fa-fast-forward fa-3x"></i>
@@ -48,7 +49,7 @@
       <tr id="{{song._id}}">
         <td>
           {% if song.no_cover %}
-            <img class='cover' src='/static/images/unknown.png'/>
+            <i class='fa fa-question unkown_cover'></i>
           {% else %}
             <img class='cover' src='/cover/{{song._id}}'/>
           {% endif %}
@@ -62,7 +63,11 @@
   </table>
 </script>
 <script type="text/swig" id="current_info_template">
-  <img class='info_cover' src='/cover/{{_id}}'/>
+  {% if no_cover %}
+    <i class='fa fa-question info_unknown_cover'></i>
+  {% else %}
+    <img class='info_cover' src='/cover/{{_id}}'/>
+  {% endif %}
   <p class="info_title">{{title}}</p>
   <p class="info_detail">{{artist}} - {{album}}</p>
 </script>

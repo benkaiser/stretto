@@ -72,6 +72,7 @@ function findSong(item, callback){
       });
     } else {
       // perform rescan? hard rescan option?
+      callback(null);
     }
   })
 }

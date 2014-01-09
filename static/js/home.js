@@ -6,11 +6,22 @@ function PlayState(){
   this.names = {
     playpause: "#playpause",
     next: "#next",
-    prev: "#prev"
-  }
+    prev: "#prev",
+    repeat: "#repeat",
+    repeat_badge: "#repeat_badge",
+    shuffle: "#shuffle"
+  };
+  this.repeat_states = {
+    all: 0,
+    one: 1,
+    none: 2
+  };
   this.songs = [];
+  this.queue_pool = [];
   this.playing_id = null;
   this.is_playing = false;
+  this.shuffle_state = false;
+  this.repeat_state = 0;
   this.current_track = document.getElementById("current_track");
   this.fade_track = document.getElementById("fade_track");
   this.scrub = null;
@@ -19,31 +30,41 @@ function PlayState(){
     $(this.names.playpause).click(function(){ player.togglePlayState() });
     $(this.names.next).click(function(){ player.nextTrack() });
     $(this.names.prev).click(function(){ player.prevTrack() });
+    $(this.names.repeat).click(function(){ player.toggleRepeat() });
+    $(this.names.shuffle).click(function(){ player.toggleShuffle() });
+    this.current_track.addEventListener('ended', function(){ player.nextTrack() });
   }
   this.update = function(){
     if(this.is_playing && !this.isSeeking){
       this.scrub.slider('setValue', this.current_track.currentTime / this.current_track.duration * 100.0);
     }
   }
-  this.findSong = function(id){
+  this.findSongIndex = function(id){
     for (var i = 0; i < this.songs.length; i++) {
       if(id == this.songs[i]["_id"]){
-        return this.songs[i];
+        return i;
       }
     }
   }
   this.playSong = function(id){
-    this.current_song = this.findSong(id);
+    this.current_song = this.songs[this.findSongIndex(id)];
     if(id == this.playing_id){
       return;
     } else {
       this.playing_id = id;
     }
+    // update the audio element
+    this.current_track.pause();
     this.current_track.innerHTML = "<source src='/songs/"+this.playing_id+"' type='audio/mpeg'>";
     this.current_track.play();
+    // set the state to playing
     this.setIsPlaying(true);
+    // show the songs info
     info = new InfoView();
     MusicApp.infoRegion.show(info);
+    // update the selected item
+    $("tr").removeClass("light-blue");
+    $("#"+id).addClass("light-blue");
   };
   this.setIsPlaying = function(isPlaying){
     this.is_playing = isPlaying;
@@ -62,11 +83,44 @@ function PlayState(){
     }
     this.setIsPlaying(!this.is_playing);
   }
+  this.toggleShuffle = function(){
+    this.shuffle_state = !this.shuffle_state;
+    if(this.shuffle_state){
+      $(this.names.shuffle).addClass('blue');
+    } else {
+      $(this.names.shuffle).removeClass('blue');
+    }
+  }
+  this.toggleRepeat = function(){
+    // change the state
+    this.repeat_state = (this.repeat_state+1)%3;
+    // reset the look
+    $(this.names.repeat).addClass("blue");
+    $(this.names.repeat_badge).addClass("hidden");
+    if(this.repeat_state == this.repeat_states.one){
+      $(this.names.repeat_badge).removeClass("hidden");
+    } else if(this.repeat_state == this.repeat_states.none) {
+      $(this.names.repeat).removeClass("blue");
+    }
+  }
   this.nextTrack = function(){
-
+    if(this.repeat_state == this.repeat_states.one){
+      this.current_track.currentTime = 0;
+      this.current_track.play();
+      return;
+    }
+    var index = this.findSongIndex(this.current_song._id)+1;
+    if(index == this.songs.length){
+      index = 0;
+    }
+    this.playSong(this.songs[index]._id);
   }
   this.prevTrack = function(){
-
+    var index = this.findSongIndex(this.current_song._id)-1;
+    if(index == -1){
+      index = this.songs.length-1;
+    }
+    this.playSong(this.songs[index]._id);
   }
   this.setScubElem = function(elem){
     this.scrub = elem;
@@ -138,11 +192,8 @@ SongView = Backbone.View.extend({
     "click tr": "triggerSong"
   },
   triggerSong: function(ev){
-    this.$el.find("tr").removeClass("light-blue");
-    tr = $(ev.target).closest("tr");
-    tr.addClass("light-blue");
-    id = tr.attr('id');
-    console.log(id);
+    id = $(ev.target).closest("tr").attr('id');
+    player.queue_pool = player.songs;
     player.playSong(id);
   }
 });

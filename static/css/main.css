@@ -6,10 +6,12 @@ body{
 #content{
   margin-left: 200px;
   padding: 20px;
+  padding-bottom: 60px;
 }
 #sidebar{
   margin-top: 10px;
   padding-left: 10px;
+  padding-bottom: 60px;
   width: 200px;
   height: 100%;
   position: fixed;
@@ -19,11 +21,11 @@ body{
 #bottom_bar{
   position: fixed;
   bottom: 0;
-  height: 60px;
+  height: 61px;
   width: 100%;
   background-color: white;
-  box-shadow: 0 0 30px #555;
-  padding-top: 4px;
+  box-shadow: 0 0 30px #ccc;
+  padding-top: 2px;
 }
 .song_table{
   table-layout: fixed;
@@ -45,6 +47,11 @@ tr:hover{
   height: 40px;
   margin-right: 10px;
 }
+.unkown_cover{
+  font-size: 40px;
+  margin-right: 18px;
+  margin-left: 8px;
+}
 .controls{
   float: left;
   width: 323px;
@@ -62,15 +69,32 @@ tr:hover{
 .controls .fa:hover{
   background-color: #ddd;
 }
+#repeat_badge{
+  position: absolute;
+  margin-left: -25px;
+  margin-top: 5px;
+  background-color: #4BF;
+}
 #scrub_bar_slider{
   width: 100%;
   position: fixed;
-  bottom: 51px;
+  bottom: 48px;
   left: 0px;
 }
-.slider-track{
-  background: #ddd;
+/*** slider changes ***/
+.slider.slider-horizontal .slider-track{
+  height: 5px;
+  background: #ccc;
 }
+.slider-selection{
+  background: #4BF;
+}
+.slider.slider-horizontal .slider-handle{
+  opacity: 1;
+  margin-top: -7px;
+  background: #4BF;
+}
+/*** info ***/
 #current_info{
   float: left;
   width: 50%;
@@ -82,6 +106,11 @@ tr:hover{
   height: 60px;
   margin-right: 10px;
 }
+.info_unknown_cover{
+  float: left;
+  font-size: 60px;
+  margin-right: 10px;
+}
 .info_title{
   margin-bottom: 0;
   font-size: 22px;
@@ -91,9 +120,7 @@ tr:hover{
   font-size: 15px;
   color: #666;
 }
-.slider-handle{
-  opacity: 1;
-}
+/*** color definitions ***/
 .blue{
   color: #4BF;
 }
