@@ -1,3 +1,47 @@
+// define things before they are used
+var socket = io.connect('http://'+window.location.hostname+':2000');
+
+var PlaylistCollection = Backbone.Collection.extend({
+  fetch: function(options){
+    socket.emit('fetch_playlists');
+  },
+  getBy_Id: function(id){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes["_id"] == id){
+        return this.models[i].attributes;
+      }
+    }
+    return -1;
+  }
+});
+
+var SongCollection = Backbone.Collection.extend({
+  fetch: function(options){
+    socket.emit('fetch_songs');
+  },
+  findBy_Id: function(id){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes["_id"] == id){
+        return this.models[i];
+      }
+    }
+    return 0;
+  },
+  getByIds: function(playlist){
+    if(playlist !== undefined && playlist.songs !== undefined){
+      songs = [];
+      for(var i = 0; i < playlist.songs.length; i++){
+        song = this.findBy_Id(playlist.songs[i]["_id"]);
+        if(song){
+          songs.push(song);
+        }
+      }
+      return songs;
+    }
+    return;
+  }
+});
+
 // music library object
 function PlayState(){
   this.d = {
@@ -16,8 +60,12 @@ function PlayState(){
     one: 1,
     none: 2
   };
+  // currently viewed songs
   this.songs = [];
+  // current pool of songs to play
   this.queue_pool = [];
+  this.song_collection = null;
+  this.playlist_collection = null;
   this.playing_id = null;
   this.is_playing = false;
   this.shuffle_state = false;
@@ -32,7 +80,15 @@ function PlayState(){
     $(this.names.prev).click(function(){ player.prevTrack() });
     $(this.names.repeat).click(function(){ player.toggleRepeat() });
     $(this.names.shuffle).click(function(){ player.toggleShuffle() });
+    this.current_src = $("#current_src");
+    this.fade_src = $("#fade_src");
     this.current_track.addEventListener('ended', function(){ player.nextTrack() });
+  }
+  this.setupCollections = function(){
+    this.song_collection = new SongCollection();
+    this.playlist_collection = new PlaylistCollection();
+    this.song_collection.fetch();
+    this.playlist_collection.fetch();
   }
   this.update = function(){
     if(this.is_playing && !this.isSeeking){
@@ -41,13 +97,14 @@ function PlayState(){
   }
   this.findSongIndex = function(id){
     for (var i = 0; i < this.songs.length; i++) {
-      if(id == this.songs[i]["_id"]){
+      if(id == this.songs[i].attributes._id){
         return i;
       }
     }
   }
   this.playSong = function(id){
-    this.current_song = this.songs[this.findSongIndex(id)];
+    this.current_index = this.findSongIndex(id);
+    this.current_song = this.songs[this.current_index];
     if(id == this.playing_id){
       return;
     } else {
@@ -55,7 +112,8 @@ function PlayState(){
     }
     // update the audio element
     this.current_track.pause();
-    this.current_track.innerHTML = "<source src='/songs/"+this.playing_id+"' type='audio/mpeg'>";
+    this.current_src.attr("src", "/songs/"+this.playing_id); 
+    this.current_track.load();
     this.current_track.play();
     // set the state to playing
     this.setIsPlaying(true);
@@ -109,18 +167,18 @@ function PlayState(){
       this.current_track.play();
       return;
     }
-    var index = this.findSongIndex(this.current_song._id)+1;
+    var index = this.current_index+1;
     if(index == this.songs.length){
       index = 0;
     }
-    this.playSong(this.songs[index]._id);
+    this.playSong(this.songs[index].attributes._id);
   }
   this.prevTrack = function(){
-    var index = this.findSongIndex(this.current_song._id)-1;
+    var index = this.current_index-1;
     if(index == -1){
       index = this.songs.length-1;
     }
-    this.playSong(this.songs[index]._id);
+    this.playSong(this.songs[index].attributes._id);
   }
   this.setScubElem = function(elem){
     this.scrub = elem;
@@ -145,27 +203,47 @@ function PlayState(){
 }
 var player = new PlayState();
 player.init();
+player.setupCollections();
 
 // soccet connection and events
-var socket = io.connect('http://'+window.location.hostname+':2000');
 var loaded = false;
 socket.on('connect', function(){
   console.log("Socket connected");
+  socket.emit('player_page_connected');
   if(!loaded){
-    socket.emit('fetch_songs');
     loaded = !loaded;
   }
 });
 socket.on('songs', function(data){
-  player.songs = data.songs;
-  songView = new SongView();
-  MusicApp.contentRegion.show(songView);
+  player.song_collection.add(data.songs);
+  loadedRestart("songs");
+});
+socket.on('playlists', function(data){
+  player.playlist_collection.reset();
+  player.playlist_collection.add(data.playlists);
+  MusicApp.router.sidebar();
+  loadedRestart("playlists");
 });
 
 // jquery initialiser
 $(document).ready(function(){
-  console.log("Ready");
   player.setScubElem($("#scrub_bar"));
+  $("#wrapper").keydown(function(event){
+    switch(event.which){
+      case 32:
+        player.togglePlayState();
+        event.preventDefault();
+        break;
+      case 39:
+        player.nextTrack();
+        event.preventDefault();
+        break;
+      case 37:
+        player.prevTrack();
+        event.preventDefault();
+        break;
+    }
+  });
 });
 
 // backbone app
@@ -177,10 +255,31 @@ MusicApp.addRegions({
   infoRegion: "#current_info"
 });
 
+items = ["playlists", "songs"];
+itemsLoaded = [];
+MusicAppRouter = Backbone.Router.extend({
+  sb: null,
+  songview: null,
+  routes: {
+    "playlist/:id": "playlist"
+  },
+  playlist: function(id){
+    player.playlist = player.playlist_collection.getBy_Id(id);
+    player.songs = player.song_collection.getByIds(player.playlist);
+    if(player.songs){
+      this.songview = new SongView();
+      MusicApp.contentRegion.show(this.songview);
+    }
+  },
+  sidebar: function(id){
+    this.sb = new SidebarView();
+    MusicApp.sideBarRegion.show(this.sb);
+  }
+});
+
 MusicApp.addInitializer(function(options){
-  sidebar = new SidebarView();
-  MusicApp.sideBarRegion.show(sidebar);
-  Backbone.history.start();
+  this.router = new MusicAppRouter();
+  Backbone.history.start({pushState: false});
 });
 
 SongView = Backbone.View.extend({
@@ -189,19 +288,56 @@ SongView = Backbone.View.extend({
     this.$el.html(render(this.template, {songs: player.songs}));
   },
   events: {
-    "click tr": "triggerSong"
+    "click tr": "triggerSong",
+    "click .options": "triggerOptions"
   },
   triggerSong: function(ev){
+    if($(ev.target).hasClass("options")){
+      return;
+    }
     id = $(ev.target).closest("tr").attr('id');
     player.queue_pool = player.songs;
     player.playSong(id);
+  },
+  triggerOptions: function(ev){
+    id = $(ev.target).closest("tr").attr('id');
+    player.selectedItem = id;
+    createOptions(ev.clientX, ev.clientY);
   }
 });
+
+function createOptions(x, y){
+  $(".options_container").html(render("#options_template", {
+      playlists: player.playlist_collection.models
+    }))
+    .css({"top": y+"px", "left": x+"px"});
+  $(".add_to_playlist").click(function(ev){
+    id = $(ev.target).closest("li").attr('id');
+    socket.emit("add_to_playlist", {add: player.selectedItem, playlist: id});
+    hideOptions();
+  });
+}
+
+function hideOptions(){
+  $(".options_container").css({"top:": "-1000px", "left": "-1000px"});
+}
+
+$(window).scroll(hideOptions);
 
 SidebarView = Backbone.View.extend({
   template: "#sidebar_template",
   render: function(){
-    this.$el.html(render(this.template, {"title": "Sidebar"}));
+    this.$el.html(render(this.template, {"title": "Playlists", playlists: player.playlist_collection.models}));
+  },
+  events: {
+    "click .add_playlist": "addPlaylist"
+  },
+  addPlaylist: function(){
+    bootbox.prompt("Playlist title?", function(result){
+      if (result !== null) {
+        socket.emit('create_playlist', {"title": result});
+      }
+    });
   }
 });
 
@@ -217,4 +353,26 @@ MusicApp.start();
 // utility functions
 function render(template, data){
   return swig.render($(template).html(), {locals: data});
+}
+
+function loadedRestart(item){
+  itemsLoaded.push(item);
+  if(arraysEqual(items, itemsLoaded)){
+    Backbone.history.stop();
+    Backbone.history.start();
+  }
+}
+
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length != b.length) return false;
+
+  a.sort();
+  b.sort();
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
 }

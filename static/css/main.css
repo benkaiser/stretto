@@ -10,13 +10,21 @@ body{
 }
 #sidebar{
   margin-top: 10px;
-  padding-left: 10px;
   padding-bottom: 60px;
   width: 200px;
   height: 100%;
   position: fixed;
   left: 0;
   box-shadow: 0 0 20px #ccc;
+}
+.sidebar_controls{
+  bottom: 120px;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+}
+#sidebar h3{
+  padding-left: 10px;
 }
 #bottom_bar{
   position: fixed;
@@ -41,6 +49,18 @@ tr:hover{
 }
 .light-blue:hover{
   background-color: #DDEEFF;
+}
+tr:hover .options{
+  display: inline-block;
+}
+.options{
+  float: right;
+  margin-right: 10px;
+  margin-top: 17px;
+  display: none;
+}
+.options:hover{
+  color: #4BF;
 }
 .cover{
   width: 40px;
@@ -119,6 +139,10 @@ tr:hover{
 .info_detail{
   font-size: 15px;
   color: #666;
+}
+/*** options dialog ***/
+.options_container{
+  position: fixed;
 }
 /*** color definitions ***/
 .blue{

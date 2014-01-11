@@ -21,20 +21,20 @@
     <i id="shuffle" class="fa fa-random fa-3x"></i>
   </div>
 </div>
-<audio id='current_track'></audio>
-<audio id='fade_track'></audio>
+<audio id='current_track'><source id="current_src" type='audio/mpeg'></audio>
+<audio id='fade_track'><source id="fade_src" type='audio/mpeg'></audio>
+<div class="options_container"></div>
 {% raw %}
 <script type="text/swig" id='sidebar_template'>
   <h3>{{title}}</h3>
   <ul class="nav">
-    <li><a href="#">Dashboard</a></li>
-    <li><a href="#">Shortcuts</a></li>
-    <li><a href="#">Overview</a></li>
-    <li><a href="#">Events</a></li>
-    <li><a href="#">About</a></li>
-    <li><a href="#">Services</a></li>
-    <li><a href="#">Contact</a></li>
+    {% for playlist in playlists %}
+      <li><a href="#playlist/{{playlist.attributes._id}}">{{playlist.attributes.title}}</a></li>
+    {% endfor %}
   </ul>
+  <div class='sidebar_controls'>
+  <button class='add_playlist btn btn-default'>Add Playlist</button>
+  </div>
 </script>
 <script type='text/swig' id='song_template'>
   <h1>Music</h1>
@@ -46,30 +46,45 @@
     </thead>
     <tbody class='song_body'>
     {% for song in songs %}
-      <tr id="{{song._id}}">
+      <tr id="{{song.attributes._id}}">
         <td>
-          {% if song.no_cover %}
+          {% if song.attributes.no_cover %}
             <i class='fa fa-question unkown_cover'></i>
           {% else %}
-            <img class='cover' src='/cover/{{song._id}}'/>
+            <img class='cover' src='/cover/{{song.attributes._id}}'/>
           {% endif %}
-          {{song.title}}
+          {{song.attributes.title}}
+          <i class='fa fa-caret-square-o-down options'></i>
         </td>
-        <td>{{song.artist}}</td>
-        <td>{{song.album}}</td>
+        <td>{{song.attributes.artist}}</td>
+        <td>{{song.attributes.album}}</td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
 </script>
 <script type="text/swig" id="current_info_template">
-  {% if no_cover %}
+  {% if attributes.no_cover %}
     <i class='fa fa-question info_unknown_cover'></i>
   {% else %}
-    <img class='info_cover' src='/cover/{{_id}}'/>
+    <img class='info_cover' src='/cover/{{attributes._id}}'/>
   {% endif %}
-  <p class="info_title">{{title}}</p>
-  <p class="info_detail">{{artist}} - {{album}}</p>
+  <p class="info_title">{{attributes.title}}</p>
+  <p class="info_detail">{{attributes.artist}} - {{attributes.album}}</p>
+</script>
+<script type="text/swig" id="options_template">
+<div class="dropdown open">
+  <ul class="dropdown-menu" role="menu">
+    <li><a>Play Next</a></li>
+    <li class="divider"></li>
+    <li role="presentation" class="dropdown-header">Add to Playlist</li>
+    {% for playlist in playlists %}
+      {% if playlist.attributes.editable %}
+      <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+</div>
 </script>
 {% endraw %}
 
@@ -84,6 +99,7 @@
     "/static/js/libs/socket.io.min.js",
     "/static/js/libs/swig.min.js",
     "/static/js/libs/tablesort.min.js",
+    "/static/js/libs/bootbox.min.js",
     "/static/js/home.js"
     );
 </script>

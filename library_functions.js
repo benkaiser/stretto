@@ -14,10 +14,13 @@ function findNextSong(){
   if(cnt < song_list.length && running){
     findSong(song_list[cnt], function(err, title){
       cnt++;
-      findNextSong();
+      setTimeout(findNextSong, 0);
     });
   } else {
     console.log("finished!");
+    broadcast("update", {count: song_list.length, completed: song_list.length, details: "Finished"});
+    // reset for next scan
+    cnt = 0;
   }
 }
 
