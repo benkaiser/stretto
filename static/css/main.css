@@ -35,6 +35,14 @@ body{
   box-shadow: 0 0 30px #ccc;
   padding-top: 2px;
 }
+.disable_selection{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
 .song_table{
   table-layout: fixed;
 }
@@ -43,6 +51,10 @@ body{
   line-height: 40px;
   vertical-align: middle;
   overflow: hidden;
+  white-space: nowrap;
+}
+.song_table tbody > tr > td .unkown_cover {
+  vertical-align: top;
 }
 tr:hover{
   background-color: #eeeeee;
@@ -54,10 +66,12 @@ tr:hover .options{
   display: inline-block;
 }
 .options{
-  float: right;
-  margin-right: 10px;
-  margin-top: 17px;
   display: none;
+}
+.option_div{
+  float: right;
+  vertical-align: middle;
+  margin-right: 10px;
 }
 .options:hover{
   color: #4BF;
