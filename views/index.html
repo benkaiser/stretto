@@ -9,7 +9,7 @@
   <div id='content'>
   </div>
 </div>
-<div id='bottom_bar'>
+<div id='bottom_bar' class='disable_selection'>
   <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
   <div id="current_info">&nbsp;</div>
   <div class="controls">
@@ -27,7 +27,7 @@
 {% raw %}
 <script type="text/swig" id='sidebar_template'>
   <h3>{{title}}</h3>
-  <ul class="nav">
+  <ul class="nav disable_selection">
     {% for playlist in playlists %}
       <li><a href="#playlist/{{playlist.attributes._id}}">{{playlist.attributes.title}}</a></li>
     {% endfor %}
@@ -38,30 +38,32 @@
 </script>
 <script type='text/swig' id='song_template'>
   <h1>Music</h1>
-  <table class='table song_table'>
+  <table class='table song_table disable_selection'>
     <thead>
       <th class='title_th'>Title</th>
       <th class='artist_th'>Artist</th>
       <th class='album_th'>Album</th>
     </thead>
     <tbody class='song_body'>
-    {% for song in songs %}
-      <tr id="{{song.attributes._id}}">
-        <td>
-          {% if song.attributes.no_cover %}
-            <i class='fa fa-question unkown_cover'></i>
-          {% else %}
-            <img class='cover' src='/cover/{{song.attributes._id}}'/>
-          {% endif %}
-          {{song.attributes.title}}
-          <i class='fa fa-caret-square-o-down options'></i>
-        </td>
-        <td>{{song.attributes.artist}}</td>
-        <td>{{song.attributes.album}}</td>
-      </tr>
-    {% endfor %}
     </tbody>
   </table>
+</script>
+<script type='text/swig' id='song_item'>
+<tr id="{{song.attributes._id}}">
+<td>
+  <div class='option_div'>
+    <i class='fa fa-caret-square-o-down options'></i>
+  </div>
+  {% if song.attributes.no_cover %}
+    <i class='fa fa-question unkown_cover'></i>
+  {% else %}
+    <img class='cover' src='/cover/{{song.attributes._id}}'/>
+  {% endif %}
+  <span class='song_text'>{{song.attributes.title}}</span>
+</td>
+<td>{{song.attributes.artist}}</td>
+<td>{{song.attributes.album}}</td>
+</tr>
 </script>
 <script type="text/swig" id="current_info_template">
   {% if attributes.no_cover %}
@@ -100,6 +102,7 @@
     "/static/js/libs/swig.min.js",
     "/static/js/libs/tablesort.min.js",
     "/static/js/libs/bootbox.min.js",
+    "/static/js/libs/coverbox.js",
     "/static/js/home.js"
     );
 </script>

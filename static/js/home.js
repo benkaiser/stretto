@@ -74,7 +74,7 @@ function PlayState(){
   this.fade_track = document.getElementById("fade_track");
   this.scrub = null;
   this.init = function(){
-    setInterval(function(){ player.update() }, 20);
+    setInterval(function(){ player.update() }, 50);
     $(this.names.playpause).click(function(){ player.togglePlayState() });
     $(this.names.next).click(function(){ player.nextTrack() });
     $(this.names.prev).click(function(){ player.prevTrack() });
@@ -286,10 +286,17 @@ SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
     this.$el.html(render(this.template, {songs: player.songs}));
+    $(window).scroll(function(){
+      MusicApp.router.songview.checkScroll();
+    });
+    this.songIndex = 0;
+    this.renderSong();
   },
   events: {
     "click tr": "triggerSong",
-    "click .options": "triggerOptions"
+    "click .options": "triggerOptions",
+    "contextmenu td": "triggerOptions",
+    "click .cover": "triggerCover"
   },
   triggerSong: function(ev){
     if($(ev.target).hasClass("options")){
@@ -303,8 +310,40 @@ SongView = Backbone.View.extend({
     id = $(ev.target).closest("tr").attr('id');
     player.selectedItem = id;
     createOptions(ev.clientX, ev.clientY);
+    return false;
+  },
+  triggerCover: function(ev){
+    id = $(ev.target).closest("tr").attr('id');
+    showCover(id);
+    return false;
+  },
+  renderSong: function(){
+    if(this.songIndex < player.songs.length){
+      console.log(player.songs[this.songIndex]);
+      item = render("#song_item", { song: player.songs[this.songIndex], index: this.songIndex} );
+      this.$el.find(".song_body").append(item);
+      this.songIndex++;
+      if(this.songIndex % 50 != 0){
+        // stop after 50 songs
+        setTimeout(function(){
+          MusicApp.router.songview.renderSong();
+        }, 0);
+      }
+    }
+  },
+  checkScroll: function(){
+    var scroll = $(window).scrollTop();
+    var height = $(document).height();
+    if((scroll / height) > 0.5){
+      this.renderSong();
+    }
   }
 });
+
+function showCover(id){
+  box = new CoverBox("/cover/" + id);
+  box.activate();
+}
 
 function createOptions(x, y){
   $(".options_container").html(render("#options_template", {
