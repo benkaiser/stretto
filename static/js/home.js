@@ -323,8 +323,7 @@ SongView = Backbone.View.extend({
     return false;
   },
   triggerCover: function(ev){
-    id = $(ev.target).closest("tr").attr('id');
-    showCover(id);
+    showCover($(ev.target).attr('src'));
     return false;
   },
   renderSong: function(){
@@ -349,8 +348,8 @@ SongView = Backbone.View.extend({
   }
 });
 
-function showCover(id){
-  box = new CoverBox("/cover/" + id);
+function showCover(src){
+  box = new CoverBox(src);
   box.activate();
 }
 
@@ -393,6 +392,13 @@ InfoView = Backbone.View.extend({
   template: "#current_info_template",
   render: function(){
     this.$el.html(render(this.template, player.current_song));
+  },
+  events: {
+    "click .info_cover": "triggerCover"
+  },
+  triggerCover: function(ev){
+    showCover($(ev.target).attr('src'));
+    return false;
   }
 });
 

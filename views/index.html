@@ -68,10 +68,10 @@
 </tr>
 </script>
 <script type="text/swig" id="current_info_template">
-  {% if attributes.no_cover %}
-    <i class='fa fa-question info_unknown_cover'></i>
-  {% else %}
+  {% if attributes.hasOwnProperty('cover_location') %}
     <img class='info_cover' src='/cover/{{attributes._id}}'/>
+  {% else %}
+    <i class='fa fa-question info_unknown_cover'></i>
   {% endif %}
   <p class="info_title">{{attributes.title}}</p>
   <p class="info_detail">{{attributes.artist}} - {{attributes.album}}</p>
