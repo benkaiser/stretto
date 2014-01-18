@@ -83,6 +83,7 @@ function PlayState(){
     this.current_src = $("#current_src");
     this.fade_src = $("#fade_src");
     this.current_track.addEventListener('ended', function(){ player.nextTrack() });
+    this.current_track.addEventListener('durationchange', function(){ player.durationChanged() });
   }
   this.setupCollections = function(){
     this.song_collection = new SongCollection();
@@ -93,6 +94,8 @@ function PlayState(){
   this.update = function(){
     if(this.is_playing && !this.isSeeking){
       this.scrub.slider('setValue', this.current_track.currentTime / this.current_track.duration * 100.0);
+      var seconds = prettyPrintSeconds(this.current_track.currentTime);
+      $(".current_time").html(seconds);
     }
   }
   this.findSongIndex = function(id){
@@ -101,6 +104,10 @@ function PlayState(){
         return i;
       }
     }
+  }
+  this.durationChanged = function(){
+    var seconds = prettyPrintSeconds(this.current_track.duration);
+    $(".duration").html(seconds);
   }
   this.playSong = function(id){
     this.current_index = this.findSongIndex(id);
@@ -192,12 +199,15 @@ function PlayState(){
     }
     this.d.scrubTimeout = setTimeout(function(){ player.scrubTo() }, 1000);
     this.isSeeking = true;
+    // update the time to show the current scrub value
+    var seconds = prettyPrintSeconds(this.current_track.duration * this.scrub.slider('getValue') / 100.00);
+    $(".current_time").html(seconds);
   }
   this.scrubTo = function(){
     clearTimeout(this.d.scrubTimeout);
     this.isSeeking = false;
-    value = this.scrub.slider('getValue');
-    length = this.current_track.duration;
+    var value = this.scrub.slider('getValue');
+    var length = this.current_track.duration;
     this.current_track.currentTime = length * value / 100.00;
   }
 }
@@ -413,4 +423,11 @@ function arraysEqual(a, b) {
     if (a[i] !== b[i]) return false;
   }
   return true;
+}
+
+function prettyPrintSeconds(seconds){
+  var pretty = "";
+  pretty += (seconds > 60) ? Math.floor(seconds/60) + ":" : "0:";
+  pretty += ("0" + Math.floor(seconds % 60)).slice(-2);
+  return pretty;
 }

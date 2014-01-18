@@ -35,6 +35,38 @@ body{
   box-shadow: 0 0 30px #ccc;
   padding-top: 2px;
 }
+.duration{
+  position: fixed;
+  right: 0;
+  bottom: 48px;
+  display: none;
+}
+#bottom_bar:hover .duration{
+  display: block;
+  background-color: #4BF;
+  z-index: 2;
+  padding: 2px;
+  padding-left: 5px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  color: #fff;
+}
+.current_time{
+  position: fixed;
+  left: 0;
+  bottom: 48px;
+  display: none;
+}
+#bottom_bar:hover .current_time{
+  display: block;
+  background-color: #4BF;
+  z-index: 2;
+  padding: 2px;
+  padding-right: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  color: #fff;
+}
 .disable_selection{
   -webkit-touch-callout: none;
   -webkit-user-select: none;
