@@ -54,10 +54,10 @@
   <div class='option_div'>
     <i class='fa fa-caret-square-o-down options'></i>
   </div>
-  {% if song.attributes.no_cover %}
-    <i class='fa fa-question unkown_cover'></i>
-  {% else %}
+  {% if song.attributes.hasOwnProperty('cover_location') %}
     <img class='cover' src='/cover/{{song.attributes._id}}'/>
+  {% else %}
+    <i class='fa fa-question unkown_cover'></i>
   {% endif %}
   <span class='song_text'>{{song.attributes.title}}</span>
 </td>

@@ -50,13 +50,6 @@ function sendCover(req, res){
 function returnSongs(req){
   app.db.songs.find({}, function(err, docs){
     if(!err){
-      for(var i = 0; i < docs.length; i++){
-        if(!docs[i].hasOwnProperty("cover_location")){
-          docs[i].no_cover = true;
-        } else {
-          docs[i].no_cover = false;
-        }
-      }
       req.io.emit('songs', {"songs": docs});
     }
   });

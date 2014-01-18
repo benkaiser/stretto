@@ -319,7 +319,6 @@ SongView = Backbone.View.extend({
   },
   renderSong: function(){
     if(this.songIndex < player.songs.length){
-      console.log(player.songs[this.songIndex]);
       item = render("#song_item", { song: player.songs[this.songIndex], index: this.songIndex} );
       this.$el.find(".song_body").append(item);
       this.songIndex++;
