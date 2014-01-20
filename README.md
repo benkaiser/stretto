@@ -2,7 +2,7 @@ Node Music Player
 =================
 #### An open source web-based music player
 
-![alt tag](http://picpaste.com/pics/murdoch-results1-U5mB2gGm.1390047919.png)
+![alt tag](http://kaiserapps.com/links/node-music-player.png)
 
 ### How does it work?
 Run it on your computer or server containing your music library and then access it through `<ip of computer>:2000`, for example if you run it on your local computer you would use `localhost:2000`.
