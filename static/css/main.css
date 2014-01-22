@@ -3,6 +3,9 @@ body, html{
 body{
   padding-top: 32px;
 }
+#wrapper:focus{
+  outline: 0;
+}
 #content{
   margin-left: 200px;
   padding: 20px;
@@ -34,6 +37,9 @@ body{
   background-color: white;
   box-shadow: 0 0 30px #ccc;
   padding-top: 2px;
+}
+#bottom_bar:focus{
+  outline: 0;
 }
 .duration{
   position: fixed;

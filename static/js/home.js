@@ -238,7 +238,7 @@ socket.on('playlists', function(data){
 // jquery initialiser
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
-  $("#wrapper").keydown(function(event){
+  $("#wrapper, #bottom_bar").keydown(function(event){
     switch(event.which){
       case 32:
         player.togglePlayState();
