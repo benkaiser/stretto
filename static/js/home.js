@@ -340,9 +340,9 @@ SongView = Backbone.View.extend({
     }
   },
   checkScroll: function(){
-    var scroll = $(window).scrollTop();
+    var scroll = $(window).scrollTop() + $(window).height();
     var height = $(document).height();
-    if((scroll / height) > 0.5){
+    if((scroll / height) > 0.8){
       this.renderSong();
     }
   }
@@ -437,3 +437,12 @@ function prettyPrintSeconds(seconds){
   pretty += ("0" + Math.floor(seconds % 60)).slice(-2);
   return pretty;
 }
+function prettyPrintSecondsorNA(seconds){
+  if(seconds == 0){
+    return "N/A";
+  } else {
+    return prettyPrintSeconds(seconds);
+  }
+}
+// make it usable in swig
+swig.setFilter('prettyPrintSeconds', prettyPrintSecondsorNA);

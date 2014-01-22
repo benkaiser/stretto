@@ -22,3 +22,13 @@ $("#start_scan").click(function(){
   }
   on = !on;
 });
+$("#start_scan_hard").click(function(){
+  if(on){
+    socket.emit('stop_scan');
+    $(this).text("Hard Scan (recheck all songs)");
+  } else {
+    socket.emit('start_scan_hard');
+    $(this).text("Stop Hard Scan");
+  }
+  on = !on;
+});

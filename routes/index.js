@@ -15,7 +15,8 @@ exports.createRoutes = function(app_ref){
   app.get('/cover/:id', sendCover);
   app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
   app.io.route('player_page_connected', function(req){ req.io.join('players'); });
-  app.io.route('start_scan', function(req){ lib_func.scanLibrary(app); });
+  app.io.route('start_scan', function(req){ lib_func.scanLibrary(app, false); });
+  app.io.route('start_scan_hard', function(req){ lib_func.scanLibrary(app, true); });
   app.io.route('stop_scan', function(req){ lib_func.stopScan(app); });
   app.io.route('fetch_songs', returnSongs);
   app.io.route('fetch_playlists', returnPlaylists);
@@ -32,6 +33,7 @@ function sendSong(req, res){
     if(err || !song){
       res.status(404).send();
     } else {
+      console.log(song.location);
       res.sendfile(song.location, {'root': '/'});
     }
   });

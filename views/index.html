@@ -45,6 +45,7 @@
       <th class='title_th'>Title</th>
       <th class='artist_th'>Artist</th>
       <th class='album_th'>Album</th>
+      <th class='duration'><i class="fa fa-clock-o"></i></th>
     </thead>
     <tbody class='song_body'>
     </tbody>
@@ -65,6 +66,7 @@
 </td>
 <td>{{song.attributes.artist}}</td>
 <td>{{song.attributes.album}}</td>
+<td>{{song.attributes.duration|prettyPrintSeconds}}</td>
 </tr>
 </script>
 <script type="text/swig" id="current_info_template">

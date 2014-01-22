@@ -6,6 +6,7 @@ var util = require(__dirname + '/util.js');
 var config = require(__dirname + '/config').config();
 
 var running = false;
+var hard_rescan = false;
 var app = null;
 var cnt = 0;
 var song_list = [];
@@ -25,9 +26,9 @@ function findNextSong(){
 }
 
 function findSong(item, callback){
-  console.log("looking for item...");
   app.db.songs.findOne({location: item}, function(err, doc){
-    if(doc == null){
+    // only scan if we haven't scanned before, or we are scanning every document again
+    if(doc == null || hard_rescan){
       // insert the new song
       var parser = new mm(fs.createReadStream(item));
 
@@ -40,6 +41,7 @@ function findSong(item, callback){
           albumartist: result.albumartist,
           genre: result.genre,
           year: result.year,
+          duration: result.duration,
           location: item
         };
         // write the cover photo as an md5 string
@@ -56,15 +58,25 @@ function findSong(item, callback){
             }
           })
         }
-        // insert the song
-        app.db.songs.insert(song, function (err, newDocs){
-          // update the browser the song has been added
-          broadcast("update", {
-            count: song_list.length,
-            completed: cnt,
-            details: "Added: " + newDocs["title"] + " - " + newDocs["albumartist"]
+        if(doc == null){
+          // insert the song
+          app.db.songs.insert(song, function (err, newDoc){
+            // update the browser the song has been added
+            broadcast("update", {
+              count: song_list.length,
+              completed: cnt,
+              details: "Added: " + newDoc["title"] + " - " + newDoc["albumartist"]
+            });
           });
-        });
+        } else if (hard_rescan){
+          app.db.songs.update({location: item}, song, {}, function(err, numRplaced){
+            broadcast("update", {
+              count: song_list.length,
+              completed: cnt,
+              details: "Updated: " + song["title"] + " - " + song["artist"]
+            });
+          })
+        }
       });
 
       parser.on('done', function (err) {
@@ -80,8 +92,9 @@ function findSong(item, callback){
   })
 }
 
-exports.scanLibrary = function(app_ref){
+exports.scanLibrary = function(app_ref, hard){
   app = app_ref;
+  hard_rescan = hard;
   util.walk(config.music_dir, function(err, list){
     if(err){
       console.log(err);
