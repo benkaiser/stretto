@@ -33,7 +33,6 @@ function sendSong(req, res){
     if(err || !song){
       res.status(404).send();
     } else {
-      console.log(song.location);
       res.sendfile(song.location, {'root': '/'});
     }
   });
