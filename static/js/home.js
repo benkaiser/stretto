@@ -301,6 +301,7 @@ SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
     this.$el.html(render(this.template, {title: player.playlist.title, songs: player.songs}));
+    this.$el.addClass("custom_scrollbar");
     // add scroll event handler
     MusicApp.getRegion("contentRegion").$el.scroll(function(){
       MusicApp.router.songview.checkScroll();
@@ -337,16 +338,18 @@ SongView = Backbone.View.extend({
     return false;
   },
   renderSong: function(){
+    var batch = 50;
+
     if(this.songIndex < player.songs.length){
-      item = render("#song_item", { song: player.songs[this.songIndex], index: this.songIndex} );
-      this.$el.find(".song_body").append(item);
-      this.songIndex++;
-      if(this.songIndex % 50 != 0){
-        // stop after 50 songs
-        setTimeout(function(){
-          MusicApp.router.songview.renderSong();
-        }, 0);
+      var item = "";
+      for(i = 0; i < batch; i++){
+        item += render("#song_item", { song: player.songs[this.songIndex], index: this.songIndex} );
+        this.songIndex++;
+        if(this.songIndex == player.songs.length){
+          break;
+        }
       }
+      this.$el.find(".song_body").append(item);
     }
   },
   checkScroll: function(){
