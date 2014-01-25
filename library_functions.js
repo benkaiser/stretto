@@ -30,7 +30,7 @@ function findSong(item, callback){
     // only scan if we haven't scanned before, or we are scanning every document again
     if(doc == null || hard_rescan){
       // insert the new song
-      var parser = new mm(fs.createReadStream(item));
+      var parser = new mm(fs.createReadStream(item), { duration: true });
 
       parser.on('metadata', function(result){
         // add the location
