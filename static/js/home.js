@@ -2,6 +2,9 @@
 var socket = io.connect('http://'+window.location.hostname+':2000');
 
 var PlaylistCollection = Backbone.Collection.extend({
+  comparator: function(playlist){
+    return [playlist.get("editable"), playlist.get('title')];
+  },
   fetch: function(options){
     socket.emit('fetch_playlists');
   },
@@ -238,7 +241,7 @@ socket.on('playlists', function(data){
 // jquery initialiser
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
-  $("#wrapper, #bottom_bar").keydown(function(event){
+  $("#wrapper").keydown(function(event){
     switch(event.which){
       case 32:
         player.togglePlayState();
@@ -254,6 +257,8 @@ $(document).ready(function(){
         break;
     }
   });
+  // disable the options on scroll
+  $("#content").scroll(hideOptions);
 });
 
 // backbone app
@@ -295,15 +300,16 @@ MusicApp.addInitializer(function(options){
 SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
-    this.$el.html(render(this.template, {songs: player.songs}));
-    $(window).scroll(function(){
+    this.$el.html(render(this.template, {title: player.playlist.title, songs: player.songs}));
+    // add scroll event handler
+    MusicApp.getRegion("contentRegion").$el.scroll(function(){
       MusicApp.router.songview.checkScroll();
     });
     this.songIndex = 0;
     this.renderSong();
   },
   events: {
-    "click tr": "triggerSong",
+    "click tbody > tr": "triggerSong",
     "click .options": "triggerOptions",
     "contextmenu td": "triggerOptions",
     "click .cover": "triggerCover"
@@ -317,9 +323,13 @@ SongView = Backbone.View.extend({
     player.playSong(id);
   },
   triggerOptions: function(ev){
-    id = $(ev.target).closest("tr").attr('id');
-    player.selectedItem = id;
-    createOptions(ev.clientX, ev.clientY);
+    if(!optionsVisible){
+      id = $(ev.target).closest("tr").attr('id');
+      player.selectedItem = id;
+      createOptions(ev.clientX, ev.clientY);
+    } else {
+      hideOptions();
+    }
     return false;
   },
   triggerCover: function(ev){
@@ -340,8 +350,8 @@ SongView = Backbone.View.extend({
     }
   },
   checkScroll: function(){
-    var scroll = $(window).scrollTop() + $(window).height();
-    var height = $(document).height();
+    var scroll = $("#content").scrollTop() + $("#content").height();
+    var height = $("#content > div > table").height();
     if((scroll / height) > 0.8){
       this.renderSong();
     }
@@ -353,6 +363,7 @@ function showCover(src){
   box.activate();
 }
 
+var optionsVisible = false;
 function createOptions(x, y){
   $(".options_container").html(render("#options_template", {
       playlists: player.playlist_collection.models
@@ -363,18 +374,19 @@ function createOptions(x, y){
     socket.emit("add_to_playlist", {add: player.selectedItem, playlist: id});
     hideOptions();
   });
+  optionsVisible = true;
 }
-
 function hideOptions(){
   $(".options_container").css({"top:": "-1000px", "left": "-1000px"});
+  optionsVisible = false;
 }
-
-$(window).scroll(hideOptions);
 
 SidebarView = Backbone.View.extend({
   template: "#sidebar_template",
   render: function(){
-    this.$el.html(render(this.template, {"title": "Playlists", playlists: player.playlist_collection.models}));
+    var editable = player.playlist_collection.where({'editable': true});
+    var fixed = player.playlist_collection.where({'editable': false});
+    this.setElement(render(this.template, {"title": "Playlists", editable: editable, fixed: fixed}));
   },
   events: {
     "click .add_playlist": "addPlaylist"

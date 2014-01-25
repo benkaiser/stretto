@@ -6,21 +6,21 @@
 <div id="wrapper" tabindex="0">
   <div id='sidebar'>
   </div>
-  <div id='content'>
+  <div id='content' class="custom_scrollbar">
   </div>
-</div>
-<div id='bottom_bar' class='disable_selection' tabindex="1">
-  <div class='current_time'></div>
-  <div class='duration'></div>
-  <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
-  <div id="current_info">&nbsp;</div>
-  <div class="controls">
-    <i id="repeat" class="fa fa-retweet fa-3x blue"></i> <!-- Possible: fa-refresh -->
-    <span id="repeat_badge" class="badge hidden">1</span>
-    <i id="prev" class="fa fa-fast-backward fa-3x"></i>
-    <i id="playpause" class="fa fa-play fa-3x"></i>
-    <i id="next" class="fa fa-fast-forward fa-3x"></i>
-    <i id="shuffle" class="fa fa-random fa-3x"></i>
+  <div id='bottom_bar' class='disable_selection' tabindex="1">
+    <div class='current_time'></div>
+    <div class='duration'></div>
+    <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
+    <div id="current_info">&nbsp;</div>
+    <div class="controls">
+      <i id="repeat" class="fa fa-retweet fa-3x blue"></i> <!-- Possible: fa-refresh -->
+      <span id="repeat_badge" class="badge hidden">1</span>
+      <i id="prev" class="fa fa-fast-backward fa-3x"></i>
+      <i id="playpause" class="fa fa-play fa-3x"></i>
+      <i id="next" class="fa fa-fast-forward fa-3x"></i>
+      <i id="shuffle" class="fa fa-random fa-3x"></i>
+    </div>
   </div>
 </div>
 <audio id='current_track'><source id="current_src" type='audio/mpeg'></audio>
@@ -28,24 +28,31 @@
 <div class="options_container"></div>
 {% raw %}
 <script type="text/swig" id='sidebar_template'>
-  <h3>{{title}}</h3>
-  <ul class="nav disable_selection">
-    {% for playlist in playlists %}
-      <li><a href="#playlist/{{playlist.attributes._id}}">{{playlist.attributes.title}}</a></li>
-    {% endfor %}
-  </ul>
-  <div class='sidebar_controls'>
-  <button class='add_playlist btn btn-default'>Add Playlist</button>
+  <div id='sidebar_height_wrapper'>
+    <h3>{{title}}</h3>
+    <ul class="nav disable_selection custom_scrollbar">
+      {% if fixed %}<li class='dropdown-header'>Auto-Playlists</li>{% endif %}
+      {% for playlist in fixed %}
+        <li><a href="#playlist/{{playlist.attributes._id}}">{{playlist.attributes.title}}</a></li>
+      {% endfor %}
+      {% if fixed %}<li class='dropdown-header'>Playlists</li>{% endif %}
+      {% for playlist in editable %}
+        <li><a href="#playlist/{{playlist.attributes._id}}">{{playlist.attributes.title}}</a></li>
+      {% endfor %}
+    </ul>
+    <div class='sidebar_controls'>
+    <button class='add_playlist btn btn-default'>Add Playlist</button>
+    </div>
   </div>
 </script>
 <script type='text/swig' id='song_template'>
-  <h1>Music</h1>
+  <h1>{{title}}</h1>
   <table class='table song_table disable_selection'>
     <thead>
       <th class='title_th'>Title</th>
       <th class='artist_th'>Artist</th>
       <th class='album_th'>Album</th>
-      <th class='duration'><i class="fa fa-clock-o"></i></th>
+      <th class='duration_th'><i class="fa fa-clock-o"></i></th>
     </thead>
     <tbody class='song_body'>
     </tbody>
