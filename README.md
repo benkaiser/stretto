@@ -9,16 +9,14 @@ Run it on your computer or server containing your music library and then access 
 
 ### Installation Instructions
 ##### Dependencies
-[node](http://nodejs.org/), [git](http://git-scm.com/book/en/Getting-Started-Installing-Git)
+[node](http://nodejs.org/)
 
-Clone the repo and install the needed packages with the following commands:
+Install with the following commands:
 ```
-git clone git@github.com:benkaiser/node-music-player.git
-cd node-music-player
-npm install
-node server.js
+npm i https://github.com/benkaiser/node-music-player/archive/master.tar.gz
+cd node_modules/node-music-player/
 ```
-Edit the `condig.js` file and set `music_dir` to be the folder you want to be scanned for your music.
+Edit the `config.js` file and set `music_dir` to be the folder you want to be scanned for your music.
 
 Then run the server with:
 ```
