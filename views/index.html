@@ -28,7 +28,11 @@
 <div class="options_container"></div>
 {% raw %}
 <script type="text/swig" id='sidebar_template'>
-  <div id='sidebar_height_wrapper'>
+  <div id="sidebar_height_wrapper">
+    <div class="input-group input-group-sm">
+      <span class="input-group-addon"><i class='fa fa-search'></i></span>
+      <input type="text" class="form-control search-input" placeholder="Search">
+    </div>
     <h3>{{title}}</h3>
     <ul class="nav disable_selection custom_scrollbar">
       {% if fixed %}<li class='dropdown-header'>Auto-Playlists</li>{% endif %}

@@ -40,6 +40,10 @@ body{
   text-align: center;
   width: 100%;
 }
+#sidebar .input-group{
+  margin: 10px;
+  margin-bottom: 0;
+}
 #sidebar h3{
   padding-left: 10px;
 }

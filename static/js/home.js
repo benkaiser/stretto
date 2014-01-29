@@ -108,6 +108,36 @@ function PlayState(){
       }
     }
   }
+  this.searchItems = function(searchText){
+    if(searchText.length < 3){
+      return;
+    }
+    searchText = searchText.toLowerCase();
+    var tmpSongs = [];
+    for (var i = 0; i < this.song_collection.length; i++) {
+      var item = this.song_collection.models[i];
+      if(this.songMatches(item, searchText)){
+        tmpSongs.push(item);
+      }
+    }
+    this.songs = tmpSongs;
+    this.playlist = {
+      title: "Search Results for: '"+searchText+"'"
+    };
+    MusicApp.router.songview.render();
+    window.location.hash = '';
+  }
+  this.songMatches = function(item, searchText){
+    item = item.attributes;
+    if(
+      (item.title && item.title.toLowerCase().indexOf(searchText) != -1) ||
+      (item.album && item.album.toLowerCase().indexOf(searchText) != -1) ||
+      (item.artist && item.artist.length > 0 && item.artist[0].toLowerCase().indexOf(searchText) != -1)
+      ){
+      return true;
+    }
+    return false;
+  }
   this.durationChanged = function(){
     var seconds = prettyPrintSeconds(this.current_track.duration);
     $(".duration").html(seconds);
@@ -242,6 +272,9 @@ socket.on('playlists', function(data){
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
   $("#wrapper").keydown(function(event){
+    if(event.target.id != 'wrapper'){
+      return;
+    }
     switch(event.which){
       case 32:
         player.togglePlayState();
@@ -303,7 +336,7 @@ SongView = Backbone.View.extend({
     this.$el.html(render(this.template, {title: player.playlist.title, songs: player.songs}));
     this.$el.addClass("custom_scrollbar");
     // add scroll event handler
-    MusicApp.getRegion("contentRegion").$el.scroll(function(){
+    this.$el.scroll(function(){
       MusicApp.router.songview.checkScroll();
     });
     this.songIndex = 0;
@@ -353,8 +386,8 @@ SongView = Backbone.View.extend({
     }
   },
   checkScroll: function(){
-    var scroll = $("#content").scrollTop() + $("#content").height();
-    var height = $("#content > div > table").height();
+    var scroll = this.$el.scrollTop() + $("#content").height();
+    var height = this.$el.find("table").height();
     if((scroll / height) > 0.8){
       this.renderSong();
     }
@@ -392,7 +425,8 @@ SidebarView = Backbone.View.extend({
     this.setElement(render(this.template, {"title": "Playlists", editable: editable, fixed: fixed}));
   },
   events: {
-    "click .add_playlist": "addPlaylist"
+    "click .add_playlist": "addPlaylist",
+    "keyup .search-input": "searchItems"
   },
   addPlaylist: function(){
     bootbox.prompt("Playlist title?", function(result){
@@ -400,6 +434,11 @@ SidebarView = Backbone.View.extend({
         socket.emit('create_playlist', {"title": result, songs: []});
       }
     });
+  },
+  searchItems: function(){
+    searchText = $(".search-input").val();
+    player.searchItems(searchText);
+    return true;
   }
 });
 
