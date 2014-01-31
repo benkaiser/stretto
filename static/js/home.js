@@ -102,8 +102,8 @@ function PlayState(){
     }
   }
   this.findSongIndex = function(id){
-    for (var i = 0; i < this.songs.length; i++) {
-      if(id == this.songs[i].attributes._id){
+    for (var i = 0; i < this.queue_pool.length; i++) {
+      if(id == this.queue_pool[i].attributes._id){
         return i;
       }
     }
@@ -144,7 +144,7 @@ function PlayState(){
   }
   this.playSong = function(id){
     this.current_index = this.findSongIndex(id);
-    this.current_song = this.songs[this.current_index];
+    this.current_song = this.queue_pool[this.current_index];
     if(id == this.playing_id){
       return;
     } else {
@@ -208,17 +208,17 @@ function PlayState(){
       return;
     }
     var index = this.current_index+1;
-    if(index == this.songs.length){
+    if(index == this.queue_pool.length){
       index = 0;
     }
-    this.playSong(this.songs[index].attributes._id);
+    this.playSong(this.queue_pool[index].attributes._id);
   }
   this.prevTrack = function(){
     var index = this.current_index-1;
     if(index == -1){
-      index = this.songs.length-1;
+      index = this.queue_pool.length-1;
     }
-    this.playSong(this.songs[index].attributes._id);
+    this.playSong(this.queue_pool[index].attributes._id);
   }
   this.setScubElem = function(elem){
     this.scrub = elem;
@@ -353,7 +353,7 @@ SongView = Backbone.View.extend({
       return;
     }
     id = $(ev.target).closest("tr").attr('id');
-    player.queue_pool = player.songs;
+    player.queue_pool = player.songs.slice(0);
     player.playSong(id);
   },
   triggerOptions: function(ev){
