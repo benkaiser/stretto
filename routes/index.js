@@ -33,7 +33,7 @@ function sendSong(req, res){
     if(err || !song){
       res.status(404).send();
     } else {
-      res.sendfile(encodeURIComponent(song.location), {'root': '/'});
+      res.sendfile(encodeURIComponent(song.location));
     }
   });
 }
@@ -43,7 +43,7 @@ function sendCover(req, res){
     if(!song || !song.hasOwnProperty("cover_location")){
       res.sendfile("/static/images/unknown.png", {root: __dirname + "/../"});
     } else {
-      res.sendfile(song.cover_location, {'root': '/'});
+      res.sendfile(song.cover_location);
     }
   });
 }
