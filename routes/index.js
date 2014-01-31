@@ -1,6 +1,9 @@
 var util = require(__dirname + '/../util.js');
 var lib_func = require(__dirname + '/../library_functions.js');
 var config = require(__dirname + '/../config').config();
+var async = require('async');
+var AdmZip = require('adm-zip');
+var os = require('os');
 /*
  * GET home page.
  */
@@ -13,6 +16,7 @@ exports.createRoutes = function(app_ref){
   app.get('/scan', scanRoute);
   app.get('/songs/:id', sendSong);
   app.get('/cover/:id', sendCover);
+  app.get('/downloadplaylist/:id', downloadPlaylist);
   app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
   app.io.route('player_page_connected', function(req){ req.io.join('players'); });
   app.io.route('start_scan', function(req){ lib_func.scanLibrary(app, false); });
@@ -46,6 +50,26 @@ function sendCover(req, res){
     } else {
       res.sendfile(song.cover_location);
     }
+  });
+}
+
+function downloadPlaylist(req, res){
+  app.db.playlists.findOne({_id: req.params.id}, function(err, playlist){
+    if(err) throw err;
+    // create zip
+    var filename = os.tmpdir() + '/download.zip';
+    var zip = new AdmZip();
+    async.forEach(playlist.songs, function(item, callback){
+      app.db.songs.findOne({_id: item._id}, function(err, song){
+        if(err) throw err;
+        //song.location.replace(config.music_dir, '')
+        zip.addLocalFile(song.location);
+        callback();
+      });
+    }, function(err){
+      zip.writeZip(filename);
+      res.download(filename, 'download.zip');
+    });
   });
 }
 

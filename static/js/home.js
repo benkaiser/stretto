@@ -125,7 +125,8 @@ function PlayState(){
     }
     this.songs = tmpSongs;
     this.playlist = {
-      title: "Search Results for: '"+searchText+"'"
+      title: "Search Results for: '"+searchText+"'",
+      editable: false
     };
     MusicApp.router.songview.render();
     window.location.hash = '';
@@ -336,7 +337,12 @@ MusicApp.addInitializer(function(options){
 SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
-    this.$el.html(render(this.template, {title: player.playlist.title, songs: player.songs}));
+    this.$el.html(render(this.template, {
+      title: player.playlist.title, 
+      editable: player.playlist.editable,
+      _id: player.playlist._id,
+      songs: player.songs
+    }));
     this.$el.addClass("custom_scrollbar");
     // add scroll event handler
     this.$el.scroll(function(){

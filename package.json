@@ -10,6 +10,8 @@
     "swig": "*",
     "musicmetadata": "*",
     "nedb": "*",
-    "MD5": "*"
+    "MD5": "*",
+    "async": "*",
+    "adm-zip": "*"
   }
 }

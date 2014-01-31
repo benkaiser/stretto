@@ -51,6 +51,9 @@
 </script>
 <script type='text/swig' id='song_template'>
   <h1>{{title}}</h1>
+  {% if editable %}
+    <a class='download_playlist btn btn-default btn-sm' target='_blank' href='/downloadplaylist/{{_id}}'>Download Playlist</a>
+  {% endif %}
   <table class='table song_table disable_selection'>
     <thead>
       <th class='title_th'>Title</th>
