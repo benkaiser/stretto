@@ -63,6 +63,8 @@ function PlayState(){
     one: 1,
     none: 2
   };
+  // search info
+  this.searchText = ""
   // currently viewed songs
   this.songs = [];
   // current pool of songs to play
@@ -109,6 +111,7 @@ function PlayState(){
     }
   }
   this.searchItems = function(searchText){
+    this.searchText = searchText;
     if(searchText.length < 3){
       return;
     }
@@ -359,8 +362,7 @@ SongView = Backbone.View.extend({
   triggerOptions: function(ev){
     if(!optionsVisible){
       id = $(ev.target).closest("tr").attr('id');
-      player.selectedItem = id;
-      createOptions(ev.clientX, ev.clientY);
+      createOptions(ev.clientX, ev.clientY, id);
     } else {
       hideOptions();
     }
@@ -400,14 +402,23 @@ function showCover(src){
 }
 
 var optionsVisible = false;
-function createOptions(x, y){
+var optionsItem = "";
+function createOptions(x, y, id){
+  optionsItem = id;
   $(".options_container").html(render("#options_template", {
-      playlists: player.playlist_collection.models
+      playlists: player.playlist_collection.models,
+      current_playlist: player.playlist
     }))
     .css({"top": y+"px", "left": x+"px"});
   $(".add_to_playlist").click(function(ev){
     id = $(ev.target).closest("li").attr('id');
-    socket.emit("add_to_playlist", {add: player.selectedItem, playlist: id});
+    socket.emit("add_to_playlist", {add: optionsItem, playlist: id});
+    hideOptions();
+  });
+  $(".remove_from_playlist").click(function(ev){
+    id = $(ev.target).closest("li").attr('id');
+    $("#"+optionsItem).remove();
+    socket.emit("remove_from_playlist", {remove: optionsItem, playlist: id});
     hideOptions();
   });
   optionsVisible = true;
@@ -422,7 +433,7 @@ SidebarView = Backbone.View.extend({
   render: function(){
     var editable = player.playlist_collection.where({'editable': true});
     var fixed = player.playlist_collection.where({'editable': false});
-    this.setElement(render(this.template, {"title": "Playlists", editable: editable, fixed: fixed}));
+    this.setElement(render(this.template, {"title": "Playlists", search: player.searchText, editable: editable, fixed: fixed}));
   },
   events: {
     "click .add_playlist": "addPlaylist",

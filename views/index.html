@@ -31,7 +31,7 @@
   <div id="sidebar_height_wrapper">
     <div class="input-group input-group-sm">
       <span class="input-group-addon"><i class='fa fa-search'></i></span>
-      <input type="text" class="form-control search-input" placeholder="Search">
+      <input type="text" class="form-control search-input" placeholder="Search" value="{{search}}">
     </div>
     <h3>{{title}}</h3>
     <ul class="nav disable_selection custom_scrollbar">
@@ -92,7 +92,10 @@
 <script type="text/swig" id="options_template">
 <div class="dropdown open">
   <ul class="dropdown-menu" role="menu">
-    <li><a>Play Next</a></li>
+    <li class='play_next'><a>Play Next</a></li>
+    {% if current_playlist.editable %}
+      <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
+    {% endif %}
     <li class="divider"></li>
     <li role="presentation" class="dropdown-header">Add to Playlist</li>
     {% for playlist in playlists %}

@@ -22,6 +22,7 @@ exports.createRoutes = function(app_ref){
   app.io.route('fetch_playlists', returnPlaylists);
   app.io.route('create_playlist', createPlaylist);
   app.io.route('add_to_playlist', addToPlaylist);
+  app.io.route('remove_from_playlist', removeFromPlaylist);
 };
 
 function musicRoute(req, res){
@@ -94,9 +95,37 @@ function createPlaylist(req){
 function addToPlaylist(req){
   add = req.data.add;
   to = req.data.playlist;
-  app.db.playlists.update({_id: to}, { $push:{songs: {_id: add}}}, function(){
-    req.io.route('fetch_playlists');
+  app.db.playlists.findOne({ _id: to}, function (err, doc) {
+    var found = false;
+    for(var i = 0; i < doc.songs.length; i++){
+      if(doc.songs[i]._id == add){
+        found = true;
+        break;
+      }
+    }
+    if(!found){
+      app.db.playlists.update({_id: to}, { $push:{songs: {_id: add}}}, function(){
+        req.io.route('fetch_playlists');
+      });
+    }
   });
+}
+
+function removeFromPlaylist(req){
+  remove = req.data.remove;
+  to = req.data.playlist;
+  app.db.playlists.findOne({ _id: to}, function (err, doc) {
+    var tmpSongs = [];
+    for(var i = 0; i < doc.songs.length; i++){
+      if(doc.songs[i]._id != remove){
+        tmpSongs.push(doc.songs[i]);
+      }
+    }
+    app.db.playlists.update({_id: to}, { $set:{songs: tmpSongs}}, function(){
+      req.io.route('fetch_playlists');
+    });
+  });
+  
 }
 
 function scanRoute(req, res){
