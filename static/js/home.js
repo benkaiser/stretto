@@ -211,18 +211,36 @@ function PlayState(){
       this.current_track.play();
       return;
     }
-    var index = this.current_index+1;
-    if(index == this.queue_pool.length){
-      index = 0;
+    var index = 0;
+    if(this.shuffle_state){
+      // the -2 is to take 1 off the length and 1 for the current track
+      // it then adds to the value if it is >= the current index.
+      // this ensures the same track is not played and the the new random
+      // track contains no bias
+      var index = randomIntFromInterval(0, this.queue_pool.length-2);
+      if(index >= this.current_index){
+        index++;
+      }
+    } else {
+      var index = this.current_index+1;
+      if(index == this.queue_pool.length){
+        index = 0;
+      }
     }
     this.playSong(this.queue_pool[index].attributes._id);
   }
   this.prevTrack = function(){
-    var index = this.current_index-1;
-    if(index == -1){
-      index = this.queue_pool.length-1;
+    if(this.current_track.currentTime > 5.00 || this.repeat_state == this.repeat_states.one){
+      this.current_track.currentTime = 0;
+      this.current_track.play();
+    } else {
+      // move to the previous song
+      var index = this.current_index-1;
+      if(index == -1){
+        index = this.queue_pool.length-1;
+      }
+      this.playSong(this.queue_pool[index].attributes._id);
     }
-    this.playSong(this.queue_pool[index].attributes._id);
   }
   this.setScubElem = function(elem){
     this.scrub = elem;
@@ -524,6 +542,10 @@ function prettyPrintSecondsorNA(seconds){
   } else {
     return prettyPrintSeconds(seconds);
   }
+}
+
+function randomIntFromInterval(min,max){
+  return Math.floor(Math.random()*(max-min+1)+min);
 }
 // make it usable in swig
 swig.setFilter('prettyPrintSeconds', prettyPrintSecondsorNA);
