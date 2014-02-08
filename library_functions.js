@@ -22,6 +22,7 @@ function findNextSong(){
     broadcast("update", {count: song_list.length, completed: song_list.length, details: "Finished"});
     // reset for next scan
     cnt = 0;
+    running = false;
   }
 }
 
@@ -90,6 +91,14 @@ function findSong(item, callback){
       callback(null);
     }
   })
+}
+
+exports.scanItem = function(app_ref, location){
+  app = app_ref;
+  hard_rescan = true;
+  running = true;
+  song_list.push(location);
+  findNextSong();
 }
 
 exports.scanLibrary = function(app_ref, hard){

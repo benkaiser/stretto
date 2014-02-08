@@ -140,6 +140,10 @@ tr:hover .options{
 .options:hover{
   color: #4BF;
 }
+.options-menu{
+  max-height: 300px;
+  overflow-y: scroll;
+}
 .cover{
   width: 40px;
   height: 40px;

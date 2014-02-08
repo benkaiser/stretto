@@ -410,10 +410,16 @@ function showCover(src){
 var optionsVisible = false;
 var optionsItem = "";
 function createOptions(x, y, id){
+  // calculate if the menu should 'drop up'
+  var dropup = "";
+  if(y+300 > $(window).height()){
+    dropup = "dropup"
+  }
   optionsItem = id;
   $(".options_container").html(render("#options_template", {
       playlists: player.playlist_collection.models,
-      current_playlist: player.playlist
+      current_playlist: player.playlist,
+      dropup: dropup
     }))
     .css({"top": y+"px", "left": x+"px"});
   $(".add_to_playlist").click(function(ev){
@@ -425,6 +431,10 @@ function createOptions(x, y, id){
     id = $(ev.target).closest("li").attr('id');
     $("#"+optionsItem).remove();
     socket.emit("remove_from_playlist", {remove: optionsItem, playlist: id});
+    hideOptions();
+  });
+  $(".hard_rescan").click(function(ev){
+    socket.emit("hard_rescan", {item: optionsItem});
     hideOptions();
   });
   optionsVisible = true;

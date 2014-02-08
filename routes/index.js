@@ -27,6 +27,7 @@ exports.createRoutes = function(app_ref){
   app.io.route('create_playlist', createPlaylist);
   app.io.route('add_to_playlist', addToPlaylist);
   app.io.route('remove_from_playlist', removeFromPlaylist);
+  app.io.route('hard_rescan', rescanItem);
 };
 
 function musicRoute(req, res){
@@ -149,7 +150,14 @@ function removeFromPlaylist(req){
       req.io.route('fetch_playlists');
     });
   });
-  
+}
+
+function rescanItem(req){
+  item = req.data.item;
+  app.db.songs.findOne({_id: item}, function(err, song){
+    if(!err && song)
+      lib_func.scanItem(app, song.location);
+  });
 }
 
 function scanRoute(req, res){
