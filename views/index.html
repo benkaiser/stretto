@@ -78,7 +78,7 @@
   {% endif %}
   <span class='song_text'>{{song.attributes.title}}</span>
 </td>
-<td>{{song.attributes.artist}}</td>
+<td>{{song.attributes.display_artist}}</td>
 <td>{{song.attributes.album}}</td>
 <td>{{song.attributes.duration|prettyPrintSeconds}}</td>
 </tr>
@@ -90,7 +90,7 @@
     <i class='fa fa-question info_unknown_cover'></i>
   {% endif %}
   <p class="info_title">{{attributes.title}}</p>
-  <p class="info_detail">{{attributes.artist}} - {{attributes.album}}</p>
+  <p class="info_detail">{{attributes.display_artist}} - {{attributes.album}}</p>
 </script>
 <script type="text/swig" id="options_template">
 <div class="dropdown open {{dropup}}">

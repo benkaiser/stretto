@@ -31,15 +31,16 @@ function findSong(item, callback){
     // only scan if we haven't scanned before, or we are scanning every document again
     if(doc == null || hard_rescan){
       // insert the new song
-      var parser = new mm(fs.createReadStream(item), { duration: true });
+      var parser = new mm(fs.createReadStream(item));
 
       parser.on('metadata', function(result){
         // add the location
-        song = {
+        var song = {
           title: result.title,
           album: result.album,
           artist: result.artist,
           albumartist: result.albumartist,
+          display_artist: normaliseArtist(result.albumartist, result.artist),
           genre: result.genre,
           year: result.year,
           duration: result.duration,
@@ -91,6 +92,24 @@ function findSong(item, callback){
       callback(null);
     }
   })
+}
+
+function normaliseArtist(albumartist, artist){
+  if(typeof(albumartist) != 'string'){
+    if(albumartist.length == 0){
+      albumartist = '';
+    } else {
+      albumartist = albumartist.join('/');
+    }
+  }
+  if(typeof(artist) != 'string'){
+    if(artist.length == 0){
+      artist = '';
+    } else {
+      artist = artist.join('/');
+    }
+  }
+  return (artist.length > albumartist.length) ? artist : albumartist;
 }
 
 exports.scanItem = function(app_ref, location){
