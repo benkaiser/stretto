@@ -128,7 +128,12 @@ function PlayState(){
       title: "Search Results for: '"+searchText+"'",
       editable: false
     };
-    MusicApp.router.songview.render();
+    if(MusicApp.router.songview){
+      MusicApp.router.songview.render();
+    } else {
+      MusicApp.router.songview = new SongView();
+      MusicApp.contentRegion.show(MusicApp.router.songview);
+    }
     window.location.hash = '';
   }
   this.songMatches = function(item, searchText){
