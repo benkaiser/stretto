@@ -136,13 +136,18 @@ function PlayState(){
     }
     window.location.hash = '';
   }
+  // note: this is a very expensive method of searching
+  // it is used to match each term in the search against the title, album and artist
   this.songMatches = function(item, searchText){
     item = item.attributes;
-    if(
-      (item.title && item.title.toLowerCase().indexOf(searchText) != -1) ||
-      (item.album && item.album.toLowerCase().indexOf(searchText) != -1) ||
-      (item.artist && item.artist.length > 0 && item.artist[0].toLowerCase().indexOf(searchText) != -1)
-      ){
+    if(!item.searchString){
+      item.searchString = "";
+      item.searchString += (item.title) ? item.title.toLowerCase() : "";
+      item.searchString += (item.album) ? item.album.toLowerCase() : "";
+      item.searchString += (item.display_artist) ? item.display_artist.toLowerCase() : "";
+    }
+    var searchTextParts = searchText.split(/[ ]+/);
+    if(searchMatchesSong(item.searchString, searchTextParts)){
       return true;
     }
     return false;
@@ -547,6 +552,15 @@ function prettyPrintSecondsorNA(seconds){
   } else {
     return prettyPrintSeconds(seconds);
   }
+}
+
+function searchMatchesSong(songString, searchWords){
+  for(var i = 0; i < searchWords.length; i++){
+    if(songString.indexOf(searchWords[i]) == -1){
+      return false;
+    }
+  }
+  return true;
 }
 
 function randomIntFromInterval(min,max){
