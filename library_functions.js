@@ -1,5 +1,6 @@
 var fs = require('fs');
 var mm = require('musicmetadata');
+var taglib = require('taglib');
 var md5 = require('MD5');
 
 var util = require(__dirname + '/util.js');
@@ -63,6 +64,7 @@ function findSong(item, callback){
         if(doc == null){
           // insert the song
           app.db.songs.insert(song, function (err, newDoc){
+            taglib_fetch(item, newDoc._id);
             // update the browser the song has been added
             broadcast("update", {
               count: song_list.length,
@@ -72,6 +74,7 @@ function findSong(item, callback){
           });
         } else if (hard_rescan){
           app.db.songs.update({location: item}, song, {}, function(err, numRplaced){
+            taglib_fetch(item, doc._id);
             broadcast("update", {
               count: song_list.length,
               completed: cnt,
@@ -110,6 +113,13 @@ function normaliseArtist(albumartist, artist){
     }
   }
   return (artist.length > albumartist.length) ? artist : albumartist;
+}
+
+function taglib_fetch(path, id){
+  // use taglib to fetch duration
+  taglib.read(path, function(err, tag, audioProperties) {
+    app.db.songs.update({ _id: id }, { $set: { duration: audioProperties.length} });
+  });
 }
 
 exports.scanItem = function(app_ref, location){
