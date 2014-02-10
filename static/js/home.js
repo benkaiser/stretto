@@ -89,6 +89,10 @@ function PlayState(){
     this.fade_src = $("#fade_src");
     this.current_track.addEventListener('ended', function(){ player.nextTrack() });
     this.current_track.addEventListener('durationchange', function(){ player.durationChanged() });
+    this.shuffle_state = localStorage.getItem('shuffle') || false;
+    this.redrawShuffle();
+    this.repeat_state = localStorage.getItem('repeat') || this.repeat_states.all;
+    this.redrawRepeat();
   }
   this.setupCollections = function(){
     this.song_collection = new SongCollection();
@@ -196,7 +200,13 @@ function PlayState(){
     this.setIsPlaying(!this.is_playing);
   }
   this.toggleShuffle = function(){
+    // toggle and save the value
     this.shuffle_state = !this.shuffle_state;
+    localStorage.setItem('shuffle', this.shuffle_state);
+    this.redrawShuffle();
+  }
+  this.redrawShuffle = function(){
+    // change the dom
     if(this.shuffle_state){
       $(this.names.shuffle).addClass('blue');
     } else {
@@ -204,9 +214,12 @@ function PlayState(){
     }
   }
   this.toggleRepeat = function(){
-    // change the state
+    // change the state and save the value
     this.repeat_state = (this.repeat_state+1)%3;
-    // reset the look
+    localStorage.setItem('repeat', this.repeat_state);
+    this.redrawRepeat();
+  }
+  this.redrawRepeat = function(){
     $(this.names.repeat).addClass("blue");
     $(this.names.repeat_badge).addClass("hidden");
     if(this.repeat_state == this.repeat_states.one){
