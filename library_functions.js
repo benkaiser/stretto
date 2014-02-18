@@ -23,6 +23,7 @@ function findNextSong(){
     broadcast("update", {count: song_list.length, completed: song_list.length, details: "Finished"});
     // reset for next scan
     cnt = 0;
+    song_list = [];
     running = false;
   }
 }
@@ -118,6 +119,7 @@ function normaliseArtist(albumartist, artist){
 function taglib_fetch(path, id){
   // use taglib to fetch duration
   taglib.read(path, function(err, tag, audioProperties) {
+    console.log(audioProperties.length);
     app.db.songs.update({ _id: id }, { $set: { duration: audioProperties.length} });
   });
 }
