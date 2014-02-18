@@ -181,6 +181,8 @@ function PlayState(){
     // update the selected item
     $("tr").removeClass("light-blue");
     $("#"+id).addClass("light-blue");
+    // update the window title
+    window.document.title = this.current_song.attributes.title + " - " + this.current_song.attributes.display_artist;
   };
   this.setIsPlaying = function(isPlaying){
     this.is_playing = isPlaying;
