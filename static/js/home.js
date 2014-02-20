@@ -406,6 +406,7 @@ SongView = Backbone.View.extend({
       return;
     }
     id = $(ev.target).closest("tr").attr('id');
+    hideOptions();
     if(ev.ctrlKey){
       // ctrlKey pressed, add to selection
       addToSelection(id, true);
@@ -452,6 +453,7 @@ SongView = Backbone.View.extend({
           className: "btn-danger",
           callback: function() {
             socket.emit('delete_playlist', {del: player.playlist._id});
+            MusicApp.router.playlist("LIBRARY");
           }
         }
       }
