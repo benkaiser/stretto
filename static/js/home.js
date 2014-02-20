@@ -521,7 +521,7 @@ function createOptions(x, y){
     hideOptions();
   });
   $(".hard_rescan").click(function(ev){
-    socket.emit("hard_rescan", {item: selectedItems});
+    socket.emit("hard_rescan", {items: selectedItems});
     hideOptions();
   });
   optionsVisible = true;

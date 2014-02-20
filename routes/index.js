@@ -167,10 +167,14 @@ function removeFromPlaylist(req){
 }
 
 function rescanItem(req){
-  item = req.data.item;
-  app.db.songs.findOne({_id: item}, function(err, song){
-    if(!err && song)
-      lib_func.scanItem(app, song.location);
+  items = req.data.items;
+  app.db.songs.find({ _id: { $in: items }}, function(err, songs){
+    if(!err && songs)
+      var songLocArr = [];
+      for (var i = 0; i < songs.length; i++) {
+        songLocArr.push(songs[i].location);
+      };
+      lib_func.scanItems(app, songLocArr);
   });
 }
 

@@ -119,16 +119,15 @@ function normaliseArtist(albumartist, artist){
 function taglib_fetch(path, id){
   // use taglib to fetch duration
   taglib.read(path, function(err, tag, audioProperties) {
-    console.log(audioProperties.length);
     app.db.songs.update({ _id: id }, { $set: { duration: audioProperties.length} });
   });
 }
 
-exports.scanItem = function(app_ref, location){
+exports.scanItems = function(app_ref, locations){
   app = app_ref;
   hard_rescan = true;
   running = true;
-  song_list.push(location);
+  song_list = song_list.concat(locations);
   findNextSong();
 }
 
