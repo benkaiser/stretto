@@ -359,7 +359,11 @@ MusicAppRouter = Backbone.Router.extend({
     "playlist/:id": "playlist"
   },
   playlist: function(id){
-    player.playlist = player.playlist_collection.getBy_Id(id);
+    findId = player.playlist_collection.getBy_Id(id);
+    if(findId == -1){
+      findId = player.playlist_collection.getBy_Id("LIBRARY");
+    }
+    player.playlist = findId;
     player.songs = player.song_collection.getByIds(player.playlist);
     if(player.songs){
       this.songview = new SongView();
