@@ -25,6 +25,7 @@ exports.createRoutes = function(app_ref){
   app.io.route('fetch_songs', returnSongs);
   app.io.route('fetch_playlists', returnPlaylists);
   app.io.route('create_playlist', createPlaylist);
+  app.io.route('delete_playlist', deletePlaylist);
   app.io.route('add_to_playlist', addToPlaylist);
   app.io.route('remove_from_playlist', removeFromPlaylist);
   app.io.route('hard_rescan', rescanItem);
@@ -117,32 +118,45 @@ function createPlaylist(req){
   });
 }
 
+function deletePlaylist(req){
+  del = req.data.del;
+  app.db.playlists.remove({_id: del}, {}, function(err, numRemoved){
+    req.io.route('fetch_playlists');
+  });
+}
+
 function addToPlaylist(req){
-  add = req.data.add;
+  addItems = req.data.add;
   to = req.data.playlist;
   app.db.playlists.findOne({ _id: to}, function (err, doc) {
-    var found = false;
-    for(var i = 0; i < doc.songs.length; i++){
-      if(doc.songs[i]._id == add){
-        found = true;
-        break;
+    waitingOn = 0;
+    for (var i = 0; i < addItems.length; i++) {
+      var found = false;
+      for(var j = 0; j < doc.songs.length; j++){
+        if(doc.songs[j]._id == addItems[i]){
+          found = true;
+          break;
+        }
       }
-    }
-    if(!found){
-      app.db.playlists.update({_id: to}, { $push:{songs: {_id: add}}}, function(){
-        req.io.route('fetch_playlists');
-      });
+      if(!found){
+        waitingOn++;
+        app.db.playlists.update({_id: to}, { $push:{songs: {_id: addItems[i]}}}, function(){
+          if(--waitingOn == 0){
+            req.io.route('fetch_playlists');
+          }
+        });
+      }
     }
   });
 }
 
 function removeFromPlaylist(req){
-  remove = req.data.remove;
+  removeItems = req.data.remove;
   to = req.data.playlist;
   app.db.playlists.findOne({ _id: to}, function (err, doc) {
     var tmpSongs = [];
     for(var i = 0; i < doc.songs.length; i++){
-      if(doc.songs[i]._id != remove){
+      if(removeItems.indexOf(doc.songs[i]._id) == -1){
         tmpSongs.push(doc.songs[i]);
       }
     }

@@ -53,6 +53,7 @@
   <h1>{{title}}</h1>
   {% if editable %}
     <a class='download_playlist btn btn-default btn-sm' target='_blank' href='/downloadplaylist/{{_id}}'>Download Playlist</a>
+    <a class='delete_playlist btn btn-danger btn-sm'>Delete Playlist</a>
   {% endif %}
   <table class='table song_table disable_selection'>
     <thead>
@@ -69,7 +70,7 @@
 <tr id="{{song.attributes._id}}">
 <td>
   <div class='option_div'>
-    <i class='fa fa-caret-square-o-down options'></i>
+    <i class='fa fa-plus-square-o options'></i>
   </div>
   {% if song.attributes.hasOwnProperty('cover_location') %}
     <img class='cover' src='/cover/{{song.attributes._id}}'/>
@@ -89,8 +90,11 @@
   {% else %}
     <i class='fa fa-question info_unknown_cover'></i>
   {% endif %}
-  <p class="info_title">{{attributes.title}}</p>
-  <p class="info_detail">{{attributes.display_artist}} - {{attributes.album}}</p>
+  <div class='info_wrapper'>
+    <p class="info_title">{{attributes.title}}</p>
+    <p class="info_detail">{{attributes.display_artist}} - {{attributes.album}}</p>
+  </div>
+  <p><i class='fa fa-plus-square-o info_options'></i></p>
 </script>
 <script type="text/swig" id="options_template">
 <div class="dropdown open {{dropup}}">

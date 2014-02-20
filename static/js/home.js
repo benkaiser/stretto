@@ -398,20 +398,31 @@ SongView = Backbone.View.extend({
     "click tbody > tr": "triggerSong",
     "click .options": "triggerOptions",
     "contextmenu td": "triggerOptions",
-    "click .cover": "triggerCover"
+    "click .cover": "triggerCover",
+    "click .delete_playlist": "deletePlaylist"
   },
   triggerSong: function(ev){
     if($(ev.target).hasClass("options")){
       return;
     }
     id = $(ev.target).closest("tr").attr('id');
-    player.queue_pool = player.songs.slice(0);
-    player.playSong(id);
+    if(ev.ctrlKey){
+      // ctrlKey pressed, add to selection
+      addToSelection(id);
+    } else if(ev.shiftKey){
+      // shiftkey pressed, add to selection
+    } else {
+      // just play the song
+      clearSelection();
+      player.queue_pool = player.songs.slice(0);
+      player.playSong(id);
+    }
   },
   triggerOptions: function(ev){
     if(!optionsVisible){
       id = $(ev.target).closest("tr").attr('id');
-      createOptions(ev.clientX, ev.clientY, id);
+      addToSelection(id);
+      createOptions(ev.clientX, ev.clientY);
     } else {
       hideOptions();
     }
@@ -420,6 +431,25 @@ SongView = Backbone.View.extend({
   triggerCover: function(ev){
     showCover($(ev.target).attr('src'));
     return false;
+  },
+  deletePlaylist: function(ev){
+    bootbox.dialog({
+      message: "Do you really want to delete this playlist?",
+      title: "Delete Playlist",
+      buttons: {
+        cancel: {
+          label: "Cancel",
+          className: "btn-default"
+        },
+        del: {
+          label: "Delete",
+          className: "btn-danger",
+          callback: function() {
+            socket.emit('delete_playlist', {del: player.playlist._id});
+          }
+        }
+      }
+    });
   },
   renderSong: function(){
     var batch = 50;
@@ -451,14 +481,13 @@ function showCover(src){
 }
 
 var optionsVisible = false;
-var optionsItem = "";
-function createOptions(x, y, id){
+var selectedItems = [];
+function createOptions(x, y){
   // calculate if the menu should 'drop up'
   var dropup = "";
   if(y+300 > $(window).height()){
     dropup = "dropup"
   }
-  optionsItem = id;
   $(".options_container").html(render("#options_template", {
       playlists: player.playlist_collection.models,
       current_playlist: player.playlist,
@@ -467,17 +496,19 @@ function createOptions(x, y, id){
     .css({"top": y+"px", "left": x+"px"});
   $(".add_to_playlist").click(function(ev){
     id = $(ev.target).closest("li").attr('id');
-    socket.emit("add_to_playlist", {add: optionsItem, playlist: id});
+    socket.emit("add_to_playlist", {add: selectedItems, playlist: id});
     hideOptions();
   });
   $(".remove_from_playlist").click(function(ev){
     id = $(ev.target).closest("li").attr('id');
-    $("#"+optionsItem).remove();
-    socket.emit("remove_from_playlist", {remove: optionsItem, playlist: id});
+    for (var i = 0; i < selectedItems.length; i++) {
+      $("#"+selectedItems[i]).remove();
+    }
+    socket.emit("remove_from_playlist", {remove: selectedItems, playlist: id});
     hideOptions();
   });
   $(".hard_rescan").click(function(ev){
-    socket.emit("hard_rescan", {item: optionsItem});
+    socket.emit("hard_rescan", {item: selectedItems});
     hideOptions();
   });
   optionsVisible = true;
@@ -485,6 +516,19 @@ function createOptions(x, y, id){
 function hideOptions(){
   $(".options_container").css({"top:": "-1000px", "left": "-1000px"});
   optionsVisible = false;
+}
+function addToSelection(id){
+  for (var i = 0; i < selectedItems.length; i++) {
+    if(selectedItems[i] == id){
+      return;
+    }
+  }
+  selectedItems.push(id);
+  $("#"+id).addClass("selected");
+}
+function clearSelection(){
+  selectedItems = [];
+  $("tr").removeClass("selected")
 }
 
 SidebarView = Backbone.View.extend({
@@ -518,10 +562,18 @@ InfoView = Backbone.View.extend({
     this.$el.html(render(this.template, player.current_song));
   },
   events: {
-    "click .info_cover": "triggerCover"
+    "click .info_cover": "triggerCover",
+    "click .info_options": "triggerOptions"
   },
   triggerCover: function(ev){
     showCover($(ev.target).attr('src'));
+    return false;
+  },
+  triggerOptions: function(ev){
+    if(!optionsVisible){
+      addToSelection(player.playing_id);
+      createOptions(ev.clientX, ev.clientY);
+    }
     return false;
   }
 });

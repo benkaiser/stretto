@@ -226,6 +226,17 @@ tr:hover .options{
   font-size: 15px;
   color: #666;
 }
+.info_wrapper{
+  display: inline-block;
+  float: left;
+}
+.info_options{
+  margin-left: 20px;
+  margin-top: 22px;
+}
+.info_options:hover{
+  color: #4BF;
+}
 /*** options dialog ***/
 .options_container{
   position: fixed;
@@ -236,6 +247,9 @@ tr:hover .options{
 }
 .light-blue{
   background-color: #DDEEFF;
+}
+.selected{
+  background-color: #EEE;
 }
 /*** custom scrollbar ***/
 .custom_scrollbar::-webkit-scrollbar {
