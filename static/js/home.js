@@ -408,12 +408,14 @@ SongView = Backbone.View.extend({
     id = $(ev.target).closest("tr").attr('id');
     if(ev.ctrlKey){
       // ctrlKey pressed, add to selection
-      addToSelection(id);
+      addToSelection(id, true);
     } else if(ev.shiftKey){
       // shiftkey pressed, add to selection
+      selectBetween(id, lastSelection);
     } else {
       // just play the song
       clearSelection();
+      addToSelection(id, false);
       player.queue_pool = player.songs.slice(0);
       player.playSong(id);
     }
@@ -421,7 +423,11 @@ SongView = Backbone.View.extend({
   triggerOptions: function(ev){
     if(!optionsVisible){
       id = $(ev.target).closest("tr").attr('id');
-      addToSelection(id);
+      if($.inArray(id, selectedItems) == -1){
+        // right click on non-selected item should select only that item
+        clearSelection();
+      }
+      addToSelection(id, false);
       createOptions(ev.clientX, ev.clientY);
     } else {
       hideOptions();
@@ -482,6 +488,7 @@ function showCover(src){
 
 var optionsVisible = false;
 var selectedItems = [];
+var lastSelection = '';
 function createOptions(x, y){
   // calculate if the menu should 'drop up'
   var dropup = "";
@@ -517,14 +524,42 @@ function hideOptions(){
   $(".options_container").css({"top:": "-1000px", "left": "-1000px"});
   optionsVisible = false;
 }
-function addToSelection(id){
+function addToSelection(id, clearIfIn){
+  lastSelection = id;
   for (var i = 0; i < selectedItems.length; i++) {
     if(selectedItems[i] == id){
+      if(clearIfIn){
+        selectedItems.splice(i, 1);
+        $("#"+id).removeClass("selected");
+      }
       return;
     }
   }
   selectedItems.push(id);
   $("#"+id).addClass("selected");
+}
+function selectBetween(id, id2){
+  loc1 = indexInPlaylist(id);
+  loc2 = indexInPlaylist(id2);
+  // make sure loc1 is less than loc2
+  if(loc1 > loc2){
+    temp = loc1;
+    loc1 = loc2;
+    loc2 = temp;
+  }
+  console.log(loc1);
+  console.log(loc2);
+  for(var i = loc1; i <= loc2; i++){
+    addToSelection(player.playlist.songs[i]._id, false)
+  };
+}
+function indexInPlaylist(id){
+  for(var i = 0; i < player.playlist.songs.length; i++){
+    if(player.playlist.songs[i]._id == id){
+      return i;
+    }
+  }
+  return -1;
 }
 function clearSelection(){
   selectedItems = [];
@@ -571,7 +606,7 @@ InfoView = Backbone.View.extend({
   },
   triggerOptions: function(ev){
     if(!optionsVisible){
-      addToSelection(player.playing_id);
+      addToSelection(player.playing_id, false);
       createOptions(ev.clientX, ev.clientY);
     }
     return false;
