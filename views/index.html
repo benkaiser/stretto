@@ -50,11 +50,18 @@
   </div>
 </script>
 <script type='text/swig' id='song_template'>
-  <h1>{{title}}</h1>
+  <h1>{{title}}
   {% if editable %}
-    <a class='download_playlist btn btn-default btn-sm' target='_blank' href='/downloadplaylist/{{_id}}'>Download Playlist</a>
-    <a class='delete_playlist btn btn-danger btn-sm'>Delete Playlist</a>
-  {% endif %}
+    <div class="btn-group">
+      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+        Options <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu">
+        <li><a class='download_playlist' target='_blank' href='/downloadplaylist/{{_id}}'>Download Playlist</a></li>
+        <li><a class='delete_playlist'>Delete Playlist</a></li>
+      </ul>
+    </div>
+  {% endif %}</h1>
   <table class='table song_table disable_selection'>
     <thead>
       <th class='title_th'>Title</th>
