@@ -249,7 +249,7 @@ tr:hover .options{
   background-color: #DDEEFF;
 }
 .selected{
-  background-color: #EEE;
+  background-color: #DDEEFF;
 }
 /*** custom scrollbar ***/
 .custom_scrollbar::-webkit-scrollbar {
