@@ -14,12 +14,17 @@
     <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
     <div id="current_info">&nbsp;</div>
     <div class="controls">
-      <i id="repeat" class="fa fa-retweet fa-3x blue"></i> <!-- Possible: fa-refresh -->
+      <i id="repeat" class="fa fa-retweet fa-3x blue"></i>
       <span id="repeat_badge" class="badge hidden">1</span>
       <i id="prev" class="fa fa-fast-backward fa-3x"></i>
       <i id="playpause" class="fa fa-play fa-3x"></i>
       <i id="next" class="fa fa-fast-forward fa-3x"></i>
       <i id="shuffle" class="fa fa-random fa-3x"></i>
+    </div>
+    <div class="settings_bar">
+      <i class="fa fa-volume-up fa-2x volume_icon"></i>
+      <input type="text" id="vol_bar" data-slider-id="vol_bar_slider" data-slider-max="100" data-slider-step="0.1" data-slider-value="100" data-slider-tooltip="hide" />
+      <button id='remote_setup' class='btn btn-primary'>Control Options</button>
     </div>
   </div>
 </div>
@@ -99,7 +104,7 @@
   {% endif %}
   <div class='info_wrapper'>
     <p class="info_title">{{attributes.title}}</p>
-    <p class="info_detail">{{attributes.display_artist}} - {{attributes.album}}</p>
+    <p class="info_detail"><span class='colsearch'>{{attributes.display_artist}}</span> - <span class='colsearch'>{{attributes.album}}</span></p>
   </div>
   <p><i class='fa fa-plus-square-o info_options'></i></p>
 </script>

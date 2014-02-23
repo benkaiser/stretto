@@ -279,6 +279,15 @@ function PlayState(){
       .on('slide', function(){ player.scrubTimeout() })
       .on('slideStop', function(){ player.scrubTo() });
   }
+  this.setVolElem = function(elem){
+    this.vol = elem;
+    this.vol.slider()
+      .on('slide', function(){ player.setVolume() });
+  }
+  this.setVolume = function(){
+    var value = this.vol.slider('getValue');
+    this.current_track.volume = value / 100.00;
+  }
   this.scrubTimeout = function(){
     if(this.d.scrubTimeout !== null){
       clearTimeout(this.d.scrubTimeout);
@@ -324,8 +333,10 @@ socket.on('playlists', function(data){
 // jquery initialiser
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
+  player.setVolElem($("#vol_bar"));
   $("#wrapper").keydown(function(event){
-    if(event.target.id != 'wrapper'){
+    // don't fire the controls if the user is editing an input
+    if(event.target.localName == 'input'){
       return;
     }
     switch(event.which){
@@ -378,7 +389,6 @@ MusicAppRouter = Backbone.Router.extend({
     }
   },
   search: function(search){
-    console.log(search);
     player.searchItems(search);
   },
   sidebar: function(id){
@@ -410,7 +420,6 @@ SongView = Backbone.View.extend({
     this.renderSong();
   },
   events: {
-    "click .colsearch": "triggerSearch",
     "click .colsearch": "triggerSearch",
     "click tbody > tr": "triggerSong",
     "click .options": "triggerOptions",
@@ -627,6 +636,7 @@ InfoView = Backbone.View.extend({
     this.$el.html(render(this.template, player.current_song));
   },
   events: {
+    "click .colsearch": "triggerSearch",
     "click .info_cover": "triggerCover",
     "click .info_options": "triggerOptions"
   },
@@ -640,6 +650,10 @@ InfoView = Backbone.View.extend({
       createOptions(ev.clientX, ev.clientY);
     }
     return false;
+  },
+  triggerSearch: function(ev){
+    search = $(ev.target).text();
+    player.updateSearch(search);
   }
 });
 

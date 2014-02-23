@@ -157,6 +157,7 @@ tr:hover .options{
   margin-right: 18px;
   margin-left: 8px;
 }
+/*** bottom bar items ***/
 .controls{
   float: left;
   width: 323px;
@@ -174,6 +175,10 @@ tr:hover .options{
 .controls .fa:hover{
   background-color: #ddd;
 }
+.settings_bar{
+  float: right;
+  padding: 9px;
+}
 #repeat_badge{
   position: absolute;
   margin-left: -25px;
@@ -185,6 +190,13 @@ tr:hover .options{
   position: fixed;
   bottom: 48px;
   left: 0px;
+}
+#vol_bar_slider{
+  margin-right: 20px;
+}
+.volume_icon{
+  vertical-align: middle;
+  margin-right: 5px;
 }
 /*** slider changes ***/
 .slider.slider-horizontal:hover .slider-track{
