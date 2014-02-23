@@ -6,6 +6,7 @@
 var express = require('express.io');
 var http = require('http');
 var path = require('path');
+var mkdirp = require('mkdirp');
 
 var app = express();
 app.http().io();
@@ -35,6 +36,8 @@ if ('development' == app.get('env')) {
   // })
   app.use(express.errorHandler());
 }
+// make sure the cover directory is present
+mkdirp(__dirname + '/dbs/covers', '666');
 
 require(__dirname + '/routes').createRoutes(app);
 
