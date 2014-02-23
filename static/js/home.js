@@ -114,7 +114,11 @@ function PlayState(){
       }
     }
   }
+  this.updateSearch = function(searchText){
+    MusicApp.router.navigate("search/"+encodeURIComponent(searchText), true);
+  }
   this.searchItems = function(searchText){
+    console.log(searchText);
     this.searchText = searchText;
     if(searchText.length < 3){
       return;
@@ -138,7 +142,6 @@ function PlayState(){
       MusicApp.router.songview = new SongView();
       MusicApp.contentRegion.show(MusicApp.router.songview);
     }
-    window.location.hash = '';
   }
   // note: this is a very expensive method of searching
   // it is used to match each term in the search against the title, album and artist
@@ -356,7 +359,8 @@ MusicAppRouter = Backbone.Router.extend({
   sb: null,
   songview: null,
   routes: {
-    "playlist/:id": "playlist"
+    "playlist/:id": "playlist",
+    "search/:search": "search"
   },
   playlist: function(id){
     findId = player.playlist_collection.getBy_Id(id);
@@ -369,6 +373,10 @@ MusicAppRouter = Backbone.Router.extend({
       this.songview = new SongView();
       MusicApp.contentRegion.show(this.songview);
     }
+  },
+  search: function(search){
+    console.log(search);
+    player.searchItems(search);
   },
   sidebar: function(id){
     this.sb = new SidebarView();
@@ -409,7 +417,7 @@ SongView = Backbone.View.extend({
   },
   triggerSearch: function(ev){
     search = $(ev.target).text();
-    player.searchItems(search);
+    player.updateSearch(search);
   },
   triggerSong: function(ev){
     if($(ev.target).hasClass("options") || $(ev.target).hasClass("colsearch")){
@@ -598,7 +606,7 @@ SidebarView = Backbone.View.extend({
   },
   searchItems: function(){
     searchText = $(".search-input").val();
-    player.searchItems(searchText);
+    player.updateSearch(searchText);
     return true;
   }
 });
