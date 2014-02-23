@@ -86,8 +86,8 @@
   {% endif %}
   <span class='song_text'>{{song.attributes.title}}</span>
 </td>
-<td>{{song.attributes.display_artist}}</td>
-<td>{{song.attributes.album}}</td>
+<td><span class='colsearch'>{{song.attributes.display_artist}}</span></td>
+<td><span class='colsearch'>{{song.attributes.album}}</span></td>
 <td>{{song.attributes.duration|prettyPrintSeconds}}</td>
 </tr>
 </script>

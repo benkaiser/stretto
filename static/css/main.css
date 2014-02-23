@@ -144,6 +144,9 @@ tr:hover .options{
   max-height: 300px;
   overflow-y: scroll;
 }
+.colsearch:hover{
+  text-decoration: underline;
+}
 .cover{
   width: 40px;
   height: 40px;

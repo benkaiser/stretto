@@ -129,7 +129,7 @@ function PlayState(){
     }
     this.songs = tmpSongs;
     this.playlist = {
-      title: "Search Results for: '"+searchText+"'",
+      title: "Search Results for: '"+this.searchText+"'",
       editable: false
     };
     if(MusicApp.router.songview){
@@ -399,14 +399,20 @@ SongView = Backbone.View.extend({
     this.renderSong();
   },
   events: {
+    "click .colsearch": "triggerSearch",
+    "click .colsearch": "triggerSearch",
     "click tbody > tr": "triggerSong",
     "click .options": "triggerOptions",
     "contextmenu td": "triggerOptions",
     "click .cover": "triggerCover",
     "click .delete_playlist": "deletePlaylist"
   },
+  triggerSearch: function(ev){
+    search = $(ev.target).text();
+    player.searchItems(search);
+  },
   triggerSong: function(ev){
-    if($(ev.target).hasClass("options")){
+    if($(ev.target).hasClass("options") || $(ev.target).hasClass("colsearch")){
       return;
     }
     id = $(ev.target).closest("tr").attr('id');
