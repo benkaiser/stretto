@@ -118,7 +118,6 @@ function PlayState(){
     MusicApp.router.navigate("search/"+encodeURIComponent(searchText), true);
   }
   this.searchItems = function(searchText){
-    console.log(searchText);
     this.searchText = searchText;
     if(searchText.length < 3){
       return;
@@ -164,6 +163,10 @@ function PlayState(){
     $(".duration").html(seconds);
   }
   this.playSong = function(id){
+    // remove the last playing song from the selection
+    delFromSelection(this.playing_id);
+    addToSelection(id, false);
+    // set the current song
     this.current_index = this.findSongIndex(id);
     this.current_song = this.queue_pool[this.current_index];
     if(id == this.playing_id){
@@ -434,7 +437,6 @@ SongView = Backbone.View.extend({
     } else {
       // just play the song
       clearSelection();
-      addToSelection(id, false);
       player.queue_pool = player.songs.slice(0);
       player.playSong(id);
     }
@@ -557,6 +559,14 @@ function addToSelection(id, clearIfIn){
   }
   selectedItems.push(id);
   $("#"+id).addClass("selected");
+}
+function delFromSelection(id){
+  for (var i = 0; i < selectedItems.length; i++) {
+    if(selectedItems[i] == id){
+      selectedItems.splice(i, 1);
+      $("#"+id).removeClass("selected");
+    }
+  }
 }
 function selectBetween(id, id2){
   loc1 = indexInPlaylist(id);
