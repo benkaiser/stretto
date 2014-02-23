@@ -51,6 +51,7 @@ function findSong(item, callback){
         // write the cover photo as an md5 string
         if(result.picture.length > 0){
           pic = result.picture[0];
+          pic["format"] = pic["format"].replace(/[^a-z0-9]/gi, '_').toLowerCase();
           filename = __dirname + '/dbs/covers/' + md5(pic['data']) + "." + pic["format"];
           song.cover_location = filename;
           fs.exists(filename, function(exists){
