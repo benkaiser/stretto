@@ -175,7 +175,7 @@ tr:hover .options{
 .controls .fa:hover{
   background-color: #ddd;
 }
-.settings_bar{
+#settings_bar{
   float: right;
   padding: 9px;
 }

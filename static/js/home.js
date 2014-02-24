@@ -277,31 +277,33 @@ function PlayState(){
     this.scrub = elem;
     this.scrub.slider()
       .on('slide', function(){ player.scrubTimeout() })
-      .on('slideStop', function(){ player.scrubTo() });
+      .on('slideStop', function(){ player.scrubTimeoutComplete() });
   }
   this.setVolElem = function(elem){
     this.vol = elem;
     this.vol.slider()
-      .on('slide', function(){ player.setVolume() });
+      .on('slide', function(){ player.setVolume(player.vol.slider('getValue')) });
   }
-  this.setVolume = function(){
-    var value = this.vol.slider('getValue');
+  this.setVolume = function(value){
     this.current_track.volume = value / 100.00;
   }
   this.scrubTimeout = function(){
     if(this.d.scrubTimeout !== null){
       clearTimeout(this.d.scrubTimeout);
     }
-    this.d.scrubTimeout = setTimeout(function(){ player.scrubTo() }, 1000);
+    this.d.scrubTimeout = setTimeout(function(){ player.scrubTimeoutComplete() }, 1000);
     this.isSeeking = true;
     // update the time to show the current scrub value
     var seconds = prettyPrintSeconds(this.current_track.duration * this.scrub.slider('getValue') / 100.00);
     $(".current_time").html(seconds);
   }
-  this.scrubTo = function(){
+  this.scrubTimeoutComplete = function(){
     clearTimeout(this.d.scrubTimeout);
     this.isSeeking = false;
-    var value = this.scrub.slider('getValue');
+    this.scrubTo(this.scrub.slider('getValue'));
+  }
+  // scrub to percentage in current track
+  this.scrubTo = function(value){
     var length = this.current_track.duration;
     this.current_track.currentTime = length * value / 100.00;
   }
@@ -333,7 +335,6 @@ socket.on('playlists', function(data){
 // jquery initialiser
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
-  player.setVolElem($("#vol_bar"));
   $("#wrapper").keydown(function(event){
     // don't fire the controls if the user is editing an input
     if(event.target.localName == 'input'){
@@ -364,7 +365,8 @@ MusicApp = new Backbone.Marionette.Application();
 MusicApp.addRegions({
   sideBarRegion: "#sidebar",
   contentRegion: "#content",
-  infoRegion: "#current_info"
+  infoRegion: "#current_info",
+  settingBarRegion: "#settings_bar"
 });
 
 items = ["playlists", "songs"];
@@ -372,6 +374,7 @@ itemsLoaded = [];
 MusicAppRouter = Backbone.Router.extend({
   sb: null,
   songview: null,
+  settingsbar: null,
   routes: {
     "playlist/:id": "playlist",
     "search/:search": "search"
@@ -394,11 +397,18 @@ MusicAppRouter = Backbone.Router.extend({
   sidebar: function(id){
     this.sb = new SidebarView();
     MusicApp.sideBarRegion.show(this.sb);
+  },
+  settingsbar: function(id){
+    this.settingsbar = new SettingsBarView();
+    MusicApp.settingBarRegion.show(this.settingsbar);
   }
 });
 
 MusicApp.addInitializer(function(options){
   this.router = new MusicAppRouter();
+  // setup the settings bar section
+  MusicApp.router.settingsbar();
+  // load the history api
   Backbone.history.start({pushState: false});
 });
 
@@ -629,6 +639,22 @@ SidebarView = Backbone.View.extend({
     return true;
   }
 });
+
+SettingsBarView = Backbone.View.extend({
+  template: "#settings_bar_template",
+  render: function(){
+    this.$el.html(render(this.template, {vol: 100}));
+    _.defer(function(){
+      player.setVolElem($("#vol_bar"));
+    });
+  },
+  events: {
+    "click #remote_setup": "openOptions"
+  },
+  openOptions: function(){
+    console.log("clicked");
+  }
+})
 
 InfoView = Backbone.View.extend({
   template: "#current_info_template",

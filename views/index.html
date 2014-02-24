@@ -21,10 +21,7 @@
       <i id="next" class="fa fa-fast-forward fa-3x"></i>
       <i id="shuffle" class="fa fa-random fa-3x"></i>
     </div>
-    <div class="settings_bar">
-      <i class="fa fa-volume-up fa-2x volume_icon"></i>
-      <input type="text" id="vol_bar" data-slider-id="vol_bar_slider" data-slider-max="100" data-slider-step="0.1" data-slider-value="100" data-slider-tooltip="hide" />
-      <button id='remote_setup' class='btn btn-primary'>Control Options</button>
+    <div id="settings_bar">
     </div>
   </div>
 </div>
@@ -125,6 +122,11 @@
     {% endfor %}
   </ul>
 </div>
+</script>
+<script type="text/swig" id="settings_bar_template">
+  <i class="fa fa-volume-up fa-2x volume_icon"></i>
+  <input type="text" id="vol_bar" data-slider-id="vol_bar_slider" data-slider-max="100" data-slider-step="0.1" data-slider-value="{{vol}}" data-slider-tooltip="hide" />
+  <button id='remote_setup' class='btn btn-primary'>Control Options</button>
 </script>
 {% endraw %}
 
