@@ -19,6 +19,7 @@ exports.createRoutes = function(app_ref){
   app.get('/downloadplaylist/:id', downloadPlaylist);
   app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
   app.io.route('player_page_connected', function(req){ req.io.join('players'); });
+  app.io.route('set_comp_name', setCompName);
   app.io.route('start_scan', function(req){ lib_func.scanLibrary(app, false); });
   app.io.route('start_scan_hard', function(req){ lib_func.scanLibrary(app, true); });
   app.io.route('stop_scan', function(req){ lib_func.stopScan(app); });
@@ -29,6 +30,8 @@ exports.createRoutes = function(app_ref){
   app.io.route('add_to_playlist', addToPlaylist);
   app.io.route('remove_from_playlist', removeFromPlaylist);
   app.io.route('hard_rescan', rescanItem);
+  // remote control routes
+  app.io.route('get_receivers', getReceivers);
 };
 
 function musicRoute(req, res){
@@ -189,4 +192,23 @@ function scanRoute(req, res){
       num_items: list.length
     });
   });
+}
+
+function setCompName(req){
+  req.io.join('receivers');
+  req.socket.set('name', req.data.name);
+}
+
+function getReceivers(req){
+  var receivers = app.io.sockets.clients('receivers');
+  var validReceivers = [];
+  receivers.forEach(function(client){
+    if(client.store.data.name && client.store.data.name.length > 0){
+      validReceivers.push({
+        id: client.id,
+        name: client.store.data.name
+      });
+    }
+  });
+  req.io.emit('recievers', {"recievers": validReceivers});
 }

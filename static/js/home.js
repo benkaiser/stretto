@@ -1,5 +1,5 @@
 // define things before they are used
-var socket = io.connect('http://'+window.location.hostname+':2000');
+var socket = io.connect('http://'+window.location.host);
 
 var PlaylistCollection = Backbone.Collection.extend({
   comparator: function(playlist){
@@ -78,6 +78,8 @@ function PlayState(){
   this.current_track = document.getElementById("current_track");
   this.fade_track = document.getElementById("fade_track");
   this.scrub = null;
+  // remote control data
+  this.comp_name = null;
   this.init = function(){
     setInterval(function(){ player.update() }, 50);
     $(this.names.playpause).click(function(){ player.togglePlayState() });
@@ -93,6 +95,8 @@ function PlayState(){
     this.redrawShuffle();
     this.repeat_state = localStorage.getItem('repeat') || this.repeat_states.all;
     this.redrawRepeat();
+    this.comp_name = localStorage.getItem('comp_name') || '';
+    socket.emit('set_comp_name', {name: this.comp_name});
   }
   this.setupCollections = function(){
     this.song_collection = new SongCollection();
@@ -306,6 +310,13 @@ function PlayState(){
   this.scrubTo = function(value){
     var length = this.current_track.duration;
     this.current_track.currentTime = length * value / 100.00;
+  }
+  this.setCompName = function(name){
+    // update the local data
+    this.comp_name = name;
+    localStorage.setItem('comp_name', this.comp_name);
+    // update the name with the server
+    socket.emit('set_comp_name', {name: this.comp_name});
   }
 }
 var player = new PlayState();
@@ -596,8 +607,6 @@ function selectBetween(id, id2){
     loc1 = loc2;
     loc2 = temp;
   }
-  console.log(loc1);
-  console.log(loc2);
   for(var i = loc1; i <= loc2; i++){
     addToSelection(player.playlist.songs[i]._id, false)
   };
@@ -652,7 +661,24 @@ SettingsBarView = Backbone.View.extend({
     "click #remote_setup": "openOptions"
   },
   openOptions: function(){
-    console.log("clicked");
+    bootbox.dialog({
+      message: render("#control_template", { comp_name: player.comp_name, host: window.location.host }),
+      title: "Setup Remote Control",
+      buttons: {
+        danger: {
+          label: "Cancel",
+          className: "btn-danger"
+        },
+        success: {
+          label: "Save",
+          className: "btn-success",
+          callback: function() {
+            comp_name = $("#comp_name_input").val();
+            player.setCompName(comp_name);
+          }
+        }
+      }
+    });
   }
 })
 
