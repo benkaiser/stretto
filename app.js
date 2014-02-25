@@ -6,12 +6,18 @@
 var express = require('express.io');
 var http = require('http');
 var path = require('path');
-var mkdirp = require('mkdirp');
+var util = require(__dirname + '/util.js');
 
 var app = express();
 app.http().io();
-// attach the db to the app
-require(__dirname + '/db.js')(app);
+// make sure the dbs directory is present
+util.mkdir(__dirname + '/dbs', function(){
+  // attach the db to the app
+  require(__dirname + '/db.js')(app);
+  // make sure the cover directory is present
+  util.mkdir(__dirname + '/dbs/covers', function(){});
+});
+
 
 // all environments
 app.set('port', process.env.PORT || 2000);
@@ -36,8 +42,6 @@ if ('development' == app.get('env')) {
   // })
   app.use(express.errorHandler());
 }
-// make sure the cover directory is present
-mkdirp(__dirname + '/dbs/covers', '666');
 
 require(__dirname + '/routes').createRoutes(app);
 
