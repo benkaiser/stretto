@@ -21,7 +21,7 @@ Edit the `config.js` file and set `music_dir` to be the folder you want to be sc
 
 Then run the server with:
 ```
-node server.js
+node app.js
 ```
 Go to `localhost:2000` in your browser (or known ip of server if it is on a different machine). From there click the `Scan Library` tab at the top of the page. From there select `Start Scan` and let it do it's magic. Once your library is scanned you should be able to access it from the `Music` tab up the top.
 
