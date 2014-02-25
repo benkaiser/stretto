@@ -30,72 +30,83 @@ function findNextSong(){
 
 function findSong(item, callback){
   app.db.songs.findOne({location: item}, function(err, doc){
-    // only scan if we haven't scanned before, or we are scanning every document again
-    if(doc == null || hard_rescan){
-      // insert the new song
-      var parser = new mm(fs.createReadStream(item));
+    // check if the file has disappeared
+    fs.exists(item, function(exists){
+      if(!exists){
+        // file deleted, remove and return
+        app.db.songs.remove({_id: doc._id}, {}, function(err, numRemoved){
+          console.log('document removed: ' + doc.title + " - " + doc.display_artist);
+        });
+      } else {
+        // file still exists, carry on
+        // only scan if we haven't scanned before, or we are scanning every document again
+        if(doc == null || hard_rescan){
+          // insert the new song
+          var parser = new mm(fs.createReadStream(item));
 
-      parser.on('metadata', function(result){
-        // add the location
-        var song = {
-          title: result.title,
-          album: result.album,
-          artist: result.artist,
-          albumartist: result.albumartist,
-          display_artist: normaliseArtist(result.albumartist, result.artist),
-          genre: result.genre,
-          year: result.year,
-          duration: result.duration,
-          location: item
-        };
-        // write the cover photo as an md5 string
-        if(result.picture.length > 0){
-          pic = result.picture[0];
-          pic["format"] = pic["format"].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-          filename = __dirname + '/dbs/covers/' + md5(pic['data']) + "." + pic["format"];
-          song.cover_location = filename;
-          fs.exists(filename, function(exists){
-            if(!exists){
-              fs.writeFile(filename, pic['data'], function(err){
-                if(err) console.log(err);
-                console.log("Wrote file!");
-              });
+          parser.on('metadata', function(result){
+            // add the location
+            var song = {
+              title: result.title,
+              album: result.album,
+              artist: result.artist,
+              albumartist: result.albumartist,
+              display_artist: normaliseArtist(result.albumartist, result.artist),
+              genre: result.genre,
+              year: result.year,
+              duration: result.duration,
+              location: item
+            };
+            // write the cover photo as an md5 string
+            if(result.picture.length > 0){
+              pic = result.picture[0];
+              pic["format"] = pic["format"].replace(/[^a-z0-9]/gi, '_').toLowerCase();
+              filename = __dirname + '/dbs/covers/' + md5(pic['data']) + "." + pic["format"];
+              song.cover_location = filename;
+              fs.exists(filename, function(exists){
+                if(!exists){
+                  fs.writeFile(filename, pic['data'], function(err){
+                    if(err) console.log(err);
+                    console.log("Wrote file!");
+                  });
+                }
+              })
             }
-          })
-        }
-        if(doc == null){
-          // insert the song
-          app.db.songs.insert(song, function (err, newDoc){
-            taglib_fetch(item, newDoc._id);
-            // update the browser the song has been added
-            broadcast("update", {
-              count: song_list.length,
-              completed: cnt,
-              details: "Added: " + newDoc["title"] + " - " + newDoc["albumartist"]
-            });
+            if(doc == null){
+              // insert the song
+              app.db.songs.insert(song, function (err, newDoc){
+                taglib_fetch(item, newDoc._id);
+                // update the browser the song has been added
+                broadcast("update", {
+                  count: song_list.length,
+                  completed: cnt,
+                  details: "Added: " + newDoc["title"] + " - " + newDoc["albumartist"]
+                });
+              });
+            } else if (hard_rescan){
+              app.db.songs.update({location: item}, song, {}, function(err, numRplaced){
+                taglib_fetch(item, doc._id);
+                broadcast("update", {
+                  count: song_list.length,
+                  completed: cnt,
+                  details: "Updated: " + song["title"] + " - " + song["artist"]
+                });
+              })
+            }
           });
-        } else if (hard_rescan){
-          app.db.songs.update({location: item}, song, {}, function(err, numRplaced){
-            taglib_fetch(item, doc._id);
-            broadcast("update", {
-              count: song_list.length,
-              completed: cnt,
-              details: "Updated: " + song["title"] + " - " + song["artist"]
-            });
-          })
-        }
-      });
 
-      parser.on('done', function (err) {
-        if (err) {
-          callback(err);
+          parser.on('done', function (err) {
+            if (err) {
+              callback(err);
+            }
+            callback(null);
+          });
+        } else {
+          // perform rescan? hard rescan option?
+          callback(null);
         }
-        callback(null);
-      });
-    } else {
-      // perform rescan? hard rescan option?
-      callback(null);
-    }
+      }
+    });
   })
 }
 
