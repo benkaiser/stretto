@@ -2,19 +2,20 @@ Node Music Player
 =================
 #### An open source web-based music player
 
-![alt tag](http://kaiserapps.com/links/node-music-player.png)
+![alt tag](https://f.cloud.github.com/assets/608054/2256870/25a93a38-9e0e-11e3-8432-b0cc2e2c896f.png)
 
 ### How does it work?
 Run it on your computer or server containing your music library and then access it through `<ip of computer>:2000`, for example if you run it on your local computer you would use `localhost:2000`.
 
 ### Installation Instructions
 ##### Dependencies
-[node](http://nodejs.org/)
+[node](http://nodejs.org/), [git](http://git-scm.com/)
 
 Install with the following commands:
 ```
-npm i https://github.com/benkaiser/node-music-player/archive/master.tar.gz
-cd node_modules/node-music-player/
+git clone git@github.com:benkaiser/node-music-player.git
+cd node-music-player/
+npm install
 ```
 Edit the `config.js` file and set `music_dir` to be the folder you want to be scanned for your music.
 
@@ -26,17 +27,16 @@ Go to `localhost:2000` in your browser (or known ip of server if it is on a diff
 
 ### Features Implemented
 
-- Play songs
-- Move between tracks
+- Play songs and move between tracks
 - View full-resolution cover art
-- Create playlists and add songs to them
-- Repeat and repeat one
+- Full playlist support
+- Multiple selection
+- Repeat, repeat one and shuffle
+- Search functionality
 
 ### Short-Term planned features
 
-- Better playlist management (removing songs)
-- Search functionality
-- Favourite artists section
-- Implement shuffling correctly
+- Cross-device syncing over network (between computers and android devices)
 - Remote controlling from other devices (i.e. phones, tablets, other computers)
 - Mobile viewing, so one may play and listen their library in an intuitive interface for a mobile phone
+- Favourite artists section
