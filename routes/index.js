@@ -68,12 +68,16 @@ function downloadPlaylist(req, res){
       app.db.songs.findOne({_id: item._id}, function(err, song){
         if(err) throw err;
         //song.location.replace(config.music_dir, '')
-        zip.addLocalFile(song.location);
+        zip.addLocalFile(song.location, "/");
         callback();
       });
     }, function(err){
-      zip.writeZip(filename);
-      res.download(filename, 'download.zip');
+      // convert the zip to a buffer
+      zip.toBuffer(function(buffer){
+        // download the buffer
+        res.setHeader('Content-disposition', 'attachment; filename=download.zip');
+        res.end(buffer, 'binary');
+      });
     });
   });
 }
