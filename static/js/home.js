@@ -137,7 +137,8 @@ function PlayState(){
     this.songs = tmpSongs;
     this.playlist = {
       title: "Search Results for: '"+this.searchText+"'",
-      editable: false
+      editable: false,
+      songs: deAttribute(this.songs)
     };
     if(MusicApp.router.songview){
       MusicApp.router.songview.render();
@@ -763,6 +764,14 @@ function searchMatchesSong(songString, searchWords){
 
 function randomIntFromInterval(min,max){
   return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+function deAttribute(collection){
+  var newCollection = [];
+  for (var i = 0; i < collection.length; i++) {
+    newCollection.push(collection[i].attributes);
+  }
+  return newCollection;
 }
 // make it usable in swig
 swig.setFilter('prettyPrintSeconds', prettyPrintSecondsorNA);
