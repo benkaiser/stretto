@@ -11,12 +11,17 @@ Run it on your computer or server containing your music library and then access 
 ##### Dependencies
 [node](http://nodejs.org/), [git](http://git-scm.com/)
 
+You will also need a package `taglib` installed. On Ubundu and derivatives this is `libtag1-dev`, on Arch Linux `taglib`.
+There is currently [an issue](https://github.com/benkaiser/node-music-player/issues/4) with the OSX version.
+Windows support is not guaranteed and is up to someone else to submit any pull requests for windows support.
+
 Install with the following commands:
 ```
 git clone git@github.com:benkaiser/node-music-player.git
 cd node-music-player/
 npm install
 ```
+
 Edit the `config.js` file and set `music_dir` to be the folder you want to be scanned for your music.
 
 Then run the server with:
