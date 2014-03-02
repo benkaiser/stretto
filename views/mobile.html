@@ -3,16 +3,16 @@
 {% block title %}Music{% endblock %}
 
 {% block content %}
-<div id="wrapper" class="custom_scrollbar" tabindex="0">
+<div id="wrapper" tabindex="0">
+  <div id="current_info"></div>
   <div id='sidebar'>
   </div>
-  <div id='content'>
+  <div id='content' class="custom_scrollbar">
   </div>
   <div id='bottom_bar' class='disable_selection' tabindex="1">
     <div class='current_time'></div>
     <div class='duration'></div>
     <input type="text" id="scrub_bar" data-slider-value="0" data-slider-id="scrub_bar_slider" value="" data-slider-max="100" data-slider-step="0.1" data-slider-tooltip="hide" />
-    <div id="current_info">&nbsp;</div>
     <div class="controls">
       <i id="repeat" class="fa fa-retweet fa-3x blue"></i>
       <span id="repeat_badge" class="badge hidden">1</span>
@@ -20,8 +20,6 @@
       <i id="playpause" class="fa fa-play fa-3x"></i>
       <i id="next" class="fa fa-fast-forward fa-3x"></i>
       <i id="shuffle" class="fa fa-random fa-3x"></i>
-    </div>
-    <div id="settings_bar">
     </div>
   </div>
 </div>
@@ -46,9 +44,6 @@
         <li><a href="#playlist/{{playlist.attributes._id}}">{{playlist.attributes.title}}</a></li>
       {% endfor %}
     </ul>
-    <div class='sidebar_controls'>
-    <button class='add_playlist btn btn-default'>Add Playlist</button>
-    </div>
   </div>
 </script>
 <script type='text/swig' id='song_template'>
@@ -68,8 +63,6 @@
     <thead>
       <th class='title_th'>Title</th>
       <th class='artist_th'>Artist</th>
-      <th class='album_th'>Album</th>
-      <th class='duration_th'><i class="fa fa-clock-o"></i></th>
     </thead>
     <tbody class='song_body'>
     </tbody>
@@ -88,9 +81,7 @@
   {% endif %}
   <span class='song_text'>{{song.attributes.title}}</span>
 </td>
-<td><span class='colsearch'>{{song.attributes.display_artist}}</span></td>
-<td><span class='colsearch'>{{song.attributes.album}}</span></td>
-<td>{{song.attributes.duration|prettyPrintSeconds}}</td>
+<td>{{song.attributes.display_artist}}</td>
 </tr>
 </script>
 <script type="text/swig" id="current_info_template">
@@ -103,7 +94,6 @@
     <p class="info_title">{{attributes.title}}</p>
     <p class="info_detail"><span class='colsearch'>{{attributes.display_artist}}</span> - <span class='colsearch'>{{attributes.album}}</span></p>
   </div>
-  <p><i class='fa fa-plus-square-o info_options'></i></p>
 </script>
 <script type="text/swig" id="options_template">
 <div class="dropdown open {{dropup}}">
@@ -156,5 +146,8 @@
     "/static/js/libs/coverbox.js",
     "/static/js/home.js"
     );
+  head.load(
+    "/static/css/mobile.css"
+  );
 </script>
 {% endblock %}
