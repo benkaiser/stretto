@@ -253,8 +253,8 @@ function PlayState(){
       // it then adds to the value if it is >= the current index.
       // this ensures the same track is not played and the the new random
       // track contains no bias
-      var index = randomIntFromInterval(0, this.queue_pool.length-2);
-      if(index >= this.current_index){
+      var index = randomIntFromInterval(0, this.queue_pool.length-1);
+      if(index >= this.current_index && this.queue_pool.lenght > 1){
         index++;
       }
     } else {
@@ -763,6 +763,9 @@ function searchMatchesSong(songString, searchWords){
 }
 
 function randomIntFromInterval(min,max){
+  if(max < min){
+    return min;
+  }
   return Math.floor(Math.random()*(max-min+1)+min);
 }
 
