@@ -198,7 +198,8 @@ function scanRoute(req, res){
 
     res.render('scan', {
       dir: config.music_dir,
-      num_items: list.length
+      num_items: list.length,
+      menu: true
     });
   });
 }
