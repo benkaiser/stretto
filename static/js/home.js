@@ -167,14 +167,14 @@ function PlayState(){
     var seconds = prettyPrintSeconds(this.current_track.duration);
     $(".duration").html(seconds);
   }
-  this.playSong = function(id){
+  this.playSong = function(id, force_restart){
     // remove the last playing song from the selection
     delFromSelection(this.playing_id);
     addToSelection(id, false);
     // set the current song
     this.current_index = this.findSongIndex(id);
     this.current_song = this.queue_pool[this.current_index];
-    if(id == this.playing_id){
+    if(id == this.playing_id && !force_restart){
       return;
     } else {
       this.playing_id = id;
@@ -253,9 +253,13 @@ function PlayState(){
       // it then adds to the value if it is >= the current index.
       // this ensures the same track is not played and the the new random
       // track contains no bias
-      var index = randomIntFromInterval(0, this.queue_pool.length-1);
-      if(index >= this.current_index && this.queue_pool.lenght > 1){
-        index++;
+      if(this.queue_pool.length > 1){
+        var index = randomIntFromInterval(0, this.queue_pool.length-2);
+        if(index >= this.current_index && this.queue_pool.length > 1){
+          index++;
+        }
+      } else {
+        index = this.current_index;
       }
     } else {
       var index = this.current_index+1;
@@ -263,7 +267,7 @@ function PlayState(){
         index = 0;
       }
     }
-    this.playSong(this.queue_pool[index].attributes._id);
+    this.playSong(this.queue_pool[index].attributes._id, true);
   }
   this.prevTrack = function(){
     if(this.current_track.currentTime > 5.00 || this.repeat_state == this.repeat_states.one){
@@ -275,7 +279,7 @@ function PlayState(){
       if(index == -1){
         index = this.queue_pool.length-1;
       }
-      this.playSong(this.queue_pool[index].attributes._id);
+      this.playSong(this.queue_pool[index].attributes._id, true);
     }
   }
   this.setScubElem = function(elem){
@@ -469,7 +473,7 @@ SongView = Backbone.View.extend({
       // just play the song
       clearSelection();
       player.queue_pool = player.songs.slice(0);
-      player.playSong(id);
+      player.playSong(id, false);
     }
   },
   triggerOptions: function(ev){
@@ -763,9 +767,6 @@ function searchMatchesSong(songString, searchWords){
 }
 
 function randomIntFromInterval(min,max){
-  if(max < min){
-    return min;
-  }
   return Math.floor(Math.random()*(max-min+1)+min);
 }
 
