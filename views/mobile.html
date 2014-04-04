@@ -34,7 +34,7 @@
       <input type="text" class="form-control search-input" placeholder="Search" value="{{search}}">
     </div>
     <h3>{{title}}</h3>
-    <ul class="nav disable_selection custom_scrollbar">
+    <ul class="nav disable_selection">
       {% if fixed %}<li class='dropdown-header'>Auto-Playlists</li>{% endif %}
       {% for playlist in fixed %}
         <li><a href="#playlist/{{playlist.attributes._id}}">{{playlist.attributes.title}}</a></li>
