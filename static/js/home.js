@@ -94,6 +94,7 @@ function PlayState(){
     this.shuffle_state = localStorage.getItem('shuffle') || false;
     this.redrawShuffle();
     this.repeat_state = localStorage.getItem('repeat') || this.repeat_states.all;
+    this.trackHistory = localStorage.getItem('trackHistory') || [];
     this.redrawRepeat();
     this.comp_name = localStorage.getItem('comp_name') || '';
     socket.emit('set_comp_name', {name: this.comp_name});
@@ -267,6 +268,7 @@ function PlayState(){
         index = 0;
       }
     }
+    this.addTrackToHistory(this.current_track);
     this.playSong(this.queue_pool[index].attributes._id, true);
   }
   this.prevTrack = function(){
@@ -275,11 +277,7 @@ function PlayState(){
       this.current_track.play();
     } else {
       // move to the previous song
-      var index = this.current_index-1;
-      if(index == -1){
-        index = this.queue_pool.length-1;
-      }
-      this.playSong(this.queue_pool[index].attributes._id, true);
+      (this.trackHistory.pop()).play();
     }
   }
   this.setScubElem = function(elem){
@@ -322,6 +320,12 @@ function PlayState(){
     localStorage.setItem('comp_name', this.comp_name);
     // update the name with the server
     socket.emit('set_comp_name', {name: this.comp_name});
+  }
+  this.addTrackToHistory = function(track)
+  {
+    this.trackHistory = localStorage.getItem("trackHistory") || [];
+    this.trackHistory.push(track);
+    localStorage.setItem("trackHistory", JSON.stringify(this.trackHistory));
   }
 }
 var player = new PlayState();
