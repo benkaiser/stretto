@@ -18,19 +18,25 @@ exports.createRoutes = function(app_ref){
   app.get('/songs/:id', sendSong);
   app.get('/cover/:id', sendCover);
   app.get('/downloadplaylist/:id', downloadPlaylist);
-  app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
   app.io.route('player_page_connected', function(req){ req.io.join('players'); });
+  // remote functions
   app.io.route('set_comp_name', setCompName);
+  // scanning signals
+  app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
   app.io.route('start_scan', function(req){ lib_func.scanLibrary(app, false); });
   app.io.route('start_scan_hard', function(req){ lib_func.scanLibrary(app, true); });
   app.io.route('stop_scan', function(req){ lib_func.stopScan(app); });
+  app.io.route('hard_rescan', rescanItem);
+  // send the songs to the client
   app.io.route('fetch_songs', returnSongs);
+  // playlist modifications
   app.io.route('fetch_playlists', returnPlaylists);
   app.io.route('create_playlist', createPlaylist);
   app.io.route('delete_playlist', deletePlaylist);
   app.io.route('add_to_playlist', addToPlaylist);
   app.io.route('remove_from_playlist', removeFromPlaylist);
-  app.io.route('hard_rescan', rescanItem);
+  // play count
+  app.io.route('update_play_count', updatePlayCount);
   // remote control routes
   app.io.route('get_receivers', getReceivers);
 };
@@ -176,6 +182,13 @@ function removeFromPlaylist(req){
       req.io.route('fetch_playlists');
     });
   });
+}
+
+function updatePlayCount(req){
+  var _id = req.data.track_id;
+  var plays = req.data.plays;
+  // apply the new play_count to the database
+  app.db.songs.update({_id: _id}, { $set: { play_count: plays } });
 }
 
 function rescanItem(req){

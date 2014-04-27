@@ -89,7 +89,7 @@ function PlayState(){
     $(this.names.shuffle).click(function(){ player.toggleShuffle() });
     this.current_src = $("#current_src");
     this.fade_src = $("#fade_src");
-    this.current_track.addEventListener('ended', function(){ player.nextTrack() });
+    this.current_track.addEventListener('ended', function(){ player.trackEnded() });
     this.current_track.addEventListener('durationchange', function(){ player.durationChanged() });
     this.shuffle_state = localStorage.getItem('shuffle') || false;
     this.redrawShuffle();
@@ -166,6 +166,18 @@ function PlayState(){
   this.durationChanged = function(){
     var seconds = prettyPrintSeconds(this.current_track.duration);
     $(".duration").html(seconds);
+  }
+  this.trackEnded = function(){
+    // increment the playcount
+    this.current_song.attributes.play_count++;
+    socket.emit('update_play_count', {
+      track_id: this.current_song.attributes._id,
+      plays: this.current_song.attributes.play_count
+    });
+    // redraw that songs row (i.e. update it's play count)
+    MusicApp.router.songview.redrawSong(this.current_song.attributes._id);
+    // go to the next track
+    this.nextTrack();
   }
   this.playSong = function(id, force_restart){
     // remove the last playing song from the selection
@@ -520,13 +532,21 @@ SongView = Backbone.View.extend({
     if(this.songIndex < player.songs.length){
       var item = "";
       for(i = 0; i < batch; i++){
-        item += render("#song_item", { song: player.songs[this.songIndex], index: this.songIndex} );
+        item += render("#song_item", { song: player.songs[this.songIndex]} );
         this.songIndex++;
         if(this.songIndex == player.songs.length){
           break;
         }
       }
       this.$el.find(".song_body").append(item);
+    }
+  },
+  redrawSong: function(_id){
+    // check if the song is already visible
+    var song = this.$el.find("#"+_id);
+    if(song.length != 0){
+      // now replace the item
+      this.$el.find("#"+_id).replaceWith(render("#song_item", { song: player.song_collection.findBy_Id(_id)}));
     }
   },
   checkScroll: function(){

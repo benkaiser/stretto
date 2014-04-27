@@ -291,3 +291,6 @@ tr:hover .options{
 .duration_th{
   width: 50px;
 }
+.play_count_th{
+  width: 100px;
+}

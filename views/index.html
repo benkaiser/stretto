@@ -70,6 +70,7 @@
       <th class='artist_th'>Artist</th>
       <th class='album_th'>Album</th>
       <th class='duration_th'><i class="fa fa-clock-o"></i></th>
+      <th class='play_count_th'>Plays</th>
     </thead>
     <tbody class='song_body'>
     </tbody>
@@ -91,6 +92,7 @@
 <td><span class='colsearch'>{{song.attributes.display_artist}}</span></td>
 <td><span class='colsearch'>{{song.attributes.album}}</span></td>
 <td>{{song.attributes.duration|prettyPrintSeconds}}</td>
+<td>{{song.attributes.play_count}}</td>
 </tr>
 </script>
 <script type="text/swig" id="current_info_template">
