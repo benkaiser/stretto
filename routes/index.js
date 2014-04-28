@@ -209,6 +209,11 @@ function scanRoute(req, res){
       console.log(err);
     }
 
+    if(typeof list == 'undefined')
+    {
+      list = []
+    }
+
     res.render('scan', {
       dir: config.music_dir,
       num_items: list.length,
