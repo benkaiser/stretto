@@ -49,7 +49,7 @@ function findSong(item, callback){
           genre: result.genre,
           year: result.year,
           duration: result.duration,
-          play_count: doc.play_count || 0,
+          play_count: (doc == null) ? 0 : doc.play_count || 0,
           location: item
         };
         // write the cover photo as an md5 string
