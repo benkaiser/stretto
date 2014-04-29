@@ -138,6 +138,9 @@ function PlayState(){
       }
     }
     this.songs = tmpSongs;
+    // reset the sorting attributes
+    player.sort_asc = player.sort_col = null;
+    // create a mock playlist for the search results
     this.playlist = {
       title: "Search Results for: '"+this.searchText+"'",
       editable: false,
@@ -437,7 +440,11 @@ MusicAppRouter = Backbone.Router.extend({
       findId = player.playlist_collection.getBy_Id("LIBRARY");
     }
     player.playlist = findId;
+    // update the currently viewed songs
     player.songs = player.song_collection.getByIds(player.playlist);
+    // reset the sorting variables
+    player.sort_asc = player.sort_col = null;
+    // if the songs were found, update the songview
     if(player.songs){
       this.songview = new SongView();
       MusicApp.contentRegion.show(this.songview);
