@@ -209,15 +209,18 @@ function scanRoute(req, res){
       console.log(err);
     }
 
-    if(typeof list == 'undefined')
-    {
+    if(typeof list == 'undefined') {
       list = []
+      dir_error = true;
+    } else {
+      dir_error = false;
     }
 
     res.render('scan', {
       dir: config.music_dir,
       num_items: list.length,
-      menu: true
+      menu: true,
+      dir_error: dir_error
     });
   });
 }
