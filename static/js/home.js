@@ -67,6 +67,9 @@ function PlayState(){
   this.searchText = ""
   // currently viewed songs
   this.songs = [];
+  // current song list sort state
+  this.sort_asc = null;
+  this.sort_col = null;
   // current pool of songs to play
   this.queue_pool = [];
   this.song_collection = null;
@@ -162,6 +165,27 @@ function PlayState(){
       return true;
     }
     return false;
+  }
+  // sort the list of songs currently viewed by a certain column
+  this.sortSongs = function(col){
+    if(this.sort_col == null || this.sort_asc == null || this.sort_col != col) {
+      // start the sorting
+      this.sort_col = col;
+      this.sort_asc = true;
+    } else if(this.sort_col == col){
+      // already sorted on this column, flip the direction
+      this.sort_asc = !this.sort_asc;
+    }
+    // perform the sort
+    player.songs.sort(this.songSortFunc);
+  }
+  // function to perform the sort based on current sorting attributes
+  this.songSortFunc = function(a, b){
+    if(a.attributes[player.sort_col] < b.attributes[player.sort_col])
+       return (player.sort_asc) ? -1 : 1;
+    if(a.attributes[player.sort_col] > b.attributes[player.sort_col])
+      return (player.sort_asc) ? 1 : -1;
+    return 0;
   }
   this.durationChanged = function(){
     var seconds = prettyPrintSeconds(this.current_track.duration);
@@ -447,6 +471,8 @@ SongView = Backbone.View.extend({
       title: player.playlist.title, 
       editable: player.playlist.editable,
       _id: player.playlist._id,
+      sort_col: player.sort_col,
+      sort_asc: player.sort_asc,
       songs: player.songs
     }));
     this.$el.addClass("custom_scrollbar");
@@ -459,6 +485,7 @@ SongView = Backbone.View.extend({
   },
   events: {
     "click .colsearch": "triggerSearch",
+    "click thead > tr": "triggerSort",
     "click tbody > tr": "triggerSong",
     "click .options": "triggerOptions",
     "contextmenu td": "triggerOptions",
@@ -466,8 +493,13 @@ SongView = Backbone.View.extend({
     "click .delete_playlist": "deletePlaylist"
   },
   triggerSearch: function(ev){
-    search = $(ev.target).text();
+    var search = $(ev.target).text();
     player.updateSearch(search);
+  },
+  triggerSort: function(ev){
+    var column_name = $(ev.target).closest("th").attr('class').replace('_th', '');
+    player.sortSongs(column_name);
+    this.render();
   },
   triggerSong: function(ev){
     if($(ev.target).hasClass("options") || $(ev.target).hasClass("colsearch")){
@@ -532,7 +564,10 @@ SongView = Backbone.View.extend({
     if(this.songIndex < player.songs.length){
       var item = "";
       for(i = 0; i < batch; i++){
-        item += render("#song_item", { song: player.songs[this.songIndex]} );
+        item += render("#song_item", {
+          song: player.songs[this.songIndex],
+          selected: (selectedItems.indexOf(player.songs[this.songIndex].attributes._id) != -1)
+        });
         this.songIndex++;
         if(this.songIndex == player.songs.length){
           break;

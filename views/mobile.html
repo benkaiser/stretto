@@ -61,8 +61,12 @@
   {% endif %}</h1>
   <table class='table song_table disable_selection'>
     <thead>
-      <th class='title_th'>Title</th>
-      <th class='artist_th'>Artist</th>
+      <th class='title_th'>Title
+        {% if sort_col == 'title' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
+      <th class='display_artist_th'>Artist
+        {% if sort_col == 'display_artist' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
     </thead>
     <tbody class='song_body'>
     </tbody>

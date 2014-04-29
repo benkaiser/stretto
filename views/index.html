@@ -66,18 +66,28 @@
   {% endif %}</h1>
   <table class='table song_table disable_selection'>
     <thead>
-      <th class='title_th'>Title</th>
-      <th class='artist_th'>Artist</th>
-      <th class='album_th'>Album</th>
-      <th class='duration_th'><i class="fa fa-clock-o"></i></th>
-      <th class='play_count_th'>Plays</th>
+      <th class='title_th'>Title
+        {% if sort_col == 'title' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
+      <th class='display_artist_th'>Artist
+        {% if sort_col == 'display_artist' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
+      <th class='album_th'>Album
+        {% if sort_col == 'album' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
+      <th class='duration_th'><i class="fa fa-clock-o"></i>
+        {% if sort_col == 'duration' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
+      <th class='play_count_th'>Plays
+        {% if sort_col == 'play_count' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
     </thead>
     <tbody class='song_body'>
     </tbody>
   </table>
 </script>
 <script type='text/swig' id='song_item'>
-<tr id="{{song.attributes._id}}">
+<tr id="{{song.attributes._id}}" {% if selected %}class='selected'{% endif %}>
 <td>
   <div class='option_div'>
     <i class='fa fa-plus-square-o options'></i>
