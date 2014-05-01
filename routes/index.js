@@ -104,6 +104,7 @@ function returnSongs(req){
 function returnPlaylists(req){
   app.db.playlists.find({}, function(err, docs){
     playlists = docs;
+    // create a new playlist for the library
     getLibraryIds(function(result){
       playlists.push({
         _id: "LIBRARY",
@@ -111,13 +112,15 @@ function returnPlaylists(req){
         songs: result,
         editable: false
       });
+      // send the playlists back to the user
       req.io.emit('playlists', {"playlists": playlists});
     });
   });
 }
 
+// get the _id's of every song in the library
 function getLibraryIds(callback){
-  app.db.songs.find({}, function(err, docs){
+  app.db.songs.find({}).sort({ title: 1 }).exec(function(err, docs){
     for(var i = 0; i < docs.length; i++){
       docs[i] = {_id: docs[i]["_id"]};
     }
@@ -146,8 +149,9 @@ function deletePlaylist(req){
 function addToPlaylist(req){
   addItems = req.data.add;
   to = req.data.playlist;
+  // pull the playlists database
   app.db.playlists.findOne({ _id: to}, function (err, doc) {
-    waitingOn = 0;
+    waitingOn = 0; // used as a counter to count how many still need to be added
     for (var i = 0; i < addItems.length; i++) {
       var found = false;
       for(var j = 0; j < doc.songs.length; j++){
