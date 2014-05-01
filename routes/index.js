@@ -207,20 +207,14 @@ function scanRoute(req, res){
   util.walk(config.music_dir, function(err, list){
     if(err){
       console.log(err);
-    }
-
-    if(typeof list == 'undefined') {
-      list = []
-      dir_error = true;
-    } else {
-      dir_error = false;
+      list = [];
     }
 
     res.render('scan', {
       dir: config.music_dir,
       num_items: list.length,
       menu: true,
-      dir_error: dir_error
+      err: err
     });
   });
 }

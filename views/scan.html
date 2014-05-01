@@ -5,9 +5,9 @@
 {% block content %}
 <div class='content-body'>
   <h1>Scan</h1>
-  {% if dir_error %}
+  {% if err %}
     <div class="alert alert-danger">
-      The path specified as <code>music_dir</code> could not be found. You need to change it in the config.js file.
+      <strong>Error {{err.errno}}</strong><br/>Your music directory <code>{{dir}}</code> could not be accessed, please check the directory is valid and make sure it is readable by the user running this process. This setting is configured in the `config.js` file.
     </div>
   {% else %}
     <p>Currently your music dir is <code>{{dir}}</code> and contains <code>{{num_items}}</code> items.</p>
