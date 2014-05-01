@@ -34,8 +34,10 @@ var SongCollection = Backbone.Collection.extend({
     if(playlist !== undefined && playlist.songs !== undefined){
       songs = [];
       for(var i = 0; i < playlist.songs.length; i++){
-        song = this.findBy_Id(playlist.songs[i]["_id"]);
+        var song = this.findBy_Id(playlist.songs[i]["_id"]);
         if(song){
+          // set the index in the playlist
+          song.attributes.index = i;
           songs.push(song);
         }
       }
@@ -131,9 +133,14 @@ function PlayState(){
     }
     searchText = searchText.toLowerCase();
     var tmpSongs = [];
+    // counter for index in the song list
+    var matched = 0;
     for (var i = 0; i < this.song_collection.length; i++) {
       var item = this.song_collection.models[i];
       if(this.songMatches(item, searchText)){
+        // set the index
+        item.attributes.index = matched++;
+        // add it to the list of matched songs
         tmpSongs.push(item);
       }
     }
@@ -487,6 +494,19 @@ SongView = Backbone.View.extend({
     this.$el.scroll(function(){
       MusicApp.router.songview.checkScroll();
     });
+    this.$el.find(".song_table").sortable({
+      items: 'tr',
+      helper: fixHelper,
+      update: function(event, ui){
+        // get where the item has moved from - to
+        var newIndex = ui.item.index();
+        var item = player.song_collection.findBy_Id(ui.item.attr('id'));
+        var oldIndex = item.attributes.index;
+        // TODO: actually move the data on the client and on the server and redraw the indexes
+        console.log(newIndex);
+        console.log(item);
+      }
+    });
     this.songIndex = 0;
     this.renderSong();
   },
@@ -839,5 +859,14 @@ function deAttribute(collection){
   }
   return newCollection;
 }
+
+// make table row widths be correct when dragging
+var fixHelper = function(e, ui) {
+  ui.children().each(function() {
+    $(this).width($(this).width());
+  });
+  return ui;
+};
+
 // make it usable in swig
 swig.setFilter('prettyPrintSeconds', prettyPrintSecondsorNA);

@@ -294,3 +294,10 @@ tr:hover .options{
 .play_count_th{
   width: 100px;
 }
+.index_th{
+  width: 55px;
+  text-align: right;
+}
+.index_text{
+  padding-right: 10px;
+}
