@@ -37,7 +37,7 @@ var SongCollection = Backbone.Collection.extend({
         var song = this.findBy_Id(playlist.songs[i]["_id"]);
         if(song){
           // set the index in the playlist
-          song.attributes.index = i;
+          song.attributes.index = i+1;
           songs.push(song);
         }
       }
@@ -494,19 +494,39 @@ SongView = Backbone.View.extend({
     this.$el.scroll(function(){
       MusicApp.router.songview.checkScroll();
     });
-    this.$el.find(".song_table").sortable({
-      items: 'tr',
-      helper: fixHelper,
-      update: function(event, ui){
-        // get where the item has moved from - to
-        var newIndex = ui.item.index();
-        var item = player.song_collection.findBy_Id(ui.item.attr('id'));
-        var oldIndex = item.attributes.index;
-        // TODO: actually move the data on the client and on the server and redraw the indexes
-        console.log(newIndex);
-        console.log(item);
-      }
-    });
+    // logic to manually order the songs in a playlist
+    if( player.playlist.editable && // playlist is editable
+        // it is sorted in a way that makes sense for sorting
+        ((player.sort_col == null && player.sort_asc == null) ||
+        (player.sort_col == "index" && player.sort_asc == true))){
+      this.$el.find(".song_table tbody").sortable({
+        items: 'tr',
+        helper: fixHelper,
+        update: function(event, ui){
+          // get where the item has moved from - to
+          var item = player.song_collection.findBy_Id(ui.item.attr('id'));
+          var oldIndex = item.attributes.index-1;
+          var newIndex = ui.item.index();
+          // remove the item from it's old place
+          var item = player.playlist.songs.splice(oldIndex, 1)[0];
+          // add the item into it's new place
+          player.playlist.songs.splice(newIndex, 0, item);
+          // refresh the songs array from the playlist
+          player.songs = player.song_collection.getByIds(player.playlist);
+          // redraw all the song indexes (reasonably efficient method)
+          $(".song_table tbody tr").each(function(index){
+            $(this).find(".index_text").text(index+1);
+          });
+          // send the data back to the server
+          socket.emit("song_moved_in_playlist", {
+            playlist_id: player.playlist._id,
+            oldIndex: oldIndex,
+            newIndex: newIndex
+          });
+        }
+      });
+    }
+    // set the defaults and start rendering songs
     this.songIndex = 0;
     this.renderSong();
   },
@@ -605,8 +625,8 @@ SongView = Backbone.View.extend({
   },
   redrawSong: function(_id){
     // check if the song is already visible
-    var song = this.$el.find("#"+_id);
-    if(song.length != 0){
+    var song_tr = this.$el.find("#"+_id);
+    if(song_tr.length != 0){
       // now replace the item
       this.$el.find("#"+_id).replaceWith(render("#song_item", { song: player.song_collection.findBy_Id(_id)}));
     }

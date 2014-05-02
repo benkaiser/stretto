@@ -35,6 +35,7 @@ exports.createRoutes = function(app_ref){
   app.io.route('delete_playlist', deletePlaylist);
   app.io.route('add_to_playlist', addToPlaylist);
   app.io.route('remove_from_playlist', removeFromPlaylist);
+  app.io.route('song_moved_in_playlist', songMovedInPlaylist);
   // play count
   app.io.route('update_play_count', updatePlayCount);
   // remote control routes
@@ -185,6 +186,20 @@ function removeFromPlaylist(req){
     app.db.playlists.update({_id: to}, { $set:{songs: tmpSongs}}, function(){
       req.io.route('fetch_playlists');
     });
+  });
+}
+
+function songMovedInPlaylist(req){
+  var playlist_id = req.data.playlist_id;
+  var oldIndex = req.data.oldIndex;
+  var newIndex = req.data.newIndex;
+  app.db.playlists.findOne({ _id: playlist_id}, function (err, playlist) {
+    // remove the item from it's old place
+    var item = playlist.songs.splice(oldIndex, 1)[0];
+    // add the item into it's new place
+    playlist.songs.splice(newIndex, 0, item);
+    // update the playlist with the new order
+    app.db.playlists.update({_id: playlist_id}, { $set:{songs: playlist.songs}});
   });
 }
 
