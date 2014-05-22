@@ -66,9 +66,6 @@
   {% endif %}</h1>
   <table class='table song_table disable_selection'>
     <thead>
-      <th class='index_th'>#
-        {% if sort_col == 'index' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
-      </th>
       <th class='title_th'>Title
         {% if sort_col == 'title' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
@@ -91,7 +88,6 @@
 </script>
 <script type='text/swig' id='song_item'>
 <tr id="{{song.attributes._id}}" {% if selected %}class='selected'{% endif %}>
-<td class='text-right'><span class="index_text">{{song.attributes.index}}</span></td>
 <td>
   <div class='option_div'>
     <i class='fa fa-plus-square-o options'></i>

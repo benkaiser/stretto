@@ -227,7 +227,7 @@ function PlayState(){
     }
     // update the audio element
     this.current_track.pause();
-    this.current_src.attr("src", "/songs/"+this.playing_id); 
+    this.current_src.attr("src", "/songs/"+this.playing_id);
     this.current_track.load();
     this.current_track.play();
     // set the state to playing
@@ -482,7 +482,7 @@ SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
     this.$el.html(render(this.template, {
-      title: player.playlist.title, 
+      title: player.playlist.title,
       editable: player.playlist.editable,
       _id: player.playlist._id,
       sort_col: player.sort_col,
@@ -497,8 +497,7 @@ SongView = Backbone.View.extend({
     // logic to manually order the songs in a playlist
     if( player.playlist.editable && // playlist is editable
         // it is sorted in a way that makes sense for sorting
-        ((player.sort_col == null && player.sort_asc == null) ||
-        (player.sort_col == "index" && player.sort_asc == true))){
+        (player.sort_col == null && player.sort_asc == null)){
       this.$el.find(".song_table tbody").sortable({
         items: 'tr',
         helper: fixHelper,
@@ -513,10 +512,6 @@ SongView = Backbone.View.extend({
           player.playlist.songs.splice(newIndex, 0, item);
           // refresh the songs array from the playlist
           player.songs = player.song_collection.getByIds(player.playlist);
-          // redraw all the song indexes (reasonably efficient method)
-          $(".song_table tbody tr").each(function(index){
-            $(this).find(".index_text").text(index+1);
-          });
           // send the data back to the server
           socket.emit("song_moved_in_playlist", {
             playlist_id: player.playlist._id,
