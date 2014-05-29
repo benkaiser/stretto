@@ -83,6 +83,9 @@ function PlayState(){
   this.current_track = document.getElementById("current_track");
   this.fade_track = document.getElementById("fade_track");
   this.scrub = null;
+  // keep track of play next and history
+  this.play_history = [];
+  this.play_history_idx = 0;
   // remote control data
   this.comp_name = null;
   this.init = function(){
@@ -288,44 +291,66 @@ function PlayState(){
     }
   }
   this.nextTrack = function(){
+    // repeat the current song if the repeat state is on one
     if(this.repeat_state == this.repeat_states.one){
       this.current_track.currentTime = 0;
       this.current_track.play();
       return;
     }
+    // find the index we should move to
     var index = 0;
-    if(this.shuffle_state){
-      // the -2 is to take 1 off the length and 1 for the current track
-      // it then adds to the value if it is >= the current index.
-      // this ensures the same track is not played and the the new random
-      // track contains no bias
-      if(this.queue_pool.length > 1){
-        var index = randomIntFromInterval(0, this.queue_pool.length-2);
-        if(index >= this.current_index && this.queue_pool.length > 1){
-          index++;
+    if(this.play_history_idx > 0 && this.play_history.length >= this.play_history_idx){
+      // move forward a song in the history
+      this.play_history_idx--;
+      // play it and break
+      this.playSong(this.play_history[this.play_history_idx], true);
+      return;
+    } else{
+      // add the song to the history
+      this.play_history.unshift(this.current_song.attributes._id);
+
+      if(this.shuffle_state){
+        // the -2 is to take 1 off the length and 1 for the current track
+        // it then adds to the value if it is >= the current index.
+        // this ensures the same track is not played and the the new random
+        // track contains no bias
+        if(this.queue_pool.length > 1){
+          var index = randomIntFromInterval(0, this.queue_pool.length-2);
+          if(index >= this.current_index && this.queue_pool.length > 1){
+            index++;
+          }
+        } else {
+          index = this.current_index;
         }
       } else {
-        index = this.current_index;
-      }
-    } else {
-      var index = this.current_index+1;
-      if(index == this.queue_pool.length){
-        index = 0;
+        var index = this.current_index+1;
+        if(index == this.queue_pool.length){
+          index = 0;
+        }
       }
     }
     this.playSong(this.queue_pool[index].attributes._id, true);
   }
   this.prevTrack = function(){
+    // should we just start this song again
     if(this.current_track.currentTime > 5.00 || this.repeat_state == this.repeat_states.one){
       this.current_track.currentTime = 0;
       this.current_track.play();
     } else {
-      // move to the previous song
-      var index = this.current_index-1;
-      if(index == -1){
-        index = this.queue_pool.length-1;
+      // find the previous song if it exists
+      if(this.play_history.length > 0 && this.play_history_idx < this.play_history.length){
+        // play the song from the history
+        this.playSong(this.play_history[this.play_history_idx], true);
+        // increment the history index marker
+        this.play_history_idx++;
+      } else {
+        // move to the previous song in the playlist
+        var index = this.current_index-1;
+        if(index == -1){
+          index = this.queue_pool.length-1;
+        }
+        this.playSong(this.queue_pool[index].attributes._id, true);
       }
-      this.playSong(this.queue_pool[index].attributes._id, true);
     }
   }
   this.setScubElem = function(elem){
