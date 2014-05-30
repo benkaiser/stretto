@@ -165,6 +165,8 @@ tr:hover .options{
   margin: 0;
   margin-left: -161px;
   padding: 0;
+  background-color: #fff;
+  box-shadow: -10px 0px 5px #fff;
 }
 .controls .fa{
   padding-left: 10px;
@@ -220,6 +222,7 @@ tr:hover .options{
   float: left;
   width: 50%;
   text-align: left;
+  white-space: nowrap;
 }
 .info_cover{
   float: left;
@@ -243,7 +246,6 @@ tr:hover .options{
 }
 .info_wrapper{
   display: inline-block;
-  float: left;
 }
 .info_options{
   margin-left: 20px;
