@@ -691,7 +691,6 @@ function createOptions(x, y){
     }))
     .css({"top": y+"px", "left": x+"px"});
   $(".add_to_queue").click(function(ev){
-    console.log(lastSelection);
     player.play_history.unshift(lastSelection);
     player.play_history_idx++;
     hideOptions();
