@@ -41,10 +41,7 @@ Go to `localhost:2000` in your browser (or known ip of server if it is on a diff
 
 ### Planned features
 
-- Cross-device syncing over network (between computers and android devices)
-- Remote controlling from other devices (i.e. phones, tablets, other computers)
-- Mobile viewing, so one may play and listen their library in an intuitive interface for a mobile phone
-- Favourite artists section
+- See TODO.md
 
 ### FAQ
 
