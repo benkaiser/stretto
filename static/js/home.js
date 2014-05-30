@@ -125,6 +125,8 @@ function PlayState(){
         return i;
       }
     }
+    // fallback to all songs
+    return null;
   }
   this.updateSearch = function(searchText){
     MusicApp.router.navigate("search/"+encodeURIComponent(searchText), true);
@@ -221,8 +223,14 @@ function PlayState(){
     delFromSelection(this.playing_id);
     addToSelection(id, false);
     // set the current song
-    this.current_index = this.findSongIndex(id);
-    this.current_song = this.queue_pool[this.current_index];
+    var index_in_queue = this.findSongIndex(id);
+    if(index_in_queue == null){
+      this.current_index = 0;
+      this.current_song = this.song_collection.findBy_Id(id);
+    } else {
+      this.current_index = index_in_queue;
+      this.current_song = this.queue_pool[this.current_index];
+    }
     if(id == this.playing_id && !force_restart){
       return;
     } else {
@@ -305,10 +313,7 @@ function PlayState(){
       // play it and break
       this.playSong(this.play_history[this.play_history_idx], true);
       return;
-    } else{
-      // add the song to the history
-      this.play_history.unshift(this.current_song.attributes._id);
-
+    } else {
       if(this.shuffle_state){
         // the -2 is to take 1 off the length and 1 for the current track
         // it then adds to the value if it is >= the current index.
@@ -328,6 +333,8 @@ function PlayState(){
           index = 0;
         }
       }
+      // add the song to the history
+      this.play_history.unshift(this.queue_pool[index].attributes._id);
     }
     this.playSong(this.queue_pool[index].attributes._id, true);
   }
@@ -338,11 +345,11 @@ function PlayState(){
       this.current_track.play();
     } else {
       // find the previous song if it exists
-      if(this.play_history.length > 0 && this.play_history_idx < this.play_history.length){
-        // play the song from the history
-        this.playSong(this.play_history[this.play_history_idx], true);
+      if(this.play_history.length > 0 && this.play_history_idx+1 < this.play_history.length){
         // increment the history index marker
         this.play_history_idx++;
+        // play the song from the history
+        this.playSong(this.play_history[this.play_history_idx], true);
       } else {
         // move to the previous song in the playlist
         var index = this.current_index-1;
@@ -422,7 +429,7 @@ socket.on('playlists', function(data){
 // jquery initialiser
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
-  $("#wrapper").keydown(function(event){
+  $("body").keydown(function(event){
     // don't fire the controls if the user is editing an input
     if(event.target.localName == 'input'){
       return;
@@ -585,6 +592,9 @@ SongView = Backbone.View.extend({
       clearSelection();
       player.queue_pool = player.songs.slice(0);
       player.playSong(id, false);
+      // add the song to the history and reset it to the top
+      player.play_history.unshift(id);
+      player.play_history_idx = 0;
     }
   },
   triggerOptions: function(ev){
