@@ -17,7 +17,7 @@ Windows support is not guaranteed and is up to someone else to submit any pull r
 
 Install with the following commands:
 ```
-git clone git@github.com:benkaiser/node-music-player.git
+git clone https://github.com/benkaiser/node-music-player.git
 cd node-music-player/
 npm install
 ```
