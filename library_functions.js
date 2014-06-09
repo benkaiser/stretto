@@ -12,6 +12,8 @@ var app = null;
 var cnt = 0;
 var song_list = [];
 
+var song_extentions = ["mp3", "m4a", "aac", "ogg", "wav", "flac", "raw"];
+
 function findNextSong(){
   if(cnt < song_list.length && running){
     findSong(song_list[cnt], function(err){
@@ -92,17 +94,62 @@ function findSong(item, callback){
 
       parser.on('done', function (err) {
         if (err) {
-          callback(err);
+          var ext = "";
+          if(item.lastIndexOf(".") > 0) {
+            ext = item.substr(item.lastIndexOf(".")+1, item.length);
+          }
+          // if it was a metadata error and the file appears to be audio, add it
+          if(err.toString().indexOf("Could not find metadata header") > 0
+             && util.contains(song_extentions, ext)){
+            console.log("Could not find metadata. Adding the song by filename.");
+            // create a song with the filename as the title
+            var song = {
+              title: item.substr(item.lastIndexOf("/") + 1, item.length),
+              album: "Unknown (no tags)",
+              artist: "Unknown (no tags)",
+              albumartist: "Unknown (no tags)",
+              display_artist: "Unknown (no tags)",
+              genre: "Unknown",
+              year: "Unknown",
+              duration: 0,
+              play_count: (doc == null) ? 0 : doc.play_count || 0,
+              location: item
+            };
+            if(doc == null){
+              app.db.songs.insert(song, function (err, newDoc){
+                taglib_fetch(item, newDoc._id);
+                // update the browser the song has been added
+                broadcast("update", {
+                  count: song_list.length,
+                  completed: cnt,
+                  details: "Added: " + newDoc["title"]
+                });
+              });
+            } else if (hard_rescan){
+              app.db.songs.update({location: item}, song, {}, function(err, numRplaced){
+                taglib_fetch(item, doc._id);
+                broadcast("update", {
+                  count: song_list.length,
+                  completed: cnt,
+                  details: "Updated: " + song["title"]
+                });
+              })
+            }
+            callback(null);
+          } else {
+            callback(err);
+          }
         } else {
           callback(null);
         }
       });
     } else {
-      broadcast("update", {
-        count: song_list.length,
-        completed: cnt,
-        details: "Already scanned item: " + item
-      });
+      // TODO: make this less frequent
+      // broadcast("update", {
+      //   count: song_list.length,
+      //   completed: cnt,
+      //   details: "Already scanned item: " + item
+      // });
       // perform rescan? hard rescan option?
       callback(null);
     }

@@ -37,3 +37,14 @@ var mkdir = function(dir, done) {
   });
 }
 exports.mkdir = mkdir;
+
+var contains = function(a, obj){
+    var i = a.length;
+    while (i--) {
+       if (a[i] === obj) {
+           return true;
+       }
+    }
+    return false;
+}
+exports.contains = contains;
