@@ -70,8 +70,12 @@ function PlayState(){
   // current song list sort state
   this.sort_asc = null;
   this.sort_col = null;
-  // current pool of songs to play
+  // current pool of songs to play, in order from whatever list they were picked
   this.queue_pool = [];
+  // same as above but shuffled, used to make sure a correct shuffle is done
+  this.shuffle_pool = [];
+  this.shuffle_idx = 0;
+  // other state
   this.song_collection = null;
   this.playlist_collection = null;
   this.playing_id = null;
@@ -296,6 +300,17 @@ function PlayState(){
       $(this.names.repeat).removeClass("blue");
     }
   }
+  this.genShufflePool = function(){
+    // create the shuffle pool, remove the current track, shuffle it and place
+    // the current track at the start. This creates a correct shuffle.
+    player.shuffle_pool = player.queue_pool.slice(0);
+    // remove the current song
+    player.shuffle_pool.splice(player.current_index, 1);
+    // shuffle the array
+    player.shuffle_pool = shuffle_array(player.shuffle_pool);
+    // set the shuffle idx back at the start
+    player.shuffle_idx = 0;
+  }
   this.nextTrack = function(){
     // repeat the current song if the repeat state is on one
     if(this.repeat_state == this.repeat_states.one){
@@ -313,28 +328,26 @@ function PlayState(){
       return;
     } else {
       if(this.shuffle_state){
-        // the -2 is to take 1 off the length and 1 for the current track
-        // it then adds to the value if it is >= the current index.
-        // this ensures the same track is not played and the the new random
-        // track contains no bias
-        if(this.queue_pool.length > 1){
-          var index = randomIntFromInterval(0, this.queue_pool.length-2);
-          if(index >= this.current_index && this.queue_pool.length > 1){
-            index++;
-          }
-        } else {
-          index = this.current_index;
+        if(this.shuffle_idx == this.shuffle_pool.length){
+          // reshuffle to make it seem more random
+          this.genShufflePool();
         }
+        // play the next shuffle song
+        this.play_history.unshift(this.shuffle_pool[this.shuffle_idx].attributes._id);
+        this.playSong(this.shuffle_pool[this.shuffle_idx].attributes._id, true);
+        // increment the shuffle idx for the next time `next` is pressed
+        this.shuffle_idx++;
       } else {
+        // they don't have shuffle turned on, play the next song in the queue
         var index = this.current_index+1;
         if(index == this.queue_pool.length){
           index = 0;
         }
+        // add the song to the history
+        this.play_history.unshift(this.queue_pool[index].attributes._id);
+        this.playSong(this.queue_pool[index].attributes._id, true);
       }
-      // add the song to the history
-      this.play_history.unshift(this.queue_pool[index].attributes._id);
     }
-    this.playSong(this.queue_pool[index].attributes._id, true);
   }
   this.prevTrack = function(){
     // should we just start this song again
@@ -590,6 +603,7 @@ SongView = Backbone.View.extend({
       clearSelection();
       player.queue_pool = player.songs.slice(0);
       player.playSong(id, false);
+      player.genShufflePool();
       // add the song to the history and reset it to the top
       player.play_history.unshift(id);
       player.play_history_idx = 0;
@@ -899,6 +913,20 @@ function searchMatchesSong(songString, searchWords){
     }
   }
   return true;
+}
+
+// implementation of knuth-shuffle by @coolaj86
+// https://github.com/coolaj86/knuth-shuffle
+function shuffle_array(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+  while (0 !== currentIndex) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
 }
 
 function randomIntFromInterval(min,max){
