@@ -301,15 +301,20 @@ function PlayState(){
     }
   }
   this.genShufflePool = function(){
-    // create the shuffle pool, remove the current track, shuffle it and place
-    // the current track at the start. This creates a correct shuffle.
-    player.shuffle_pool = player.queue_pool.slice(0);
-    // remove the current song
-    player.shuffle_pool.splice(player.current_index, 1);
-    // shuffle the array
-    player.shuffle_pool = shuffle_array(player.shuffle_pool);
-    // set the shuffle idx back at the start
-    player.shuffle_idx = 0;
+    if(player.queue_pool.length > 1){
+      // create the shuffle pool, remove the current track, shuffle it and place
+      // the current track at the start. This creates a correct shuffle.
+      player.shuffle_pool = player.queue_pool.slice(0);
+      // remove the current song
+      player.shuffle_pool.splice(player.current_index, 1);
+      // shuffle the array
+      player.shuffle_pool = shuffle_array(player.shuffle_pool);
+      // set the shuffle idx back at the start
+      player.shuffle_idx = 0;
+    } else {
+      player.shuffle_pool = player.queue_pool.slice(0);
+      player.shuffle_idx = 0;
+    }
   }
   this.nextTrack = function(){
     // repeat the current song if the repeat state is on one
