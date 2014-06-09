@@ -49,9 +49,7 @@ var SongCollection = Backbone.Collection.extend({
 
 // music library object
 function PlayState(){
-  this.d = {
-    scrubTimeout: null
-  };
+  this.scrubberTimeout = null;
   this.names = {
     playpause: "#playpause",
     next: "#next",
@@ -375,17 +373,17 @@ function PlayState(){
     this.current_track.volume = value / 100.00;
   }
   this.scrubTimeout = function(){
-    if(this.d.scrubTimeout !== null){
-      clearTimeout(this.d.scrubTimeout);
+    if(this.scrubberTimeout !== null){
+      clearTimeout(this.scrubberTimeout);
     }
-    this.d.scrubTimeout = setTimeout(function(){ player.scrubTimeoutComplete() }, 1000);
+    this.scrubberTimeout = setTimeout(function(){ player.scrubTimeoutComplete() }, 1000);
     this.isSeeking = true;
     // update the time to show the current scrub value
     var seconds = prettyPrintSeconds(this.current_track.duration * this.scrub.slider('getValue') / 100.00);
     $(".current_time").html(seconds);
   }
   this.scrubTimeoutComplete = function(){
-    clearTimeout(this.d.scrubTimeout);
+    clearTimeout(this.scrubberTimeout);
     this.isSeeking = false;
     this.scrubTo(this.scrub.slider('getValue'));
   }
