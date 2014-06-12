@@ -547,6 +547,7 @@ SongView = Backbone.View.extend({
         // it is sorted in a way that makes sense for sorting
         (player.sort_col == null && player.sort_asc == null)){
       this.$el.find(".song_table tbody").sortable({
+        delay: 100,
         items: 'tr',
         helper: fixHelper,
         update: function(event, ui){
@@ -881,7 +882,9 @@ function loadedRestart(item){
     Backbone.history.stop();
     Backbone.history.start();
     // if the player is showing nothing, show the default place
-    MusicApp.router.playlist();
+    if(MusicApp.router.songview === null){
+      MusicApp.router.playlist();
+    }
   }
 }
 
