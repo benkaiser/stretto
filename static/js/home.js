@@ -880,6 +880,8 @@ function loadedRestart(item){
   if(arraysEqual(items, itemsLoaded)){
     Backbone.history.stop();
     Backbone.history.start();
+    // if the player is showing nothing, show the default place
+    MusicApp.router.playlist();
   }
 }
 
