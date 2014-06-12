@@ -4,6 +4,14 @@ Node Music Player
 
 ![alt tag](https://f.cloud.github.com/assets/608054/2256870/25a93a38-9e0e-11e3-8432-b0cc2e2c896f.png)
 
+### Live Demo
+You can view a version I have hosted on one of my personal servers at [http://xpressen.com:2020](http://xpressen.com:2020).
+
+To have the full functionality and to use your own music please follow the install instructions below.
+
+The music I have used for the hosted version is copyright of [Social Club](http://martymar.goodcitymusic.com/).
+To purchase or download their music visit [their website](http://martymar.goodcitymusic.com/).
+
 ### How does it work?
 Run it on your computer or server containing your music library and then access it through `<ip of computer>:2000`, for example if you run it on your local computer you would use `localhost:2000`.
 
