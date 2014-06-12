@@ -34,7 +34,9 @@ function findNextSong(){
 }
 
 function findSong(item, callback){
-  app.db.songs.findOne({location: item}, function(err, doc){
+  // convert the filename into a relative filename
+  var location = item.replace(config.music_dir, "");
+  app.db.songs.findOne({location: location}, function(err, doc){
     // only scan if we haven't scanned before, or we are scanning every document again
     if(doc == null || hard_rescan){
       // insert the new song
@@ -52,14 +54,14 @@ function findSong(item, callback){
           year: result.year,
           duration: result.duration,
           play_count: (doc == null) ? 0 : doc.play_count || 0,
-          location: item
+          location: location
         };
         // write the cover photo as an md5 string
         if(result.picture.length > 0){
           pic = result.picture[0];
           pic["format"] = pic["format"].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-          filename = __dirname + '/dbs/covers/' + md5(pic['data']) + "." + pic["format"];
-          song.cover_location = filename;
+          song.cover_location = md5(pic['data']) + "." + pic["format"];
+          filename = __dirname + '/dbs/covers/' + song.cover_location;
           fs.exists(filename, function(exists){
             if(!exists){
               fs.writeFile(filename, pic['data'], function(err){
@@ -72,7 +74,7 @@ function findSong(item, callback){
         if(doc == null){
           // insert the song
           app.db.songs.insert(song, function (err, newDoc){
-            taglib_fetch(item, newDoc._id);
+            taglib_fetch(location, newDoc._id);
             // update the browser the song has been added
             broadcast("update", {
               count: song_list.length,
@@ -81,8 +83,8 @@ function findSong(item, callback){
             });
           });
         } else if (hard_rescan){
-          app.db.songs.update({location: item}, song, {}, function(err, numRplaced){
-            taglib_fetch(item, doc._id);
+          app.db.songs.update({location: location}, song, {}, function(err, numRplaced){
+            taglib_fetch(location, doc._id);
             broadcast("update", {
               count: song_list.length,
               completed: cnt,
@@ -94,6 +96,7 @@ function findSong(item, callback){
 
       parser.on('done', function (err) {
         if (err) {
+          // get the file extension
           var ext = "";
           if(item.lastIndexOf(".") > 0) {
             ext = item.substr(item.lastIndexOf(".")+1, item.length);
@@ -113,11 +116,11 @@ function findSong(item, callback){
               year: "Unknown",
               duration: 0,
               play_count: (doc == null) ? 0 : doc.play_count || 0,
-              location: item
+              location: location
             };
             if(doc == null){
               app.db.songs.insert(song, function (err, newDoc){
-                taglib_fetch(item, newDoc._id);
+                taglib_fetch(location, newDoc._id);
                 // update the browser the song has been added
                 broadcast("update", {
                   count: song_list.length,
@@ -126,8 +129,8 @@ function findSong(item, callback){
                 });
               });
             } else if (hard_rescan){
-              app.db.songs.update({location: item}, song, {}, function(err, numRplaced){
-                taglib_fetch(item, doc._id);
+              app.db.songs.update({location: location}, song, {}, function(err, numRplaced){
+                taglib_fetch(location, doc._id);
                 broadcast("update", {
                   count: song_list.length,
                   completed: cnt,
@@ -176,7 +179,7 @@ function normaliseArtist(albumartist, artist){
 
 function taglib_fetch(path, id){
   // use taglib to fetch duration
-  taglib.read(path, function(err, tag, audioProperties) {
+  taglib.read(config.music_dir + path, function(err, tag, audioProperties) {
     app.db.songs.update({ _id: id }, { $set: { duration: audioProperties.length} });
   });
 }

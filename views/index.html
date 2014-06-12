@@ -93,7 +93,7 @@
     <i class='fa fa-plus-square-o options'></i>
   </div>
   {% if song.attributes.hasOwnProperty('cover_location') %}
-    <img class='cover' src='/cover/{{song.attributes._id}}'/>
+    <img class='cover' src='/cover/{{song.attributes.cover_location}}'/>
   {% else %}
     <i class='fa fa-question unkown_cover'></i>
   {% endif %}
@@ -107,7 +107,7 @@
 </script>
 <script type="text/swig" id="current_info_template">
   {% if attributes.hasOwnProperty('cover_location') %}
-    <img class='info_cover' src='/cover/{{attributes._id}}'/>
+    <img class='info_cover' src='/cover/{{attributes.cover_location}}'/>
   {% else %}
     <i class='fa fa-question info_unknown_cover'></i>
   {% endif %}

@@ -55,19 +55,18 @@ function sendSong(req, res){
     if(err || !song){
       res.status(404).send();
     } else {
-      res.sendfile(encodeURIComponent(song.location));
+      res.sendfile(config.music_dir + "/" + encodeURIComponent(song.location));
     }
   });
 }
 
 function sendCover(req, res){
-  app.db.songs.findOne({_id: req.params.id}, function(err, song){
-    if(!song || !song.hasOwnProperty("cover_location")){
-      res.sendfile("/static/images/unknown.png", {root: __dirname + "/../"});
-    } else {
-      res.sendfile(song.cover_location);
-    }
-  });
+  // if they passed the location of the cover, fetch it
+  if(req.params.id.length > 0){
+    res.sendfile(app.get('root') + '/dbs/covers/' + encodeURIComponent(req.params.id));
+  } else {
+    res.sendfile(app.get('root') + "/static/images/unknown.png");
+  }
 }
 
 function downloadPlaylist(req, res){
@@ -216,7 +215,8 @@ function rescanItem(req){
     if(!err && songs)
       var songLocArr = [];
       for (var i = 0; i < songs.length; i++) {
-        songLocArr.push(songs[i].location);
+        // add the location to the list of songs to scan
+        songLocArr.push(config.music_dir + "/" + songs[i].location);
       };
       lib_func.scanItems(app, songLocArr);
   });
