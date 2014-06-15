@@ -138,6 +138,9 @@ function PlayState(){
     if(searchText.length < 3){
       return;
     }
+    // set the search box to the search text
+    $(".search-input").val(searchText);
+    // normalise the search text to lower case
     searchText = searchText.toLowerCase();
     var tmpSongs = [];
     // counter for index in the song list
@@ -166,8 +169,6 @@ function PlayState(){
       MusicApp.router.songview = new SongView();
       MusicApp.contentRegion.show(MusicApp.router.songview);
     }
-    // set the search box to the search text
-    $(".search-input").val(searchText);
   }
   // note: this is a very expensive method of searching
   // it is used to match each term in the search against the title, album and artist
