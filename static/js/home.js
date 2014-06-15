@@ -166,6 +166,8 @@ function PlayState(){
       MusicApp.router.songview = new SongView();
       MusicApp.contentRegion.show(MusicApp.router.songview);
     }
+    // set the search box to the search text
+    $(".search-input").val(searchText);
   }
   // note: this is a very expensive method of searching
   // it is used to match each term in the search against the title, album and artist
