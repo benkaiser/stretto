@@ -532,13 +532,21 @@ MusicApp.addInitializer(function(options){
 SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
+    // calculate the duration
+    var totalDuration = 0;
+    for(var song = 0; song < player.songs.length; song++){
+     totalDuration += player.songs[song].attributes.duration;
+    }
+    // render the view
     this.$el.html(render(this.template, {
       title: player.playlist.title,
       editable: player.playlist.editable,
       _id: player.playlist._id,
       sort_col: player.sort_col,
       sort_asc: player.sort_asc,
-      songs: player.songs
+      songs: player.songs,
+      numSongs: player.songs.length,
+      totalDuration: prettyPrintSecondsorNA(totalDuration)
     }));
     this.$el.addClass("custom_scrollbar");
     // add scroll event handler
@@ -907,7 +915,26 @@ function arraysEqual(a, b) {
 
 function prettyPrintSeconds(seconds){
   var pretty = "";
-  pretty += (seconds > 60) ? Math.floor(seconds/60) + ":" : "0:";
+  // days
+  if(seconds > 86400){
+    pretty += Math.floor(seconds / 86400) + " day";
+    // is it plural
+    if(Math.floor(seconds / 86400) != 1.0){
+      pretty += "s";
+    }
+    pretty += " ";
+  }
+  // hours
+  if(seconds > 3600){
+    pretty += Math.floor(seconds % 86400 / 3600) + ":";
+  }
+  // minutes
+  if(seconds > 60){
+    pretty += ("0" + Math.floor(seconds % 3600 / 60)).slice(-2) + ":";
+  } else {
+    pretty += "0:";
+  }
+  // seconds
   pretty += ("0" + Math.floor(seconds % 60)).slice(-2);
   return pretty;
 }
