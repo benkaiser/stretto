@@ -770,8 +770,8 @@ function delFromSelection(id){
   }
 }
 function selectBetween(id, id2){
-  loc1 = indexInPlaylist(id);
-  loc2 = indexInPlaylist(id2);
+  loc1 = indexInSongView(id);
+  loc2 = indexInSongView(id2);
   // make sure loc1 is less than loc2
   if(loc1 > loc2){
     temp = loc1;
@@ -779,12 +779,12 @@ function selectBetween(id, id2){
     loc2 = temp;
   }
   for(var i = loc1; i <= loc2; i++){
-    addToSelection(player.playlist.songs[i]._id, false)
+    addToSelection(player.songs[i].attributes._id, false)
   };
 }
-function indexInPlaylist(id){
-  for(var i = 0; i < player.playlist.songs.length; i++){
-    if(player.playlist.songs[i]._id == id){
+function indexInSongView(id){
+  for(var i = 0; i < player.songs.length; i++){
+    if(player.songs[i].attributes._id == id){
       return i;
     }
   }
