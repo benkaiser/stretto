@@ -32,6 +32,7 @@ exports.createRoutes = function(app_ref){
   // playlist modifications
   app.io.route('fetch_playlists', returnPlaylists);
   app.io.route('create_playlist', createPlaylist);
+  app.io.route('rename_playlist', renamePlaylist);
   app.io.route('delete_playlist', deletePlaylist);
   app.io.route('add_to_playlist', addToPlaylist);
   app.io.route('remove_from_playlist', removeFromPlaylist);
@@ -135,6 +136,14 @@ function createPlaylist(req){
     editable: true
   };
   app.db.playlists.insert(plist, function(err, doc){
+    req.io.route('fetch_playlists');
+  });
+}
+
+function renamePlaylist(req){
+  var id = req.data.id;
+  var title = req.data.title;
+  app.db.playlists.update({_id: id}, { $set: {title: title} }, function(){
     req.io.route('fetch_playlists');
   });
 }

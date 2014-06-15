@@ -441,7 +441,13 @@ socket.on('songs', function(data){
 socket.on('playlists', function(data){
   player.playlist_collection.reset();
   player.playlist_collection.add(data.playlists);
+  // if they just renamed the playlist, redraw the songview
+  if(player.playlist !== undefined && player.playlist.editable){
+    MusicApp.router.playlist(player.playlist._id);
+  }
+  // redraw the sidebar
   MusicApp.router.sidebar();
+  // restart the router if we are loading for the first time
   loadedRestart("playlists");
 });
 
@@ -592,6 +598,7 @@ SongView = Backbone.View.extend({
     "click .options": "triggerOptions",
     "contextmenu td": "triggerOptions",
     "click .cover": "triggerCover",
+    "click .rename_playlist": "renamePlaylist",
     "click .delete_playlist": "deletePlaylist"
   },
   triggerSearch: function(ev){
@@ -643,6 +650,21 @@ SongView = Backbone.View.extend({
   triggerCover: function(ev){
     showCover($(ev.target).attr('src'));
     return false;
+  },
+  renamePlaylist: function(ev){
+    bootbox.prompt({
+      title: "What would you like to rename \"" + player.playlist.title
+        + "\" to?",
+      value: player.playlist.title,
+      callback: function(result){
+        if (result !== null) {
+          socket.emit('rename_playlist', {
+            title: result,
+            id: player.playlist._id
+          });
+        }
+      }
+    });
   },
   deletePlaylist: function(ev){
     bootbox.dialog({
@@ -800,7 +822,7 @@ SidebarView = Backbone.View.extend({
   render: function(){
     var editable = player.playlist_collection.where({'editable': true});
     var fixed = player.playlist_collection.where({'editable': false});
-    this.setElement(render(this.template, {"title": "Playlists", search: player.searchText, editable: editable, fixed: fixed}));
+    this.setElement(render(this.template, {title: "Playlists", search: player.searchText, editable: editable, fixed: fixed}));
   },
   events: {
     "click .add_playlist": "addPlaylist",
@@ -809,7 +831,7 @@ SidebarView = Backbone.View.extend({
   addPlaylist: function(){
     bootbox.prompt("Playlist title?", function(result){
       if (result !== null) {
-        socket.emit('create_playlist', {"title": result, songs: []});
+        socket.emit('create_playlist', {title: result, songs: []});
       }
     });
   },
