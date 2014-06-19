@@ -98,8 +98,8 @@ function findSong(item, callback){
         if (err) {
           // get the file extension
           var ext = "";
-          if(item.lastIndexOf(".") > 0) {
-            ext = item.substr(item.lastIndexOf(".")+1, item.length);
+          if(location.lastIndexOf(".") > 0) {
+            ext = location.substr(location.lastIndexOf(".")+1, location.length);
           }
           // if it was a metadata error and the file appears to be audio, add it
           if(err.toString().indexOf("Could not find metadata header") > 0
@@ -107,7 +107,7 @@ function findSong(item, callback){
             console.log("Could not find metadata. Adding the song by filename.");
             // create a song with the filename as the title
             var song = {
-              title: item.substr(item.lastIndexOf("/") + 1, item.length),
+              title: location.substr(location.lastIndexOf("/") + 1, location.length),
               album: "Unknown (no tags)",
               artist: "Unknown (no tags)",
               albumartist: "Unknown (no tags)",
@@ -207,7 +207,13 @@ exports.scanLibrary = function(app_ref, hard){
       console.log(err);
     }
 
-    clearNotIn(list);
+    // list with paths with music_dir removed
+    var stripped = [];
+    for(var cnt = 0; cnt < list.length; cnt++){
+      stripped.push(list[cnt].replace(config.music_dir, ""));
+    }
+
+    clearNotIn(stripped);
     song_list = list;
     findNextSong();
 

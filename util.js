@@ -3,6 +3,7 @@ var fs = require('fs');
 
 var walk = function(dir, done) {
   var results = [];
+  var strip_results = [];
   fs.readdir(dir, function(err, list) {
     if (err) return done(err);
     var pending = list.length;
@@ -13,11 +14,11 @@ var walk = function(dir, done) {
         if (stat && stat.isDirectory()) {
           walk(file, function(err, res) {
             results = results.concat(res);
-            if (!--pending) done(null, results);
+            if (!--pending) done(null, results, strip_results);
           });
         } else {
           results.push(file);
-          if (!--pending) done(null, results);
+          if (!--pending) done(null, results, strip_results);
         }
       });
     });
