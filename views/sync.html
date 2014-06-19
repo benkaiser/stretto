@@ -1,0 +1,27 @@
+{% extends 'base/main_base.html' %}
+
+{% block title %}Sync Libraries{% endblock %}
+
+{% block content %}
+<div class='content-body'>
+  <h1>Sync</h1>
+    <div class='form-inline'>
+      <div class="form-group">
+        Remote Address:
+        <input class='form-control auto_width' type='text' id='remote' name='remote_btn' />
+        <a class='btn btn-primary' id='fetch_data'>Fetch Data</a>
+      </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+  head.js(
+    "/static/js/libs/underscore-min.js",
+    "/static/js/libs/backbone-min.js",
+    "/static/js/libs/backbone.marionette.min.js",
+    "/socket.io/socket.io.js",
+    "/static/js/sync.js"
+    );
+</script>
+{% endblock %}

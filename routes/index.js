@@ -15,6 +15,7 @@ exports.createRoutes = function(app_ref){
   app.get('/', musicRoute);
   app.get('/mobile', mobileMusicRoute);
   app.get('/scan', scanRoute);
+  app.get('/sync', function(req, res){ res.render('sync', {menu: true}); });
   app.get('/songs/:id', sendSong);
   app.get('/cover/:id', sendCover);
   app.get('/downloadplaylist/:id', downloadPlaylist);
@@ -41,6 +42,8 @@ exports.createRoutes = function(app_ref){
   app.io.route('update_play_count', updatePlayCount);
   // remote control routes
   app.io.route('get_receivers', getReceivers);
+  // sync routes
+  app.io.route('sync_page_connected', syncPageConnected);
 };
 
 function musicRoute(req, res){
@@ -95,14 +98,29 @@ function downloadPlaylist(req, res){
 }
 
 function returnSongs(req){
-  app.db.songs.find({}, function(err, docs){
+  get_songs(function(songs){
+    req.io.emit('songs', {"songs": songs});
+  });
+}
+
+function get_songs(callback){
+  app.db.songs.find({}, function(err, songs){
     if(!err){
-      req.io.emit('songs', {"songs": docs});
+      callback(songs);
+    } else {
+      callback([]);
     }
   });
 }
 
 function returnPlaylists(req){
+  // send the playlists back to the user
+  get_playlists(function(playlists){
+    req.io.emit('playlists', {"playlists": playlists});
+  });
+}
+
+function get_playlists(callback){
   app.db.playlists.find({}, function(err, docs){
     playlists = docs;
     // create a new playlist for the library
@@ -114,7 +132,7 @@ function returnPlaylists(req){
         editable: false
       });
       // send the playlists back to the user
-      req.io.emit('playlists', {"playlists": playlists});
+      callback(playlists);
     });
   });
 }
@@ -264,4 +282,17 @@ function getReceivers(req){
     }
   });
   req.io.emit('recievers', {"recievers": validReceivers});
+}
+
+// sync routes
+
+// the sync page has connected, send all the data
+function syncPageConnected(req){
+  // get the playlist data
+  get_playlists(function(playlists){
+    // get the songs data
+    get_songs(function(songs){
+      req.io.emit('alldata', {"playlists": playlists, "songs": songs});
+    });
+  });
 }

@@ -11,6 +11,9 @@ body{
   left: 0;
   outline: 0;
 }
+.content-body{
+  padding: 20px;
+}
 #content{
   height: 90%;
   height: calc(100% - 100px);
@@ -301,4 +304,8 @@ tr:hover .options{
 }
 .index_text{
   padding-right: 10px;
+}
+/*** sync page ***/
+.auto_width{
+  width: auto;
 }
