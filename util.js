@@ -49,3 +49,11 @@ var contains = function(a, obj){
     return false;
 }
 exports.contains = contains;
+
+// function to get the IP of the current machine on the network
+var getip = function(callback){
+  require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+    callback(add);
+  });
+}
+exports.getip = getip;

@@ -306,6 +306,9 @@ tr:hover .options{
   padding-right: 10px;
 }
 /*** sync page ***/
-.auto_width{
-  width: auto;
+.form-container{
+  max-width: 1000px;
+}
+.sync_div{
+  visibility: hidden;
 }
