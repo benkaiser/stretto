@@ -1,6 +1,45 @@
 // collections
-var PlaylistCollection = Backbone.Collection.extend({});
-var SongCollection = Backbone.Collection.extend({});
+var PlaylistCollection = Backbone.Collection.extend({
+  getBy_Id: function(id){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes["_id"] == id){
+        return this.models[i];
+      }
+    }
+    return false;
+  },
+  getByTitle: function(title){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes.title == title){
+        return this.models[i];
+      }
+    }
+    return false;
+  },
+  comparator: function(playlist){
+    return [playlist.get("editable"), playlist.get('title')];
+  }
+});
+var SongCollection = Backbone.Collection.extend({
+  findBy_Id: function(id){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes["_id"] == id){
+        return this.models[i];
+      }
+    }
+    return false;
+  },
+  findItem: function(item){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes["title"] == item.attributes["title"]
+        && this.models[i].attributes["album"] == item.attributes["album"]
+        && this.models[i].attributes["display_artist"] == item.attributes["display_artist"]){
+        return this.models[i];
+      }
+    }
+    return false;
+  }
+});
 // soccet connection to player this was loaded from
 var a = {
   socket: io.connect('http://'+window.location.host, {'force new connection': true }),
@@ -87,7 +126,7 @@ function drawSync(){
     left = new listView({
       el: $(".playlists_left")[0],
       model: {
-        playlists: a.playlist_collection.models,
+        playlists: a.playlist_collection,
         title: "This Server"
       }
     });
@@ -95,7 +134,7 @@ function drawSync(){
     right = new listView({
       el: $(".playlists_right")[0],
       model: {
-        playlists: b.playlist_collection.models,
+        playlists: b.playlist_collection,
         title: "Remote Server"
       }
     });
@@ -107,8 +146,53 @@ function drawSync(){
 
 // sync the libraries
 function sync(){
-  console.log(left.getSelected());
-  console.log(right.getSelected());
+  var left_items = left.getSelected();
+  var right_items = right.getSelected();
+
+  if(left_items.length > 0){
+    filter_out(left_items, a, b);
+  }
+  if(right_items.length > 0){
+    filter_out(right_items, b, a);
+  }
+}
+
+/* this function replaces the uids of songs that share the same title + artist
+ * + album on the playlists that are being synced across. This allows for syncing
+ * to be skipped for items that seem to be the same track.
+ */
+function filter_out(selected_lists, from, to){
+  for(var list_cnt = 0; list_cnt < selected_lists.length; list_cnt++){
+    for(var item_cnt = 0; item_cnt < selected_lists[list_cnt].songs.length; item_cnt++){
+      // if the song is already in the library, set the correct _id
+      var uid = selected_lists[list_cnt].songs[item_cnt]._id;
+      var from_song = from.song_collection.findBy_Id(uid);
+      var match = to.song_collection.findItem(from_song);
+      if(match){
+        selected_lists[list_cnt].songs[item_cnt]._id = match.attributes._id;
+      }
+    }
+    // check if the playlist is a dupe, if so merge it
+    var match = to.playlist_collection.getByTitle(selected_lists[list_cnt].title);
+    if(match){
+      selected_lists[list_cnt] = mergePlaylists(selected_lists[list_cnt], match.attributes);
+    }
+  }
+}
+
+// merge two playlists into one and return it
+function mergePlaylists(list_one, list_two){
+  for(var song_cnt = 0; song_cnt < list_two.songs.length; song_cnt++){
+    // see if we can find the song in the first playlist
+    var found = true;
+    for(var inner_cnt = 0; inner_cnt < list_one.songs.length; inner_cnt++){
+      
+    }
+    // if it isn't found, add it
+    if(!found){
+
+    }
+  }
 }
 
 // the playlist view
@@ -116,15 +200,17 @@ listView = Backbone.View.extend({
   template: "#sync_template",
   render: function(){
     this.$el.html(render(this.template, {
-      playlists: this.model.playlists,
+      playlists: this.model.playlists.models,
       title: this.model.title
     }));
   },
   getSelected: function(){
     var selected = [];
+    var self = this;
     this.$el.find(':input').each(function(index){
       if($(this).is(':checked')){
-        selected.push($(this).attr('id'));
+        // add the playlist by _id
+        selected.push(self.model.playlists.getBy_Id($(this).attr('id').attributes));
       }
     });
     return selected;
