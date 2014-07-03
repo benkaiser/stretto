@@ -10,6 +10,10 @@ var util = require(__dirname + '/util.js');
 
 var app = express();
 app.http().io();
+app.io.set('authorization', function (handshakeData, accept) {
+  // accept all requests
+  accept(null, true);
+});
 // make sure the dbs directory is present
 util.mkdir(__dirname + '/dbs', function(){
   // attach the db to the app

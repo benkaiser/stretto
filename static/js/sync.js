@@ -42,7 +42,7 @@ var SongCollection = Backbone.Collection.extend({
 });
 // soccet connection to player this was loaded from
 var a = {
-  socket: io.connect('http://'+window.location.host, {'force new connection': true }),
+  socket: io.connect('http://'+window.location.host, {'force new connection': true}),
   song_collection: new SongCollection(),
   playlist_collection: new PlaylistCollection()
 };
@@ -89,7 +89,7 @@ function bConnected(){
   var server_b_ip = $("#remote_b").val();
   localStorage.setItem('server_b_ip', server_b_ip);
   // connect
-  b.socket = io.connect(server_b_ip, {'force new connection': true });
+  b.socket = io.connect(server_b_ip, {'force new connection': true});
   b.socket.on('connect', function(){
     b.socket.emit('sync_page_connected');
     console.log("Socket_b connected");
@@ -186,7 +186,7 @@ function mergePlaylists(list_one, list_two){
     // see if we can find the song in the first playlist
     var found = true;
     for(var inner_cnt = 0; inner_cnt < list_one.songs.length; inner_cnt++){
-      
+
     }
     // if it isn't found, add it
     if(!found){
