@@ -42,12 +42,14 @@ var SongCollection = Backbone.Collection.extend({
 });
 // soccet connection to player this was loaded from
 var a = {
-  socket: io.connect('http://'+window.location.host, {'force new connection': true}),
+  socket: io.connect(a_ip, {'force new connection': true}),
+  server_ip: a_ip,
   song_collection: new SongCollection(),
   playlist_collection: new PlaylistCollection()
 };
 var b = {
   socket: null,
+  server_ip: '',
   song_collection: new SongCollection(),
   playlist_collection: new PlaylistCollection()
 };
@@ -86,10 +88,10 @@ $("#fetch_data").click(function(){
 });
 function bConnected(){
   // save the setting
-  var server_b_ip = $("#remote_b").val();
-  localStorage.setItem('server_b_ip', server_b_ip);
+  b.server_ip = $("#remote_b").val();
+  localStorage.setItem('server_b_ip', b.server_ip);
   // connect
-  b.socket = io.connect(server_b_ip, {'force new connection': true});
+  b.socket = io.connect(b.server_ip, {'force new connection': true});
   b.socket.on('connect', function(){
     b.socket.emit('sync_page_connected');
     console.log("Socket_b connected");
@@ -108,9 +110,9 @@ function bConnected(){
 }
 $(document).ready(function(){
   // set the remote to the saved address
-  var server_b_ip = localStorage.getItem('server_b_ip') || '';
-  $("#remote_b").val(server_b_ip);
-  if(server_b_ip.length > 0){
+  b.server_ip = localStorage.getItem('server_b_ip') || '';
+  $("#remote_b").val(b.server_ip);
+  if(b.server_ip.length > 0){
     bConnected();
   }
   // link up the button click
@@ -150,10 +152,20 @@ function sync(){
   var right_items = right.getSelected();
 
   if(left_items.length > 0){
-    filter_out(left_items, a, b);
+    // filter the lists and work out the new songs
+    var data_to_send = filter_out(left_items, a, b);
+    data_to_send.remote_url = a.server_ip;
+    // sync the playlists
+    console.log(data_to_send);
+    b.socket.emit("sync_playlists", data_to_send);
   }
   if(right_items.length > 0){
-    filter_out(right_items, b, a);
+    // filter the lists and work out the new songs
+    var data_to_send = filter_out(right_items, b, a);
+    data_to_send.remote_url = b.server_ip;
+    // sync the playlists
+    console.log(data_to_send);
+    a.socket.emit("sync_playlists", data_to_send);
   }
 }
 
@@ -162,6 +174,7 @@ function sync(){
  * to be skipped for items that seem to be the same track.
  */
 function filter_out(selected_lists, from, to){
+  var new_songs = [];
   for(var list_cnt = 0; list_cnt < selected_lists.length; list_cnt++){
     for(var item_cnt = 0; item_cnt < selected_lists[list_cnt].songs.length; item_cnt++){
       // if the song is already in the library, set the correct _id
@@ -170,6 +183,8 @@ function filter_out(selected_lists, from, to){
       var match = to.song_collection.findItem(from_song);
       if(match){
         selected_lists[list_cnt].songs[item_cnt]._id = match.attributes._id;
+      } else {
+        new_songs.push(from_song.attributes);
       }
     }
     // check if the playlist is a dupe, if so merge it
@@ -178,21 +193,26 @@ function filter_out(selected_lists, from, to){
       selected_lists[list_cnt] = mergePlaylists(selected_lists[list_cnt], match.attributes);
     }
   }
+  return {songs: new_songs, playlists: selected_lists};
 }
 
 // merge two playlists into one and return it
 function mergePlaylists(list_one, list_two){
+  list_one._id = list_two._id;
   for(var song_cnt = 0; song_cnt < list_two.songs.length; song_cnt++){
     // see if we can find the song in the first playlist
-    var found = true;
+    var found = false;
     for(var inner_cnt = 0; inner_cnt < list_one.songs.length; inner_cnt++){
-
+      if(list_one.songs[inner_cnt]._id == list_two.songs[song_cnt]._id){
+        found = true;
+      }
     }
     // if it isn't found, add it
     if(!found){
-
+      list_one.songs.push(list_two.songs[song_cnt]);
     }
   }
+  return list_one;
 }
 
 // the playlist view
@@ -210,7 +230,7 @@ listView = Backbone.View.extend({
     this.$el.find(':input').each(function(index){
       if($(this).is(':checked')){
         // add the playlist by _id
-        selected.push(self.model.playlists.getBy_Id($(this).attr('id').attributes));
+        selected.push(self.model.playlists.getBy_Id($(this).attr('id')).attributes);
       }
     });
     return selected;

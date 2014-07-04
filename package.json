@@ -13,6 +13,7 @@
     "nedb": "*",
     "MD5": "*",
     "async": "*",
-    "adm-zip": "*"
+    "adm-zip": "*",
+    "request": "*"
   }
 }

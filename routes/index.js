@@ -44,6 +44,7 @@ exports.createRoutes = function(app_ref){
   app.io.route('get_receivers', getReceivers);
   // sync routes
   app.io.route('sync_page_connected', syncPageConnected);
+  app.io.route('sync_playlists', syncPlaylists);
 };
 
 function musicRoute(req, res){
@@ -301,4 +302,25 @@ function syncPageConnected(req){
       req.io.emit('alldata', {"playlists": playlists, "songs": songs});
     });
   });
+}
+
+// the playlists to sync have been selected, sync them
+function syncPlaylists(req){
+  var lists = req.data.playlists;
+  console.log(lists);
+  for(var list_cnt = 0; list_cnt < lists.length; list_cnt++){
+    // attempt to replace the playlist if it is editable
+    if(lists[list_cnt].editable){
+      app.db.playlists.update({_id: lists[list_cnt]._id}, lists[list_cnt], {upsert: true}, function(err, numReplaced, newDoc){
+        if(newDoc){
+          console.log("Inserted playlist: " + newDoc.title);
+        } else {
+          console.log("Updated playlist");
+        }
+      });
+    }
+  }
+  var songs = req.data.songs;
+  var remote_url = req.data.remote_url;
+  lib_func.sync_import(app, songs, remote_url);
 }

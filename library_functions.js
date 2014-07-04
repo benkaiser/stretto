@@ -221,6 +221,37 @@ exports.scanLibrary = function(app_ref, hard){
   running = true;
 }
 
+exports.sync_import = function(app_ref, songs, url){
+  app = app_ref;
+  // clean up the url
+  if(url.indexOf("://") == -1){
+    url = "http://" + url;
+  }
+  // import the sons
+  for(var cnt = 0; cnt < songs.length; cnt++){
+    var file_url = config.music_dir + songs[cnt].location;
+    var folder_of_file = file_url.substring(0, file_url.lastIndexOf("/"));
+    (function(cnt) {
+      // create the folder
+      util.mkdir(folder_of_file, function(){
+        var song_file_url = config.music_dir + songs[cnt].location;
+        // download the file
+        request(url + "/songs/" + songs[cnt]._id).pipe(fs.createWriteStream(song_file_url));
+        // cover file
+        if(songs[cnt].cover_location !== undefined){
+          var cover_file_url = __dirname + '/dbs/covers/' + songs[cnt].cover_location;
+          request(url + "/cover/" + songs[cnt].cover_location).pipe(fs.createWriteStream(cover_file_url));
+        }
+        // insert the song into the database
+        app.db.songs.update({_id: songs[cnt]._id}, songs[cnt], {upsert: true}, function (err, numReplaced, newDoc){
+          // update the browser the song has been added
+          console.log(newDoc);
+        });
+      });
+    })(cnt);
+  }
+}
+
 exports.stopScan = function(app){
   running = false;
 }
