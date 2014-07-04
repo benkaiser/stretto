@@ -26,19 +26,6 @@ var walk = function(dir, done) {
 }
 exports.walk = walk;
 
-var mkdir = function(dir, done) {
-  fs.exists(dir, function(exists){
-    if(!exists){
-      fs.mkdir(dir, '0777', function(){
-        done();
-      });
-    } else {
-      done();
-    }
-  });
-}
-exports.mkdir = mkdir;
-
 var contains = function(a, obj){
     var i = a.length;
     while (i--) {

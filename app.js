@@ -7,6 +7,7 @@ var express = require('express.io');
 var http = require('http');
 var path = require('path');
 var util = require(__dirname + '/util.js');
+var mkdirp = require('mkdirp');
 
 var app = express();
 app.http().io();
@@ -15,11 +16,9 @@ app.io.set('authorization', function (handshakeData, accept) {
   accept(null, true);
 });
 // make sure the dbs directory is present
-util.mkdir(__dirname + '/dbs', function(){
+mkdirp(__dirname + '/dbs/covers', function(){
   // attach the db to the app
   require(__dirname + '/db.js')(app);
-  // make sure the cover directory is present
-  util.mkdir(__dirname + '/dbs/covers', function(){});
 });
 
 

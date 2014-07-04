@@ -3,6 +3,7 @@ var mm = require('musicmetadata');
 var taglib = require('taglib');
 var md5 = require('MD5');
 var request = require('request');
+var mkdirp = require('mkdirp');
 
 var util = require(__dirname + '/util.js');
 var config = require(__dirname + '/config').config();
@@ -234,7 +235,7 @@ exports.sync_import = function(app_ref, songs, url){
     var folder_of_file = file_url.substring(0, file_url.lastIndexOf("/"));
     (function(cnt) {
       // create the folder
-      util.mkdir(folder_of_file, function(){
+      mkdirp(folder_of_file, function(){
         var song_file_url = config.music_dir + songs[cnt].location;
         // download the file
         request(url + "/songs/" + songs[cnt]._id).pipe(fs.createWriteStream(song_file_url));

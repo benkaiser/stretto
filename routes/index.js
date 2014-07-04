@@ -307,7 +307,6 @@ function syncPageConnected(req){
 // the playlists to sync have been selected, sync them
 function syncPlaylists(req){
   var lists = req.data.playlists;
-  console.log(lists);
   for(var list_cnt = 0; list_cnt < lists.length; list_cnt++){
     // attempt to replace the playlist if it is editable
     if(lists[list_cnt].editable){

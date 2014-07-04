@@ -180,11 +180,13 @@ function filter_out(selected_lists, from, to){
       // if the song is already in the library, set the correct _id
       var uid = selected_lists[list_cnt].songs[item_cnt]._id;
       var from_song = from.song_collection.findBy_Id(uid);
-      var match = to.song_collection.findItem(from_song);
-      if(match){
-        selected_lists[list_cnt].songs[item_cnt]._id = match.attributes._id;
-      } else {
-        new_songs.push(from_song.attributes);
+      if(from_song){
+        var match = to.song_collection.findItem(from_song);
+        if(match){
+          selected_lists[list_cnt].songs[item_cnt]._id = match.attributes._id;
+        } else {
+          new_songs.push(from_song.attributes);
+        }
       }
     }
     // check if the playlist is a dupe, if so merge it
