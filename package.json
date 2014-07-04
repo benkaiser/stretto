@@ -10,7 +10,7 @@
     "swig": "*",
     "musicmetadata": "*",
     "taglib": "*",
-    "nedb": "*",
+    "nedb": "benkaiser/nedb",
     "MD5": "*",
     "async": "*",
     "adm-zip": "*",

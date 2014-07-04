@@ -2,6 +2,7 @@ var fs = require('fs');
 var mm = require('musicmetadata');
 var taglib = require('taglib');
 var md5 = require('MD5');
+var request = require('request');
 
 var util = require(__dirname + '/util.js');
 var config = require(__dirname + '/config').config();
