@@ -83,8 +83,13 @@ function downloadPlaylist(req, res){
     async.forEach(playlist.songs, function(item, callback){
       app.db.songs.findOne({_id: item._id}, function(err, song){
         if(err) throw err;
-        //song.location.replace(config.music_dir, '')
-        zip.addLocalFile(song.location, "/");
+        var zip_location;
+        if(song.location.lastIndexOf("/") > 0){
+          zip_location = song.location.substring(0, song.location.lastIndexOf("/"));
+        } else {
+          zip_location = song.location;
+        }
+        zip.addLocalFile(config.music_dir + "/" + song.location, zip_location);
         callback();
       });
     }, function(err){
