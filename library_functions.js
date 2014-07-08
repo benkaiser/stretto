@@ -35,14 +35,14 @@ function findNextSong(){
   }
 }
 
-function findSong(item, callback){
-  // convert the filename into a relative filename
-  var location = item.replace(config.music_dir, "");
-  app.db.songs.findOne({location: location}, function(err, doc){
+function findSong(relative_location, callback){
+  // convert the filename into full path
+  var full_location = config.music_dir + relative_location;
+  app.db.songs.findOne({location: relative_location}, function(err, doc){
     // only scan if we haven't scanned before, or we are scanning every document again
     if(doc == null || hard_rescan){
       // insert the new song
-      var parser = new mm(fs.createReadStream(item));
+      var parser = new mm(fs.createReadStream(full_location));
 
       parser.on('metadata', function(result){
         // add the location
@@ -56,7 +56,7 @@ function findSong(item, callback){
           year: result.year,
           duration: result.duration,
           play_count: (doc == null) ? 0 : doc.play_count || 0,
-          location: location
+          location: relative_location
         };
         // write the cover photo as an md5 string
         if(result.picture.length > 0){
@@ -76,7 +76,7 @@ function findSong(item, callback){
         if(doc == null){
           // insert the song
           app.db.songs.insert(song, function (err, newDoc){
-            taglib_fetch(location, newDoc._id);
+            taglib_fetch(relative_location, newDoc._id);
             // update the browser the song has been added
             broadcast("update", {
               count: song_list.length,
@@ -85,8 +85,8 @@ function findSong(item, callback){
             });
           });
         } else if (hard_rescan){
-          app.db.songs.update({location: location}, song, {}, function(err, numRplaced){
-            taglib_fetch(location, doc._id);
+          app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
+            taglib_fetch(relative_location, doc._id);
             broadcast("update", {
               count: song_list.length,
               completed: cnt,
@@ -100,8 +100,8 @@ function findSong(item, callback){
         if (err) {
           // get the file extension
           var ext = "";
-          if(location.lastIndexOf(".") > 0) {
-            ext = location.substr(location.lastIndexOf(".")+1, location.length);
+          if(relative_location.lastIndexOf(".") > 0) {
+            ext = relative_location.substr(relative_location.lastIndexOf(".")+1, relative_location.length);
           }
           // if it was a metadata error and the file appears to be audio, add it
           if(err.toString().indexOf("Could not find metadata header") > 0
@@ -109,7 +109,7 @@ function findSong(item, callback){
             console.log("Could not find metadata. Adding the song by filename.");
             // create a song with the filename as the title
             var song = {
-              title: location.substr(location.lastIndexOf("/") + 1, location.length),
+              title: relative_location.substr(relative_location.lastIndexOf("/") + 1, relative_location.length),
               album: "Unknown (no tags)",
               artist: "Unknown (no tags)",
               albumartist: "Unknown (no tags)",
@@ -118,11 +118,11 @@ function findSong(item, callback){
               year: "Unknown",
               duration: 0,
               play_count: (doc == null) ? 0 : doc.play_count || 0,
-              location: location
+              location: relative_location
             };
             if(doc == null){
               app.db.songs.insert(song, function (err, newDoc){
-                taglib_fetch(location, newDoc._id);
+                taglib_fetch(relative_location, newDoc._id);
                 // update the browser the song has been added
                 broadcast("update", {
                   count: song_list.length,
@@ -131,8 +131,8 @@ function findSong(item, callback){
                 });
               });
             } else if (hard_rescan){
-              app.db.songs.update({location: location}, song, {}, function(err, numRplaced){
-                taglib_fetch(location, doc._id);
+              app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
+                taglib_fetch(relative_location, doc._id);
                 broadcast("update", {
                   count: song_list.length,
                   completed: cnt,
@@ -149,13 +149,11 @@ function findSong(item, callback){
         }
       });
     } else {
-      // TODO: make this less frequent
-      // broadcast("update", {
-      //   count: song_list.length,
-      //   completed: cnt,
-      //   details: "Already scanned item: " + item
-      // });
-      // perform rescan? hard rescan option?
+      broadcast("update", {
+        count: song_list.length,
+        completed: cnt,
+        details: "Already scanned item: " + item
+      });
       callback(null);
     }
   })
@@ -193,6 +191,33 @@ function clearNotIn(list){
   });
 }
 
+// removes the items that have already been scanned from the list so that the
+// scan can focus on items not scanned yet. Only used when not a hard scan
+function remove_scanned(list, callback){
+  app.db.songs.find({}, function(err, songs){
+    if(!err){
+      var unscanned_list = [];
+      for(var list_cnt = 0; list_cnt < list.length; list_cnt++){
+        var add = true;
+        for(var song_cnt = 0; song_cnt < songs.length; song_cnt++){
+          // if the song is found, don't add it and break to the next song
+          if(songs[song_cnt].location == list[list_cnt]){
+            add = false;
+            break;
+          }
+        }
+        // if no song matched the location, then it is an unscanned file and we should scan it
+        if(add){
+          unscanned_list.push(list[list_cnt]);
+        }
+      }
+      callback(unscanned_list);
+    } else {
+      console.log(err);
+    }
+  });
+}
+
 exports.scanItems = function(app_ref, locations){
   app = app_ref;
   hard_rescan = true;
@@ -216,9 +241,15 @@ exports.scanLibrary = function(app_ref, hard){
     }
 
     clearNotIn(stripped);
-    song_list = list;
-    findNextSong();
-
+    if(!hard){
+      remove_scanned(stripped, function(unscanned){
+        song_list = unscanned;
+        findNextSong();
+      })
+    } else {
+      song_list = stripped;
+      findNextSong();
+    }
   });
   running = true;
 }

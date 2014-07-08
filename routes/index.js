@@ -246,10 +246,10 @@ function rescanItem(req){
   items = req.data.items;
   app.db.songs.find({ _id: { $in: items }}, function(err, songs){
     if(!err && songs)
+        // add the location to the list of songs to scan
       var songLocArr = [];
       for (var i = 0; i < songs.length; i++) {
-        // add the location to the list of songs to scan
-        songLocArr.push(config.music_dir + "/" + songs[i].location);
+        songLocArr.push(songs[i].location);
       };
       lib_func.scanItems(app, songLocArr);
   });
