@@ -256,6 +256,9 @@ tr:hover .options{
 .info_options:hover{
   color: #4BF;
 }
+.modal-footer{
+  margin-top: 0;
+}
 /*** options dialog ***/
 .options_container{
   position: fixed;

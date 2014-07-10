@@ -763,6 +763,10 @@ function createOptions(x, y){
     socket.emit("hard_rescan", {items: selectedItems});
     hideOptions();
   });
+  $(".view_info").click(function(ev){
+    shoInfoView(selectedItems);
+    hideOptions();
+  })
   optionsVisible = true;
 }
 function hideOptions(){
@@ -815,6 +819,42 @@ function indexInSongView(id){
 function clearSelection(){
   selectedItems = [];
   $("tr").removeClass("selected")
+}
+
+// show the info for the selected songs
+function shoInfoView(items){
+  // input checking
+  if(items.length > 1){
+    console.log("Currently we only support editing of one item at a time");
+  } else if(items.length == 0){
+    console.log("Error: 0 items selected");
+    return;
+  }
+  // process the edit for the item
+  var track = player.song_collection.findBy_Id(items[0]);
+  var message = render("#info_template", track);
+  console.log(message);
+  bootbox.dialog({
+    title: track.attributes.title,
+    message: message,
+    buttons: {
+      success: {
+        label: "Save",
+        className: "btn-success",
+        callback: function(){
+          // save the data
+        }
+      },
+      main: {
+        label: "Close Without Saving",
+        className: "btn-default"
+      }
+    }
+  });
+  $(".info_cover").click(function(ev){
+    showCover($(ev.target).attr('src'));
+    return false;
+  })
 }
 
 SidebarView = Backbone.View.extend({

@@ -117,6 +117,38 @@
     <p class="info_detail"><span class='colsearch'>{{attributes.display_artist}}</span> - <span class='colsearch'>{{attributes.album}}</span> <i class='fa fa-plus-square-o info_options'></i></p>
   </div>
 </script>
+<script type="text/swig" id="info_template">
+<div class="row">
+<form class="form-horizontal clearfix" role="form">
+  <div class="form-group">
+    <label for="title" class="col-sm-2 control-label">Cover</label>
+    <div class="col-sm-10">
+      {% if attributes.hasOwnProperty('cover_location') %}
+        <img class='info_cover' src='/cover/{{attributes.cover_location}}'/>
+      {% endif %}
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="title" class="col-sm-2 control-label">Title</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="title" value="{{attributes.title}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="artist" class="col-sm-2 control-label">Artist</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="artist" value="{{attributes.display_artist}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="album" class="col-sm-2 control-label">Album</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="album" value="{{attributes.album}}">
+    </div>
+  </div>
+</form>
+</div>
+</script>
 <script type="text/swig" id="options_template">
 <div class="dropdown open {{dropup}}">
   <ul class="dropdown-menu options-menu custom_scrollbar" role="menu">
@@ -124,7 +156,8 @@
     {% if current_playlist.editable %}
       <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
     {% endif %}
-    <li class='hard_rescan'><a>Hard Rescan</a></li>
+    <li class="view_info"><a>Detailed Info</a></li>
+    <li class="hard_rescan"><a>Hard Rescan</a></li>
     <li class="divider"></li>
     <li role="presentation" class="dropdown-header">Add to Playlist</li>
     {% for playlist in playlists %}
