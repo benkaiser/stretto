@@ -119,34 +119,45 @@
 </script>
 <script type="text/swig" id="info_template">
 <div class="row">
-<form class="form-horizontal clearfix" role="form">
+<form class="form-horizontal clearfix edit_form" role="form">
+  <input type="hidden" id="edit_id" value="{{track.attributes._id}}" />
   <div class="form-group">
     <label for="title" class="col-sm-2 control-label">Cover</label>
     <div class="col-sm-10">
-      {% if attributes.hasOwnProperty('cover_location') %}
-        <img class='info_cover' src='/cover/{{attributes.cover_location}}'/>
+      {% if track.attributes.hasOwnProperty('cover_location') %}
+        <img class='info_cover detailed' src='/cover/{{track.attributes.cover_location}}'/>
+      {% else %}
+        <i class="fa fa-question info_unknown_cover"></i>
       {% endif %}
     </div>
   </div>
   <div class="form-group">
     <label for="title" class="col-sm-2 control-label">Title</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" id="title" value="{{attributes.title}}">
+      <input type="text" class="form-control" id="title" value="{{track.attributes.title}}">
     </div>
   </div>
   <div class="form-group">
     <label for="artist" class="col-sm-2 control-label">Artist</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" id="artist" value="{{attributes.display_artist}}">
+      <input type="text" class="form-control" id="artist" value="{{track.attributes.display_artist}}">
     </div>
   </div>
   <div class="form-group">
     <label for="album" class="col-sm-2 control-label">Album</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" id="album" value="{{attributes.album}}">
+      <input type="text" class="form-control" id="album" value="{{track.attributes.album}}">
     </div>
   </div>
 </form>
+<div class='col-sm-12'>
+<h3>Misc Info</h3>
+<p>Duration: {{track.attributes.duration|prettyPrintSeconds}}</p>
+<p>
+  Location: {% if onserver %}<a class='btn btn-primary open_dir' title="{{music_dir}}{{track.attributes.location}}">Open in File Manager</a>{% else %}
+  {{music_dir}}{{track.attributes.location}}{% endif %}
+</p>
+</div>
 </div>
 </script>
 <script type="text/swig" id="options_template">

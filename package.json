@@ -15,6 +15,7 @@
     "async": "*",
     "adm-zip": "*",
     "request": "*",
-    "mkdirp": "*"
+    "mkdirp": "*",
+    "opener": "*"
   }
 }

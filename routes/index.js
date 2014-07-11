@@ -4,6 +4,7 @@ var config = require(__dirname + '/../config').config();
 var async = require('async');
 var AdmZip = require('adm-zip');
 var os = require('os');
+var opener = require('opener');
 /*
  * GET home page.
  */
@@ -42,17 +43,21 @@ exports.createRoutes = function(app_ref){
   app.io.route('update_play_count', updatePlayCount);
   // remote control routes
   app.io.route('get_receivers', getReceivers);
+  // open file manager to location
+  app.io.route('open_dir', function(req){ opener(req.data.substring(0, req.data.lastIndexOf('/'))); });
+  // update the info of a song
+  app.io.route('update_song_info', updateSongInfo);
   // sync routes
   app.io.route('sync_page_connected', syncPageConnected);
   app.io.route('sync_playlists', syncPlaylists);
 };
 
 function musicRoute(req, res){
-  res.render('index', {menu: true});
+  res.render('index', {menu: true, music_dir: config.music_dir});
 }
 
 function mobileMusicRoute(req, res){
-  res.render('mobile', {menu: false});
+  res.render('mobile', {menu: false, music_dir: config.music_dir});
 }
 
 function sendSong(req, res){
@@ -235,6 +240,7 @@ function songMovedInPlaylist(req){
   });
 }
 
+// update song play count
 function updatePlayCount(req){
   var _id = req.data.track_id;
   var plays = req.data.plays;
@@ -242,6 +248,7 @@ function updatePlayCount(req){
   app.db.songs.update({_id: _id}, { $set: { play_count: plays } });
 }
 
+// force rescan of a set of items
 function rescanItem(req){
   items = req.data.items;
   app.db.songs.find({ _id: { $in: items }}, function(err, songs){
@@ -255,6 +262,19 @@ function rescanItem(req){
   });
 }
 
+// update the details for a song
+function updateSongInfo(req){
+  // update the song in the database
+  app.db.songs.update({_id: req.data._id}, {
+    $set: {
+      title: req.data.title,
+      display_artist: req.data.artist,
+      album: req.data.album
+    }
+  });
+}
+
+// render the scan page
 function scanRoute(req, res){
   util.walk(config.music_dir, function(err, list){
     if(err){
@@ -270,6 +290,8 @@ function scanRoute(req, res){
     });
   });
 }
+
+// controller routes
 
 function setCompName(req){
   req.io.join('receivers');

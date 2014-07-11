@@ -832,8 +832,28 @@ function shoInfoView(items){
   }
   // process the edit for the item
   var track = player.song_collection.findBy_Id(items[0]);
-  var message = render("#info_template", track);
-  console.log(message);
+  // if they are currently on the computer running the app
+  var onserver = (window.location.hostname == 'localhost') ? true : false;
+  // generate the content of the modal
+  var message = render("#info_template", {track: track, music_dir: music_dir, onserver: onserver});
+  // function for saving data
+  var save_func = function(){
+    // change the data
+    var data = {
+      _id: $("#edit_id").val(),
+      title: $("#title").val(),
+      artist: $("#artist").val(),
+      album: $("#album").val()
+    };
+    // get the data to change on the server
+    socket.emit('update_song_info', data);
+    // get the data to change on the client
+    track.attributes.title = data.title;
+    track.attributes.display_artist = data.artist;
+    track.attributes.album = data.album;
+    // redraw the song
+    MusicApp.router.songview.redrawSong(data._id);
+  };
   bootbox.dialog({
     title: track.attributes.title,
     message: message,
@@ -841,9 +861,7 @@ function shoInfoView(items){
       success: {
         label: "Save",
         className: "btn-success",
-        callback: function(){
-          // save the data
-        }
+        callback: save_func
       },
       main: {
         label: "Close Without Saving",
@@ -851,10 +869,34 @@ function shoInfoView(items){
       }
     }
   });
-  $(".info_cover").click(function(ev){
-    showCover($(ev.target).attr('src'));
-    return false;
-  })
+  // show the img in full when mousove
+  $(".info_cover, .detailed").popover({
+    html: true,
+    trigger: 'hover',
+    placement: 'bottom',
+    content: function () {
+      return '<p><img src="' +$(this)[0].src + '" /></p>';
+    }
+  });
+  // tie the enter key on the inputs to the save function
+  $(".edit_form :input").keydown(function(ev){
+    // if enter key
+    if(ev.keyCode==13){
+      save_func();
+      // manually hide the modal, because it wasn't called from the button press
+      $('.bootbox').modal('hide');
+    }
+  });
+  // open the directory in a file manager
+  $(".open_dir").click(function(ev){
+    var location = $(this).attr('title');
+    socket.emit('open_dir', location);
+  });
+  // dismiss the modal on backdrop click
+  $(".bootbox").click(function(ev){
+    if(ev.target != this) return;
+    $('.bootbox').modal('hide');
+  });
 }
 
 SidebarView = Backbone.View.extend({

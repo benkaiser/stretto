@@ -233,6 +233,14 @@ tr:hover .options{
   height: 60px;
   margin-right: 10px;
 }
+.detailed_info_cover{
+  max-width: 200px;
+  max-height: 200px;
+}
+/* override popove max width */
+.popover{
+  max-width: 1000px;
+}
 .info_unknown_cover{
   float: left;
   font-size: 60px;
