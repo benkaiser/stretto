@@ -52,19 +52,21 @@
   </div>
 </script>
 <script type='text/swig' id='song_template'>
-  <h1>{{title}}
-  {% if editable %}
-    <div class="btn-group">
-      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
-        Options <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" role="menu">
-        <li><a class='download_playlist' target='_blank' href='/downloadplaylist/{{_id}}'>Download Playlist</a></li>
-        <li><a class='rename_playlist'>Rename Playlist</a></li>
-        <li><a class='delete_playlist'>Delete Playlist</a></li>
-      </ul>
-    </div>
-  {% endif %}</h1><p>{{numSongs}} Songs - {{totalDuration}}</p>
+  <div class='playlist_meta'>
+    <h1>{{title}}
+    {% if editable %}
+      <div class="btn-group">
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+          Options <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a class='download_playlist' target='_blank' href='/downloadplaylist/{{_id}}'>Download Playlist</a></li>
+          <li><a class='rename_playlist'>Rename Playlist</a></li>
+          <li><a class='delete_playlist'>Delete Playlist</a></li>
+        </ul>
+      </div>
+    {% endif %}</h1><p>{{numSongs}} Songs - {{totalDuration}}</p>
+  </div>
   <table class='table song_table disable_selection'>
     <thead>
       <th class='title_th'>Title
@@ -84,11 +86,13 @@
       </th>
     </thead>
     <tbody class='song_body'>
+      <tr class="top-spacer" data-index='spacer' style="height: 0"/>
+      <tr class="bottom-spacer" data-index='spacer' style="height: 0"/>
     </tbody>
   </table>
 </script>
 <script type='text/swig' id='song_item'>
-<tr id="{{song.attributes._id}}" {% if selected %}class='selected'{% endif %}>
+<tr id="{{song.attributes._id}}" data-index="{{index}}" {% if selected %}class='selected'{% endif %}>
 <td>
   <div class='option_div'>
     <i class='fa fa-plus-square-o options'></i>
@@ -96,7 +100,7 @@
   {% if song.attributes.hasOwnProperty('cover_location') %}
     <img class='cover' src='/cover/{{song.attributes.cover_location}}'/>
   {% else %}
-    <i class='fa fa-question unkown_cover'></i>
+    <i class='fa fa-question unknown_cover'></i>
   {% endif %}
   <span class='song_text'>{{song.attributes.title}}</span>
 </td>

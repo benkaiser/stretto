@@ -538,6 +538,7 @@ MusicApp.addInitializer(function(options){
 SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
+    var self = this;
     // calculate the duration
     var totalDuration = 0;
     for(var song = 0; song < player.songs.length; song++){
@@ -556,8 +557,8 @@ SongView = Backbone.View.extend({
     }));
     this.$el.addClass("custom_scrollbar");
     // add scroll event handler
-    this.$el.scroll(function(){
-      MusicApp.router.songview.checkScroll();
+    this.$el.scroll(function(ev){
+      MusicApp.router.songview.checkScroll(ev);
     });
     // logic to manually order the songs in a playlist
     if( player.playlist.editable && // playlist is editable
@@ -588,8 +589,28 @@ SongView = Backbone.View.extend({
       });
     }
     // set the defaults and start rendering songs
-    this.songIndex = 0;
-    this.renderSong();
+    // content height
+    this.contentHeight = $("#content").height();
+    // height of one item
+    this.individual_height = 42;
+    // how many to show at a time
+    this.how_many_drawn = Math.ceil(window.innerHeight / this.individual_height) * 2;
+    if(this.how_many_drawn > player.songs.length){
+      this.how_many_drawn = player.songs.length;
+    }
+    // initialise the lastmin and lastmax
+    this.lastmin = 1;
+    this.lastmax = 0;
+    // height of number drawn
+    this.height_of_drawn = this.how_many_drawn * this.individual_height;
+    // how high is the table in total
+    this.total_table_height = player.songs.length * this.individual_height;
+    setTimeout(function(){
+      // get hight of elems above table body incl header row
+      self.meta_height = $(".playlist_meta").height() + 40;
+      // draw the songs
+      self.renderSong();
+    }, 0);
   },
   events: {
     "click .colsearch": "triggerSearch",
@@ -687,21 +708,93 @@ SongView = Backbone.View.extend({
     });
   },
   renderSong: function(){
-    var batch = 50;
+    // simple block to make sure it is only processing a render once at any point in time
+    if(!this.processing){
+      this.processing = true;
+      // cache scroll top variable
+      var scrollTop = this.$el.scrollTop();
+      // get the index of the item in the center of the screen
+      var middle_of_viewport = scrollTop + this.contentHeight / 2 - this.meta_height;
+      var middle_item = Math.floor(middle_of_viewport / this.individual_height);
 
-    if(this.songIndex < player.songs.length){
-      var item = "";
-      for(i = 0; i < batch; i++){
-        item += render("#song_item", {
-          song: player.songs[this.songIndex],
-          selected: (selectedItems.indexOf(player.songs[this.songIndex].attributes._id) != -1)
-        });
-        this.songIndex++;
-        if(this.songIndex == player.songs.length){
-          break;
-        }
+      // get the bounds of items to draw
+      var min = middle_item - this.how_many_drawn/2;
+      var max = middle_item + this.how_many_drawn/2;
+      if(min < 0){
+        min = 0;
+        max = this.how_many_drawn;
       }
-      this.$el.find(".song_body").append(item);
+      if(max > player.songs.length){
+        max = player.songs.length-1;
+        min = max - this.how_many_drawn + 1;
+      }
+
+      if(min != this.lastmin || max != this.lastmax){
+        // the elements we are drawing has changed
+        // remove the elements no longer viewable
+        $(".song_body tr").each(function(index){
+          var index = $(this).attr('data-index');
+          if(index != 'spacer'){
+            index = parseInt(index);
+            if(index < min || index > max){
+              $(this).remove();
+            }
+          }
+        });
+        // add the elements from the side they can be added from
+        var index = 0;
+        if(max > this.lastmax){
+          // add them to the bottom
+          var diff = max - this.lastmax - 1;
+          while(diff >= 0){
+            index = max-diff;
+            var render_item = render("#song_item", {
+              song: player.songs[index],
+              selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
+              index: index
+            });
+            $(".bottom-spacer").before(render_item);
+            diff--;
+          }
+        }
+        if(min < this.lastmin){
+          console.log(min);
+          // add them to the top
+          var diff = this.lastmin - min - 1;
+          while(diff >= 0){
+            index = min+diff;
+            var render_item = render("#song_item", {
+              song: player.songs[index],
+              selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
+              index: index
+            });
+            $(".top-spacer").after(render_item);
+            diff--;
+          }
+        }
+        this.lastmax = max;
+        this.lastmin = min;
+      }
+
+      // calculate the spacing heights
+      var top_of_viewport  = scrollTop;
+      var top = top_of_viewport - this.height_of_drawn/2;
+      if(top < 0)
+        top = 0;
+      if(top > this.total_table_height - this.height_of_drawn)
+        top = this.total_table_height - this.height_of_drawn;
+
+      var bottom_of_viewport = scrollTop + this.contentHeight;
+      var bottom = this.total_table_height - bottom_of_viewport - this.height_of_drawn/2;
+      if(bottom < 0)
+        bottom = 0;
+
+      // set the spacing heights
+      $(".top-spacer").css('height', top);
+      $(".items-spacer").css('height', this.height_of_drawn);
+      $(".bottom-spacer").css('height', bottom);
+
+      this.processing = false;
     }
   },
   redrawSong: function(_id){
@@ -712,12 +805,8 @@ SongView = Backbone.View.extend({
       this.$el.find("#"+_id).replaceWith(render("#song_item", { song: player.song_collection.findBy_Id(_id)}));
     }
   },
-  checkScroll: function(){
-    var scroll = this.$el.scrollTop() + $("#content").height();
-    var height = this.$el.find("table").height();
-    if((scroll / height) > 0.8){
-      this.renderSong();
-    }
+  checkScroll: function(ev){
+    this.renderSong();
   }
 });
 

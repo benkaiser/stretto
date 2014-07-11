@@ -120,7 +120,7 @@ body{
   overflow: hidden;
   white-space: nowrap;
 }
-.song_table tbody > tr > td .unkown_cover {
+.song_table tbody > tr > td .unknown_cover {
   vertical-align: top;
 }
 tr:hover{
@@ -155,8 +155,8 @@ tr:hover .options{
   height: 40px;
   margin-right: 10px;
 }
-.unkown_cover{
-  font-size: 40px;
+.unknown_cover{
+  font-size: 41px;
   margin-right: 18px;
   margin-left: 8px;
 }
