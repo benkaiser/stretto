@@ -589,6 +589,8 @@ SongView = Backbone.View.extend({
       });
     }
     // set the defaults and start rendering songs
+    // init the processing variable
+    this.processing = false;
     // content height
     this.contentHeight = $("#content").height();
     // height of one item
@@ -758,7 +760,6 @@ SongView = Backbone.View.extend({
           }
         }
         if(min < this.lastmin){
-          console.log(min);
           // add them to the top
           var diff = this.lastmin - min - 1;
           while(diff >= 0){
