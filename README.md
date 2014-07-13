@@ -40,7 +40,7 @@ Go to `localhost:2000` in your browser (or known ip of server if it is on a diff
 
 ### Features Implemented
 
-- Play songs and move between tracks
+- Sync between computers (servers running on different computers)
 - View full-resolution cover art
 - Full playlist support
 - Multiple selection
@@ -49,7 +49,7 @@ Go to `localhost:2000` in your browser (or known ip of server if it is on a diff
 
 ### Planned features
 
-- See TODO.md
+- See the projects public [Trello board](https://trello.com/b/cXdOSOoR/node-music-player) for features planned / implemented. If you want to request a feature, please [create an issue](https://github.com/benkaiser/node-music-player/issues/new).
 
 ### FAQ
 
