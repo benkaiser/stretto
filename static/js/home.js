@@ -601,7 +601,10 @@ SongView = Backbone.View.extend({
       this.how_many_drawn = player.songs.length;
     }
     // initialise the lastmin and lastmax
-    this.lastmin = 1;
+    this.lastmin = 0;
+    if(player.songs.length > 0){
+      this.lastmin = 1;
+    }
     this.lastmax = 0;
     // height of number drawn
     this.height_of_drawn = this.how_many_drawn * this.individual_height;
@@ -726,7 +729,7 @@ SongView = Backbone.View.extend({
         min = 0;
         max = this.how_many_drawn;
       }
-      if(max > player.songs.length){
+      if(max > player.songs.length-1){
         max = player.songs.length-1;
         min = max - this.how_many_drawn + 1;
       }
@@ -1019,7 +1022,10 @@ SettingsBarView = Backbone.View.extend({
   render: function(){
     this.$el.html(render(this.template, {vol: 100}));
     _.defer(function(){
-      player.setVolElem($("#vol_bar"));
+      var volElem = $("#vol_bar");
+      if(volElem.length > 0){
+        player.setVolElem(volElem);
+      }
     });
   },
   events: {
