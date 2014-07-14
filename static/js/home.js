@@ -573,7 +573,6 @@ SongView = Backbone.View.extend({
           var item = player.song_collection.findBy_Id(ui.item.attr('id'));
           var oldIndex = item.attributes.index-1;
           var newIndex = self.lastmin + ui.item.index() - 1;
-          console.log([newIndex, oldIndex]);
           // remove the item from it's old place
           var item = player.playlist.songs.splice(oldIndex, 1)[0];
           // add the item into it's new place
