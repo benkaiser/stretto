@@ -606,6 +606,8 @@ SongView = Backbone.View.extend({
       this.lastmin = 1;
     }
     this.lastmax = 0;
+    // if the viewport has been drawn at least once
+    self.drawn_full = false;
     // height of number drawn
     this.height_of_drawn = this.how_many_drawn * this.individual_height;
     // how high is the table in total
@@ -717,14 +719,14 @@ SongView = Backbone.View.extend({
     if(!this.processing){
       this.processing = true;
       // cache scroll top variable
-      var scrollTop = this.$el.scrollTop();
+      this.scrollTop = this.$el.scrollTop();
       // get the index of the item in the center of the screen
-      var middle_of_viewport = scrollTop + this.contentHeight / 2 - this.meta_height;
-      var middle_item = Math.floor(middle_of_viewport / this.individual_height);
+      var middle_of_viewport = this.scrollTop + this.contentHeight / 2 - this.meta_height;
+      this.middle_item = Math.floor(middle_of_viewport / this.individual_height);
 
       // get the bounds of items to draw
-      var min = middle_item - this.how_many_drawn/2;
-      var max = middle_item + this.how_many_drawn/2;
+      var min = this.middle_item - this.how_many_drawn/2;
+      var max = this.middle_item + this.how_many_drawn/2;
       if(min < 0){
         min = 0;
         max = this.how_many_drawn;
@@ -735,22 +737,16 @@ SongView = Backbone.View.extend({
       }
 
       if(min != this.lastmin || max != this.lastmax){
-        // the elements we are drawing has changed
-        // remove the elements no longer viewable
-        $(".song_body tr").each(function(index){
-          var index = $(this).attr('data-index');
-          if(index != 'spacer'){
-            index = parseInt(index);
-            if(index < min || index > max){
-              $(this).remove();
-            }
-          }
-        });
+        // shortcut to remove all items easily
+        if(min > this.lastmax || max < this.lastmin){
+          this.$el.find(".song_row").remove();
+          this.drawn_full = false;
+        }
         // add the elements from the side they can be added from
         var index = 0;
         if(max > this.lastmax){
           // add them to the bottom
-          var diff = max - this.lastmax - 1;
+          var diff = Math.min(max - this.lastmax, this.how_many_drawn) - 1;
           while(diff >= 0){
             index = max-diff;
             var render_item = render("#song_item", {
@@ -758,13 +754,17 @@ SongView = Backbone.View.extend({
               selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
               index: index
             });
-            $(".bottom-spacer").before(render_item);
+            // if we are redrawing, remove from the other side
+            if(this.drawn_full){
+              this.$el.find("#top-spacer").next().remove();
+            }
+            this.$el.find("#bottom-spacer").before(render_item);
             diff--;
           }
         }
         if(min < this.lastmin){
           // add them to the top
-          var diff = this.lastmin - min - 1;
+          var diff = Math.min(this.lastmin - min, this.how_many_drawn) - 1;
           while(diff >= 0){
             index = min+diff;
             var render_item = render("#song_item", {
@@ -772,7 +772,11 @@ SongView = Backbone.View.extend({
               selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
               index: index
             });
-            $(".top-spacer").after(render_item);
+            // if we are redrawing, remove from the other side
+            if(this.drawn_full){
+              this.$el.find("#bottom-spacer").prev().remove();
+            }
+            this.$el.find("#top-spacer").after(render_item);
             diff--;
           }
         }
@@ -781,24 +785,25 @@ SongView = Backbone.View.extend({
       }
 
       // calculate the spacing heights
-      var top_of_viewport  = scrollTop;
+      var top_of_viewport  = this.scrollTop;
       var top = top_of_viewport - this.height_of_drawn/2;
       if(top < 0)
         top = 0;
       if(top > this.total_table_height - this.height_of_drawn)
         top = this.total_table_height - this.height_of_drawn;
 
-      var bottom_of_viewport = scrollTop + this.contentHeight;
+      var bottom_of_viewport = this.scrollTop + this.contentHeight;
       var bottom = this.total_table_height - bottom_of_viewport - this.height_of_drawn/2;
       if(bottom < 0)
         bottom = 0;
 
       // set the spacing heights
-      $(".top-spacer").css('height', top);
-      $(".items-spacer").css('height', this.height_of_drawn);
-      $(".bottom-spacer").css('height', bottom);
+      this.$el.find("#top-spacer").css('height', top);
+      this.$el.find("#bottom-spacer").css('height', bottom);
 
+      // set some finish variables
       this.processing = false;
+      this.drawn_full = true;
     }
   },
   redrawSong: function(_id){

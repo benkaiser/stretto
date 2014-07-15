@@ -70,13 +70,13 @@
       </th>
     </thead>
     <tbody class='song_body'>
-      <tr class="top-spacer" data-index='spacer' style="height: 0"/>
-      <tr class="bottom-spacer" data-index='spacer' style="height: 0"/>
+      <tr id="top-spacer" data-index='spacer' style="height: 0"/>
+      <tr id="bottom-spacer" data-index='spacer' style="height: 0"/>
     </tbody>
   </table>
 </script>
 <script type='text/swig' id='song_item'>
-<tr id="{{song.attributes._id}}">
+<tr id="{{song.attributes._id}}" data-index="{{index}}" class='song_row {% if selected %}selected{% endif %}'>
 <td>
   <div class='option_div'>
     <i class='fa fa-plus-square-o options'></i>
