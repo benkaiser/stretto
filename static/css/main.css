@@ -155,6 +155,11 @@ tr:hover .options{
   height: 40px;
   margin-right: 10px;
 }
+.popover_cover{
+  max-width: 400px;
+  max-height: 400px;
+  border-radius: 20px;
+}
 .unknown_cover{
   font-size: 41px;
   margin-right: 18px;

@@ -936,14 +936,19 @@ function shoInfoView(items){
       _id: $("#edit_id").val(),
       title: $("#title").val(),
       artist: $("#artist").val(),
-      album: $("#album").val()
+      album: $("#album").val(),
+      cover: $(".info_cover, .detailed").attr('src')
     };
+    if(data.cover == track.attributes.cover_location){
+      data.cover = null;
+    }
     // get the data to change on the server
     socket.emit('update_song_info', data);
     // get the data to change on the client
     track.attributes.title = data.title;
     track.attributes.display_artist = data.artist;
     track.attributes.album = data.album;
+
     // redraw the song
     MusicApp.router.songview.redrawSong(data._id);
   };
@@ -963,13 +968,35 @@ function shoInfoView(items){
     }
   });
   // show the img in full when mousove
-  $(".info_cover, .detailed").popover({
-    html: true,
-    trigger: 'hover',
-    placement: 'bottom',
-    content: function () {
-      return '<p><img src="' +$(this)[0].src + '" /></p>';
-    }
+  var info_cover_popover = function(){
+    $(".info_cover, .detailed").popover({
+      html: true,
+      trigger: 'hover',
+      placement: 'bottom',
+      content: function () {
+        return '<p><img class="popover_cover" src="' +$(this)[0].src + '" /></p>';
+      }
+    });
+  };
+  info_cover_popover();
+  // they want to find the cover for the song
+  $(".find_cover_art").click(function(ev){
+    var lastfm = new LastFM({
+      'apiKey' : '4795cbddcdec3a6b3f622235caa4b504',
+      'apiSecret' : 'cbe22daa03f35df599746f590bf015a5'
+    });
+
+    lastfm.album.getInfo({"artist": $("#artist").val(), "album": $("#album").val()}, {success: function(data){
+      if(data.album.image.length > 0 && data.album.image[data.album.image.length-1]["#text"] != ""){
+        var cover_url = data.album.image[data.album.image.length-1]["#text"];
+        $(".img_block").html("<img class='info_cover detailed' src='"+cover_url+"'/>");
+        info_cover_popover();
+      } else {
+        bootbox.alert("Artwork not found on LastFM");
+      }
+    }, error: function(code, message){
+      bootbox.alert("Error fetching album artwork: " + message);
+    }});
   });
   // tie the enter key on the inputs to the save function
   $(".edit_form :input").keydown(function(ev){

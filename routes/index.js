@@ -5,6 +5,9 @@ var async = require('async');
 var AdmZip = require('adm-zip');
 var os = require('os');
 var opener = require('opener');
+var md5 = require('MD5');
+var request = require('request').defaults({ encoding: null });
+var fs = require('fs');
 /*
  * GET home page.
  */
@@ -264,7 +267,35 @@ function rescanItem(req){
 
 // update the details for a song
 function updateSongInfo(req){
-  // update the song in the database
+  var cover = req.data.cover;
+  if(cover != null){
+    request(cover, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var suffix = response.headers['content-type'].split('/').pop();
+        var song_filename = md5(body) + "." + suffix;
+        var location = app.get('root') + '/dbs/covers/' + song_filename;
+        fs.exists(location, function(exists){
+          if(!exists){
+            fs.writeFile(location, body, function(err){
+              if(err){
+                console.log(err);
+              } else {
+                console.log("Wrote cover here: " + location);
+              }
+              app.db.songs.update({display_artist: req.data.artist, album: req.data.album}, {
+                $set: {
+                  cover_location: song_filename
+                }
+              }, { multi: true }, function (err, numReplaced) {
+                // TODO let the client know the new cover images
+              });
+            });
+          }
+        })
+      }
+    });
+  }
+  // update the rest of the details about the song in the database
   app.db.songs.update({_id: req.data._id}, {
     $set: {
       title: req.data.title,
