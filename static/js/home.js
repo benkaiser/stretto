@@ -557,8 +557,8 @@ SongView = Backbone.View.extend({
     }));
     this.$el.addClass("custom_scrollbar");
     // add scroll event handler
-    this.$el.scroll(function(ev){
-      MusicApp.router.songview.checkScroll(ev);
+    this.$el.scroll(function(){
+      MusicApp.router.songview.renderSong();
     });
     // logic to manually order the songs in a playlist
     if( player.playlist.editable && // playlist is editable
@@ -612,12 +612,14 @@ SongView = Backbone.View.extend({
     this.height_of_drawn = this.how_many_drawn * this.individual_height;
     // how high is the table in total
     this.total_table_height = player.songs.length * this.individual_height;
-    setTimeout(function(){
+    // precompile the song rendering tempalte
+    this.song_template = swig.compile($("#song_item").html());
+    _.defer(function(){
       // get hight of elems above table body incl header row
       self.meta_height = $(".playlist_meta").height() + 40;
       // draw the songs
       self.renderSong();
-    }, 0);
+    });
   },
   events: {
     "click .colsearch": "triggerSearch",
@@ -749,7 +751,7 @@ SongView = Backbone.View.extend({
           var diff = Math.min(max - this.lastmax, this.how_many_drawn) - 1;
           while(diff >= 0){
             index = max-diff;
-            var render_item = render("#song_item", {
+            var render_item = this.song_template({
               song: player.songs[index],
               selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
               index: index
@@ -767,7 +769,7 @@ SongView = Backbone.View.extend({
           var diff = Math.min(this.lastmin - min, this.how_many_drawn) - 1;
           while(diff >= 0){
             index = min+diff;
-            var render_item = render("#song_item", {
+            var render_item = this.song_template({
               song: player.songs[index],
               selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
               index: index
@@ -811,11 +813,8 @@ SongView = Backbone.View.extend({
     var song_tr = this.$el.find("#"+_id);
     if(song_tr.length != 0){
       // now replace the item
-      this.$el.find("#"+_id).replaceWith(render("#song_item", { song: player.song_collection.findBy_Id(_id)}));
+      this.$el.find("#"+_id).replaceWith(this.song_template({ song: player.song_collection.findBy_Id(_id)}));
     }
-  },
-  checkScroll: function(ev){
-    this.renderSong();
   }
 });
 
