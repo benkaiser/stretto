@@ -44,3 +44,18 @@ var getip = function(callback){
   });
 }
 exports.getip = getip;
+
+exports.decodeBase64Image = function(dataString) {
+  var matches = dataString.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/),
+    response = {};
+
+  if (matches == null) {
+    console.log(dataString);
+    console.log('Invalid file uploaded');
+  }
+
+  response.type = matches[1];
+  response.data = new Buffer(matches[2], 'base64');
+
+  return response;
+}

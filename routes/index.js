@@ -267,35 +267,7 @@ function rescanItem(req){
 
 // update the details for a song
 function updateSongInfo(req){
-  var cover = req.data.cover;
-  if(cover != null){
-    request(cover, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        var suffix = response.headers['content-type'].split('/').pop();
-        var song_filename = md5(body) + "." + suffix;
-        var location = app.get('root') + '/dbs/covers/' + song_filename;
-        fs.exists(location, function(exists){
-          if(!exists){
-            fs.writeFile(location, body, function(err){
-              if(err){
-                console.log(err);
-              } else {
-                console.log("Wrote cover here: " + location);
-              }
-              app.db.songs.update({display_artist: req.data.artist, album: req.data.album}, {
-                $set: {
-                  cover_location: song_filename
-                }
-              }, { multi: true }, function (err, numReplaced) {
-                // TODO let the client know the new cover images
-              });
-            });
-          }
-        })
-      }
-    });
-  }
-  // update the rest of the details about the song in the database
+  // update the details about the song in the database (minus the cover)
   app.db.songs.update({_id: req.data._id}, {
     $set: {
       title: req.data.title,
@@ -303,6 +275,49 @@ function updateSongInfo(req){
       album: req.data.album
     }
   });
+  // update the cover photo
+  var cover = req.data.cover;
+  if(cover != null){
+    // function to be called by both download file and file upload methods
+    var process_cover = function(type, content_buffer){
+      var cover_filename = md5(content_buffer) + "." + type;
+      var location = app.get('root') + '/dbs/covers/' + cover_filename;
+      fs.exists(location, function(exists){
+        if(!exists){
+          fs.writeFile(location, content_buffer, function(err){
+            if(err){
+              console.log(err);
+            } else {
+              console.log("Wrote cover here: " + location);
+            }
+          });
+        }
+        // update the songs cover even if the image already exists
+        app.db.songs.update({display_artist: req.data.artist, album: req.data.album}, {
+          $set: {
+            cover_location: cover_filename
+          }
+        }, { multi: true }, function (err, numReplaced) {
+          // TODO let the client know the new cover images
+        });
+      })
+    };
+    // different methods of setting cover
+    if(req.data.cover_is_url && req.data.cover_is_lastfm){
+      // they fetched the cover from lastfm
+      request(cover, function (error, response, body) {
+        console.log(response.statusCode);
+        if (!error && response.statusCode == 200) {
+          var type = response.headers['content-type'].split('/').pop();
+          process_cover(type, body);
+        }
+      });
+    } else {
+      // they dropped a file to upload
+      var image = util.decodeBase64Image(cover);
+      process_cover(image.type, image.data);
+    }
+  }
 }
 
 // render the scan page
