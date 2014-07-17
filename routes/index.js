@@ -306,7 +306,6 @@ function updateSongInfo(req){
     if(req.data.cover_is_url && req.data.cover_is_lastfm){
       // they fetched the cover from lastfm
       request(cover, function (error, response, body) {
-        console.log(response.statusCode);
         if (!error && response.statusCode == 200) {
           var type = response.headers['content-type'].split('/').pop();
           process_cover(type, body);

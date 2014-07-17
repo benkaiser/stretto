@@ -987,7 +987,7 @@ function shoInfoView(items){
       title: $("#title").val(),
       artist: $("#artist").val(),
       album: $("#album").val(),
-      cover: $(".lfm_cover").attr('src'),
+      cover: $(".lfm_cover").attr('src') || filedropdata,
       cover_is_lastfm: islastfm,
       cover_is_url: cover_is_url
     };
