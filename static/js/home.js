@@ -754,19 +754,36 @@ SongView = Backbone.View.extend({
   // move the selection up and down
   moveSelection: function(direction){
     var index_in_queue = player.findSongIndex(lastSelection);
-    var new_index = index_in_queue;
+    var new_index = index_in_queue || 0;
     if(direction == 'up' && index_in_queue - 1 >= 0){
       new_index--;
-      // move the viewport up
-      this.$el.scrollTop(this.$el.scrollTop() - this.individual_height);
     } else if (direction == 'down'  && index_in_queue + 1 < player.queue_pool.length){
       new_index++;
-      // move the viewport down
-      this.$el.scrollTop(this.$el.scrollTop() + this.individual_height);
     }
     var newly_selected = player.queue_pool[new_index];
+    // get the offset
+    var new_item = $("#" + newly_selected.attributes._id);
+    var offset = new_item.offset();
+    // it is actually in the view
+    if(offset !== undefined){
+      // do we need to scroll to show the full item?
+      var doc_height = $(document).height();
+      // how far past the top minus navbar
+      var top_diff = offset.top - 51;
+      // how far past the bottom plus control bar and height of element
+      var bottom_diff = offset.top - doc_height + 63 + this.individual_height;
+      if(top_diff <= 0){
+        // move one item up
+        this.$el.scrollTop(this.$el.scrollTop() - this.individual_height);
+      } else if(bottom_diff > 0){
+        // move one item down
+        this.$el.scrollTop(this.$el.scrollTop() + this.individual_height);
+      }
+    }
     // remove the old selection
-    delFromSelection(player.queue_pool[index_in_queue].attributes._id);
+    if(index_in_queue != null){
+      delFromSelection(player.queue_pool[index_in_queue].attributes._id);
+    }
     // select the new item
     addToSelection(newly_selected.attributes._id, false);
   },
