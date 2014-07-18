@@ -631,6 +631,9 @@ SongView = Backbone.View.extend({
     this.processing = false;
     // content height
     this.contentHeight = $("#content").height();
+    // get the spacers
+    this.top_spacer = this.$el.find("#top-spacer");
+    this.bottom_spacer = this.$el.find("#bottom-spacer");
     // height of one item
     this.individual_height = 42;
     // how many to show at a time
@@ -796,9 +799,9 @@ SongView = Backbone.View.extend({
             });
             // if we are redrawing, remove from the other side
             if(this.drawn_full){
-              this.$el.find("#top-spacer").next().remove();
+              this.top_spacer.next().remove();
             }
-            this.$el.find("#bottom-spacer").before(render_item);
+            this.bottom_spacer.before(render_item);
             diff--;
           }
         }
@@ -814,9 +817,9 @@ SongView = Backbone.View.extend({
             });
             // if we are redrawing, remove from the other side
             if(this.drawn_full){
-              this.$el.find("#bottom-spacer").prev().remove();
+              this.bottom_spacer.prev().remove();
             }
-            this.$el.find("#top-spacer").after(render_item);
+            this.top_spacer.after(render_item);
             diff--;
           }
         }
@@ -838,8 +841,8 @@ SongView = Backbone.View.extend({
         bottom = 0;
 
       // set the spacing heights
-      this.$el.find("#top-spacer").css('height', top);
-      this.$el.find("#bottom-spacer").css('height', bottom);
+      this.top_spacer.css('height', top);
+      this.bottom_spacer.css('height', bottom);
 
       // set some finish variables
       this.processing = false;
