@@ -268,16 +268,20 @@ function PlayState(){
     // set the current song
     var index_in_queue = this.findSongIndex(id);
     if(index_in_queue == null){
+      // song was played from outside the current queue, get it by id
       this.current_index = 0;
       this.current_song = this.song_collection.findBy_Id(id);
     } else {
+      // song played was in the current queue, fetch the info from the queue
       this.current_index = index_in_queue;
       this.current_song = this.queue_pool[this.current_index];
     }
+    // skip resetting the song if it's the same song playing and we don't need to force restart
     if(id == this.playing_id && !force_restart){
       return;
     } else {
       this.playing_id = id;
+      localStorage.setItem('last_playing_id', id);
     }
     // update the audio element
     this.current_track.pause();
@@ -297,6 +301,7 @@ function PlayState(){
   };
   this.setIsPlaying = function(isPlaying){
     this.is_playing = isPlaying;
+    localStorage.setItem('last_play_state', isPlaying);
     $(this.names.playpause).removeClass("fa-play fa-pause");
     if(this.is_playing){
       $(this.names.playpause).addClass("fa-pause");
@@ -544,6 +549,16 @@ MusicAppRouter = Backbone.Router.extend({
     player.playlist = findId;
     // update the currently viewed songs
     player.songs = player.song_collection.getByIds(player.playlist);
+    // block for when this function is called on page load
+    if(player.songs == undefined){
+      return;
+    }
+    // if they haven't selected a queue yet, make this playlist the queue
+    // this is used when they are loading a page and haven't clicked a song yet
+    if(player.queue_pool.length == 0){
+      player.queue_pool = player.songs.slice(0);
+      player.genShufflePool();
+    }
     // reset the sorting variables
     player.sort_asc = player.sort_col = null;
     // if the songs were found, update the songview
@@ -1219,6 +1234,16 @@ function loadedRestart(item){
     // if the player is showing nothing, show the default place
     if(MusicApp.router.songview === null){
       MusicApp.router.playlist();
+    }
+    // if they last played a song, continue playing
+    var play_state = localStorage.getItem('last_play_state'); // must be fetched before the song is played
+    var song_id = localStorage.getItem('last_playing_id');
+    if(song_id){
+      player.playSong(song_id);
+    }
+    // it is stored as a string
+    if(play_state == "false"){
+      player.togglePlayState();
     }
   }
 }
