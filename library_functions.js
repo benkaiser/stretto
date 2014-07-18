@@ -269,17 +269,26 @@ exports.sync_import = function(app_ref, songs, url){
       mkdirp(folder_of_file, function(){
         var song_file_url = config.music_dir + songs[cnt].location;
         // download the file
-        request(url + "/songs/" + songs[cnt]._id).pipe(fs.createWriteStream(song_file_url));
-        // cover file
-        if(songs[cnt].cover_location !== undefined){
-          var cover_file_url = __dirname + '/dbs/covers/' + songs[cnt].cover_location;
-          request(url + "/cover/" + songs[cnt].cover_location).pipe(fs.createWriteStream(cover_file_url));
-        }
-        // insert the song into the database
-        app.db.songs.update({_id: songs[cnt]._id}, songs[cnt], {upsert: true}, function (err, numReplaced, newDoc){
-          // update the browser the song has been added
-          console.log(newDoc);
-        });
+        request(url + "/songs/" + songs[cnt]._id).on('end', function(){
+          // once the song has been transferred successfully
+          var addSong = function(song){
+            app.db.songs.update({_id: song._id}, song, {upsert: true}, function (err, numReplaced, newDoc){
+              // update the browser the song has been added
+              console.log(newDoc);
+            });
+          };
+          // is there a cover?
+          if(songs[cnt].cover_location !== undefined){
+            var cover_file_url = __dirname + '/dbs/covers/' + songs[cnt].cover_location;
+            request(url + "/cover/" + songs[cnt].cover_location).on('end', function(){
+              // once the cover has finished transferring add the song to the database
+              addSong(songs[cnt]);
+            }).pipe(fs.createWriteStream(cover_file_url));
+          } else {
+            // no cover, add the song to the database
+            addSong(songs[cnt]);
+          }
+        }).pipe(fs.createWriteStream(song_file_url));
       });
     })(cnt);
   }
