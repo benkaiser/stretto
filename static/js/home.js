@@ -503,18 +503,32 @@ $(document).ready(function(){
       return;
     }
     switch(event.which){
-      case 32:
+      case 32: // space key
         player.togglePlayState();
         event.preventDefault();
         break;
-      case 39:
+      case 39: // right key
         player.nextTrack();
         event.preventDefault();
         break;
-      case 37:
+      case 37: // left key
         player.prevTrack();
         event.preventDefault();
         break;
+      case 38: // up key
+        MusicApp.router.songview.moveSelection("up");
+        event.preventDefault();
+        break;
+      case 40: // down key
+        MusicApp.router.songview.moveSelection("down");
+        event.preventDefault();
+        break;
+      case 13: // enter key
+        // play the last selected item
+        player.playSong(lastSelection);
+        // add it to the history and reset the history
+        player.play_history.unshift(lastSelection);
+        player.play_history_idx = 0;
     }
   });
   // disable the options on scroll
@@ -736,6 +750,25 @@ SongView = Backbone.View.extend({
   triggerCover: function(ev){
     showCover($(ev.target).attr('src'));
     return false;
+  },
+  // move the selection up and down
+  moveSelection: function(direction){
+    var index_in_queue = player.findSongIndex(lastSelection);
+    var new_index = index_in_queue;
+    if(direction == 'up' && index_in_queue - 1 >= 0){
+      new_index--;
+      // move the viewport up
+      this.$el.scrollTop(this.$el.scrollTop() - this.individual_height);
+    } else if (direction == 'down'  && index_in_queue + 1 < player.queue_pool.length){
+      new_index++;
+      // move the viewport down
+      this.$el.scrollTop(this.$el.scrollTop() + this.individual_height);
+    }
+    var newly_selected = player.queue_pool[new_index];
+    // remove the old selection
+    delFromSelection(player.queue_pool[index_in_queue].attributes._id);
+    // select the new item
+    addToSelection(newly_selected.attributes._id, false);
   },
   renamePlaylist: function(ev){
     bootbox.prompt({
