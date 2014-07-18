@@ -53,10 +53,11 @@ body{
 }
 #sidebar_height_wrapper{
   height: 80%;
+  height: calc(100% - 150px);
 }
 #sidebar_height_wrapper > ul{
   height: 90%;
-  height: calc(100% - 60px);
+  height: calc(100% - 50px);
   overflow-y: auto;
 }
 #bottom_bar{
