@@ -20,6 +20,7 @@ body{
   margin-top: 40px;
   margin-left: 200px;
   padding: 20px;
+  padding-bottom: 0px;
 }
 #content > div{
   height: 100%;
