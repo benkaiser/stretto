@@ -484,10 +484,6 @@ socket.on('songs', function(data){
 socket.on('playlists', function(data){
   player.playlist_collection.reset();
   player.playlist_collection.add(data.playlists);
-  // if they just renamed the playlist, redraw the songview
-  if(player.playlist !== undefined && player.playlist.editable){
-    MusicApp.router.playlist(player.playlist._id);
-  }
   // redraw the sidebar
   MusicApp.router.sidebar();
   // restart the router if we are loading for the first time
@@ -798,6 +794,7 @@ SongView = Backbone.View.extend({
             title: result,
             id: player.playlist._id
           });
+          $("#playlist_header").text(result);
         }
       }
     });
