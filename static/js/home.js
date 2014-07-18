@@ -1142,16 +1142,18 @@ function shoInfoView(items){
   });
   dropZone = $("body");
   var drop_visible = false;
-  dropZone.on('dragover', function(e){
+  var dragover_handler = function(e){
     e.stopPropagation();
     e.preventDefault();
     if(!drop_visible){
       $("body").append("<div class='dropping_file'>Drop File</div>");
       drop_visible = true;
     }
-  });
-  dropZone.on("drop", function(e) {
+  };
+  var dropped_handler = function(e) {
     drop_visible = false;
+    dropZone.unbind("dragover", dragover_handler);
+    dropZone.unbind("drop", dropped_handler)
     // remove the drop file div
     $(".dropping_file").remove();
     // stop the event propogating (i.e. don't load the image as the page in the browser)
@@ -1175,7 +1177,9 @@ function shoInfoView(items){
         }
       }
     }
-  });
+  };
+  dropZone.on('dragover', dragover_handler);
+  dropZone.on("drop", dropped_handler);
 }
 
 SidebarView = Backbone.View.extend({
