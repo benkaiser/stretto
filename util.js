@@ -9,6 +9,10 @@ var walk = function(dir, done) {
     var pending = list.length;
     if (!pending) return done(null, results);
     list.forEach(function(file) {
+      if(file[0] === '.') {
+        if (!--pending) done(null, results, strip_results);
+        return;
+      }
       file = dir + '/' + file;
       fs.stat(file, function(err, stat) {
         if (stat && stat.isDirectory()) {
