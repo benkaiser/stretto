@@ -3,7 +3,7 @@ path = require('path');
 exports.config = function(){
   data = {
     // edit below here
-    music_dir: "/home/benkaiser/Music/"
+    music_dir: "/home/benkaiser/Music/",
     // and above here
     ignore: [
       /(\/|^)\./ // ignore dot files and folders
