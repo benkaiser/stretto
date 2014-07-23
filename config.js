@@ -3,8 +3,11 @@ path = require('path');
 exports.config = function(){
   data = {
     // edit below here
-    music_dir: "/home/benkaiser/Music/"
+    music_dir: "/home/benkaiser/Music/",
     // and above here
+    ignore: [
+      /(\/|^)\./ // ignore dot files and folders
+    ]
   }
   data.music_dir = path.normalize(data.music_dir);
   if(data.music_dir.lastIndexOf("/") == data.music_dir.length-1){

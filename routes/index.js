@@ -333,7 +333,7 @@ function scanRoute(req, res){
       menu: true,
       err: err
     });
-  });
+  }, config.ignore);
 }
 
 // controller routes

@@ -1,7 +1,8 @@
 // This file is a bunch of utility functions
 var fs = require('fs');
 
-var walk = function(dir, done) {
+var walk = function(dir, done, ignore) {
+  ignore = ignore || [];
   var results = [];
   var strip_results = [];
   fs.readdir(dir, function(err, list) {
@@ -14,12 +15,18 @@ var walk = function(dir, done) {
         return;
       }
       file = dir + '/' + file;
+      
+      if(ignore.reduce(function(a,b){ return a || b.test(file)  },false)){
+        if (!--pending) done(null, results, strip_results);
+        return;
+      }
+      
       fs.stat(file, function(err, stat) {
         if (stat && stat.isDirectory()) {
           walk(file, function(err, res) {
             results = results.concat(res);
             if (!--pending) done(null, results, strip_results);
-          });
+          },ignore);
         } else {
           results.push(file);
           if (!--pending) done(null, results, strip_results);

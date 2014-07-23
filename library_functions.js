@@ -250,7 +250,7 @@ exports.scanLibrary = function(app_ref, hard){
       song_list = stripped;
       findNextSong();
     }
-  });
+  },config.ignore);
   running = true;
 }
 
