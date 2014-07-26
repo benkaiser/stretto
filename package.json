@@ -16,6 +16,7 @@
     "adm-zip": "*",
     "request": "*",
     "mkdirp": "*",
-    "opener": "*"
+    "opener": "*",
+    "soundcloud-resolver": "*"
   }
 }

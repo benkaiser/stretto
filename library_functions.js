@@ -1,13 +1,20 @@
 var fs = require('fs');
+var path = require('path');
 var mm = require('musicmetadata');
 var taglib = require('taglib');
 var md5 = require('MD5');
 var request = require('request');
 var mkdirp = require('mkdirp');
+var async = require('async');
+var SoundcloudResolver = require('soundcloud-resolver');
 
 var util = require(__dirname + '/util.js');
 var config = require(__dirname + '/config').config();
 
+// init the soundcloud resolver with the clientid
+var scres = new SoundcloudResolver(config.sc_client_id);
+
+// init other variables
 var running = false;
 var hard_rescan = false;
 var app = null;
@@ -254,6 +261,33 @@ exports.scanLibrary = function(app_ref, hard){
   running = true;
 }
 
+exports.scDownload = function(app_ref, url){
+  app = app_ref;
+  // resolve the tracks
+  scres.resolve( url, function(err, tracks) {
+    console.log(url);
+    console.log(tracks.length);
+    // make sure the dl dir is existent
+    var out_dir = path.join(config.music_dir, config.sc_dl_dir);
+    mkdirp(out_dir, function(){
+      // start an async loop to download the songs
+      var finished = false;
+      async.until(function(){ return tracks.length === 0; }, function(callback){
+        var current_track = tracks.pop();
+        var file_out_name = path.join(out_dir, current_track.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
+        console.log("Downloading: " + current_track.title);
+        console.log("To: " + file_out_name);
+        request(current_track.stream_url + "?client_id=" + config.sc_client_id).on('end', function(){
+          callback();
+        }).pipe(fs.createWriteStream(file_out_name));
+      }, function(){
+        // finished
+        console.log("Finished Download");
+      });
+    });
+  });
+};
+
 exports.sync_import = function(app_ref, songs, url){
   app = app_ref;
   // clean up the url
@@ -299,5 +333,5 @@ exports.stopScan = function(app){
 }
 
 function broadcast(id, message){
-  app.io.room('scanners').broadcast(id, message);
+  app.io.broadcast(id, message);
 }

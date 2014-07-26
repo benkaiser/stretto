@@ -29,6 +29,9 @@
       <li><a href="/scan">Scan Library</a></li>
       <li><a href="/sync">Sync Libraries</a></li>
     </ul>
+    <ul class="nav navbar-nav pull-right">
+      {% block extra_nav %}{% endblock %}
+    </ul>
   </nav>
   {% endif %}
   {% block content %}

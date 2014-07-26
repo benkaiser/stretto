@@ -102,7 +102,7 @@ function PlayState(){
     none: 2
   };
   // search info
-  this.searchText = ""
+  this.searchText = "";
   // currently viewed songs
   this.songs = [];
   // current song list sort state
@@ -529,6 +529,17 @@ $(document).ready(function(){
   });
   // disable the options on scroll
   $("#content").scroll(hideOptions);
+  // add click handler on menu items
+  $("#soundcloud_fetch").click(function(){
+    bootbox.prompt({
+      title: "Enter the SoundCloud URL",
+      callback: function(result){
+        if (result !== null) {
+          socket.emit("soundcloud_download", {url: result});
+        }
+      }
+    });
+  });
 });
 
 // backbone app

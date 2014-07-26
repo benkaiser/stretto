@@ -351,3 +351,7 @@ tr:hover .options{
 .sync_div{
   visibility: hidden;
 }
+/*** custom generic classes ***/
+.pointer{
+  cursor: pointer;
+}

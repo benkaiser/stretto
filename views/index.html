@@ -2,6 +2,15 @@
 
 {% block title %}Music{% endblock %}
 
+{% block extra_nav %}
+<li class='dropdown'>
+  <a class='pointer dropdown-toggle' data-toggle='dropdown'>Fetch New Music <span class="caret"></span></a>
+  <ul class='dropdown-menu' role='menu'>
+    <li><a class='pointer' id='soundcloud_fetch'>From SoundCloud</a></li>
+  </ul>
+</li>
+{% endblock %}
+
 {% block content %}
 <div id="wrapper" class="custom_scrollbar" tabindex="0">
   <div id='sidebar'>

@@ -53,6 +53,8 @@ exports.createRoutes = function(app_ref){
   // sync routes
   app.io.route('sync_page_connected', syncPageConnected);
   app.io.route('sync_playlists', syncPlaylists);
+  // soundcloud downloading
+  app.io.route('soundcloud_download', soundcloudDownload);
 };
 
 function musicRoute(req, res){
@@ -394,4 +396,9 @@ function syncPlaylists(req){
   var songs = req.data.songs;
   var remote_url = req.data.remote_url;
   lib_func.sync_import(app, songs, remote_url);
+}
+
+// download the soundcloud songs from the requested url
+function soundcloudDownload(req){
+  lib_func.scDownload(app, req.data.url);
 }
