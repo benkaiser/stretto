@@ -277,9 +277,24 @@ exports.scDownload = function(app_ref, url){
         var file_out_name = path.join(out_dir, current_track.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
         console.log("Downloading: " + current_track.title);
         console.log("To: " + file_out_name);
-        request(current_track.stream_url + "?client_id=" + config.sc_client_id).on('end', function(){
-          callback();
-        }).pipe(fs.createWriteStream(file_out_name));
+        // check if we need to download it
+        fs.exists(file_out_name, function(exists){
+          if(!exists){
+            // download the song
+            request(current_track.stream_url + "?client_id=" + config.sc_client_id).on('end', function(){
+              // download it's cover art
+              var large_cover_url = current_track.artwork_url.replace('large.jpg', 't500x500.jpg');
+              request(current_track.artwork_url, function(error, response, body){
+                // write the cover art
+                console.log(body);
+              });
+              callback();
+            }).pipe(fs.createWriteStream(file_out_name));
+          } else {
+            console.log("File already exists at: " + file_out_name);
+            callback();
+          }
+        });
       }, function(){
         // finished
         console.log("Finished Download");
