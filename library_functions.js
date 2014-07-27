@@ -282,13 +282,31 @@ exports.scDownload = function(app_ref, url){
           if(!exists){
             // download the song
             request(current_track.stream_url + "?client_id=" + config.sc_client_id).on('end', function(){
-              // download it's cover art
-              var large_cover_url = current_track.artwork_url.replace('large.jpg', 't500x500.jpg');
-              request(current_track.artwork_url, function(error, response, body){
-                // write the cover art
-                console.log(body);
-              });
-              callback();
+              // is artwork present?
+              if(current_track.artwork_url){
+                // download it's cover art
+                var large_cover_url = current_track.artwork_url.replace('large.jpg', 't500x500.jpg');
+                request({url: large_cover_url, encoding: null}, function(error, response, body){
+                  // where are we storing the cover art?
+                  var cover_location = md5(body) + ".jpg";
+                  var filename = __dirname + '/dbs/covers/' + cover_location;
+                  // does it exist?
+                  fs.exists(filename, function(exists){
+                    if(!exists){
+                      fs.writeFile(filename, body, function(err){
+                        console.log("Wrote cover to " + filename);
+                      });
+                    } else {
+                      console.log("cover already present");
+                    }
+                  });
+                  // add the song to the database
+                  callback();
+                });
+              } else {
+                // add without artwork to the database
+                callback();
+              }
             }).pipe(fs.createWriteStream(file_out_name));
           } else {
             console.log("File already exists at: " + file_out_name);
