@@ -273,12 +273,25 @@ exports.scDownload = function(app_ref, url){
       // start an async loop to download the songs
       var finished = false;
       async.until(function(){ return tracks.length === 0; }, function(callback){
+        // get the current item and remove it from the stack
         var current_track = tracks.pop();
-        var file_out_name = path.join(out_dir, current_track.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
-        console.log("Downloading: " + current_track.title);
-        console.log("To: " + file_out_name);
+        // create the location the song is written to
+        var location = path.join(out_dir, current_track.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
+        // create the data to add to the database
+        var song = {
+          title: current_track.title || 'Unknown Title',
+          album: current_track.label_name || 'Unknown Album',
+          artist: current_track.user.username  || 'Unknown Artist',
+          albumartist: current_track.user.username  || 'Unknown Artist',
+          display_artist: current_track.user.username || 'Unknown Artist',
+          genre: current_track.genre,
+          year: current_track.release_year  || '2014',
+          duration: current_track.duration/1000, // in milliseconds
+          play_count: 0,
+          location: location
+        };
         // check if we need to download it
-        fs.exists(file_out_name, function(exists){
+        fs.exists(location, function(exists){
           if(!exists){
             // download the song
             request(current_track.stream_url + "?client_id=" + config.sc_client_id).on('end', function(){
@@ -307,9 +320,9 @@ exports.scDownload = function(app_ref, url){
                 // add without artwork to the database
                 callback();
               }
-            }).pipe(fs.createWriteStream(file_out_name));
+            }).pipe(fs.createWriteStream(location));
           } else {
-            console.log("File already exists at: " + file_out_name);
+            console.log("File already exists ('" + location + "'). Most likely already in library.");
             callback();
           }
         });
