@@ -193,6 +193,11 @@ function PlayState(){
       }
     }
     this.songs = tmpSongs;
+    // used for if they load the browser with a search page
+    if(this.queue_pool.length === 0){
+      this.queue_pool = this.songs.slice(0);
+      this.genShufflePool();
+    }
     // reset the sorting attributes
     player.sort_asc = player.sort_col = null;
     // create a mock playlist for the search results
