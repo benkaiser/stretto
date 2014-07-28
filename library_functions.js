@@ -372,11 +372,9 @@ exports.scDownload = function(app_ref, url){
                   fs.exists(filename, function(exists){
                     if(!exists){
                       fs.writeFile(filename, body, function(err){
-                        console.log("Wrote cover to " + filename);
                         finish_add();
                       });
                     } else {
-                      console.log("cover already present");
                       finish_add();
                     }
                   });
@@ -387,7 +385,7 @@ exports.scDownload = function(app_ref, url){
               }
             }).pipe(fs.createWriteStream(location));
           } else {
-            console.log("File already exists ('" + location + "'). Most likely already in library.");
+            console.log("File already exists ('" + location + "'). Most likely already in library. Either scan libaray or remove file and start again.");
             callback();
           }
         });
