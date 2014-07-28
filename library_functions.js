@@ -47,7 +47,7 @@ function findSong(relative_location, callback){
   var full_location = config.music_dir + relative_location;
   app.db.songs.findOne({location: relative_location}, function(err, doc){
     // only scan if we haven't scanned before, or we are scanning every document again
-    if(doc == null || hard_rescan){
+    if(doc === null || hard_rescan){
       // insert the new song
       var parser = new mm(fs.createReadStream(full_location));
 
@@ -62,25 +62,25 @@ function findSong(relative_location, callback){
           genre: result.genre,
           year: result.year,
           duration: result.duration,
-          play_count: (doc == null) ? 0 : doc.play_count || 0,
+          play_count: (doc === null) ? 0 : doc.play_count || 0,
           location: relative_location
         };
         // write the cover photo as an md5 string
         if(result.picture.length > 0){
           pic = result.picture[0];
-          pic["format"] = pic["format"].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-          song.cover_location = md5(pic['data']) + "." + pic["format"];
+          pic.format = pic.format.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+          song.cover_location = md5(pic.data) + "." + pic.format;
           filename = __dirname + '/dbs/covers/' + song.cover_location;
           fs.exists(filename, function(exists){
             if(!exists){
-              fs.writeFile(filename, pic['data'], function(err){
+              fs.writeFile(filename, pic.data, function(err){
                 if(err) console.log(err);
                 console.log("Wrote file!");
               });
             }
-          })
+          });
         }
-        if(doc == null){
+        if(doc === null){
           // insert the song
           app.db.songs.insert(song, function (err, newDoc){
             taglib_fetch(relative_location, newDoc._id);
@@ -88,7 +88,7 @@ function findSong(relative_location, callback){
             broadcast("update", {
               count: song_list.length,
               completed: cnt,
-              details: "Added: " + newDoc["title"] + " - " + newDoc["albumartist"]
+              details: "Added: " + newDoc.title + " - " + newDoc.albumartist
             });
           });
         } else if (hard_rescan){
@@ -97,9 +97,9 @@ function findSong(relative_location, callback){
             broadcast("update", {
               count: song_list.length,
               completed: cnt,
-              details: "Updated: " + song["title"] + " - " + song["artist"]
+              details: "Updated: " + song.title + " - " + song.artist
             });
-          })
+          });
         }
       });
 
@@ -111,8 +111,8 @@ function findSong(relative_location, callback){
             ext = relative_location.substr(relative_location.lastIndexOf(".")+1, relative_location.length);
           }
           // if it was a metadata error and the file appears to be audio, add it
-          if(err.toString().indexOf("Could not find metadata header") > 0
-             && util.contains(song_extentions, ext)){
+          if(err.toString().indexOf("Could not find metadata header") > 0 &&
+              util.contains(song_extentions, ext)){
             console.log("Could not find metadata. Adding the song by filename.");
             // create a song with the filename as the title
             var song = {
@@ -124,17 +124,17 @@ function findSong(relative_location, callback){
               genre: "Unknown",
               year: "Unknown",
               duration: 0,
-              play_count: (doc == null) ? 0 : doc.play_count || 0,
+              play_count: (doc === null) ? 0 : doc.play_count || 0,
               location: relative_location
             };
-            if(doc == null){
+            if(doc === null){
               app.db.songs.insert(song, function (err, newDoc){
                 taglib_fetch(relative_location, newDoc._id);
                 // update the browser the song has been added
                 broadcast("update", {
                   count: song_list.length,
                   completed: cnt,
-                  details: "Added: " + newDoc["title"]
+                  details: "Added: " + newDoc.title
                 });
               });
             } else if (hard_rescan){
@@ -143,9 +143,9 @@ function findSong(relative_location, callback){
                 broadcast("update", {
                   count: song_list.length,
                   completed: cnt,
-                  details: "Updated: " + song["title"]
+                  details: "Updated: " + song.title
                 });
-              })
+              });
             }
             callback(null);
           } else {
@@ -163,19 +163,19 @@ function findSong(relative_location, callback){
       });
       callback(null);
     }
-  })
+  });
 }
 
 function normaliseArtist(albumartist, artist){
   if(typeof(albumartist) != 'string'){
-    if(albumartist.length == 0){
+    if(albumartist.length === 0){
       albumartist = '';
     } else {
       albumartist = albumartist.join('/');
     }
   }
   if(typeof(artist) != 'string'){
-    if(artist.length == 0){
+    if(artist.length === 0){
       artist = '';
     } else {
       artist = artist.join('/');
@@ -231,7 +231,7 @@ exports.scanItems = function(app_ref, locations){
   running = true;
   song_list = song_list.concat(locations);
   findNextSong();
-}
+};
 
 exports.scanLibrary = function(app_ref, hard){
   app = app_ref;
@@ -252,14 +252,14 @@ exports.scanLibrary = function(app_ref, hard){
       remove_scanned(stripped, function(unscanned){
         song_list = unscanned;
         findNextSong();
-      })
+      });
     } else {
       song_list = stripped;
       findNextSong();
     }
   });
   running = true;
-}
+};
 
 // add a song_id to a certain playlist
 var addToPlaylist = function(song_id, playlist_name){
@@ -437,11 +437,11 @@ exports.sync_import = function(app_ref, songs, url){
       });
     })(cnt);
   }
-}
+};
 
 exports.stopScan = function(app){
   running = false;
-}
+};
 
 function broadcast(id, message){
   app.io.broadcast(id, message);
