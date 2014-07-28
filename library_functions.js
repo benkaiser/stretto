@@ -265,8 +265,8 @@ exports.scDownload = function(app_ref, url){
   app = app_ref;
   // resolve the tracks
   scres.resolve( url, function(err, tracks) {
-    console.log(url);
-    console.log(tracks.length);
+    if(err) console.log(err);
+    var track_length = tracks.length;
     // make sure the dl dir is existent
     var out_dir = path.join(config.music_dir, config.sc_dl_dir);
     mkdirp(out_dir, function(){
@@ -288,7 +288,22 @@ exports.scDownload = function(app_ref, url){
           year: current_track.release_year  || '2014',
           duration: current_track.duration/1000, // in milliseconds
           play_count: 0,
-          location: location
+          location: location.replace(config.music_dir, "")
+        };
+        // prep function to run after we have finished grabbing all the files we can
+        var finish_add = function(){
+          // add the song
+          app.db.songs.insert(song, function (err, newDoc){
+            // update the browser the song has been added
+            broadcast("update", {
+              count: track_length,
+              completed: track_length-tracks.length,
+              message: "Added: " + newDoc.title,
+              content: newDoc
+            });
+            // enter next iteration
+            callback();
+          });
         };
         // check if we need to download it
         fs.exists(location, function(exists){
@@ -301,24 +316,24 @@ exports.scDownload = function(app_ref, url){
                 var large_cover_url = current_track.artwork_url.replace('large.jpg', 't500x500.jpg');
                 request({url: large_cover_url, encoding: null}, function(error, response, body){
                   // where are we storing the cover art?
-                  var cover_location = md5(body) + ".jpg";
-                  var filename = __dirname + '/dbs/covers/' + cover_location;
+                  song.cover_location = md5(body) + ".jpg";
+                  var filename = __dirname + '/dbs/covers/' + song.cover_location;
                   // does it exist?
                   fs.exists(filename, function(exists){
                     if(!exists){
                       fs.writeFile(filename, body, function(err){
                         console.log("Wrote cover to " + filename);
+                        finish_add();
                       });
                     } else {
                       console.log("cover already present");
+                      finish_add();
                     }
                   });
-                  // add the song to the database
-                  callback();
                 });
               } else {
                 // add without artwork to the database
-                callback();
+                finish_add();
               }
             }).pipe(fs.createWriteStream(location));
           } else {
