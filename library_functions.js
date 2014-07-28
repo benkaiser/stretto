@@ -261,12 +261,48 @@ exports.scanLibrary = function(app_ref, hard){
   running = true;
 }
 
+// add a song_id to a certain playlist
+var addToPlaylist = function(song_id, playlist_name){
+  app.db.playlists.findOne({ title: playlist_name}, function (err, doc) {
+    if(!doc){
+      // playlist doesn't exist, add it
+      var plist = {
+        title: playlist_name,
+        songs: [{_id: song_id}],
+        editable: true
+      };
+      app.db.playlists.insert(plist);
+    } else {
+      // playlist does exist, inser the song if it isn't already in there
+      var found = false;
+      for(var i = 0; i < doc.songs.length; i++){
+        if(doc.songs[i]._id == song_id){
+          found = true;
+          break;
+        }
+      }
+      if(!found){
+        // it isn't in there, add it
+        app.db.playlists.update({_id: doc._id}, { $push:{songs: {_id: song_id}}});
+      }
+    }
+  });
+};
+// make it visible outside this module
+exports.addToPlaylist = addToPlaylist;
+
 exports.scDownload = function(app_ref, url){
   app = app_ref;
   // resolve the tracks
   scres.resolve( url, function(err, tracks) {
     if(err) console.log(err);
     var track_length = tracks.length;
+    // update the client
+    broadcast("sc_update", {
+      type: "started",
+      count: track_length,
+      completed: 0
+    });
     // make sure the dl dir is existent
     var out_dir = path.join(config.music_dir, config.sc_dl_dir);
     mkdirp(out_dir, function(){
@@ -294,11 +330,12 @@ exports.scDownload = function(app_ref, url){
         var finish_add = function(){
           // add the song
           app.db.songs.insert(song, function (err, newDoc){
+            addToPlaylist(newDoc._id, "SoundCloud");
             // update the browser the song has been added
-            broadcast("update", {
+            broadcast("sc_update", {
+              type: "added",
               count: track_length,
               completed: track_length-tracks.length,
-              message: "Added: " + newDoc.title,
               content: newDoc
             });
             // enter next iteration
@@ -309,7 +346,20 @@ exports.scDownload = function(app_ref, url){
         fs.exists(location, function(exists){
           if(!exists){
             // download the song
-            request(current_track.stream_url + "?client_id=" + config.sc_client_id).on('end', function(){
+            request(current_track.stream_url + "?client_id=" + config.sc_client_id, function(error, response, body){
+              // if it was an rmtp stream / didn't download
+              if(response.headers['content-length'] == 1){
+                // remove the file
+                fs.unlink(location);
+                // update the client
+                broadcast("sc_update", {
+                  type: "skipped",
+                  count: track_length,
+                  completed: track_length-tracks.length
+                });
+                callback();
+                return;
+              }
               // is artwork present?
               if(current_track.artwork_url){
                 // download it's cover art

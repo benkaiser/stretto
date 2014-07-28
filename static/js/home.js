@@ -46,6 +46,14 @@ var PlaylistCollection = Backbone.Collection.extend({
   fetch: function(options){
     socket.emit('fetch_playlists');
   },
+  getByName: function(name){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes.title == name){
+        return this.models[i].attributes;
+      }
+    }
+    return -1;
+  },
   getBy_Id: function(id){
     for(var i = 0; i < this.models.length; i++){
       if(this.models[i].attributes["_id"] == id){
@@ -486,6 +494,7 @@ socket.on('songs', function(data){
   player.song_collection.add(data.songs);
   loadedRestart("songs");
 });
+var waiting_sc_update = false;
 socket.on('playlists', function(data){
   player.playlist_collection.reset();
   player.playlist_collection.add(data.playlists);
@@ -493,6 +502,31 @@ socket.on('playlists', function(data){
   MusicApp.router.sidebar();
   // restart the router if we are loading for the first time
   loadedRestart("playlists");
+  // if they are on the soundcloud playlist, there is a chance they just added the song
+  if(waiting_sc_update){
+    var sc_plist = player.playlist_collection.getByName("SoundCloud");
+    MusicApp.router.playlist(sc_plist._id);
+  }
+});
+var MessengerMessage = null;
+socket.on('sc_update', function(data){
+  if(data.type == "started"){
+    MessengerMessage = Messenger().post("Starting download from SoundCloud of " + data.count + " tracks");
+  } else if(data.type == "added"){
+    // it came with a song
+    player.song_collection.add(data.content);
+    // show an updated message
+    var msg = "song " + data.completed + " out of " + data.count;
+    if(data.complete == data.count){
+      msg = "last song of SoundCloud download";
+    }
+    MessengerMessage.update("Added " + msg + " (" + data.content.title + ")");
+    // update the collections
+    socket.emit('fetch_playlists');
+    waiting_sc_update = true;
+  } else if(data.type == "skipped"){
+    MessengerMessage.update("Skipped song " + data.completed + ". Unable to read from SoundCloud");
+  }
 });
 
 // jquery initialiser
@@ -545,6 +579,11 @@ $(document).ready(function(){
       }
     });
   });
+  // setup messenger
+  Messenger.options = {
+      extraClasses: 'messenger-fixed messenger-on-top',
+      theme: 'air'
+  };
 });
 
 // backbone app

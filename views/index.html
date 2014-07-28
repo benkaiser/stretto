@@ -215,12 +215,17 @@
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
+  head.load(
+    "/static/css/lib/messenger.css",
+    "/static/css/lib/messenger-theme-air.css"
+  );
   head.js(
     "/static/js/libs/jquery-ui-sortable.min.js",
     "/static/js/libs/underscore-min.js",
     "/static/js/libs/backbone-min.js",
     "/static/js/libs/backbone.marionette.min.js",
     "/static/js/libs/bootstrap-slider.js",
+    "/static/js/libs/messenger.min.js",
     "/socket.io/socket.io.js",
     "/static/js/libs/swig.min.js",
     "/static/js/libs/tablesort.min.js",
