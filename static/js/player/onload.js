@@ -47,6 +47,13 @@ $(document).ready(function(){
       }
     });
   });
+  // scan library handlers
+  $("#soft_scan").click(function(){
+    socket.emit('start_scan');
+  });
+  $("#hard_scan").click(function(){
+    socket.emit('start_scan_hard');
+  });
   // setup messenger
   Messenger.options = {
       extraClasses: 'messenger-fixed messenger-on-top',

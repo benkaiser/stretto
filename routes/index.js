@@ -18,7 +18,6 @@ exports.createRoutes = function(app_ref){
   app = app_ref;
   app.get('/', musicRoute);
   app.get('/mobile', mobileMusicRoute);
-  app.get('/scan', scanRoute);
   app.get('/sync', syncRoute);
   app.get('/songs/:id', sendSong);
   app.get('/cover/:id', sendCover);
@@ -319,23 +318,6 @@ function updateSongInfo(req){
       process_cover(image.type, image.data);
     }
   }
-}
-
-// render the scan page
-function scanRoute(req, res){
-  util.walk(config.music_dir, function(err, list){
-    if(err){
-      console.log(err);
-      list = [];
-    }
-
-    res.render('scan', {
-      dir: config.music_dir,
-      num_items: list.length,
-      menu: true,
-      err: err
-    });
-  });
 }
 
 // controller routes

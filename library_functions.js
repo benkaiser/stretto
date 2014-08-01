@@ -34,7 +34,7 @@ function findNextSong(){
     });
   } else {
     console.log("finished!");
-    broadcast("update", {count: song_list.length, completed: song_list.length, details: "Finished"});
+    broadcast("scan_update", {type: "finish", count: song_list.length, completed: song_list.length, details: "Finished"});
     // reset for next scan
     cnt = 0;
     song_list = [];
@@ -43,6 +43,7 @@ function findNextSong(){
 }
 
 function findSong(relative_location, callback){
+  var found_metadata = false;
   // convert the filename into full path
   var full_location = config.music_dir + relative_location;
   app.db.songs.findOne({location: relative_location}, function(err, doc){
@@ -52,6 +53,7 @@ function findSong(relative_location, callback){
       var parser = new mm(fs.createReadStream(full_location));
 
       parser.on('metadata', function(result){
+        found_metadata = true;
         // add the location
         var song = {
           title: result.title,
@@ -85,20 +87,24 @@ function findSong(relative_location, callback){
           app.db.songs.insert(song, function (err, newDoc){
             taglib_fetch(relative_location, newDoc._id);
             // update the browser the song has been added
-            broadcast("update", {
+            broadcast("scan_update", {
+              type: "add",
               count: song_list.length,
               completed: cnt,
               details: "Added: " + newDoc.title + " - " + newDoc.albumartist
             });
+            callback(null);
           });
         } else if (hard_rescan){
           app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
             taglib_fetch(relative_location, doc._id);
-            broadcast("update", {
+            broadcast("scan_update", {
+              type: "update",
               count: song_list.length,
               completed: cnt,
               details: "Updated: " + song.title + " - " + song.artist
             });
+            callback(null);
           });
         }
       });
@@ -131,37 +137,38 @@ function findSong(relative_location, callback){
               app.db.songs.insert(song, function (err, newDoc){
                 taglib_fetch(relative_location, newDoc._id);
                 // update the browser the song has been added
-                broadcast("update", {
+                broadcast("scan_update", {
+                  type: "add",
                   count: song_list.length,
                   completed: cnt,
                   details: "Added: " + newDoc.title
                 });
+                callback(null);
               });
             } else if (hard_rescan){
               app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
                 taglib_fetch(relative_location, doc._id);
-                broadcast("update", {
+                broadcast("scan_update", {
+                  type: "update",
                   count: song_list.length,
                   completed: cnt,
                   details: "Updated: " + song.title
                 });
+                callback(null);
               });
+            } else {
+              callback(null);
             }
-            callback(null);
           } else {
             callback(err);
           }
         } else {
-          callback(null);
+          // metadata wasn't found, so we should call the callback
+          if(!found_metadata){
+            callback(null);
+          }
         }
       });
-    } else {
-      broadcast("update", {
-        count: song_list.length,
-        completed: cnt,
-        details: "Already scanned item: " + item
-      });
-      callback(null);
     }
   });
 }

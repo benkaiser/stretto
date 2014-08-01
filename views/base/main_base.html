@@ -26,7 +26,13 @@
     <a class="navbar-brand" href="/">Node Music Player</a>
     <ul class="nav navbar-nav">
       <li><a href="/">Music</a></li>
-      <li><a href="/scan">Scan Library</a></li>
+      <li class='dropdown'>
+        <a class='pointer dropdown-toggle' data-toggle='dropdown'>Scan Library <span class="caret"></span></a>
+        <ul class='dropdown-menu' role='menu'>
+          <li><a class='pointer' id='soft_scan'>Regular Scan</a></li>
+          <li><a class='pointer' id='hard_scan'>Hard Rescan</a></li>
+        </ul>
+      </li>
       <li><a href="/sync">Sync Libraries</a></li>
     </ul>
     <ul class="nav navbar-nav pull-right">
