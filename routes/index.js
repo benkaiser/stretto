@@ -137,11 +137,11 @@ function returnPlaylists(req){
 }
 
 function get_playlists(callback){
-  app.db.playlists.find({}, function(err, docs){
+  app.db.playlists.find({}).sort({ title: 1 }).exec(function(err, docs){
     playlists = docs;
     // create a new playlist for the library
     getLibraryIds(function(result){
-      playlists.push({
+      playlists.unshift({
         _id: "LIBRARY",
         title: "Library",
         songs: result,
