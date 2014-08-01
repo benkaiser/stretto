@@ -20,7 +20,8 @@ SongView = Backbone.View.extend({
     }));
     this.$el.addClass("custom_scrollbar");
     // add scroll event handler
-    this.$el.scroll(function(){
+    this.scrollElem = player.onMobile ? $("#wrapper") : this.$el;
+    this.scrollElem.scroll(function(){
       MusicApp.router.songview.renderSong();
     });
     // logic to manually order the songs in a playlist
@@ -83,6 +84,10 @@ SongView = Backbone.View.extend({
     _.defer(function(){
       // get hight of elems above table body incl header row
       self.meta_height = $(".playlist_meta").height() + 40;
+      if(player.onMobile){
+        // mobile view has the playlists section in the scrollable view, add it to the meta_height
+        self.meta_height += $("#sidebar").height();
+      }
       // draw the songs
       self.renderSong();
     });
@@ -224,7 +229,7 @@ SongView = Backbone.View.extend({
     if(!this.processing){
       this.processing = true;
       // cache scroll top variable
-      this.scrollTop = this.$el.scrollTop();
+      this.scrollTop = this.scrollElem.scrollTop();
       // get the index of the item in the center of the screen
       var middle_of_viewport = this.scrollTop + this.contentHeight / 2 - this.meta_height;
       this.middle_item = Math.floor(middle_of_viewport / this.individual_height);
@@ -292,14 +297,14 @@ SongView = Backbone.View.extend({
       }
 
       // calculate the spacing heights
-      var top_of_viewport  = this.scrollTop;
+      var top_of_viewport  = this.scrollTop - this.meta_height;
       var top = top_of_viewport - this.height_of_drawn/2;
       if(top < 0)
         top = 0;
       if(top > this.total_table_height - this.height_of_drawn)
         top = this.total_table_height - this.height_of_drawn;
 
-      var bottom_of_viewport = this.scrollTop + this.contentHeight;
+      var bottom_of_viewport = this.scrollTop - this.meta_height + this.contentHeight;
       var bottom = this.total_table_height - bottom_of_viewport - this.height_of_drawn/2;
       if(bottom < 0)
         bottom = 0;

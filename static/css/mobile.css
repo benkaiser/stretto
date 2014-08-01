@@ -49,6 +49,7 @@
   z-index: 1;
   overflow: hidden;
   background-color: #cef;
+  box-shadow: 0 0 30px #ccc;
 }
 .info_wrapper{
   width: calc(100% - 70px); /* cover width plus left padding */
