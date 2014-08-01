@@ -38,6 +38,10 @@ node app.js
 ```
 Go to `localhost:2000` in your browser (or known ip of server if it is on a different machine). From there click the `Scan Library` tab at the top of the page. From there select `Start Scan` and let it do it's magic. Once your library is scanned you should be able to access it from the `Music` tab up the top.
 
+### Android Sync App
+
+If you want to sync your Node Music Player playlists to your phone, [check out the android sync app repository](https://github.com/benkaiser/android-node-music-sync).
+
 ### Features Implemented
 
 - Sync between computers (servers running on different computers)
