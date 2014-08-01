@@ -156,7 +156,7 @@ function get_playlists(callback){
 function getLibraryIds(callback){
   app.db.songs.find({}).sort({ title: 1 }).exec(function(err, docs){
     for(var i = 0; i < docs.length; i++){
-      docs[i] = {_id: docs[i]["_id"]};
+      docs[i] = {_id: docs[i]._id};
     }
     callback(docs);
   });
@@ -193,7 +193,15 @@ function addToPlaylist(req){
   to = req.data.playlist;
   // pull the playlists database
   app.db.playlists.findOne({ _id: to}, function (err, doc) {
-    waitingOn = 0; // used as a counter to count how many still need to be added
+    // used as a counter to count how many still need to be added
+    waitingOn = 0;
+    // prep function for use in loop
+    var checkFinish = function(){
+      if(--waitingOn === 0){
+        req.io.route('fetch_playlists');
+      }
+    };
+    // run loop
     for (var i = 0; i < addItems.length; i++) {
       var found = false;
       for(var j = 0; j < doc.songs.length; j++){
@@ -204,11 +212,7 @@ function addToPlaylist(req){
       }
       if(!found){
         waitingOn++;
-        app.db.playlists.update({_id: to}, { $push:{songs: {_id: addItems[i]}}}, function(){
-          if(--waitingOn == 0){
-            req.io.route('fetch_playlists');
-          }
-        });
+        app.db.playlists.update({_id: to}, { $push:{songs: {_id: addItems[i]}}}, checkFinish);
       }
     }
   });
@@ -254,14 +258,14 @@ function updatePlayCount(req){
 
 // force rescan of a set of items
 function rescanItem(req){
-  items = req.data.items;
+  var items = req.data.items;
+  var songLocArr = [];
   app.db.songs.find({ _id: { $in: items }}, function(err, songs){
     if(!err && songs)
         // add the location to the list of songs to scan
-      var songLocArr = [];
       for (var i = 0; i < songs.length; i++) {
         songLocArr.push(songs[i].location);
-      };
+      }
       lib_func.scanItems(app, songLocArr);
   });
 }
@@ -278,7 +282,7 @@ function updateSongInfo(req){
   });
   // update the cover photo
   var cover = req.data.cover;
-  if(cover != null){
+  if(cover !== null){
     // function to be called by both download file and file upload methods
     var process_cover = function(type, content_buffer){
       var cover_filename = md5(content_buffer) + "." + type;
@@ -301,7 +305,7 @@ function updateSongInfo(req){
         }, { multi: true }, function (err, numReplaced) {
           // TODO let the client know the new cover images
         });
-      })
+      });
     };
     // different methods of setting cover
     if(req.data.cover_is_url && req.data.cover_is_lastfm){
@@ -363,16 +367,19 @@ function syncPageConnected(req){
 // the playlists to sync have been selected, sync them
 function syncPlaylists(req){
   var lists = req.data.playlists;
+  // function for within loop
+  var playlistResult = function(err, numReplaced, newDoc){
+    if(newDoc){
+      console.log("Inserted playlist: " + newDoc.title);
+    } else {
+      console.log("Updated playlist");
+    }
+  };
+  // loop over lists to join editable lists
   for(var list_cnt = 0; list_cnt < lists.length; list_cnt++){
     // attempt to replace the playlist if it is editable
     if(lists[list_cnt].editable){
-      app.db.playlists.update({_id: lists[list_cnt]._id}, lists[list_cnt], {upsert: true}, function(err, numReplaced, newDoc){
-        if(newDoc){
-          console.log("Inserted playlist: " + newDoc.title);
-        } else {
-          console.log("Updated playlist");
-        }
-      });
+      app.db.playlists.update({_id: lists[list_cnt]._id}, lists[list_cnt], {upsert: true}, playlistResult);
     }
   }
   var songs = req.data.songs;
