@@ -48,8 +48,20 @@ MusicAppRouter = Backbone.Router.extend({
     player.searchItems(search);
   },
   sidebar: function(id){
+    // cache the scroll if it's already loaded
+    var playlistScroll = 0;
+    if(this.sb !== null){
+      playlistScroll = $("#sidebar .custom_scrollbar").scrollTop();
+    }
+    // load the new view
     this.sb = new SidebarView();
     MusicApp.sideBarRegion.show(this.sb);
+    // refresh the scroll if needed
+    if(playlistScroll !== 0){
+      _.defer(function(){
+        $("#sidebar .custom_scrollbar").scrollTop(playlistScroll);
+      });
+    }
   },
   settingsbar: function(id){
     this.settingbar = new SettingsBarView();
