@@ -56,8 +56,8 @@ $(document).ready(function(){
   });
   // sync button handlers
   $("#load_sync_view").click(function(){
-    MusicApp.router.songview = new SyncView();
-    MusicApp.contentRegion.show(MusicApp.router.songview);
+    MusicApp.router.syncview = new SyncView();
+    MusicApp.contentRegion.show(MusicApp.router.syncview);
   });
   // setup messenger
   Messenger.options = {

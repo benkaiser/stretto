@@ -351,6 +351,9 @@ tr:hover .options{
 .sync_div{
   visibility: hidden;
 }
+.back_to_songs{
+  margin-right: 10px;
+}
 /*** custom generic classes ***/
 .pointer{
   cursor: pointer;

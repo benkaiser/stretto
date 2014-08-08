@@ -2,7 +2,8 @@ SyncView = Backbone.View.extend({
   template: "#sync_body_template",
   events: {
     "click #fetch_data": "connectB",
-    "click .sync_div": "sync"
+    "click .sync_div": "sync",
+    "click .back_to_songs": "goBack"
   },
   initialize: function(){
     this.a = {
@@ -140,6 +141,10 @@ SyncView = Backbone.View.extend({
       }
     }
     return list_one;
+  },
+  goBack: function(){
+    MusicApp.contentRegion.show(MusicApp.router.songview);
+    MusicApp.router.songview.delegateEvents();
   }
 });
 
