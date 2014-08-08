@@ -18,7 +18,6 @@ exports.createRoutes = function(app_ref){
   app = app_ref;
   app.get('/', musicRoute);
   app.get('/mobile', mobileMusicRoute);
-  app.get('/sync', syncRoute);
   app.get('/songs/:id', sendSong);
   app.get('/cover/:id', sendCover);
   app.get('/downloadplaylist/:id', downloadPlaylist);
@@ -352,14 +351,6 @@ function getReceivers(req){
 }
 
 // sync routes
-
-function syncRoute(req, res){
-  util.getip(function(ip){
-    res.render('sync', {menu: true, ip: ip + ":" + app.get('port') });
-  });
-}
-
-// the sync page has connected, send all the data
 function syncPageConnected(req){
   // get the playlist data
   get_playlists(function(playlists){
