@@ -7,21 +7,21 @@ var PlaylistCollection = Backbone.Collection.extend({
   fetch: function(options){
     socket.emit('fetch_playlists');
   },
-  getByName: function(name){
+  getByTitle: function(name){
     for(var i = 0; i < this.models.length; i++){
       if(this.models[i].attributes.title == name){
-        return this.models[i].attributes;
+        return this.models[i];
       }
     }
-    return -1;
+    return false;
   },
   getBy_Id: function(id){
     for(var i = 0; i < this.models.length; i++){
       if(this.models[i].attributes._id == id){
-        return this.models[i].attributes;
+        return this.models[i];
       }
     }
-    return -1;
+    return false;
   }
 });
 
@@ -35,7 +35,7 @@ var SongCollection = Backbone.Collection.extend({
         return this.models[i];
       }
     }
-    return 0;
+    return false;
   },
   getByIds: function(playlist){
     if(playlist !== undefined && playlist.songs !== undefined){
@@ -50,6 +50,16 @@ var SongCollection = Backbone.Collection.extend({
       }
       return songs;
     }
-    return;
+    return false;
+  },
+  findItem: function(item){
+    for(var i = 0; i < this.models.length; i++){
+      if(this.models[i].attributes.title == item.attributes.title &&
+        this.models[i].attributes.album == item.attributes.album &&
+        this.models[i].attributes.display_artist == item.attributes.display_artist){
+        return this.models[i];
+      }
+    }
+    return false;
   }
 });

@@ -34,7 +34,7 @@ socket.on('sc_update', function(data){
     }
     SCMessenger.update("Added " + msg + " (" + data.content.title + ")");
     // add the song to the SoundCloud playlist
-    var sc_plist = player.playlist_collection.getByName("SoundCloud");
+    var sc_plist = player.playlist_collection.getByTitle("SoundCloud").attributes;
     sc_plist.songs.push({_id: data.content._id});
     // render if we are on the SoundCloud playlist
     if(player.playlist.title == "SoundCloud"){

@@ -20,14 +20,14 @@ MusicAppRouter = Backbone.Router.extend({
   },
   playlist: function(id){
     findId = player.playlist_collection.getBy_Id(id);
-    if(findId == -1){
+    if(findId === false){
       findId = player.playlist_collection.getBy_Id("LIBRARY");
     }
-    player.playlist = findId;
+    player.playlist = findId.attributes;
     // update the currently viewed songs
     player.songs = player.song_collection.getByIds(player.playlist);
     // block for when this function is called on page load
-    if(player.songs === undefined){
+    if(player.songs === false){
       return;
     }
     // if they haven't selected a queue yet, make this playlist the queue

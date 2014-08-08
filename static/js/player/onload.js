@@ -54,6 +54,11 @@ $(document).ready(function(){
   $("#hard_scan").click(function(){
     socket.emit('start_scan_hard');
   });
+  // sync button handlers
+  $("#load_sync_view").click(function(){
+    MusicApp.router.songview = new SyncView();
+    MusicApp.contentRegion.show(MusicApp.router.songview);
+  });
   // setup messenger
   Messenger.options = {
       extraClasses: 'messenger-fixed messenger-on-top',

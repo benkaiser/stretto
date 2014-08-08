@@ -210,8 +210,46 @@
     </div>
   </div>
 </script>
+<!-- sync templates/data -->
+<script type="text/swig" id='sync_body_template'>
+<div>
+  <h1>Sync</h1>
+  <p>Enter the addresses so the servers each know which host they will be syncing with.</p>
+  <div class='form-container form-horizontal'>
+    <div class="form-group">
+      <label class="col-sm-3 control-label">This Server</label>
+      <div class="col-sm-9"><input class='form-control' type='text' id='remote_a' value='{{this_ip}}' /></div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-3 control-label">Remote Address</label>
+      <div class="col-sm-9"><input class='form-control' type='text' id='remote_b' value='{{remote_ip}}' /></div>
+    </div>
+    <div class="form-group">
+      <div class='col-sm-9 col-sm-offset-3'><a class='btn btn-primary' id='fetch_data'>Fetch Libraries</a></div>
+    </div>
+  </div>
+  <p>Select the playlists you would like to be moved to the other machine</p>
+  <div class='row'>
+    <div class='col-sm-5 playlists_left'></div>
+    <div class='col-sm-2 sync_div'><div class='btn btn-primary sync_btn'>
+      <i class="fa fa-chevron-left"></i> Sync <i class="fa fa-chevron-right"></i>
+    </div></div>
+    <div class='col-sm-5 playlists_right'></div>
+  </div>
+</div>
+</script>
+<script type="text/swig" id='sync_template'>
+<h3>{{title}}</h3>
+<p>
+{% for playlist in playlists %}
+  <input type="checkbox" id="{{playlist.attributes._id}}"> <label for="{{playlist.attributes._id}}">{{playlist.attributes.title}}</label><br/>
+{% endfor %}
+</p>
+</script>
 {% endraw %}
-
+<script type="text/javascript">
+var this_ip = "{{ip}}";
+</script>
 {% endblock %}
 {% block scripts %}
 <script type="text/javascript">
@@ -242,7 +280,9 @@
     "/static/js/player/selection_options.js",
     "/static/js/player/detailview.js",
     "/static/js/player/sidebarview.js",
-    "/static/js/player/footer.js"
+    "/static/js/player/syncview.js",
+    "/static/js/player/footer.js",
+    "/static/js/player/sync.js"
     );
 </script>
 {% endblock %}

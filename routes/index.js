@@ -57,7 +57,13 @@ exports.createRoutes = function(app_ref){
 };
 
 function musicRoute(req, res){
-  res.render('index', {menu: true, music_dir: config.music_dir});
+  util.getip(function(ip){
+    res.render('index', {
+      menu: true,
+      music_dir: config.music_dir,
+      ip: ip + ":" + app.get('port')
+    });
+  });
 }
 
 function mobileMusicRoute(req, res){
