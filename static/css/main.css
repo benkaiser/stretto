@@ -121,6 +121,7 @@ body{
   vertical-align: middle;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .song_table tbody > tr > td .unknown_cover {
   vertical-align: top;
