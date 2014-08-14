@@ -27,6 +27,7 @@ app.set('port', process.env.PORT || 2000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 app.set('root', __dirname);
+app.set('started', Date.now());
 app.engine('html', require('swig').renderFile);
 app.use(express.favicon());
 app.use(express.json());

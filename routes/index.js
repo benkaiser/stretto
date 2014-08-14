@@ -282,7 +282,8 @@ function updateSongInfo(req){
     $set: {
       title: req.data.title,
       display_artist: req.data.artist,
-      album: req.data.album
+      album: req.data.album,
+      date_modified: Date.now() // it has been modified, update it
     }
   });
   // update the cover photo

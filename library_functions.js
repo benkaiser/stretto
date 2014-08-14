@@ -20,6 +20,7 @@ var hard_rescan = false;
 var app = null;
 var cnt = 0;
 var song_list = [];
+var now_milli = 0;
 
 var song_extentions = ["mp3", "m4a", "aac", "ogg", "wav", "flac", "raw"];
 
@@ -44,6 +45,8 @@ function findNextSong(){
 
 function findSong(relative_location, callback){
   var found_metadata = false;
+  // extact the app start time
+  now_milli = app.get('started');
   // convert the filename into full path
   var full_location = config.music_dir + relative_location;
   app.db.songs.findOne({location: relative_location}, function(err, doc){
@@ -65,7 +68,9 @@ function findSong(relative_location, callback){
           year: result.year,
           duration: result.duration,
           play_count: (doc === null) ? 0 : doc.play_count || 0,
-          location: relative_location
+          location: relative_location,
+          date_added: now_milli,
+          date_modified: now_milli
         };
         // write the cover photo as an md5 string
         if(result.picture.length > 0){
@@ -96,6 +101,11 @@ function findSong(relative_location, callback){
             callback(null);
           });
         } else if (hard_rescan){
+          // use the old date_added
+          if(doc.date_added){
+            song.date_added = doc.date_added;
+          }
+          // update the document
           app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
             taglib_fetch(relative_location, doc._id);
             broadcast("scan_update", {
@@ -131,7 +141,9 @@ function findSong(relative_location, callback){
               year: "Unknown",
               duration: 0,
               play_count: (doc === null) ? 0 : doc.play_count || 0,
-              location: relative_location
+              location: relative_location,
+              date_added: now_milli,
+              date_modified: now_milli
             };
             if(doc === null){
               app.db.songs.insert(song, function (err, newDoc){
@@ -146,6 +158,11 @@ function findSong(relative_location, callback){
                 callback(null);
               });
             } else if (hard_rescan){
+              // use the old date_added
+              if(doc.date_added){
+                song.date_added = doc.date_added;
+              }
+              // update the document
               app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
                 taglib_fetch(relative_location, doc._id);
                 broadcast("scan_update", {
@@ -300,6 +317,8 @@ exports.addToPlaylist = addToPlaylist;
 
 exports.scDownload = function(app_ref, url){
   app = app_ref;
+  // extact the app start time
+  now_milli = app.get('started');
   // resolve the tracks
   scres.resolve( url, function(err, tracks) {
     if(err) console.log(err);
@@ -331,7 +350,9 @@ exports.scDownload = function(app_ref, url){
           year: current_track.release_year  || '2014',
           duration: current_track.duration/1000, // in milliseconds
           play_count: 0,
-          location: location.replace(config.music_dir, "")
+          location: location.replace(config.music_dir, ""),
+          date_added: now_milli,
+          date_modified: now_milli
         };
         // prep function to run after we have finished grabbing all the files we can
         var finish_add = function(){
@@ -406,6 +427,8 @@ exports.scDownload = function(app_ref, url){
 
 exports.sync_import = function(app_ref, songs, url){
   app = app_ref;
+  // extact the app start time
+  now_milli = app.get('started');
   // clean up the url
   if(url.indexOf("://") == -1){
     url = "http://" + url;
@@ -422,6 +445,12 @@ exports.sync_import = function(app_ref, songs, url){
         request(url + "/songs/" + songs[cnt]._id).on('end', function(){
           // once the song has been transferred successfully
           var addSong = function(song){
+            // if the song doesn't have the dates set, set them
+            if(song.date_added === undefined){
+              song.date_added = now_milli;
+              song.date_modified = now_milli;
+            }
+            // upsert the song
             app.db.songs.update({_id: song._id}, song, {upsert: true}, function (err, numReplaced, newDoc){
               // update the browser the song has been added
               console.log(newDoc);
