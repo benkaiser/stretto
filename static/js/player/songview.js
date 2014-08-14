@@ -108,6 +108,7 @@ SongView = Backbone.View.extend({
   },
   triggerSort: function(ev){
     var column_name = $(ev.target).closest("th").attr('class').replace('_th', '');
+    console.log(column_name);
     player.sortSongs(column_name);
     this.render();
   },

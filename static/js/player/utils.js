@@ -28,8 +28,15 @@ function prettyPrintSeconds(seconds){
   return pretty;
 }
 
-// make it usable in swig
-swig.setFilter('prettyPrintSeconds', prettyPrintSecondsorNA);
+
+// pretty print the date_added milliseconds
+function prettyPrintDateAdded(milliseconds){
+  // convert it to a javascript date object
+  var date = new Date(milliseconds);
+  // get the format of it
+  var dateFormat = date.toString("yyyy-MM-dd HH:mm:ss");
+  return dateFormat;
+}
 
 function prettyPrintSecondsorNA(seconds){
   if(seconds === 0){
@@ -38,6 +45,10 @@ function prettyPrintSecondsorNA(seconds){
     return prettyPrintSeconds(seconds);
   }
 }
+
+// make it usable in swig
+swig.setFilter('prettyPrintSeconds', prettyPrintSecondsorNA);
+swig.setFilter('prettyPrintDateAdded', prettyPrintDateAdded);
 
 function showCover(src){
   box = new CoverBox(src);

@@ -87,6 +87,9 @@
       <th class='album_th'>Album
         {% if sort_col == 'album' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
+      <th class='date_added_th'>Date Added
+        {% if sort_col == 'date_added' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
+      </th>
       <th class='duration_th'><i class="fa fa-clock-o"></i>
         {% if sort_col == 'duration' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
@@ -115,6 +118,7 @@
 </td>
 <td><span class='colsearch'>{{song.attributes.display_artist}}</span></td>
 <td><span class='colsearch'>{{song.attributes.album}}</span></td>
+<td>{{song.attributes.date_added|prettyPrintDateAdded}}</td>
 <td>{{song.attributes.duration|prettyPrintSeconds}}</td>
 <td>{{song.attributes.play_count}}</td>
 </tr>
@@ -267,6 +271,7 @@ var this_ip = "{{ip}}";
     "/socket.io/socket.io.js",
     "/static/js/libs/swig.min.js",
     "/static/js/libs/tablesort.min.js",
+    "/static/js/libs/date.min.js",
     "/static/js/libs/bootbox.min.js",
     "/static/js/libs/coverbox.js",
     "/static/js/libs/lastfm.api.js",
