@@ -2,7 +2,7 @@ Node Music Player
 =================
 #### An open source web-based music player
 
-![alt tag](https://f.cloud.github.com/assets/608054/2256870/25a93a38-9e0e-11e3-8432-b0cc2e2c896f.png)
+![screenshot](https://cloud.githubusercontent.com/assets/608054/3919259/b1ab3a00-23a5-11e4-94ad-859051b06626.jpg)
 
 ### Live Demo
 You can view a version I have hosted on one of my personal servers at [http://xpressen.com:2020](http://xpressen.com:2020).
