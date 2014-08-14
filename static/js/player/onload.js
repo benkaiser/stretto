@@ -47,6 +47,16 @@ $(document).ready(function(){
       }
     });
   });
+  $("#youtube_fetch").click(function(){
+    bootbox.prompt({
+      title: "Enter the Youtube URL",
+      callback: function(result){
+        if (result !== null) {
+          socket.emit("youtube_download", {url: result});
+        }
+      }
+    });
+  });
   // scan library handlers
   $("#soft_scan").click(function(){
     socket.emit('start_scan');

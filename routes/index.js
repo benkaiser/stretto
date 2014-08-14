@@ -53,6 +53,7 @@ exports.createRoutes = function(app_ref){
   app.io.route('sync_playlists', syncPlaylists);
   // soundcloud downloading
   app.io.route('soundcloud_download', soundcloudDownload);
+  app.io.route('youtube_download', youtubeDownload);
 };
 
 function musicRoute(req, res){
@@ -388,4 +389,9 @@ function syncPlaylists(req){
 // download the soundcloud songs from the requested url
 function soundcloudDownload(req){
   lib_func.scDownload(app, req.data.url);
+}
+
+// download the youtube song
+function youtubeDownload(req){
+  lib_func.ytDownload(app, req.data.url);
 }

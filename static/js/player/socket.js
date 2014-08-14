@@ -50,6 +50,31 @@ socket.on('sc_update', function(data){
     SCMessenger.update("Skipped song " + data.completed + ". Unable to read from SoundCloud");
   }
 });
+var YTMessenger = null;
+socket.on('yt_update', function(data){
+  console.log(data);
+  if(data.type == "started"){
+    YTMessenger = Messenger().post("Starting download from Youtube");
+  } else if(data.type == "added") {
+    player.song_collection.add(data.content);
+    YTMessenger.update("Added " + data.content.title);
+    var yt_plist = player.playlist_collection.getByTitle("Youtube").attributes;
+    yt_plist.songs.push({_id: data.content._id});
+    if(player.playlist.title == "Youtube"){
+      player.playlist = yt_plist;
+      player.songs = player.song_collection.getByIds(player.playlist);
+      player.queue_pool = player.songs.slice(0);
+      player.genShufflePool();
+      MusicApp.router.songview.renderSong();
+    }
+  } else if(data.type == "error") {
+    if(YTMessenger != null) {
+      YTMessenger.update(data.content);
+    } else {
+      YTMessenger = Messenger().post(data.content);
+    }
+  }
+});
 var ScanMessenger = null;
 var ScanTemplate = "Scanned {{count}} out of {{completed}}{% if details %}: {{details}}{% endif %}";
 socket.on('scan_update', function(data){

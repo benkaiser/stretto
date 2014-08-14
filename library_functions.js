@@ -7,6 +7,8 @@ var request = require('request');
 var mkdirp = require('mkdirp');
 var async = require('async');
 var SoundcloudResolver = require('soundcloud-resolver');
+var ytdl = require('ytdl-core');
+var ffmpeg = require('fluent-ffmpeg');
 
 var util = require(__dirname + '/util.js');
 var config = require(__dirname + '/config').config();
@@ -421,6 +423,81 @@ exports.scDownload = function(app_ref, url){
         // finished
         console.log("Finished Download");
       });
+    });
+  });
+};
+
+exports.ytDownload = function(app_ref, url, callback) {
+  app = app_ref;
+  now_milli = app.get('started');
+  var trackInfo = null;
+  var out_dir = path.join(config.music_dir, config.youtube.dl_dir);
+  var location = null;
+  mkdirp(out_dir, function(){
+    async.waterfall([
+      function(callback) {
+        broadcast("yt_update", {
+          type: "started"
+        });
+        callback();
+      },
+      function(callback) {
+        ytdl.getInfo(url, function(err, info) {
+          if(!err) {
+            trackInfo = info;
+            location = path.join(out_dir, trackInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp4");
+            callback();
+          }
+        });
+      },
+      function(callback) {
+        ffmpeg(ytdl(url, {
+          quality: "highest"    
+          }))
+          .noVideo()
+          .audioCodec('libmp3lame')
+          .on('start', function() {
+            console.log("Started converting Youtube moview to mp4");
+          })
+          .on('end', function() {
+            callback(false);
+          })
+          .on('error', function(err) {
+            callback(err);
+          })
+          .save(location);
+      }
+    ], function(error) {
+      if(!error) {
+        var song = {
+          title: trackInfo.title || 'Unknown Title',
+          album: 'Unknown Album',
+          artist: trackInfo.author  || 'Unknown Artist',
+          albumartist: 'Unknown Artist',
+          display_artist: 'Unknown Artist',
+          genre: 'Unknown Genre',
+          year: '2014',
+          duration: trackInfo.length_seconds,
+          play_count: 0,
+          location: location.replace(config.music_dir, ""),
+          date_added: now_milli,
+          date_modified: now_milli
+        };
+        app.db.songs.insert(song, function (err, newDoc){
+          addToPlaylist(newDoc._id, "Youtube");
+          // update the browser the song has been added
+          broadcast("yt_update", {
+            type: "added",
+            content: newDoc
+          });
+        });
+      } else {
+        console.log("Error: " + error.message);
+        broadcast("yt_update", {
+          type: "error",
+          content: error.message
+        });
+      }
     });
   });
 };

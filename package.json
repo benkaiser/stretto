@@ -17,6 +17,8 @@
     "request": "*",
     "mkdirp": "*",
     "opener": "*",
-    "soundcloud-resolver": "*"
+    "soundcloud-resolver": "*",
+    "fluent-ffmpeg": "~2.0.0-rc1",
+    "ytdl-core": "~0.2.4"
   }
 }
