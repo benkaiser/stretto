@@ -20,7 +20,7 @@ Run it on your computer or server containing your music library and then access 
 [node](http://nodejs.org/), [git](http://git-scm.com/)
 
 You will also need a package `taglib` installed. On Ubuntu and derivatives this is `libtag1-dev`, on Arch Linux `taglib`.
-On OSX you will need homebrew, the xcode developer tools, and then run `brew install taglib` to install taglib ([more info here](https://github.com/Homebrew/homebrew/wiki/Installation)). For the Youtube download and converison, make sure you have ffmpeg installed on your system (including all necessary encoding libraries like libmp3lame or libx264).
+On OSX you will need homebrew, the xcode developer tools, and then run `brew install taglib` to install taglib ([more info here](https://github.com/Homebrew/homebrew/wiki/Installation)). For the Youtube download and converison, make sure you have [ffmpeg](https://ffmpeg.org/) installed on your system (including all necessary encoding libraries like libmp3lame or libx264).
 Windows support is not guaranteed and is up to someone else to submit any pull requests for windows support.
 
 Install with the following commands:
