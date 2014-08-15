@@ -445,19 +445,19 @@ exports.ytDownload = function(app_ref, url, callback) {
         ytdl.getInfo(url, function(err, info) {
           if(!err) {
             trackInfo = info;
-            location = path.join(out_dir, trackInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp4");
+            location = path.join(out_dir, trackInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
             callback();
           }
         });
       },
       function(callback) {
         ffmpeg(ytdl(url, {
-          quality: "highest"    
+          quality: "highest"
           }))
           .noVideo()
           .audioCodec('libmp3lame')
           .on('start', function() {
-            console.log("Started converting Youtube moview to mp4");
+            console.log("Started converting Youtube moview to mp3");
           })
           .on('end', function() {
             callback(false);
@@ -476,7 +476,7 @@ exports.ytDownload = function(app_ref, url, callback) {
           albumartist: 'Unknown Artist',
           display_artist: 'Unknown Artist',
           genre: 'Unknown Genre',
-          year: '2014',
+          year: new Date().getFullYear(),
           duration: trackInfo.length_seconds,
           play_count: 0,
           location: location.replace(config.music_dir, ""),
