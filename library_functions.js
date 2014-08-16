@@ -416,6 +416,10 @@ exports.scDownload = function(app_ref, url){
             }).pipe(fs.createWriteStream(location));
           } else {
             console.log("File already exists ('" + location + "'). Most likely already in library. Either scan libaray or remove file and start again.");
+            broadcast('sc_update', {
+              type: "error",
+              content: "Track already exists"
+            });
             callback();
           }
         });
@@ -446,11 +450,21 @@ exports.ytDownload = function(app_ref, url, callback) {
           if(!err) {
             trackInfo = info;
             location = path.join(out_dir, trackInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
-            callback();
+            fs.exists(location, function(exists) {
+              if(!exists) {
+                callback();
+              } else {
+                console.log("Trigger deze callback");
+                callback(true, {
+                  message: "Youtube track already exists."
+                });
+              }
+            });
           }
         });
       },
       function(callback) {
+        console.log("Of komt ie nog hier");
         ffmpeg(ytdl(url, {
           quality: "highest"
           }))
@@ -467,7 +481,8 @@ exports.ytDownload = function(app_ref, url, callback) {
           })
           .save(location);
       }
-    ], function(error) {
+    ], function(error, errorMessage) {
+      console.log(error, errorMessage);
       if(!error) {
         var song = {
           title: trackInfo.title || 'Unknown Title',
@@ -492,7 +507,12 @@ exports.ytDownload = function(app_ref, url, callback) {
           });
         });
       } else {
-        console.log("Error: " + error.message);
+        if(typeof error != Object) {
+          error = {
+            message: errorMessage.message
+          };
+        }
+        console.log("Error: " + errorMessage.message);
         broadcast("yt_update", {
           type: "error",
           content: error.message
