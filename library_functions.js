@@ -454,7 +454,6 @@ exports.ytDownload = function(app_ref, url, callback) {
               if(!exists) {
                 callback();
               } else {
-                console.log("Trigger deze callback");
                 callback(true, {
                   message: "Youtube track already exists."
                 });
@@ -464,7 +463,6 @@ exports.ytDownload = function(app_ref, url, callback) {
         });
       },
       function(callback) {
-        console.log("Of komt ie nog hier");
         ffmpeg(ytdl(url, {
           quality: "highest"
           }))
