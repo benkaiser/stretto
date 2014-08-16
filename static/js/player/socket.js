@@ -48,6 +48,8 @@ socket.on('sc_update', function(data){
     }
   } else if(data.type == "skipped"){
     SCMessenger.update("Skipped song " + data.completed + ". Unable to read from SoundCloud");
+  } else if(data.type == "error"){
+    SCMessenger.update("Soundcloud track already exists");
   }
 });
 var YTMessenger = null;
