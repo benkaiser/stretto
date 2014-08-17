@@ -480,14 +480,18 @@ exports.ytDownload = function(app_ref, url, callback) {
           .save(location);
       }
     ], function(error, errorMessage) {
-      console.log(error, errorMessage);
       if(!error) {
+        var trackTitle = [];
+        var str = trackInfo.title.split('-');
+        trackTitle.push(str.shift());
+        trackTitle.push(str.join('-').replace(/^[ ]+|[ ]+$/g,'')); // Strip leading and trailing whitespace
+
         var song = {
-          title: trackInfo.title || 'Unknown Title',
+          title: trackTitle[0] || 'Unknown Title',
           album: 'Unknown Album',
-          artist: trackInfo.author  || 'Unknown Artist',
-          albumartist: 'Unknown Artist',
-          display_artist: 'Unknown Artist',
+          artist: trackTitle[1] || 'Unknown Artist',
+          albumartist: trackTitle[1] || 'Unknown Artist',
+          display_artist: trackTitle[1] || 'Unknown Artist',
           genre: 'Unknown Genre',
           year: new Date().getFullYear(),
           duration: trackInfo.length_seconds,
