@@ -469,7 +469,7 @@ exports.ytDownload = function(app_ref, url, callback) {
           .noVideo()
           .audioCodec('libmp3lame')
           .on('start', function() {
-            console.log("Started converting Youtube moview to mp3");
+            console.log("Started converting Youtube movie to mp3");
           })
           .on('end', function() {
             callback(false);
@@ -481,17 +481,22 @@ exports.ytDownload = function(app_ref, url, callback) {
       }
     ], function(error, errorMessage) {
       if(!error) {
-        var trackTitle = [];
-        var str = trackInfo.title.split('-');
-        trackTitle.push(str.shift());
-        trackTitle.push(str.join('-').replace(/^[ ]+|[ ]+$/g,'')); // Strip leading and trailing whitespace
+        var dashpos = trackInfo.title.indexOf('-');
+        var title = trackInfo.title;
+        var artist = trackInfo.title;
+        
+        // if there is a dash, set them in the assumed format [title] - [artist]
+        if(dashpos != -1){
+          title = trackInfo.title.substr(0, dashpos);
+          artist = trackInfo.title.substr(dashpos + 1);
+        }
 
         var song = {
-          title: trackTitle[0] || 'Unknown Title',
-          album: 'Unknown Album',
-          artist: trackTitle[1] || 'Unknown Artist',
-          albumartist: trackTitle[1] || 'Unknown Artist',
-          display_artist: trackTitle[1] || 'Unknown Artist',
+          title: title || 'Unknown Title',
+          album: trackInfo.title || 'Unknown Album',
+          artist: artist || 'Unknown Artist',
+          albumartist: artist || 'Unknown Artist',
+          display_artist: artist || 'Unknown Artist',
           genre: 'Unknown Genre',
           year: new Date().getFullYear(),
           duration: trackInfo.length_seconds,
