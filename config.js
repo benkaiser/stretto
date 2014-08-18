@@ -11,7 +11,7 @@ exports.config = function(){
       quality: "highest"
     },
     // set true if you want taglib enabled
-    taglib:false
+    taglib:true
     // and above here
   }
   data.music_dir = path.normalize(data.music_dir);
