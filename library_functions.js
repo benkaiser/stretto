@@ -484,7 +484,7 @@ exports.ytDownload = function(app_ref, url, callback) {
         var dashpos = trackInfo.title.indexOf('-');
         var title = trackInfo.title;
         var artist = trackInfo.title;
-        
+
         // if there is a dash, set them in the assumed format [title] - [artist]
         if(dashpos != -1){
           title = trackInfo.title.substr(0, dashpos);
