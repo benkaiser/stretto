@@ -19,6 +19,8 @@ app.io.set('authorization', function (handshakeData, accept) {
 mkdirp(__dirname + '/dbs/covers', function(){
   // attach the db to the app
   require(__dirname + '/db.js')(app);
+  // patch the app
+  require(__dirname + '/patches.js')(app);
 });
 
 
