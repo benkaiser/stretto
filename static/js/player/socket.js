@@ -43,8 +43,7 @@ socket.on('sc_update', function(data){
       player.songs = player.song_collection.getByIds(player.playlist);
       player.queue_pool = player.songs.slice(0);
       player.genShufflePool();
-      // redraw the songview
-      MusicApp.router.songview.renderSong();
+      redrawSongsChangedModel();
     }
   } else if(data.type == "skipped"){
     SCMessenger.update("Skipped song " + data.completed + ". Unable to read from SoundCloud");
@@ -67,10 +66,10 @@ socket.on('yt_update', function(data){
       player.songs = player.song_collection.getByIds(player.playlist);
       player.queue_pool = player.songs.slice(0);
       player.genShufflePool();
-      MusicApp.router.songview.renderSong();
+      redrawSongsChangedModel();
     }
   } else if(data.type == "error") {
-    if(YTMessenger != null) {
+    if(YTMessenger !== null) {
       YTMessenger.update(data.content);
     } else {
       YTMessenger = Messenger().post(data.content);
@@ -87,3 +86,10 @@ socket.on('scan_update', function(data){
     ScanMessenger.update(swig.render(ScanTemplate, {locals: data}));
   }
 });
+
+
+function redrawSongsChangedModel(){
+  var sv = MusicApp.router.songview;
+  // render
+  sv.render();
+}
