@@ -46,6 +46,10 @@ function shoInfoView(items){
 
     // redraw the song
     MusicApp.router.songview.redrawSong(data._id);
+
+    if(player.playing_id === data._id) {
+      MusicApp.infoRegion.currentView.render();
+    }
   };
   bootbox.dialog({
     title: track.attributes.title,
