@@ -91,8 +91,10 @@ function PlayState(){
     if(searchText.length < 3){
       return;
     }
-    // set the search box to the search text
-    $(".search-input").val(searchText);
+    // set the search box to the search text if it isn't focuessed
+    if($(".search-input:focus").size() === 0){
+      $(".search-input").val(searchText);
+    }
     // normalise the search text to lower case
     searchText = searchText.toLowerCase();
     var tmpSongs = [];
