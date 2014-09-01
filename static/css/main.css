@@ -222,7 +222,7 @@ tr:hover .options{
 #scrub_bar_slider{
   width: 100%;
   position: fixed;
-  bottom: 48px;
+  bottom: 55px;
   left: 0px;
 }
 #vol_bar_slider{
@@ -240,6 +240,8 @@ tr:hover .options{
   height: 5px;
   background: #eee;
   transition: background 1s;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 .slider-selection{
   background: #4BF;
