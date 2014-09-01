@@ -5,7 +5,6 @@ $(document).ready(function(){
     if(event.target.localName == 'input'){
       return;
     }
-    console.log(['key', event.which]);
     switch(event.which){
       case 191: // '?' key
       case 83: // 's' key
