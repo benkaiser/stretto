@@ -537,11 +537,11 @@ exports.sync_import = function(app_ref, songs, url){
   if(url.indexOf("://") == -1){
     url = "http://" + url;
   }
-  // import the sons
-  for(var cnt = 0; cnt < songs.length; cnt++){
+  // import the songs
+  var cnt = 0;
+  async.until(function(){ return songs.length == cnt; }, function(callback){
     var file_url = config.music_dir + songs[cnt].location;
     var folder_of_file = file_url.substring(0, file_url.lastIndexOf("/"));
-    (function(cnt) {
       // create the folder
       mkdirp(folder_of_file, function(){
         var song_file_url = config.music_dir + songs[cnt].location;
@@ -556,8 +556,11 @@ exports.sync_import = function(app_ref, songs, url){
             }
             // upsert the song
             app.db.songs.update({_id: song._id}, song, {upsert: true}, function (err, numReplaced, newDoc){
-              // update the browser the song has been added
+              // TODO: update the browser the song has been added
               console.log(newDoc);
+              // start the next iteration
+              cnt++;
+              callback();
             });
           };
           // is there a cover?
@@ -573,8 +576,10 @@ exports.sync_import = function(app_ref, songs, url){
           }
         }).pipe(fs.createWriteStream(song_file_url));
       });
-    })(cnt);
-  }
+  }, function(){
+    // finished
+    console.log("Finished Syncing songs to this computer");
+  });
 };
 
 exports.stopScan = function(app){

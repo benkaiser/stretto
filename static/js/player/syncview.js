@@ -59,7 +59,8 @@ SyncView = Backbone.View.extend({
         el: this.$el.find(".playlists_left")[0],
         model: {
           playlists: this.a.playlist_collection,
-          title: "This Server"
+          title: "This Server",
+          side: "left"
         }
       });
       this.left.render();
@@ -67,7 +68,8 @@ SyncView = Backbone.View.extend({
         el: this.$el.find(".playlists_right")[0],
         model: {
           playlists: this.b.playlist_collection,
-          title: "Remote Server"
+          title: "Remote Server",
+          side: "right"
         }
       });
       this.right.render();
@@ -154,6 +156,7 @@ SyncListView = Backbone.View.extend({
   render: function(){
     this.$el.html(render(this.template, {
       playlists: this.model.playlists.models,
+      side: this.model.side,
       title: this.model.title
     }));
   },
@@ -163,7 +166,7 @@ SyncListView = Backbone.View.extend({
     this.$el.find(':input').each(function(index){
       if($(this).is(':checked')){
         // add the playlist by _id
-        selected.push(self.model.playlists.getBy_Id($(this).attr('id')).attributes);
+        selected.push(self.model.playlists.getBy_Id($(this).attr('id').replace(self.model.side + "_", '')).attributes);
       }
     });
     return selected;

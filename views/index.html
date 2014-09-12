@@ -247,7 +247,7 @@
 <h3>{{title}}</h3>
 <p>
 {% for playlist in playlists %}
-  <input type="checkbox" id="{{playlist.attributes._id}}"> <label for="{{playlist.attributes._id}}">{{playlist.attributes.title}}</label><br/>
+  <input type="checkbox" id="{{side}}_{{playlist.attributes._id}}"> <label for="{{side}}_{{playlist.attributes._id}}">{{playlist.attributes.title}}</label><br/>
 {% endfor %}
 </p>
 </script>
