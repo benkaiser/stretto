@@ -1,5 +1,9 @@
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
+  // variable for keeping track of seeking
+  var is_seeking = false;
+  var seek_interval = 0;
+  var HOLD_TIME = 500;
   $("body").keydown(function(event){
     // don't fire the controls if the user is editing an input
     if(event.target.localName == 'input'){
@@ -16,11 +20,27 @@ $(document).ready(function(){
         event.preventDefault();
         break;
       case 39: // right key
-        player.nextTrack();
+        // block to only run on first key down
+        if(!seek_interval){
+          is_seeking = false;
+          // call function every HOLD_TIME, if we don't get called, then it wasn't held down
+          seek_interval = setInterval(function(){
+            is_seeking = true;
+            player.seekTo(player.current_track.currentTime + 5);
+          }, HOLD_TIME);
+        }
         event.preventDefault();
         break;
       case 37: // left key
-        player.prevTrack();
+        // block to only run on first key down
+        if(!seek_interval){
+          is_seeking = false;
+          // call function every HOLD_TIME, if we don't get called, then it wasn't held down
+          seek_interval = setInterval(function(){
+            is_seeking = true;
+            player.seekTo(player.current_track.currentTime - 5);
+          }, HOLD_TIME);
+        }
         event.preventDefault();
         break;
       case 38: // up key
@@ -37,6 +57,34 @@ $(document).ready(function(){
         // add it to the history and reset the history
         player.play_history.unshift(lastSelection);
         player.play_history_idx = 0;
+    }
+  });
+  $("body").keyup(function(event){
+    // don't fire the controls if the user is editing an input
+    if(event.target.localName == 'input'){
+      return;
+    }
+    switch(event.which){
+      case 39: // right key
+        // reset the seeking state and remove interval function
+        clearInterval(seek_interval);
+        seek_interval = 0;
+        // if they are now seeking (i.e. haven't been holding the key down) skip to next
+        if(!is_seeking){
+          player.nextTrack();
+        }
+        event.preventDefault();
+        break;
+      case 37: // left key
+        // reset the seeking state and remove interval function
+        clearInterval(seek_interval);
+        seek_interval = 0;
+        // if they are now seeking (i.e. haven't been holding the key down) move to previous
+        if(!is_seeking){
+          player.prevTrack();
+        }
+        event.preventDefault();
+        break;
     }
   });
   // disable the options on scroll

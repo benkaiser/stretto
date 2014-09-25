@@ -376,7 +376,11 @@ function PlayState(){
   // scrub to percentage in current track
   this.scrubTo = function(value){
     var length = this.current_track.duration;
-    this.current_track.currentTime = length * value / 100.00;
+    this.seekTo(length * value / 100.00);
+  };
+  // seek to specific time in track
+  this.seekTo = function(value){
+    this.current_track.currentTime = value;
   };
   this.setCompName = function(name){
     // update the local data
