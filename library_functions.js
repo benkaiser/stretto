@@ -47,8 +47,6 @@ function findNextSong(){
 
 function findSong(relative_location, callback){
   var found_metadata = false;
-  // extact the app start time
-  now_milli = app.get('started');
   // convert the filename into full path
   var full_location = config.music_dir + relative_location;
   app.db.songs.findOne({location: relative_location}, function(err, doc){
@@ -255,6 +253,7 @@ exports.scanItems = function(app_ref, locations){
   app = app_ref;
   hard_rescan = true;
   running = true;
+  now_milli = Date.now();
   song_list = song_list.concat(locations);
   findNextSong();
 };
@@ -262,6 +261,7 @@ exports.scanItems = function(app_ref, locations){
 exports.scanLibrary = function(app_ref, hard){
   app = app_ref;
   hard_rescan = hard;
+  now_milli = Date.now();
   util.walk(config.music_dir, function(err, list){
     if(err){
       console.log(err);
@@ -319,8 +319,8 @@ exports.addToPlaylist = addToPlaylist;
 
 exports.scDownload = function(app_ref, url){
   app = app_ref;
-  // extact the app start time
-  now_milli = app.get('started');
+  // set the time these songs are added
+  now_milli = Date.now();
   // resolve the tracks
   scres.resolve( url, function(err, tracks) {
     if(err) console.log(err);
@@ -433,7 +433,7 @@ exports.scDownload = function(app_ref, url){
 
 exports.ytDownload = function(app_ref, url, callback) {
   app = app_ref;
-  now_milli = app.get('started');
+  now_milli = Date.now();
   var trackInfo = null;
   var out_dir = path.join(config.music_dir, config.youtube.dl_dir);
   var location = null;
