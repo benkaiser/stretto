@@ -27,9 +27,22 @@ function createOptions(x, y){
   });
   $(".remove_from_playlist").click(function(ev){
     id = $(ev.target).closest("li").attr('id');
+    // get a handle on the playlist
     for (var i = 0; i < selectedItems.length; i++) {
       $("#"+selectedItems[i]).remove();
+      // remove the song from the queue_pool
+      for(var j = 0; j < player.songs.length; j++){
+        if(player.songs[j].attributes._id == selectedItems[i]){
+          // remove the element
+          player.songs.splice(j, 1);
+        }
+      }
     }
+    // fix bug with infinite scroll having elements removed
+    if(MusicApp.router.songview.how_many_drawn > player.songs.length){
+      MusicApp.router.songview.how_many_drawn = player.songs.length;
+    }
+    // update the server
     socket.emit("remove_from_playlist", {remove: selectedItems, playlist: id});
     hideOptions();
   });
