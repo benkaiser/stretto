@@ -50,9 +50,22 @@ function prettyPrintSecondsorNA(seconds){
 swig.setFilter('prettyPrintSeconds', prettyPrintSecondsorNA);
 swig.setFilter('prettyPrintDateAdded', prettyPrintDateAdded);
 
+var cover_is_current = false;
+var cover_is_visible = false;
+var box; // coverbox ref
 function showCover(src){
-  box = new CoverBox(src);
+  // deactivate it if it's visible already
+  if(cover_is_visible && box){
+    box.deactivate();
+  }
+  // check if the new cover art is from the current track
+  cover_is_current = ("/cover/" + player.current_song.attributes.cover_location == src);
+  // create and activate the cover art
+  box = new CoverBox(src, function(){
+    cover_is_visible = false;
+  });
   box.activate();
+  cover_is_visible = true;
 }
 
 // utility functions

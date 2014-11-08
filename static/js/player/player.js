@@ -220,6 +220,10 @@ function PlayState(){
     $("#"+id).addClass("light-blue");
     // update the window title
     window.document.title = this.current_song.attributes.title + " - " + this.current_song.attributes.display_artist;
+    // update the cover photo if it's showing fullscreen and the new song has cover art
+    if(cover_is_visible && cover_is_current && this.current_song.attributes.cover_location){
+      showCover("/cover/" + this.current_song.attributes.cover_location);
+    }
   };
   this.setIsPlaying = function(isPlaying){
     this.is_playing = isPlaying;
