@@ -1,6 +1,6 @@
 var element = null;
 var padding_factor = 100;
-function CoverBox(url){
+function CoverBox(url, deactivatedCB){
   this.url = url;
   this.activate = function(){
     var imgCSS = "position: fixed; z-index: 1031; border-radius: 20px; box-shadow: #333 0px 0px 30px 5px;";
@@ -34,5 +34,6 @@ function CoverBox(url){
   this.deactivate = function(){
     $(".modal-backdrop").remove();
     $(".modal-picture").remove();
+    deactivatedCB();
   };
 }
