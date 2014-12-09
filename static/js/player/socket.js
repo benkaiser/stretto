@@ -86,7 +86,35 @@ socket.on('scan_update', function(data){
     ScanMessenger.update(swig.render(ScanTemplate, {locals: data}));
   }
 });
-
+// remote controll events
+var CommandMessenger = null;
+var CommandTemplate = "Received command '{{command}}'.";
+socket.on('command', function(data){
+  var command = data.command;
+  // show command
+  if(CommandMessenger === null){
+    CommandMessenger = Messenger().post(swig.render(CommandTemplate, {locals: data}));
+  } else {
+    CommandMessenger.update(swig.render(CommandTemplate, {locals: data}));
+  }
+  // run command
+  switch(command){
+    case 'next':
+      player.nextTrack();
+      break;
+    case 'prev':
+      player.prevTrack();
+      break;
+    case 'playpause':
+      player.togglePlayState();
+      break;
+    case 'playpause':
+      player.prevTrack();
+      break;
+    default:
+      break;
+  }
+});
 
 function redrawSongsChangedModel(){
   var sv = MusicApp.router.songview;

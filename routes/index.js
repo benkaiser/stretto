@@ -21,6 +21,8 @@ exports.createRoutes = function(app_ref){
   app.get('/songs/:id', sendSong);
   app.get('/cover/:id', sendCover);
   app.get('/downloadplaylist/:id', downloadPlaylist);
+  // remote control commands
+  app.get('/command/:name/:command', remoteCommand);
   app.io.route('player_page_connected', function(req){ req.io.join('players'); });
   // remote functions
   app.io.route('set_comp_name', setCompName);
@@ -43,7 +45,7 @@ exports.createRoutes = function(app_ref){
   // play count
   app.io.route('update_play_count', updatePlayCount);
   // remote control routes
-  app.io.route('get_receivers', getReceivers);
+  app.io.route('get_receivers', getReceiversMinusThis);
   // open file manager to location
   app.io.route('open_dir', function(req){ opener(req.data.substring(0, req.data.lastIndexOf('/'))); });
   // update the info of a song
@@ -333,13 +335,41 @@ function updateSongInfo(req){
 
 // controller routes
 
+function remoteCommand(req, res){
+  // get params
+  var command = req.params.command;
+  var name = req.params.name;
+  // bool to see if server was found
+  var command_sent = false;
+  // find destination machine and send the command
+  var receivers = getReceiverList();
+  receivers.forEach(function(client){
+    if(client.store.data.name &&
+      client.store.data.name.length > 0 &&
+      client.store.data.name == name){
+      client.emit("command", {command: command});
+      // mark it as sent
+      command_sent = true;
+    }
+  });
+  if(command_sent){
+    res.send("OK");
+  } else {
+    res.send("NAME_NOT_FOUND");
+  }
+}
+
 function setCompName(req){
   req.io.join('receivers');
   req.socket.set('name', req.data.name);
 }
 
-function getReceivers(req){
-  var receivers = app.io.sockets.clients('receivers');
+function getReceiverList(req){
+  return app.io.sockets.clients('receivers');
+}
+
+function getReceiversMinusThis(req){
+  var receivers = getReceiverList();
   var validReceivers = [];
   receivers.forEach(function(client){
     if(client.store.data.name && client.store.data.name.length > 0){
