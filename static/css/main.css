@@ -68,6 +68,7 @@ body{
   background-color: white;
   box-shadow: 0 0 30px #ccc;
   padding-top: 2px;
+  -webkit-transform: translateZ(0);
 }
 #bottom_bar:focus{
   outline: 0;

@@ -8,6 +8,7 @@ var opener = require('opener');
 var md5 = require('MD5');
 var request = require('request').defaults({ encoding: null });
 var fs = require('fs');
+var MobileDetect = require('mobile-detect');
 /*
  * GET home page.
  */
@@ -17,7 +18,7 @@ app = null;
 exports.createRoutes = function(app_ref){
   app = app_ref;
   app.get('/', musicRoute);
-  app.get('/mobile', mobileMusicRoute);
+  app.get('/remote/:name', musicRoute);
   app.get('/songs/:id', sendSong);
   app.get('/cover/:id', sendCover);
   app.get('/downloadplaylist/:id', downloadPlaylist);
@@ -59,17 +60,26 @@ exports.createRoutes = function(app_ref){
 };
 
 function musicRoute(req, res){
+  // test if client is mobile
+  md = new MobileDetect(req.headers['user-agent']);
+  // get ip (for syncing functions)
   util.getip(function(ip){
-    res.render('index', {
-      menu: true,
+    // render the view
+    res.render((md.mobile() ? 'mobile' : 'index'), {
+      menu: !md.mobile(),
       music_dir: config.music_dir,
-      ip: ip + ":" + app.get('port')
+      ip: ip + ":" + app.get('port'),
+      remote_name: req.params.name
     });
   });
 }
 
 function mobileMusicRoute(req, res){
-  res.render('mobile', {menu: false, music_dir: config.music_dir});
+  res.render('mobile', {
+    menu: false,
+    music_dir: config.music_dir,
+    remote_name: req.params.name
+  });
 }
 
 function sendSong(req, res){

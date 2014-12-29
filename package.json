@@ -6,19 +6,20 @@
     "start": "nodemon app.js -e 'html|css|js'"
   },
   "dependencies": {
-    "express.io": "*",
-    "swig": "*",
-    "musicmetadata": "*",
-    "taglib": "*",
-    "nedb": "*",
     "MD5": "*",
-    "async": "*",
     "adm-zip": "*",
-    "request": "*",
-    "mkdirp": "*",
-    "opener": "*",
-    "soundcloud-resolver": "*",
+    "async": "*",
+    "express.io": "*",
     "fluent-ffmpeg": "~2.0.0-rc1",
+    "mkdirp": "*",
+    "mobile-detect": "^0.4.3",
+    "musicmetadata": "*",
+    "nedb": "*",
+    "opener": "*",
+    "request": "*",
+    "soundcloud-resolver": "*",
+    "swig": "*",
+    "taglib": "*",
     "ytdl-core": "~0.2.4"
   }
 }

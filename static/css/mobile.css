@@ -50,6 +50,7 @@
   overflow: hidden;
   background-color: #cef;
   box-shadow: 0 0 30px #ccc;
+  -webkit-transform: translateZ(0); 
 }
 .info_wrapper{
   width: calc(100% - 70px); /* cover width plus left padding */
