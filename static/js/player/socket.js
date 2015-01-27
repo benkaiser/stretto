@@ -23,7 +23,7 @@ var SCMessenger = null;
 socket.on('sc_update', function(data){
   console.log(data);
   if(data.type == "started"){
-    SCMessenger = Messenger().post("Starting download from SoundCloud of " + data.count + " tracks");
+    SCMessenger = Messenger().post("Starting download from SoundCloud of " + data.count + " tracks" + (not_streamable > 0 ? " (" + data.not_streamable + " not streamable)" : ""));
   } else if(data.type == "added"){
     // it came with a song
     player.song_collection.add(data.content);

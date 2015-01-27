@@ -323,111 +323,126 @@ exports.scDownload = function(app_ref, url){
   now_milli = Date.now();
   // resolve the tracks
   scres.resolve( url, function(err, tracks) {
-    if(err) console.log(err);
-    var track_length = tracks.length;
-    // update the client
-    broadcast("sc_update", {
-      type: "started",
-      count: track_length,
-      completed: 0
-    });
-    // make sure the dl dir is existent
-    var out_dir = path.join(config.music_dir, config.sc_dl_dir);
-    mkdirp(out_dir, function(){
-      // start an async loop to download the songs
-      var finished = false;
-      async.until(function(){ return tracks.length === 0; }, function(callback){
-        // get the current item and remove it from the stack
-        var current_track = tracks.pop();
-        // create the location the song is written to
-        var location = path.join(out_dir, current_track.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
-        // create the data to add to the database
-        var song = {
-          title: current_track.title || 'Unknown Title',
-          album: current_track.label_name || 'Unknown Album',
-          artist: current_track.user.username  || 'Unknown Artist',
-          albumartist: current_track.user.username  || 'Unknown Artist',
-          display_artist: current_track.user.username || 'Unknown Artist',
-          genre: current_track.genre,
-          year: current_track.release_year  || '2014',
-          duration: current_track.duration/1000, // in milliseconds
-          play_count: 0,
-          location: location.replace(config.music_dir, ""),
-          date_added: now_milli,
-          date_modified: now_milli
-        };
-        // prep function to run after we have finished grabbing all the files we can
-        var finish_add = function(){
-          // add the song
-          app.db.songs.insert(song, function (err, newDoc){
-            addToPlaylist(newDoc._id, "SoundCloud");
-            // update the browser the song has been added
-            broadcast("sc_update", {
-              type: "added",
-              count: track_length,
-              completed: track_length-tracks.length,
-              content: newDoc
-            });
-            // enter next iteration
-            callback();
-          });
-        };
-        // check if we need to download it
-        fs.exists(location, function(exists){
-          if(!exists){
-            // download the song
-            request(current_track.stream_url + "?client_id=" + config.sc_client_id, function(error, response, body){
-              // if it was an rmtp stream / didn't download
-              if(response.headers['content-length'] == 1){
-                // remove the file
-                fs.unlink(location);
-                // update the client
-                broadcast("sc_update", {
-                  type: "skipped",
-                  count: track_length,
-                  completed: track_length-tracks.length
-                });
-                callback();
-                return;
-              }
-              // is artwork present?
-              if(current_track.artwork_url){
-                // download it's cover art
-                var large_cover_url = current_track.artwork_url.replace('large.jpg', 't500x500.jpg');
-                request({url: large_cover_url, encoding: null}, function(error, response, body){
-                  // where are we storing the cover art?
-                  song.cover_location = md5(body) + ".jpg";
-                  var filename = __dirname + '/dbs/covers/' + song.cover_location;
-                  // does it exist?
-                  fs.exists(filename, function(exists){
-                    if(!exists){
-                      fs.writeFile(filename, body, function(err){
-                        finish_add();
-                      });
-                    } else {
-                      finish_add();
-                    }
-                  });
-                });
-              } else {
-                // add without artwork to the database
-                finish_add();
-              }
-            }).pipe(fs.createWriteStream(location));
-          } else {
-            console.log("File already exists ('" + location + "'). Most likely already in library. Either scan libaray or remove file and start again.");
-            broadcast('sc_update', {
-              type: "error",
-              content: "Track already exists"
-            });
-            callback();
-          }
-        });
-      }, function(){
-        // finished
-        console.log("Finished Download");
+    if(err){
+      console.log(err);
+    } else {
+      var track_length = tracks.length;
+      // filter out not streamable tracks
+      var not_streamable = 0;
+      for(var x = 0; x < tracks.length; x++){
+        if(!tracks[x].streamable){
+          // remove it and modify the index
+          tracks.splice(x, 1);
+          x--;
+          // increment not streamable
+          not_streamable++;
+        }
+      }
+      // update the client
+      broadcast("sc_update", {
+        type: "started",
+        count: track_length,
+        not_streamable: not_streamable,
+        completed: 0
       });
-    });
+      // make sure the dl dir is existent
+      var out_dir = path.join(config.music_dir, config.sc_dl_dir);
+      mkdirp(out_dir, function(){
+        // start an async loop to download the songs
+        var finished = false;
+        async.until(function(){ return tracks.length === 0; }, function(callback){
+          // get the current item and remove it from the stack
+          var current_track = tracks.pop();
+          // create the location the song is written to
+          var location = path.join(out_dir, current_track.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".mp3");
+          // create the data to add to the database
+          var song = {
+            title: current_track.title || 'Unknown Title',
+            album: current_track.label_name || 'Unknown Album',
+            artist: current_track.user.username  || 'Unknown Artist',
+            albumartist: current_track.user.username  || 'Unknown Artist',
+            display_artist: current_track.user.username || 'Unknown Artist',
+            genre: current_track.genre,
+            year: current_track.release_year  || '2014',
+            duration: current_track.duration/1000, // in milliseconds
+            play_count: 0,
+            location: location.replace(config.music_dir, ""),
+            date_added: now_milli,
+            date_modified: now_milli
+          };
+          // prep function to run after we have finished grabbing all the files we can
+          var finish_add = function(){
+            // add the song
+            app.db.songs.insert(song, function (err, newDoc){
+              addToPlaylist(newDoc._id, "SoundCloud");
+              // update the browser the song has been added
+              broadcast("sc_update", {
+                type: "added",
+                count: track_length,
+                completed: track_length-tracks.length,
+                content: newDoc
+              });
+              // enter next iteration
+              callback();
+            });
+          };
+          // check if we need to download it
+          fs.exists(location, function(exists){
+            if(!exists){
+              // download the song
+              request(current_track.stream_url + "?client_id=" + config.sc_client_id, function(error, response, body){
+                // if it was an rmtp stream / didn't download
+                if(response.headers['content-length'] == 1){
+                  // remove the file
+                  fs.unlink(location);
+                  // update the client
+                  broadcast("sc_update", {
+                    type: "skipped",
+                    count: track_length,
+                    completed: track_length-tracks.length
+                  });
+                  callback();
+                  return;
+                }
+                // is artwork present?
+                if(current_track.artwork_url){
+                  // download it's cover art
+                  var large_cover_url = current_track.artwork_url.replace('large.jpg', 't500x500.jpg');
+                  request({url: large_cover_url, encoding: null}, function(error, response, body){
+                    // where are we storing the cover art?
+                    song.cover_location = md5(body) + ".jpg";
+                    var filename = __dirname + '/dbs/covers/' + song.cover_location;
+                    // does it exist?
+                    fs.exists(filename, function(exists){
+                      if(!exists){
+                        fs.writeFile(filename, body, function(err){
+                          finish_add();
+                        });
+                      } else {
+                        finish_add();
+                      }
+                    });
+                  });
+                } else {
+                  // add without artwork to the database
+                  finish_add();
+                }
+              }).pipe(fs.createWriteStream(location));
+            } else {
+              console.log("File already exists ('" + location + "'). Most likely already in library. Either scan libaray or remove file and start again.");
+              broadcast('sc_update', {
+                type: "error",
+                content: "Track already exists"
+              });
+              callback();
+            }
+          });
+        }, function(){
+          // finished
+          console.log("Finished Download");
+        });
+      });
+    }
   });
 };
 
@@ -475,7 +490,7 @@ exports.ytDownload = function(app_ref, url, callback) {
             callback(false);
           })
           .on('error', function(err) {
-            callback(err);
+            callback(err, {message: err});
           })
           .save(location);
       }
