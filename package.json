@@ -20,6 +20,6 @@
     "soundcloud-resolver": "*",
     "swig": "*",
     "taglib": "*",
-    "ytdl-core": "~0.2.4"
+    "ytdl-core": "*"
   }
 }

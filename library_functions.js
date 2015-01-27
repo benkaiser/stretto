@@ -474,12 +474,17 @@ exports.ytDownload = function(app_ref, url, callback) {
                 });
               }
             });
+          } else {
+            callback(true, {
+              message: "Error fetching info: " + err
+            });
           }
         });
       },
       function(callback) {
         ffmpeg(ytdl(url, {
-          quality: "highest"
+            quality: "highest",
+            filter: function(format) { return format.resolution === null; }
           }))
           .noVideo()
           .audioCodec('libmp3lame')
