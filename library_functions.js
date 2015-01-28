@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var mm = require('musicmetadata');
-var taglib = require('taglib');
+var taglib;
 var md5 = require('MD5');
 var request = require('request');
 var mkdirp = require('mkdirp');
@@ -15,6 +15,9 @@ var config = require(__dirname + '/config').config();
 
 // init the soundcloud resolver with the clientid
 var scres = new SoundcloudResolver(config.sc_client_id);
+
+if(config.taglib)
+taglib = require('taglib');
 
 // init other variables
 var running = false;
@@ -66,6 +69,8 @@ function findSong(relative_location, callback){
           display_artist: normaliseArtist(result.albumartist, result.artist),
           genre: result.genre,
           year: result.year,
+          discnr: (result.disk||{no:0}).no||0,
+          tracknr: (result.track||{no:0}).no||0,
           duration: result.duration,
           play_count: (doc === null) ? 0 : doc.play_count || 0,
           location: relative_location,
@@ -210,6 +215,7 @@ function normaliseArtist(albumartist, artist){
 
 function taglib_fetch(path, id){
   // use taglib to fetch duration
+  if(config.taglib)
   taglib.read(config.music_dir + path, function(err, tag, audioProperties) {
     app.db.songs.update({ _id: id }, { $set: { duration: audioProperties.length} });
   });
