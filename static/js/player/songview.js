@@ -2,6 +2,8 @@ SongView = Backbone.View.extend({
   template: "#song_template",
   render: function(){
     var self = this;
+    // cache scrolltop (incase this is the second render, see bottom of function)
+    var tmp_scrolltop = this.scrollTop;
     // calculate the duration
     var totalDuration = 0;
     for(var song = 0; song < player.songs.length; song++){
@@ -91,6 +93,12 @@ SongView = Backbone.View.extend({
       // draw the songs
       self.renderSong();
     });
+    // if they have already rendered this, scroll to last postition
+    if(this.scrollTop){
+      _.defer(function(){
+        self.scrollElem.animate({scrollTop: tmp_scrolltop + "px"}, 0);
+      });
+    }
   },
   events: {
     "click .colsearch": "triggerSearch",

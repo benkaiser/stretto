@@ -177,6 +177,7 @@
   Location: {% if onserver %}<a class='btn btn-primary open_dir' title="{{music_dir}}{{track.attributes.location}}">Open in File Manager</a>{% else %}
   {{music_dir}}{{track.attributes.location}}{% endif %}
 </p>
+<p><div class="btn btn-primary correct_info">Auto-find info</div></p>
 </div>
 </div>
 </script>
@@ -254,6 +255,7 @@
 {% endraw %}
 <script type="text/javascript">
 var this_ip = "{{ip}}";
+var country_code = "{{country_code}}";
 </script>
 {% endblock %}
 {% block scripts %}

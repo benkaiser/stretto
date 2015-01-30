@@ -103,6 +103,58 @@ function shoInfoView(items){
       $(".lastfm_spinner").replaceWith("<div class='btn btn-default find_cover_art'>Find Cover Art</div>");
     }});
   });
+  // auto correct info button
+  $(".correct_info").click(function(ev){
+    // build the search string
+    var title = $("#title").val();
+    var album = $("#album").val();
+    var artist = $("#artist").val();
+    // defailts
+    var prefix = "/proxy/search?term=";
+    var suffix = "&entity=song&limit=10" + (country_code) ? "&country=" + country_code : "";
+    // call the api with all three first
+    $.getJSON(prefix + encodeURI([title, album, artist].join(" ")) + suffix, function(data){
+      console.log("searched with title and artist and album and found " + data.resultCount + " tracks");
+      // were there results?
+      if(data.resultCount){
+        foundInfo(data.results);
+      } else {
+        // call the api with title and artist
+        $.getJSON(prefix + encodeURI([title, artist].join(" ")) + suffix, function(data){
+          console.log("searched with title and artist and found " + data.resultCount + " tracks");
+          // were there results?
+          if(data.resultCount){
+            foundInfo(data.results);
+          } else {
+            // call the api with only title
+            $.getJSON(prefix + encodeURI([title].join(" ")) + suffix, function(data){
+              console.log("searched with only title and found " + data.resultCount + " tracks");
+              if(data.resultCount){
+                foundInfo(data.results);
+              } else {
+                bootbox.alert("Unable to find song info on itunes. Maybe try tweaking the title/album/artist so it can be found better.");
+              }
+            });
+          }
+        });
+      }
+    });
+    // function to run when song info found
+    var foundInfo = function(results){
+      console.log("Found results:");
+      console.log(results);
+      // only use the first result
+      var result = results[0];
+      $("#title").val(result.trackName);
+      $("#album").val(result.collectionName);
+      $("#artist").val(result.artistName);
+      // set the image as the preview image and upgrade it's size
+      var cover_url = result.artworkUrl100.replace("100x100", "600x600");
+      $(".img_block").html("<img class='info_cover detailed lfm_cover' src='"+cover_url+"'/>");
+      info_cover_popover();
+      islastfm = true;
+    };
+  });
   // tie the enter key on the inputs to the save function
   $(".edit_form :input").keydown(function(ev){
     // if enter key

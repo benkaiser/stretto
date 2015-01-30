@@ -9,6 +9,7 @@
     "MD5": "*",
     "adm-zip": "*",
     "async": "*",
+    "express-http-proxy": "^0.3.0",
     "express.io": "*",
     "fluent-ffmpeg": "~2.0.0-rc1",
     "mkdirp": "*",

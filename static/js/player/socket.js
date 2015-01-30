@@ -76,6 +76,26 @@ socket.on('yt_update', function(data){
     }
   }
 });
+var SongMessenger = null;
+socket.on('song_update', function(data){
+  console.log("Updating song info");
+  console.log(data);
+  // iterate over tracks and update them
+  for(var x = 0; x < data.length; x++){
+    // remove the track
+    player.song_collection.remove(player.song_collection.where({_id: data[x]._id}));
+    // add the track
+    player.song_collection.add(data[x]);
+  }
+  // regenerate the list of current songs
+  player.songs = player.song_collection.getByIds(player.playlist);
+  player.queue_pool = player.songs.slice(0);
+  player.genShufflePool();
+  // redraw the view
+  redrawSongsChangedModel();
+  // redraw info view
+  redrawInfoView();
+});
 var ScanMessenger = null;
 var ScanTemplate = "Scanned {{count}} out of {{completed}}{% if details %}: {{details}}{% endif %}";
 socket.on('scan_update', function(data){
@@ -117,7 +137,9 @@ socket.on('command', function(data){
 });
 
 function redrawSongsChangedModel(){
-  var sv = MusicApp.router.songview;
-  // render
-  sv.render();
+  var sv = MusicApp.router.songview.render();
+}
+
+function redrawInfoView(){
+  MusicApp.infoRegion.currentView.render();
 }

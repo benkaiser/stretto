@@ -68,17 +68,10 @@ function musicRoute(req, res){
     res.render((md.mobile() ? 'mobile' : 'index'), {
       menu: !md.mobile(),
       music_dir: config.music_dir,
+      country_code: config.country_code,
       ip: ip + ":" + app.get('port'),
       remote_name: req.params.name
     });
-  });
-}
-
-function mobileMusicRoute(req, res){
-  res.render('mobile', {
-    menu: false,
-    music_dir: config.music_dir,
-    remote_name: req.params.name
   });
 }
 
@@ -322,7 +315,9 @@ function updateSongInfo(req){
             cover_location: cover_filename
           }
         }, { multi: true }, function (err, numReplaced) {
-          // TODO let the client know the new cover images
+          app.db.songs.find({display_artist: req.data.artist, album: req.data.album}, function(err, tracks){
+            app.io.broadcast("song_update", tracks);
+          });
         });
       });
     };

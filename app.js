@@ -8,6 +8,7 @@ var http = require('http');
 var path = require('path');
 var util = require(__dirname + '/util.js');
 var mkdirp = require('mkdirp');
+var proxy = require('express-http-proxy');
 
 var app = express();
 app.http().io();
@@ -40,6 +41,13 @@ app.use(express.bodyParser());
 app.use(express.session({secret: 'maisecret'}));
 app.use(app.router);
 app.use('/static', express.static(__dirname + '/static'));
+// proxy for itunes requests
+app.use('/proxy', proxy('https://itunes.apple.com', {
+  forwardPath: function(req, res) {
+    console.log(require('url').parse(req.url).path);
+    return require('url').parse(req.url).path;
+  }
+}));
 
 // development only
 if ('development' == app.get('env')) {
