@@ -151,10 +151,18 @@ function get_playlists(callback){
     playlists = docs;
     // create a new playlist for the library
     getLibraryIds(function(result){
+      // add library
       playlists.unshift({
         _id: "LIBRARY",
         title: "Library",
         songs: result,
+        editable: false
+      });
+      // add queue
+      playlists.unshift({
+        _id: "QUEUE",
+        title: "Queue",
+        songs: [], // populated by client
         editable: false
       });
       // send the playlists back to the user

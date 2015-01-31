@@ -39,6 +39,9 @@ var SongCollection = Backbone.Collection.extend({
   },
   getByIds: function(playlist){
     if(playlist !== undefined && playlist.songs !== undefined){
+      if(playlist._id == "QUEUE"){
+        return player.shuffle_pool;
+      }
       songs = [];
       for(var i = 0; i < playlist.songs.length; i++){
         var song = this.findBy_Id(playlist.songs[i]._id);

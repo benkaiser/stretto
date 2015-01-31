@@ -44,7 +44,6 @@ app.use('/static', express.static(__dirname + '/static'));
 // proxy for itunes requests
 app.use('/proxy', proxy('https://itunes.apple.com', {
   forwardPath: function(req, res) {
-    console.log(require('url').parse(req.url).path);
     return require('url').parse(req.url).path;
   }
 }));

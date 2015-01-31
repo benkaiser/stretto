@@ -278,14 +278,22 @@ function PlayState(){
       // the current track at the start. This creates a correct shuffle.
       player.shuffle_pool = player.queue_pool.slice(0);
       // remove the current song
-      player.shuffle_pool.splice(player.current_index, 1);
+      var current_song = player.shuffle_pool.splice(player.current_index, 1);
       // shuffle the array
       player.shuffle_pool = shuffle_array(player.shuffle_pool);
-      // set the shuffle idx back at the start
-      player.shuffle_idx = 0;
+      // re-add the current song at the start
+      player.shuffle_pool.unshift(current_song[0]);
+      // set the shuffle idx at the snog after this one
+      player.shuffle_idx = 1;
     } else {
       player.shuffle_pool = player.queue_pool.slice(0);
       player.shuffle_idx = 0;
+    }
+    if(player.playlist._id == "QUEUE"){
+      player.songs = player.shuffle_pool;
+      if(MusicApp.router.songview){
+        MusicApp.router.songview.render();
+      }
     }
   };
   this.nextTrack = function(){
