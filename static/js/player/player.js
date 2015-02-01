@@ -248,6 +248,8 @@ function PlayState(){
     this.shuffle_state = !this.shuffle_state;
     localStorage.setItem('shuffle', this.shuffle_state);
     this.redrawShuffle();
+    // if we are viewing the queue, retrigger route
+    MusicApp.router.playlist("QUEUE");
   };
   this.redrawShuffle = function(){
     // change the dom
