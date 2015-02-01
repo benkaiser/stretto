@@ -191,6 +191,14 @@
     <li class="view_info"><a>Detailed Info</a></li>
     <li class="hard_rescan"><a>Hard Rescan</a></li>
     <li class="divider"></li>
+    {% if recents.length %}
+      <li role="presentation" class="dropdown-header">Recents</li>
+      {% for playlist in recents %}
+        {% if playlist.attributes.editable %}
+        <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
     <li role="presentation" class="dropdown-header">Add to Playlist</li>
     {% for playlist in playlists %}
       {% if playlist.attributes.editable %}

@@ -2,6 +2,7 @@
 
 var optionsVisible = false;
 var selectedItems = [];
+var recentPlaylists = [];
 var lastSelection = '';
 function createOptions(x, y){
   // calculate if the menu should 'drop up'
@@ -12,6 +13,7 @@ function createOptions(x, y){
   $(".options_container").html(render("#options_template", {
       playlists: player.playlist_collection.models,
       current_playlist: player.playlist,
+      recents: recentPlaylists,
       dropup: dropup
     }))
     .css({"top": y+"px", "left": x+"px"});
@@ -24,6 +26,18 @@ function createOptions(x, y){
     id = $(ev.target).closest("li").attr('id');
     socket.emit("add_to_playlist", {add: selectedItems, playlist: id});
     hideOptions();
+    // add to recents
+    var this_playlist = player.playlist_collection.getBy_Id(id);
+    // only add if it's not in there
+    var found = false;
+    for(var x = 0; x < recentPlaylists.length; x++){
+      if(recentPlaylists[x].attributes._id == this_playlist.attributes._id){
+        found = true;
+      }
+    }
+    if(!found){
+      recentPlaylists.push(this_playlist);
+    }
   });
   $(".remove_from_playlist").click(function(ev){
     id = $(ev.target).closest("li").attr('id');
