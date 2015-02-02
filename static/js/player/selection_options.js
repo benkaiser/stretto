@@ -28,15 +28,18 @@ function createOptions(x, y){
     hideOptions();
     // add to recents
     var this_playlist = player.playlist_collection.getBy_Id(id);
-    // only add if it's not in there
-    var found = false;
+    // take it out if it's in the recents
     for(var x = 0; x < recentPlaylists.length; x++){
       if(recentPlaylists[x].attributes._id == this_playlist.attributes._id){
-        found = true;
+        // remove it from recents
+        recentPlaylists.splice(x, 1);
       }
     }
-    if(!found){
-      recentPlaylists.push(this_playlist);
+    // add to the start of recents
+    recentPlaylists.unshift(this_playlist);
+    // remove if too many
+    if(recentPlaylists.length > 3){
+      recentPlaylists.pop();
     }
   });
   $(".remove_from_playlist").click(function(ev){
