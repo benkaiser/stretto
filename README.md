@@ -42,9 +42,28 @@ Go to `localhost:2000` in your browser (or known ip of server if it is on a diff
 
 If you want to sync your Node Music Player playlists to your phone, [check out the android sync app repository](https://github.com/benkaiser/android-node-music-sync).
 
+### Remote Control Shortcuts
+
+If you would like to hook up keyboard shortcuts to play/pause/next/prev when you aren't currently focused
+on the chrome follow these steps:
+
+1. first set your remote name from the `Remote Setup` button in the bottom right.
+![set_remote_name](https://cloud.githubusercontent.com/assets/608054/6090658/9520f106-aecc-11e4-9d77-1a1822ade842.jpg)
+
+2. In whatever program you use to configure your shortcuts, link the button press you want to curl commands of the format:
+`curl http://localhost:2000/command/<remote_name>/<command>` where `<remote_name>` is the remote name you entered and  `<command>` can be either `next`, `prev` or `playpause`.
+For an example, here is my i3 config bindings that hook up Alt+PgDn, Alt+PgUp and Alt+Home to the commands:
+```
+bindsym $mod+Home exec curl http://localhost:2000/command/my_remote_name/playpause
+bindsym $mod+Next exec curl http://localhost:2000/command/my_remote_name/prev
+bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
+```
+
+
 ### Features Implemented
 
 - Sync between computers (servers running on different computers)
+- Download from youtube and soundcloud
 - View full-resolution cover art
 - Full playlist support
 - Multiple selection

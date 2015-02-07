@@ -128,9 +128,6 @@ socket.on('command', function(data){
     case 'playpause':
       player.togglePlayState();
       break;
-    case 'playpause':
-      player.prevTrack();
-      break;
     default:
       break;
   }
