@@ -143,6 +143,8 @@ tr:hover .options{
   float: right;
   vertical-align: middle;
   margin-right: 10px;
+  position: relative;
+  z-index: 1;
 }
 .options:hover{
   color: #4BF;
@@ -150,6 +152,9 @@ tr:hover .options{
 .options-menu{
   max-height: 300px;
   overflow-y: scroll;
+}
+.song_text{
+  z-index: 0;
 }
 .colsearch:hover{
   text-decoration: underline;
