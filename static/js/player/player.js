@@ -58,7 +58,7 @@ function PlayState(){
     this.repeat_state = localStorage.getItem('repeat') || this.repeat_states.all;
     this.redrawRepeat();
     this.comp_name = localStorage.getItem('comp_name') || '';
-    this.onMobile = (window.location.pathname == "/mobile") ? true : false;
+    this.onMobile = on_mobile;
     socket.emit('set_comp_name', {name: this.comp_name});
   };
   this.setupCollections = function(){
