@@ -19,8 +19,7 @@ Run it on your computer or server containing your music library and then access 
 ##### Dependencies
 [node](http://nodejs.org/), [git](http://git-scm.com/)
 
-You will also need a package `taglib` installed. On Ubuntu and derivatives this is `libtag1-dev`, on Arch Linux `taglib`.
-On OSX you will need homebrew, the xcode developer tools, and then run `brew install taglib` to install taglib ([more info here](https://github.com/Homebrew/homebrew/wiki/Installation)). For the Youtube download and converison, make sure you have [ffmpeg](https://ffmpeg.org/) installed on your system (including all necessary encoding libraries like libmp3lame or libx264).
+For the Youtube download and converison, make sure you have [ffmpeg](https://ffmpeg.org/) installed on your system (including all necessary encoding libraries like libmp3lame or libx264).
 Windows support is not guaranteed and is up to someone else to submit any pull requests for windows support.
 
 Install with the following commands:
@@ -73,9 +72,3 @@ bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
 ### Planned features
 
 - See the projects public [Trello board](https://trello.com/b/cXdOSOoR/node-music-player) for features planned / implemented. If you want to request a feature, please [create an issue](https://github.com/benkaiser/node-music-player/issues/new).
-
-### FAQ
-
-#### Q: Why do you use taglib?
-
-A: We depend on the [musicmetadata](https://github.com/leetreveil/musicmetadata) library for scanning most song attributes including cover photos, however scanning song duration in [musicmetadata](https://github.com/leetreveil/musicmetadata) is really slow. Taglib solves this problem by implementing extremely fast scanning of track audio attributes (i.e song length). If you really wish to install without taglib, just strip out all the taglib code in `library_functions.js` (the application should function as normal, just without song durations displayed).

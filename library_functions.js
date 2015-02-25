@@ -1,7 +1,6 @@
 var fs = require('fs');
 var path = require('path');
 var mm = require('musicmetadata');
-var taglib = require('taglib');
 var md5 = require('MD5');
 var request = require('request');
 var mkdirp = require('mkdirp');
@@ -38,6 +37,8 @@ function findNextSong(){
   } else {
     console.log("finished!");
     broadcast("scan_update", {type: "finish", count: song_list.length, completed: song_list.length, details: "Finished"});
+    // run check for any missing durations in 5 seconds (in case there are a few still running)
+    setTimeout(checkDurationMissing, 5000);
     // reset for next scan
     cnt = 0;
     song_list = [];
@@ -66,7 +67,7 @@ function findSong(relative_location, callback){
           display_artist: normaliseArtist(result.albumartist, result.artist),
           genre: result.genre,
           year: result.year,
-          duration: result.duration,
+          duration: -1,
           play_count: (doc === null) ? 0 : doc.play_count || 0,
           location: relative_location,
           date_added: now_milli,
@@ -90,13 +91,14 @@ function findSong(relative_location, callback){
         if(doc === null){
           // insert the song
           app.db.songs.insert(song, function (err, newDoc){
-            taglib_fetch(relative_location, newDoc._id);
+            duration_fetch(relative_location, newDoc._id);
             // update the browser the song has been added
             broadcast("scan_update", {
               type: "add",
               count: song_list.length,
               completed: cnt,
-              details: "Added: " + newDoc.title + " - " + newDoc.albumartist
+              details: "Added: " + newDoc.title + " - " + newDoc.albumartist,
+              doc: newDoc
             });
             callback(null);
           });
@@ -107,12 +109,13 @@ function findSong(relative_location, callback){
           }
           // update the document
           app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
-            taglib_fetch(relative_location, doc._id);
+            duration_fetch(relative_location, doc._id);
             broadcast("scan_update", {
               type: "update",
               count: song_list.length,
               completed: cnt,
-              details: "Updated: " + song.title + " - " + song.artist
+              details: "Updated: " + song.title + " - " + song.artist,
+              doc: doc
             });
             callback(null);
           });
@@ -139,7 +142,7 @@ function findSong(relative_location, callback){
               display_artist: "Unknown (no tags)",
               genre: "Unknown",
               year: "Unknown",
-              duration: 0,
+              duration: -1,
               play_count: (doc === null) ? 0 : doc.play_count || 0,
               location: relative_location,
               date_added: now_milli,
@@ -147,13 +150,14 @@ function findSong(relative_location, callback){
             };
             if(doc === null){
               app.db.songs.insert(song, function (err, newDoc){
-                taglib_fetch(relative_location, newDoc._id);
+                duration_fetch(relative_location, newDoc._id);
                 // update the browser the song has been added
                 broadcast("scan_update", {
                   type: "add",
                   count: song_list.length,
                   completed: cnt,
-                  details: "Added: " + newDoc.title
+                  details: "Added: " + newDoc.title,
+                  doc: newDoc
                 });
                 callback(null);
               });
@@ -164,7 +168,7 @@ function findSong(relative_location, callback){
               }
               // update the document
               app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced){
-                taglib_fetch(relative_location, doc._id);
+                duration_fetch(relative_location, doc._id);
                 broadcast("scan_update", {
                   type: "update",
                   count: song_list.length,
@@ -208,10 +212,24 @@ function normaliseArtist(albumartist, artist){
   return (artist.length > albumartist.length) ? artist : albumartist;
 }
 
-function taglib_fetch(path, id){
-  // use taglib to fetch duration
-  taglib.read(config.music_dir + path, function(err, tag, audioProperties) {
-    app.db.songs.update({ _id: id }, { $set: { duration: audioProperties.length} });
+function duration_fetch(path, id){
+  // use musicmetadata with duration flag to fetch duration
+  var parser = new mm(fs.createReadStream(config.music_dir + path), { duration: true });
+  parser.on('metadata', function(result){
+    app.db.songs.update({ _id: id }, { $set: { duration: result.duration} });
+    broadcast("duration_update", {
+      _id: id,
+      new_duration: result.duration
+    });
+  });
+}
+
+function checkDurationMissing(){
+  app.db.songs.find({duration: -1}, function(err, docs){
+    console.log(docs);
+    for(var i in docs){
+      duration_fetch(docs[i].location, docs[i]._id);
+    }
   });
 }
 

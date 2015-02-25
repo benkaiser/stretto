@@ -97,7 +97,7 @@ socket.on('song_update', function(data){
   redrawInfoView();
 });
 var ScanMessenger = null;
-var ScanTemplate = "Scanned {{count}} out of {{completed}}{% if details %}: {{details}}{% endif %}";
+var ScanTemplate = "Scanned {{completed}} out of {{count}}{% if details %}: {{details}}{% endif %}";
 socket.on('scan_update', function(data){
   console.log(data);
   if(ScanMessenger === null){
@@ -105,6 +105,21 @@ socket.on('scan_update', function(data){
   } else {
     ScanMessenger.update(swig.render(ScanTemplate, {locals: data}));
   }
+  // do we need to remove it first?
+  if(data.type == "update"){
+    // remove the track
+    player.song_collection.remove(player.song_collection.where({_id: data.doc._id}));
+  }
+  // add the track
+  player.song_collection.add(data.doc);
+  // add the id to the library
+  if(data.type == "add"){
+    addToLibraryPlaylist(data.doc._id);
+  }
+});
+// for when the durations are added
+socket.on('duration_update', function(data){
+  player.song_collection.where({_id: data._id})[0].attributes.duration = data.new_duration;
 });
 // remote controll events
 var CommandMessenger = null;
@@ -134,9 +149,13 @@ socket.on('command', function(data){
 });
 
 function redrawSongsChangedModel(){
-  var sv = MusicApp.router.songview.render();
+  MusicApp.router.songview.render();
 }
 
 function redrawInfoView(){
   MusicApp.infoRegion.currentView.render();
+}
+
+function addToLibraryPlaylist(id){
+  player.playlist_collection.where({_id: "LIBRARY"})[0].attributes.songs.push({_id: id});
 }

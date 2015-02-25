@@ -39,7 +39,7 @@ function prettyPrintDateAdded(milliseconds){
 }
 
 function prettyPrintSecondsorNA(seconds){
-  if(seconds === 0){
+  if(seconds <= 0){
     return "N/A";
   } else {
     return prettyPrintSeconds(seconds);

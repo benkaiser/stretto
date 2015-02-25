@@ -20,7 +20,6 @@
     "request": "*",
     "soundcloud-resolver": "*",
     "swig": "*",
-    "taglib": "*",
     "ytdl-core": "*"
   }
 }
