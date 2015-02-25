@@ -11,7 +11,6 @@
     "async": "*",
     "express-http-proxy": "^0.3.0",
     "express.io": "*",
-    "fluent-ffmpeg": "~2.0.0-rc1",
     "mkdirp": "*",
     "mobile-detect": "^0.4.3",
     "musicmetadata": "*",
@@ -21,5 +20,8 @@
     "soundcloud-resolver": "*",
     "swig": "*",
     "ytdl-core": "*"
+  },
+  "optionalDependencies": {
+    "fluent-ffmpeg": "~2.0.0-rc1"
   }
 }
