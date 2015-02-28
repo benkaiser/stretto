@@ -54,12 +54,12 @@ function findNextSong(){
 function findSong(relative_location, callback){
   var found_metadata = false;
   // convert the filename into full path
-  var full_location = config.music_dir + relative_location;
+  var full_location = path.join(config.music_dir, relative_location);
   app.db.songs.findOne({location: relative_location}, function(err, doc){
     // only scan if we haven't scanned before, or we are scanning every document again
     if(doc === null || hard_rescan){
       // insert the new song
-      var parser = new mm(fs.createReadStream(full_location));
+      var parser = new mm(fs.createReadStream(full_location), {});
 
       parser.on('metadata', function(result){
         found_metadata = true;
