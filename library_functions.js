@@ -14,8 +14,8 @@ try {
   var ffmpeg = null;
 }
 
-var util = require(__dirname + '/util.js');
-var config = require(__dirname + '/config').config();
+var util = require(path.join(__dirname, 'util.js'));
+var config = require(path.join(__dirname, '/config')).config();
 
 // init the soundcloud resolver with the clientid
 var scres = new SoundcloudResolver(config.sc_client_id);
@@ -140,7 +140,7 @@ function findSong(relative_location, callback){
             console.log("Could not find metadata. Adding the song by filename.");
             // create a song with the filename as the title
             var song = {
-              title: relative_location.substr(relative_location.lastIndexOf("/") + 1, relative_location.length),
+              title: relative_location.substr(relative_location.lastIndexOf(path.sep) + 1, relative_location.length),
               album: "Unknown (no tags)",
               artist: "Unknown (no tags)",
               albumartist: "Unknown (no tags)",
@@ -593,7 +593,7 @@ exports.sync_import = function(app_ref, songs, url){
   var cnt = 0;
   async.until(function(){ return songs.length == cnt; }, function(callback){
     var file_url = config.music_dir + songs[cnt].location;
-    var folder_of_file = file_url.substring(0, file_url.lastIndexOf("/"));
+    var folder_of_file = file_url.substring(0, file_url.lastIndexOf(path.sep));
       // create the folder
       mkdirp(folder_of_file, function(){
         var song_file_url = config.music_dir + songs[cnt].location;

@@ -8,6 +8,7 @@ var opener = require('opener');
 var md5 = require('MD5');
 var request = require('request').defaults({ encoding: null });
 var fs = require('fs');
+var path = require('path');
 var MobileDetect = require('mobile-detect');
 /*
  * GET home page.
@@ -48,7 +49,7 @@ exports.createRoutes = function(app_ref){
   // remote control routes
   app.io.route('get_receivers', getReceiversMinusThis);
   // open file manager to location
-  app.io.route('open_dir', function(req){ opener(req.data.substring(0, req.data.lastIndexOf('/'))); });
+  app.io.route('open_dir', function(req){ opener(req.data.substring(0, req.data.lastIndexOf(path.sep))); });
   // update the info of a song
   app.io.route('update_song_info', updateSongInfo);
   // sync routes
@@ -80,7 +81,7 @@ function sendSong(req, res){
     if(err || !song){
       res.status(404).send();
     } else {
-      res.sendfile(config.music_dir + "/" + encodeURIComponent(song.location));
+      res.sendfile(path.join(config.music_dir, encodeURIComponent(song.location)));
     }
   });
 }
@@ -104,12 +105,12 @@ function downloadPlaylist(req, res){
       app.db.songs.findOne({_id: item._id}, function(err, song){
         if(err) throw err;
         var zip_location;
-        if(song.location.lastIndexOf("/") > 0){
-          zip_location = song.location.substring(0, song.location.lastIndexOf("/"));
+        if(song.location.lastIndexOf(path.sep) > 0){
+          zip_location = song.location.substring(0, song.location.lastIndexOf(path.sep));
         } else {
           zip_location = song.location;
         }
-        zip.addLocalFile(config.music_dir + "/" + song.location, zip_location);
+        zip.addLocalFile(path.join(config.music_dir, song.location), zip_location);
         callback();
       });
     }, function(err){

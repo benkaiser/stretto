@@ -1,5 +1,6 @@
 // This file is a bunch of utility functions
 var fs = require('fs');
+var path = require('path');
 
 var walk = function(dir, done) {
   var results = [];
@@ -13,7 +14,7 @@ var walk = function(dir, done) {
         if (!--pending) done(null, results, strip_results);
         return;
       }
-      file = dir + '/' + file;
+      file = path.join(dir, file);
       fs.stat(file, function(err, stat) {
         if (stat && stat.isDirectory()) {
           walk(file, function(err, res) {
