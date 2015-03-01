@@ -73,37 +73,36 @@ body{
 #bottom_bar:focus{
   outline: 0;
 }
-.duration{
+.duration, .current_time{
   position: fixed;
-  right: 0;
-  bottom: 48px;
+  pointer-events: none;
   display: none;
+  bottom: 63px;
 }
+.duration{
+  right: 0;
+}
+.current_time{
+  left: 0;
+}
+#bottom_bar:hover .current_time,
 #bottom_bar:hover .duration{
   display: block;
   background-color: #4BF;
   z-index: 2;
   padding: 2px;
+  color: #fff;
+}
+#bottom_bar:hover .duration{
   padding-left: 5px;
   border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  color: #fff;
-}
-.current_time{
-  position: fixed;
-  left: 0;
-  bottom: 48px;
-  display: none;
 }
 #bottom_bar:hover .current_time{
-  display: block;
-  background-color: #4BF;
-  z-index: 2;
-  padding: 2px;
   padding-right: 5px;
   border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  color: #fff;
+}
+.slider-track{
+  border-radius: 0px;
 }
 .disable_selection{
   -webkit-touch-callout: none;
