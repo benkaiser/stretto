@@ -3,7 +3,7 @@ path = require('path');
 exports.config = function(){
   data = {
     // edit below here
-    music_dir: "/home/benkaiser/Music/",
+    music_dir: "C:/Users/benkaiser/Music",
     sc_dl_dir: "soundcloud",
     sc_client_id: "062e8dac092fe1ed9e16ee10dd88d566",
     youtube: {
