@@ -12,12 +12,12 @@ module.exports = function(grunt) {
     // because grunt-bower-task doesn't correctly move font-awesome
     copy: {
       fontawesome_fonts: {
-        src: 'bower_components/components-font-awesome/fonts/*',
+        src: 'bower_components/font-awesome-bower/fonts/*',
         dest: 'static/lib/font-awesome-bower/fonts/',
         expand: true, flatten: true, filter: 'isFile'
       },
       fontawesome_css: {
-        src: 'bower_components/components-font-awesome/css/*',
+        src: 'bower_components/font-awesome-bower/css/*',
         dest: 'static/lib/font-awesome-bower/css/',
         expand: true, flatten: true, filter: 'isFile'
       },
