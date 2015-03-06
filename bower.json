@@ -21,7 +21,8 @@
     "tablesort": "https://github.com/tristen/tablesort.git#~3.0.2",
     "jquery.ui": "~1.11.3",
     "socket.io-client": "0.x",
-    "font-awesome-bower": "~4.3.0"
+    "font-awesome-bower": "~4.3.0",
+    "seiyria-bootstrap-slider": "~4.5.1"
   },
   "resolutions": {
     "underscore": "~1.7.0"
