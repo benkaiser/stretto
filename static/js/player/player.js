@@ -69,7 +69,7 @@ function PlayState(){
   };
   this.update = function(){
     if(this.is_playing && !this.isSeeking){
-      this.scrub.slider('setValue', this.current_track.currentTime / this.current_track.duration * 100.0);
+      this.scrub.slider('setValue', this.current_track.currentTime / this.current_track.duration * 100.0, false);
       var seconds = prettyPrintSeconds(this.current_track.currentTime);
       $(".current_time").html(seconds);
     }
@@ -361,8 +361,14 @@ function PlayState(){
   this.setScubElem = function(elem){
     this.scrub = elem;
     this.scrub.slider()
-      .on('slide', function(){ player.scrubTimeout(); })
-      .on('slideStop', function(){ player.scrubTimeoutComplete(); });
+      /* disable seeking as soon as slide / click starts.
+      * this was added due to an issue causing the slider to update to the old
+      * duration even when a click was triggered because of the delay for the
+      * slideStop
+      */
+      .on('slideStart', function(){ player.isSeeking = true; })
+      .on('slide', function(slideEvt){ player.scrub_value = slideEvt.value; player.scrubTimeout(); })
+      .on('slideStop', function(slideEvt){ player.scrub_value = slideEvt.value; player.scrubTimeoutComplete(); });
   };
   this.setVolElem = function(elem){
     this.vol = elem;
@@ -379,13 +385,13 @@ function PlayState(){
     this.scrubberTimeout = setTimeout(function(){ player.scrubTimeoutComplete(); }, 1000);
     this.isSeeking = true;
     // update the time to show the current scrub value
-    var seconds = prettyPrintSeconds(this.current_track.duration * this.scrub.slider('getValue') / 100.00);
+    var seconds = prettyPrintSeconds(this.current_track.duration * this.scrub_value / 100.00);
     $(".current_time").html(seconds);
   };
   this.scrubTimeoutComplete = function(){
     clearTimeout(this.scrubberTimeout);
     this.isSeeking = false;
-    this.scrubTo(this.scrub.slider('getValue'));
+    this.scrubTo(this.scrub_value);
   };
   // scrub to percentage in current track
   this.scrubTo = function(value){
