@@ -5,7 +5,7 @@ Node Music Player
 ![screenshot](https://cloud.githubusercontent.com/assets/608054/3919259/b1ab3a00-23a5-11e4-94ad-859051b06626.jpg)
 
 ### Live Demo
-You can view a version I have hosted on one of my personal servers at [http://xpressen.com:2020](http://xpressen.com:2020).
+You can view a version I have hosted on one of my personal server at [http://music.kaiserapps.com/](http://music.kaiserapps.com/).
 
 To have the full functionality and to use your own music please follow the install instructions below.
 
