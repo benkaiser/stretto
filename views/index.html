@@ -10,6 +10,7 @@
     <li><a class='pointer' id='youtube_fetch'>From Youtube</a></li>
   </ul>
 </li>
+<li><a id='open_settings' class='pointer'><i class="fa fa-cog"></i> Settings</a></li>
 {% endblock %}
 
 {% block content %}
@@ -223,6 +224,28 @@
       </div>
     </div>
   </div>
+</script>
+<!-- settings view templates -->
+<script type="text/swig" id="settings_template">
+<div>
+{% if message %}
+<div class="alert alert-success">{{message}}</div>
+{% endif %}
+<form class="form-horizontal clearfix edit_form" role="form">
+  <div class="form-group">
+    <label for="music_dir_val" class="col-sm-2 control-label">Music Directory</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="music_dir_val" value="{{music_dir}}">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="country_code" class="col-sm-2 control-label">Country Code</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="country_code" value="{{country_code}}">
+    </div>
+  </div>
+</form>
+</div>
 </script>
 <!-- sync templates/data -->
 <script type="text/swig" id='sync_body_template'>

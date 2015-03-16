@@ -21,6 +21,9 @@ Run it on your computer or server containing your music library and then access 
 ##### Dependencies
 [node](http://nodejs.org/), [git](http://git-scm.com/)
 
+##### NPM Global Dependencies
+[grunt-cli](http://gruntjs.com/getting-started#installing-the-cli), [nodemon](http://nodemon.io/)
+
 For the Youtube download and converison, make sure you have [ffmpeg](https://ffmpeg.org/) installed on your system (including all necessary encoding libraries like libmp3lame or libx264).
 Windows support is not guaranteed and is up to someone else to submit any pull requests for windows support.
 
@@ -31,13 +34,11 @@ cd node-music-player/
 npm install
 ```
 
-Edit the `config.js` file and set `music_dir` to be the folder you want to be scanned for your music.
-
 Then run the server with:
 ```
 node app.js
 ```
-Go to `localhost:2000` in your browser (or known ip of server if it is on a different machine). From there click the `Scan Library` tab at the top of the page. From there select `Start Scan` and let it do it's magic. Once your library is scanned you should be able to access it from the `Music` tab up the top.
+Go to `localhost:2000` in your browser (or known ip of server if it is on a different machine). From there a prompt will show so you can change your music directory, after saving your music directory you can click `Scan Library -> Regular Scan` at the top of the page. From there select `Start Scan` and let it do it's magic adding all the songs to your library. Happy listening!
 
 ### Android Sync App
 

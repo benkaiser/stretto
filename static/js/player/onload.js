@@ -110,6 +110,13 @@ $(document).ready(function(){
       }
     });
   });
+  $("#open_settings").click(function(){
+    showSettings();
+  });
+  // ask them if they would like to view the settings on first load
+  if(!music_dir_set){
+    showSettings("Welcome! Please ensure your music directory is correct.");
+  }
   // scan library handlers
   $("#soft_scan").click(function(){
     socket.emit('start_scan');

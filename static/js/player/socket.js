@@ -153,6 +153,10 @@ socket.on('command', function(data){
       break;
   }
 });
+// generic info message reciever
+socket.on('message', function(data){
+  Messenger().post(data.message);
+});
 
 function redrawSongsChangedModel(){
   MusicApp.router.songview.render();

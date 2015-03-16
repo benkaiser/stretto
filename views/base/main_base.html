@@ -15,6 +15,7 @@
     "/static/css/main.css"
     );
   var music_dir = "{{music_dir}}";
+  var music_dir_set = "{{music_dir_set}}" === "true";
   </script>
   {% block head %}
   {% endblock %}
@@ -49,6 +50,7 @@
       "/static/js/player/player.js",
       "/static/js/player/socket.js",
       "/static/js/player/backbone_setup.js",
+      "/static/js/player/settingsview.js",
       "/static/js/player/onload.js",
       "/static/js/player/songview.js",
       "/static/js/player/selection_options.js",

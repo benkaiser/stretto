@@ -57,6 +57,8 @@ exports.createRoutes = function(app_ref){
   // soundcloud downloading
   app.io.route('soundcloud_download', soundcloudDownload);
   app.io.route('youtube_download', youtubeDownload);
+  // settings updating
+  app.io.route('update_settings', updateSettings);
 };
 
 function musicRoute(req, res){
@@ -438,4 +440,32 @@ function soundcloudDownload(req){
 // download the youtube song
 function youtubeDownload(req){
   lib_func.ytDownload(app, req.data.url);
+}
+
+// update the app settings
+function updateSettings(req){
+  // emit the settings updated message to the client
+  req.io.emit("message", {message: "Settings Updated"});
+  // update the settings
+  if(req.data.music_dir){
+    // first remove all music_dir settings
+    app.db.settings.remove({key: "music_dir"}, {multi: true}, function(){
+    // add a new one in
+    app.db.settings.insert({key: "music_dir", value: req.data.music_dir}, function(){
+      // update config
+      app.get('config').music_dir = req.data.music_dir;
+      app.get('config').music_dir_set = true;
+      });
+    });
+  }
+  if(req.data.country_code){
+    // first remove all country_code settings
+    app.db.settings.remove({key: "country_code"}, {multi: true}, function(){
+    // add a new one in
+    app.db.settings.insert({key: "country_code", value: req.data.country_code}, function(){
+      // update config
+      app.get('config').country_code = req.data.country_code;
+      });
+    });
+  }
 }
