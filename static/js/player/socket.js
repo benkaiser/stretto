@@ -19,11 +19,21 @@ socket.on('playlists', function(data){
   // restart the router if we are loading for the first time
   loadedRestart("playlists");
 });
+// mask to either update or initialise a messenger
+var updateMask = function(messenger, message){
+    if(messenger){
+      messenger.update(message);
+    } else {
+      messenger = Messenger().post(message);
+    }
+    return messenger;
+};
+
 var SCMessenger = null;
 socket.on('sc_update', function(data){
   console.log(data);
   if(data.type == "started"){
-    SCMessenger = Messenger().post("Starting download from SoundCloud of " + data.count + " tracks" + (not_streamable > 0 ? " (" + data.not_streamable + " not streamable)" : ""));
+    SCMessenger = Messenger().post("Starting download from SoundCloud of " + data.count + " tracks" + (data.not_streamable > 0 ? " (" + data.not_streamable + " not streamable)" : ""));
   } else if(data.type == "added"){
     // it came with a song
     player.song_collection.add(data.content);
@@ -32,7 +42,7 @@ socket.on('sc_update', function(data){
     if(data.complete == data.count){
       msg = "last song of SoundCloud download";
     }
-    SCMessenger.update("Added " + msg + " (" + data.content.title + ")");
+    SCMessenger = updateMask(SCMessenger, "Added " + msg + " (" + data.content.title + ")");
     // add the song to the SoundCloud playlist
     var sc_plist = player.playlist_collection.getByTitle("SoundCloud").attributes;
     sc_plist.songs.push({_id: data.content._id});
@@ -46,9 +56,9 @@ socket.on('sc_update', function(data){
       redrawSongsChangedModel();
     }
   } else if(data.type == "skipped"){
-    SCMessenger.update("Skipped song " + data.completed + ". Unable to read from SoundCloud");
+    SCMessenger = updateMask(SCMessenger, "Skipped song " + data.completed + ". Unable to read from SoundCloud");
   } else if(data.type == "error"){
-    SCMessenger.update("Soundcloud track already exists");
+    SCMessenger = updateMask(SCMessenger, "Soundcloud track already exists");
   }
 });
 var YTMessenger = null;
@@ -58,7 +68,7 @@ socket.on('yt_update', function(data){
     YTMessenger = Messenger().post("Starting download from Youtube");
   } else if(data.type == "added") {
     player.song_collection.add(data.content);
-    YTMessenger.update("Added " + data.content.title);
+    YTMessenger = updateMask(YTMessenger, "Added " + data.content.title);
     var yt_plist = player.playlist_collection.getByTitle("Youtube").attributes;
     yt_plist.songs.push({_id: data.content._id});
     if(player.playlist.title == "Youtube"){
@@ -69,11 +79,7 @@ socket.on('yt_update', function(data){
       redrawSongsChangedModel();
     }
   } else if(data.type == "error") {
-    if(YTMessenger !== null) {
-      YTMessenger.update(data.content);
-    } else {
-      YTMessenger = Messenger().post(data.content);
-    }
+    YTMessenger = updateMask(YTMessenger, data.content);
   }
 });
 var SongMessenger = null;
