@@ -2,6 +2,8 @@ Node Music Player
 =================
 #### An open source web-based music player
 
+[![Join the chat at https://gitter.im/benkaiser/node-music-player](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/benkaiser/node-music-player?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![screenshot](https://cloud.githubusercontent.com/assets/608054/3919259/b1ab3a00-23a5-11e4-94ad-859051b06626.jpg)
 
 ### Live Demo
