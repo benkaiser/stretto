@@ -229,6 +229,7 @@ tr:hover .options{
   position: fixed;
   bottom: 55px;
   left: 0px;
+  z-index: 1;
 }
 #vol_bar_slider{
   margin-right: 20px;
