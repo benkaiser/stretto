@@ -22,6 +22,8 @@ mkdirp(__dirname + '/dbs/covers', function(){
   require(__dirname + '/db.js')(app);
   // patch the app
   require(__dirname + '/patches.js')(app);
+  // attach the config
+  app.set('config', require(__dirname + '/config')(app));
 });
 
 

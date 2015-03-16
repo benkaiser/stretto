@@ -15,10 +15,6 @@ try {
 }
 
 var util = require(path.join(__dirname, 'util.js'));
-var config = require(path.join(__dirname, '/config')).config();
-
-// init the soundcloud resolver with the clientid
-var scres = new SoundcloudResolver(config.sc_client_id);
 
 // init other variables
 var running = false;
@@ -54,7 +50,7 @@ function findNextSong(){
 function findSong(relative_location, callback){
   var found_metadata = false;
   // convert the filename into full path
-  var full_location = path.join(config.music_dir, relative_location);
+  var full_location = path.join(app.get('config').music_dir, relative_location);
   app.db.songs.findOne({location: relative_location}, function(err, doc){
     // only scan if we haven't scanned before, or we are scanning every document again
     if(doc === null || hard_rescan){
@@ -211,7 +207,7 @@ function normaliseArtist(albumartist, artist){
 
 function duration_fetch(path, id){
   // use musicmetadata with duration flag to fetch duration
-  var parser = new mm(fs.createReadStream(config.music_dir + path), { duration: true });
+  var parser = new mm(fs.createReadStream(app.get('config').music_dir + path), { duration: true });
   parser.on('metadata', function(result){
     app.db.songs.update({ _id: id }, { $set: { duration: result.duration} });
     broadcast("duration_update", {
@@ -277,7 +273,7 @@ exports.scanLibrary = function(app_ref, hard){
   app = app_ref;
   hard_rescan = hard;
   now_milli = Date.now();
-  util.walk(config.music_dir, function(err, list){
+  util.walk(app.get('config').music_dir, function(err, list){
     if(err){
       console.log(err);
     }
@@ -285,7 +281,7 @@ exports.scanLibrary = function(app_ref, hard){
     // list with paths with music_dir removed
     var stripped = [];
     for(var cnt = 0; cnt < list.length; cnt++){
-      stripped.push(list[cnt].replace(config.music_dir, ""));
+      stripped.push(list[cnt].replace(app.get('config').music_dir, ""));
     }
 
     clearNotIn(stripped);
@@ -334,6 +330,8 @@ exports.addToPlaylist = addToPlaylist;
 
 exports.scDownload = function(app_ref, url){
   app = app_ref;
+  // init the soundcloud resolver with the clientid
+  var scres = new SoundcloudResolver(app.get('config').sc_client_id);
   // set the time these songs are added
   now_milli = Date.now();
   // resolve the tracks
@@ -361,7 +359,7 @@ exports.scDownload = function(app_ref, url){
         completed: 0
       });
       // make sure the dl dir is existent
-      var out_dir = path.join(config.music_dir, config.sc_dl_dir);
+      var out_dir = path.join(app.get('config').music_dir, app.get('config').sc_dl_dir);
       mkdirp(out_dir, function(){
         // start an async loop to download the songs
         var finished = false;
@@ -381,7 +379,7 @@ exports.scDownload = function(app_ref, url){
             year: current_track.release_year  || '2014',
             duration: current_track.duration/1000, // in milliseconds
             play_count: 0,
-            location: location.replace(config.music_dir, ""),
+            location: location.replace(app.get('config').music_dir, ""),
             date_added: now_milli,
             date_modified: now_milli
           };
@@ -405,7 +403,7 @@ exports.scDownload = function(app_ref, url){
           fs.exists(location, function(exists){
             if(!exists){
               // download the song
-              request(current_track.stream_url + "?client_id=" + config.sc_client_id, function(error, response, body){
+              request(current_track.stream_url + "?client_id=" + app.get('config').sc_client_id, function(error, response, body){
                 // if it was an rmtp stream / didn't download
                 if(response.headers['content-length'] == 1){
                   // remove the file
@@ -466,7 +464,7 @@ exports.ytDownload = function(app_ref, url, callback) {
     app = app_ref;
     now_milli = Date.now();
     var trackInfo = null;
-    var out_dir = path.join(config.music_dir, config.youtube.dl_dir);
+    var out_dir = path.join(app.get('config').music_dir, app.get('config').youtube.dl_dir);
     var location = null;
     mkdirp(out_dir, function(){
       async.waterfall([
@@ -537,7 +535,7 @@ exports.ytDownload = function(app_ref, url, callback) {
             year: new Date().getFullYear(),
             duration: trackInfo.length_seconds,
             play_count: 0,
-            location: location.replace(config.music_dir, ""),
+            location: location.replace(app.get('config').music_dir, ""),
             date_added: now_milli,
             date_modified: now_milli
           };
@@ -584,11 +582,11 @@ exports.sync_import = function(app_ref, songs, url){
   // import the songs
   var cnt = 0;
   async.until(function(){ return songs.length == cnt; }, function(callback){
-    var file_url = config.music_dir + songs[cnt].location;
+    var file_url = app.get('config').music_dir + songs[cnt].location;
     var folder_of_file = file_url.substring(0, file_url.lastIndexOf(path.sep));
       // create the folder
       mkdirp(folder_of_file, function(){
-        var song_file_url = config.music_dir + songs[cnt].location;
+        var song_file_url = app.get('config').music_dir + songs[cnt].location;
         // download the file
         request(url + "/songs/" + songs[cnt]._id).on('end', function(){
           // once the song has been transferred successfully

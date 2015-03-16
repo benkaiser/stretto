@@ -1,6 +1,5 @@
 var util = require(__dirname + '/../util.js');
 var lib_func = require(__dirname + '/../library_functions.js');
-var config = require(__dirname + '/../config').config();
 var async = require('async');
 var AdmZip = require('adm-zip');
 var os = require('os');
@@ -68,8 +67,9 @@ function musicRoute(req, res){
     // render the view
     res.render((md.mobile() ? 'mobile' : 'index'), {
       menu: !md.mobile(),
-      music_dir: config.music_dir,
-      country_code: config.country_code,
+      music_dir: app.get('config').music_dir,
+      music_dir_set: app.get('config').music_dir_set,
+      country_code: app.get('config').country_code,
       ip: ip + ":" + app.get('port'),
       remote_name: req.params.name
     });
@@ -81,7 +81,7 @@ function sendSong(req, res){
     if(err || !song){
       res.status(404).send();
     } else {
-      res.sendfile(path.join(config.music_dir, encodeURIComponent(song.location)));
+      res.sendfile(path.join(app.get('config').music_dir, encodeURIComponent(song.location)));
     }
   });
 }
@@ -110,7 +110,7 @@ function downloadPlaylist(req, res){
         } else {
           zip_location = song.location;
         }
-        zip.addLocalFile(path.join(config.music_dir, song.location), zip_location);
+        zip.addLocalFile(path.join(app.get('config').music_dir, song.location), zip_location);
         callback();
       });
     }, function(err){
