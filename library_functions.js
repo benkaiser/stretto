@@ -207,13 +207,14 @@ function normaliseArtist(albumartist, artist){
 
 function duration_fetch(path, id){
   // use musicmetadata with duration flag to fetch duration
-  var parser = new mm(fs.createReadStream(app.get('config').music_dir + path), { duration: true });
-  parser.on('metadata', function(result){
-    app.db.songs.update({ _id: id }, { $set: { duration: result.duration} });
-    broadcast("duration_update", {
-      _id: id,
-      new_duration: result.duration
-    });
+  var parser = new mm(fs.createReadStream(app.get('config').music_dir + path), { duration: true }, function(err, result){
+    if(!err){
+      app.db.songs.update({ _id: id }, { $set: { duration: result.duration} });
+      broadcast("duration_update", {
+        _id: id,
+        new_duration: result.duration
+      });
+    }
   });
 }
 
