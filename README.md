@@ -24,10 +24,15 @@ Run it on your computer or server containing your music library and then access 
 ##### NPM Global Dependencies
 [grunt-cli](http://gruntjs.com/getting-started#installing-the-cli), [nodemon](http://nodemon.io/)
 
+To install these, use:
+```
+sudo npm install -g grunt-cli nodemon
+```
+
 For the Youtube download and converison, make sure you have [ffmpeg](https://ffmpeg.org/) installed on your system (including all necessary encoding libraries like libmp3lame or libx264).
 Windows support is not guaranteed and is up to someone else to submit any pull requests for windows support.
 
-Install with the following commands:
+After all the dependencies have been installed, run these commands to install the music player:
 ```
 git clone https://github.com/benkaiser/node-music-player.git
 cd node-music-player/
