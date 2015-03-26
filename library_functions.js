@@ -405,8 +405,11 @@ exports.scDownload = function(app_ref, url){
             if(!exists){
               // download the song
               request(current_track.stream_url + "?client_id=" + app.get('config').sc_client_id, function(error, response, body){
+                if(error){
+                  console.log("Error downloading soundcloud track: " + error);
+                }
                 // if it was an rmtp stream / didn't download
-                if(response.headers['content-length'] == 1){
+                if(!response || response.headers['content-length'] == 1){
                   // remove the file
                   fs.unlink(location);
                   // update the client
