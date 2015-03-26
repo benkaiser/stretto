@@ -66,15 +66,25 @@ function musicRoute(req, res){
   md = new MobileDetect(req.headers['user-agent']);
   // get ip (for syncing functions)
   util.getip(function(ip){
-    // render the view
-    res.render((md.mobile() ? 'mobile' : 'index'), {
-      menu: !md.mobile(),
-      music_dir: app.get('config').music_dir,
-      music_dir_set: app.get('config').music_dir_set,
-      country_code: app.get('config').country_code,
-      ip: ip + ":" + app.get('port'),
-      remote_name: req.params.name
-    });
+    // the function to send the homepage only when the config is finished initalizing
+    var sendHome = function(){
+      // render the view
+      res.render((md.mobile() ? 'mobile' : 'index'), {
+        menu: !md.mobile(),
+        music_dir: app.get('config').music_dir,
+        music_dir_set: app.get('config').music_dir_set,
+        country_code: app.get('config').country_code,
+        ip: ip + ":" + app.get('port'),
+        remote_name: req.params.name
+      });
+    };
+    // logic to wait for config to initialise
+    var config = app.get('config');
+    if(config.initialized){
+      sendHome();
+    } else {
+      config.initializedFn = sendHome;
+    }
   });
 }
 
