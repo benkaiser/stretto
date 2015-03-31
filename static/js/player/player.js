@@ -224,6 +224,29 @@ function PlayState(){
     if(cover_is_visible && cover_is_current && this.current_song.attributes.cover_location){
       showCover("/cover/" + this.current_song.attributes.cover_location);
     }
+    var notifTitle = "Playing: " + this.current_song.attributes.title;
+    console.log(this.current_song);
+    var notifOptions = {
+      dir: "auto",
+      body: "Album: " + this.current_song.attributes.album + "\nArtist: " + this.current_song.attributes.display_artist,
+      icon: "/cover/" + this.current_song.attributes.cover_location
+    }
+    //send a song change notification to the desktop:
+    if ("Notification" in window) {
+      if (Notification.permission === "granted") {
+        var notification = new Notification(notifTitle, notifOptions);
+        setTimeout(notification.close.bind(notification), 4321);
+      }
+      else if (Notification.permission !== 'denied') {
+        Notification.requestPermission(function (permission) {
+          var notification;
+          if (permission === "granted") {
+            notification = new Notification(notifTitle, notifOptions);
+          }
+          setTimeout(notification.close.bind(notification), 4321);
+        });
+      }
+    }
   };
   this.setIsPlaying = function(isPlaying){
     this.is_playing = isPlaying;
