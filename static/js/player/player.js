@@ -224,26 +224,33 @@ function PlayState(){
     if(cover_is_visible && cover_is_current && this.current_song.attributes.cover_location){
       showCover("/cover/" + this.current_song.attributes.cover_location);
     }
-    var notifTitle = "Playing: " + this.current_song.attributes.title;
-    console.log(this.current_song);
-    var notifOptions = {
-      dir: "auto",
-      body: "Album: " + this.current_song.attributes.album + "\nArtist: " + this.current_song.attributes.display_artist,
-      icon: "/cover/" + this.current_song.attributes.cover_location
-    }
-    //send a song change notification to the desktop:
+    // send a song change notification to the desktop:
     if ("Notification" in window) {
+      var showNotifiaction = function(){
+        // build the notification data
+        var notifTitle = "Playing: " + this.current_song.attributes.title;
+        var notifOptions = {
+          dir: "auto",
+          body: "Album: " + this.current_song.attributes.album + "\nArtist: " + this.current_song.attributes.display_artist,
+          icon: "/cover/" + this.current_song.attributes.cover_location
+        };
+        if(this.lastNotificationTimeout){
+          clearTimeout(this.lastNotificationTimeout);
+          this.lastNotification.close();
+        }
+        // show the notifiaction
+        this.lastNotification = new Notification(notifTitle, notifOptions);
+        // close the notification after a timeout
+        this.lastNotificationTimeout = setTimeout(this.lastNotification.close.bind(this.lastNotification), 4321);
+      };
+      // check if we have permission, if not, ask for it
       if (Notification.permission === "granted") {
-        var notification = new Notification(notifTitle, notifOptions);
-        setTimeout(notification.close.bind(notification), 4321);
-      }
-      else if (Notification.permission !== 'denied') {
+        showNotifiaction.bind(this)();
+      } else if (Notification.permission !== 'denied') {
         Notification.requestPermission(function (permission) {
-          var notification;
-          if (permission === "granted") {
-            notification = new Notification(notifTitle, notifOptions);
+          if(permission === "granted"){
+            showNotifiaction().bind(this)();
           }
-          setTimeout(notification.close.bind(notification), 4321);
         });
       }
     }
