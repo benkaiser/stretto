@@ -43,10 +43,17 @@ var contains = function(a, obj){
 exports.contains = contains;
 
 // function to get the IP of the current machine on the network
+var cached_ip = null;
 var getip = function(callback){
-  require('dns').lookup(require('os').hostname(), function (err, add, fam) {
-    callback(add);
-  });
+  if (cached_ip == null) {
+    require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+      callback(add);
+      // save it for the next call
+      cached_ip = add;
+    });
+  } else {
+    callback(cached_ip);
+  }
 }
 exports.getip = getip;
 
