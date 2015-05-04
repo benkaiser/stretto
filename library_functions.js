@@ -670,10 +670,15 @@ function saveID3(songData){
     ffmetadata.write(destinationFile, data, options, function(err) {
       if (err) {
         console.log('Error writing id3 tags to file: ' + err);
+      } else {
+        console.log('Successfully wrote id3 tags to file: ' + destinationFile);
       }
     });
   }
 }
+
+// make the function visible outside this module
+exports.saveID3 = saveID3;
 
 function broadcast(id, message){
   app.io.broadcast(id, message);

@@ -55,6 +55,8 @@ exports.createRoutes = function(app_ref){
   app.io.route('open_dir', function(req){ opener(req.data.substring(0, req.data.lastIndexOf(path.sep))); });
   // update the info of a song
   app.io.route('update_song_info', updateSongInfo);
+  // rewrite tags of a track to the file
+  app.io.route('rewrite_tags', rewriteTags);
   // sync routes
   app.io.route('sync_page_connected', syncPageConnected);
   app.io.route('sync_playlists', syncPlaylists);
@@ -361,6 +363,19 @@ function updateSongInfo(req){
       process_cover(image.type, image.data);
     }
   }
+}
+
+// write the tags (metadata) from the database to the files for the given items
+function rewriteTags(req) {
+  var items = req.data.items;
+  app.db.songs.find({ _id: { $in: items }}, function(err, songs) {
+    if (!err && songs) {
+      // write the tags for all the given files
+      for (var i in songs) {
+        lib_func.saveID3(songs[i]);
+      }
+    }
+  });
 }
 
 // controller routes
