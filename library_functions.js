@@ -268,8 +268,12 @@ function remove_scanned(list, callback){
   });
 }
 
-exports.scanItems = function(app_ref, locations){
-  app = app_ref;
+// must be called before anything else
+exports.setApp = function(appRef) {
+  app = appRef;
+};
+
+exports.scanItems = function(locations){
   hard_rescan = true;
   running = true;
   now_milli = Date.now();
@@ -277,8 +281,7 @@ exports.scanItems = function(app_ref, locations){
   findNextSong();
 };
 
-exports.scanLibrary = function(app_ref, hard){
-  app = app_ref;
+exports.scanLibrary = function(hard){
   hard_rescan = hard;
   now_milli = Date.now();
   util.walk(app.get('config').music_dir, function(err, list){
@@ -336,8 +339,7 @@ var addToPlaylist = function(song_id, playlist_name){
 // make it visible outside this module
 exports.addToPlaylist = addToPlaylist;
 
-exports.scDownload = function(app_ref, url){
-  app = app_ref;
+exports.scDownload = function(url){
   // init the soundcloud resolver with the clientid
   var scres = new SoundcloudResolver(app.get('config').sc_client_id);
   // set the time these songs are added
@@ -473,9 +475,8 @@ exports.scDownload = function(app_ref, url){
   });
 };
 
-exports.ytDownload = function(app_ref, url, callback) {
+exports.ytDownload = function(url, callback) {
   if(ffmpeg){
-    app = app_ref;
     now_milli = Date.now();
     var trackInfo = null;
     var out_dir = path.join(app.get('config').music_dir, app.get('config').youtube.dl_dir);
@@ -588,8 +589,7 @@ exports.ytDownload = function(app_ref, url, callback) {
   }
 };
 
-exports.sync_import = function(app_ref, songs, url){
-  app = app_ref;
+exports.sync_import = function(songs, url){
   // extact the app start time
   now_milli = app.get('started');
   // clean up the url
