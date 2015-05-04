@@ -14,6 +14,13 @@ try {
   var ffmpeg = null;
 }
 
+// ffmetadata is also optional, allow failure of loading
+try {
+  var ffmetadata = require('ffmetadata');
+} catch (err) {
+  var ffmetadata = null;
+}
+
 var util = require(path.join(__dirname, 'util.js'));
 
 // init other variables
@@ -398,6 +405,9 @@ exports.scDownload = function(app_ref, url){
               });
               // enter next iteration
               callback();
+
+              // lazy save the id3 tags to the file
+              saveID3(song);
             });
           };
           // check if we need to download it
@@ -550,6 +560,9 @@ exports.ytDownload = function(app_ref, url, callback) {
               type: "added",
               content: newDoc
             });
+
+            // lazy save the id3 tags to the file
+            saveID3(song);
           });
         } else {
           if(typeof error != Object) {
@@ -631,6 +644,36 @@ exports.sync_import = function(app_ref, songs, url){
 exports.stopScan = function(app){
   running = false;
 };
+
+function saveID3(songData){
+  // did we successfully load the ffmetadata library
+  if (ffmetadata) {
+    // only commit the fields ffmpeg will honor: http://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata#MP3
+    var data = {
+      title: songData.title,
+      author: songData.artist,
+      album: songData.album,
+      year: songData.year,
+      genre: songData.genre
+    };
+
+    // add the cover art if available
+    var options = {};
+    if (songData.cover_location) {
+      // assign it in array format with 1 element
+      options.attachments = [path.join(app.get('root') + '/dbs/covers/' + songData.cover_location)];
+    }
+
+    var destinationFile = path.join(app.get('config').music_dir, songData.location);
+
+    // write the to the id3 tags on the file
+    ffmetadata.write(destinationFile, data, options, function(err) {
+      if (err) {
+        console.log('Error writing id3 tags to file: ' + err);
+      }
+    });
+  }
+}
 
 function broadcast(id, message){
   app.io.broadcast(id, message);
