@@ -14,6 +14,13 @@ try {
   var ffmpeg = null;
 }
 
+// ffmetadata is also optional, allow failure of loading
+try {
+  var ffmetadata = require('ffmetadata');
+} catch (err) {
+  var ffmetadata = null;
+}
+
 var util = require(path.join(__dirname, 'util.js'));
 
 // init other variables
@@ -261,8 +268,12 @@ function remove_scanned(list, callback){
   });
 }
 
-exports.scanItems = function(app_ref, locations){
-  app = app_ref;
+// must be called before anything else
+exports.setApp = function(appRef) {
+  app = appRef;
+};
+
+exports.scanItems = function(locations){
   hard_rescan = true;
   running = true;
   now_milli = Date.now();
@@ -270,8 +281,7 @@ exports.scanItems = function(app_ref, locations){
   findNextSong();
 };
 
-exports.scanLibrary = function(app_ref, hard){
-  app = app_ref;
+exports.scanLibrary = function(hard){
   hard_rescan = hard;
   now_milli = Date.now();
   util.walk(app.get('config').music_dir, function(err, list){
@@ -329,8 +339,7 @@ var addToPlaylist = function(song_id, playlist_name){
 // make it visible outside this module
 exports.addToPlaylist = addToPlaylist;
 
-exports.scDownload = function(app_ref, url){
-  app = app_ref;
+exports.scDownload = function(url){
   // init the soundcloud resolver with the clientid
   var scres = new SoundcloudResolver(app.get('config').sc_client_id);
   // set the time these songs are added
@@ -398,6 +407,9 @@ exports.scDownload = function(app_ref, url){
               });
               // enter next iteration
               callback();
+
+              // lazy save the id3 tags to the file
+              saveID3(song);
             });
           };
           // check if we need to download it
@@ -463,9 +475,8 @@ exports.scDownload = function(app_ref, url){
   });
 };
 
-exports.ytDownload = function(app_ref, url, callback) {
+exports.ytDownload = function(url, callback) {
   if(ffmpeg){
-    app = app_ref;
     now_milli = Date.now();
     var trackInfo = null;
     var out_dir = path.join(app.get('config').music_dir, app.get('config').youtube.dl_dir);
@@ -550,6 +561,9 @@ exports.ytDownload = function(app_ref, url, callback) {
               type: "added",
               content: newDoc
             });
+
+            // lazy save the id3 tags to the file
+            saveID3(song);
           });
         } else {
           if(typeof error != Object) {
@@ -575,8 +589,7 @@ exports.ytDownload = function(app_ref, url, callback) {
   }
 };
 
-exports.sync_import = function(app_ref, songs, url){
-  app = app_ref;
+exports.sync_import = function(songs, url){
   // extact the app start time
   now_milli = app.get('started');
   // clean up the url
@@ -631,6 +644,41 @@ exports.sync_import = function(app_ref, songs, url){
 exports.stopScan = function(app){
   running = false;
 };
+
+function saveID3(songData){
+  // did we successfully load the ffmetadata library
+  if (ffmetadata) {
+    // only commit the fields ffmpeg will honor: http://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata#MP3
+    var data = {
+      title: songData.title,
+      author: songData.artist,
+      album: songData.album,
+      year: songData.year,
+      genre: songData.genre
+    };
+
+    // add the cover art if available
+    var options = {};
+    if (songData.cover_location) {
+      // assign it in array format with 1 element
+      options.attachments = [path.join(app.get('root') + '/dbs/covers/' + songData.cover_location)];
+    }
+
+    var destinationFile = path.join(app.get('config').music_dir, songData.location);
+
+    // write the to the id3 tags on the file
+    ffmetadata.write(destinationFile, data, options, function(err) {
+      if (err) {
+        console.log('Error writing id3 tags to file: ' + err);
+      } else {
+        console.log('Successfully wrote id3 tags to file: ' + destinationFile);
+      }
+    });
+  }
+}
+
+// make the function visible outside this module
+exports.saveID3 = saveID3;
 
 function broadcast(id, message){
   app.io.broadcast(id, message);

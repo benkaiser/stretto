@@ -17,6 +17,10 @@ app = null;
 
 exports.createRoutes = function(app_ref){
   app = app_ref;
+
+  // pass the app onto the library_functions module
+  lib_func.setApp(app);
+
   app.get('/', musicRoute);
   app.get('/remote/:name', musicRoute);
   app.get('/songs/:id', sendSong);
@@ -29,9 +33,9 @@ exports.createRoutes = function(app_ref){
   app.io.route('set_comp_name', setCompName);
   // scanning signals
   app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
-  app.io.route('start_scan', function(req){ lib_func.scanLibrary(app, false); });
-  app.io.route('start_scan_hard', function(req){ lib_func.scanLibrary(app, true); });
-  app.io.route('stop_scan', function(req){ lib_func.stopScan(app); });
+  app.io.route('start_scan', function(req){ lib_func.scanLibrary(false); });
+  app.io.route('start_scan_hard', function(req){ lib_func.scanLibrary(true); });
+  app.io.route('stop_scan', function(req){ lib_func.stopScan(); });
   app.io.route('hard_rescan', rescanItem);
   // send the songs to the client
   app.io.route('fetch_songs', returnSongs);
@@ -51,6 +55,8 @@ exports.createRoutes = function(app_ref){
   app.io.route('open_dir', function(req){ opener(req.data.substring(0, req.data.lastIndexOf(path.sep))); });
   // update the info of a song
   app.io.route('update_song_info', updateSongInfo);
+  // rewrite tags of a track to the file
+  app.io.route('rewrite_tags', rewriteTags);
   // sync routes
   app.io.route('sync_page_connected', syncPageConnected);
   app.io.route('sync_playlists', syncPlaylists);
@@ -298,7 +304,7 @@ function rescanItem(req){
       for (var i = 0; i < songs.length; i++) {
         songLocArr.push(songs[i].location);
       }
-      lib_func.scanItems(app, songLocArr);
+      lib_func.scanItems(songLocArr);
   });
 }
 
@@ -357,6 +363,19 @@ function updateSongInfo(req){
       process_cover(image.type, image.data);
     }
   }
+}
+
+// write the tags (metadata) from the database to the files for the given items
+function rewriteTags(req) {
+  var items = req.data.items;
+  app.db.songs.find({ _id: { $in: items }}, function(err, songs) {
+    if (!err && songs) {
+      // write the tags for all the given files
+      for (var i in songs) {
+        lib_func.saveID3(songs[i]);
+      }
+    }
+  });
 }
 
 // controller routes
@@ -439,17 +458,17 @@ function syncPlaylists(req){
   }
   var songs = req.data.songs;
   var remote_url = req.data.remote_url;
-  lib_func.sync_import(app, songs, remote_url);
+  lib_func.sync_import(remote_url);
 }
 
 // download the soundcloud songs from the requested url
 function soundcloudDownload(req){
-  lib_func.scDownload(app, req.data.url);
+  lib_func.scDownload(req.data.url);
 }
 
 // download the youtube song
 function youtubeDownload(req){
-  lib_func.ytDownload(app, req.data.url);
+  lib_func.ytDownload(req.data.url);
 }
 
 // update the app settings

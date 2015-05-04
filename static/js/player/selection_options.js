@@ -67,6 +67,12 @@ function createOptions(x, y){
     socket.emit("hard_rescan", {items: selectedItems});
     hideOptions();
   });
+
+  $(".rewrite_tags").click(function(ev) {
+    socket.emit("rewrite_tags", {items: selectedItems});
+    hideOptions();
+  });
+
   $(".view_info").click(function(ev){
     shoInfoView(selectedItems);
     hideOptions();
