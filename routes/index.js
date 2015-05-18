@@ -458,7 +458,7 @@ function syncPlaylists(req){
   }
   var songs = req.data.songs;
   var remote_url = req.data.remote_url;
-  lib_func.sync_import(remote_url);
+  lib_func.sync_import(songs, remote_url);
 }
 
 // download the soundcloud songs from the requested url
