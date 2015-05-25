@@ -37,6 +37,7 @@ After all the dependencies have been installed, run these commands to install th
 git clone https://github.com/benkaiser/node-music-player.git
 cd node-music-player/
 npm install
+grunt
 ```
 
 Then run the server with:
