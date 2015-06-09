@@ -305,18 +305,10 @@ SongView = Backbone.View.extend({
         this.lastmin = min;
       }
 
-      // calculate the spacing heights
-      var top_of_viewport  = this.scrollTop - this.meta_height;
-      var top = top_of_viewport - this.height_of_drawn/2;
-      if(top < 0)
-        top = 0;
-      if(top > this.total_table_height - this.height_of_drawn)
-        top = this.total_table_height - this.height_of_drawn;
+      // calculate the spacer heights based off what is missing
+      var top = this.individual_height * this.lastmin;
+      var bottom = this.individual_height *  (player.songs.length - this.lastmax);
 
-      var bottom_of_viewport = this.scrollTop - this.meta_height + this.contentHeight;
-      var bottom = this.total_table_height - bottom_of_viewport - this.height_of_drawn/2;
-      if(bottom < 0)
-        bottom = 0;
 
       // set the spacing heights
       this.top_spacer.css('height', top);

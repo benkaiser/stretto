@@ -114,6 +114,7 @@ body{
 }
 .song_table{
   table-layout: fixed;
+  margin-bottom: 0;
 }
 .song_table tbody > tr > td{
   padding: 0 !important;
