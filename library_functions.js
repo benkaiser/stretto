@@ -614,11 +614,19 @@ exports.sync_import = function(songs, url){
               song.date_modified = now_milli;
             }
             // upsert the song
-            app.db.songs.update({_id: song._id}, song, {upsert: true}, function (err, numReplaced, newDoc){
-              // TODO: update the browser the song has been added
-              console.log(newDoc);
-              // start the next iteration
+            app.db.songs.update({_id: song._id}, song, {upsert: true}, function(err, numReplaced, newDoc) {
+              // incrememnt the count to be the next index
               cnt++;
+
+              // update the browser with the sync status
+              broadcast('sync_update', {
+                type: 'add',
+                count: songs.length,
+                completed: cnt,
+                content: song
+              });
+
+              // start the next iteration
               callback();
             });
           };

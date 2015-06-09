@@ -123,6 +123,32 @@ socket.on('scan_update', function(data){
     addToLibraryPlaylist(data.doc._id);
   }
 });
+// for when the sync between servers has progressed
+var SyncMessenger = null;
+var SyncTemplate = 'Synced {{completed}} out of {{count}}{% if content %} - Added {{content.title}}{% endif %}';
+socket.on('sync_update', function(data) {
+  // log the sync data to the developer tools
+  console.log(data);
+
+  if (SyncMessenger === null) {
+    SyncMessenger = Messenger().post(swig.render(SyncTemplate, {locals: data}));
+  } else {
+    SyncMessenger.update(swig.render(SyncTemplate, {locals: data}));
+  }
+
+  // add the track to the songs collection
+  player.song_collection.add(data.content);
+  // add the id to the library
+  if (data.type == 'add') {
+    addToLibraryPlaylist(data.content._id);
+  }
+
+  // if it's completed, refresh the playlists
+  if (data.completed == data.count) {
+    socket.emit('fetch_playlists');
+  }
+});
+
 // for when the durations are added
 socket.on('duration_update', function(data){
   player.song_collection.where({_id: data._id})[0].attributes.duration = data.new_duration;
