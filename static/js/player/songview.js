@@ -83,6 +83,8 @@ SongView = Backbone.View.extend({
     this.total_table_height = player.songs.length * this.individual_height;
     // precompile the song rendering tempalte
     this.song_template = swig.compile($("#song_item").html());
+    // default meta height until the defered function below evaluates
+    this.meta_height = 40;
     _.defer(function(){
       // get hight of elems above table body incl header row
       self.meta_height = $(".playlist_meta").height() + 40;
@@ -240,7 +242,8 @@ SongView = Backbone.View.extend({
       // cache scroll top variable
       this.scrollTop = this.scrollElem.scrollTop();
       // get the index of the item in the center of the screen
-      var middle_of_viewport = this.scrollTop + this.contentHeight / 2 - this.meta_height;
+      // if contentHeight is 0, contentHeight / 2 is NaN, so default to 0
+      var middle_of_viewport = this.scrollTop + (this.contentHeight / 2 || 0) - this.meta_height;
       this.middle_item = Math.floor(middle_of_viewport / this.individual_height);
 
       // get the bounds of items to draw
