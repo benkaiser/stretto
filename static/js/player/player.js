@@ -239,9 +239,13 @@ function PlayState(){
           this.lastNotification.close();
         }
         // show the notifiaction
-        this.lastNotification = new Notification(notifTitle, notifOptions);
-        // close the notification after a timeout
-        this.lastNotificationTimeout = setTimeout(this.lastNotification.close.bind(this.lastNotification), 4321);
+        try {
+          this.lastNotification = new Notification(notifTitle, notifOptions);
+          // close the notification after a timeout
+          this.lastNotificationTimeout = setTimeout(this.lastNotification.close.bind(this.lastNotification), 4321);
+        } catch(exception) {
+          console.log("Error using old notification style on device.");
+        }
       };
       // check if we have permission, if not, ask for it
       if (Notification.permission === "granted") {
