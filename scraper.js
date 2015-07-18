@@ -1,7 +1,6 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var _ = require('underscore');
-
 /**
  * Override default underscore escape map
  */
@@ -111,6 +110,7 @@ exports.findLyrics = function(artist, song){
       //urls.forEach(function(url) {
         getLyrics(urls.pop(), function(songLyrics) {
           console.log(songLyrics);
+          //socket.emit('lyrics_result', songLyrics);
         });
       //});
     }
