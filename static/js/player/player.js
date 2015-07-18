@@ -159,6 +159,13 @@ function PlayState(){
     // perform the sort
     player.songs.sort(this.songSortFunc);
   };
+
+  // sort the songs again (for when the underlying data has changed)
+  this.resortSongs = function() {
+    // perform the sort
+    player.songs.sort(this.songSortFunc);
+  };
+
   // function to perform the sort based on current sorting attributes
   this.songSortFunc = function(a, b){
     if(a.attributes[player.sort_col] < b.attributes[player.sort_col])

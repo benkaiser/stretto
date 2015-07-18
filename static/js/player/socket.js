@@ -53,6 +53,8 @@ socket.on('sc_update', function(data){
       player.songs = player.song_collection.getByIds(player.playlist);
       player.queue_pool = player.songs.slice(0);
       player.genShufflePool();
+      // resort the model data
+      player.resortSongs();
       redrawSongsChangedModel();
     }
   } else if(data.type == "skipped"){
@@ -72,10 +74,14 @@ socket.on('yt_update', function(data){
     var yt_plist = player.playlist_collection.getByTitle("Youtube").attributes;
     yt_plist.songs.push({_id: data.content._id});
     if(player.playlist.title == "Youtube"){
+      // update the model data
       player.playlist = yt_plist;
       player.songs = player.song_collection.getByIds(player.playlist);
       player.queue_pool = player.songs.slice(0);
       player.genShufflePool();
+      // resort the model data
+      player.resortSongs();
+      // redraw the songs view
       redrawSongsChangedModel();
     }
   } else if(data.type == "error") {
@@ -97,6 +103,8 @@ socket.on('song_update', function(data){
   player.songs = player.song_collection.getByIds(player.playlist);
   player.queue_pool = player.songs.slice(0);
   player.genShufflePool();
+  // resort the model data
+  player.resortSongs();
   // redraw the view
   redrawSongsChangedModel();
   // redraw info view
