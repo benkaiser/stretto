@@ -385,7 +385,7 @@ function rewriteTags(req) {
 //lyrics fetch
 function fetchLyrics(req){
   //console.log(req.data.artist);
-  console.log(lyrics.findLyrics(req.data.artist, req.data.title));
+  lyrics.findLyrics(req.data.artist, req.data.title);
 }
 
 // controller routes

@@ -45,9 +45,9 @@ var cleanLyrics = function(lyrics) {
   // remove all tags
   lyrics = lyrics.replace(/<[^>]*>/g, ' ');
   // remove all punctuation
-  lyrics = lyrics.replace(/[\.\,]/g, '');
+  //lyrics = lyrics.replace(/[\.\,]/g, '');
   // return all lower case
-  return lyrics.toLowerCase();
+  return lyrics;
 };
     
 // get the lyrics for an individual song 
@@ -88,9 +88,8 @@ exports.findLyrics = function(artist, song){
 
   var url = 'http://lyrics.wikia.com/api.php?artist=' + artist;
   // get a list of songs
-
   songName = song.toLowerCase().split(' ');
-  console.log(songName);
+  //console.log(songName);
 
   request(url, function(error, response, html) {
     if (!error) {
@@ -109,12 +108,12 @@ exports.findLyrics = function(artist, song){
         }
       }
       //console.log(urls);
-      urls.forEach(function(url) {
-        getLyrics(url, function(songLyrics) {
+      //urls.forEach(function(url) {
+        getLyrics(urls.pop(), function(songLyrics) {
           console.log(songLyrics);
         });
-      });
+      //});
     }
   });
-
+//  return 'not found';
 };
