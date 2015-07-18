@@ -6,9 +6,10 @@ SongView = Backbone.View.extend({
     var tmp_scrolltop = this.scrollTop;
     // calculate the duration
     var totalDuration = 0;
-    for(var song = 0; song < player.songs.length; song++){
-     totalDuration += player.songs[song].attributes.duration;
+    for(var song = 0; song < player.songs.length; song++) {
+      totalDuration += parseInt(player.songs[song].attributes.duration) || 0;
     }
+
     // render the view
     this.$el.html(render(this.template, {
       title: player.playlist.title,
