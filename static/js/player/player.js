@@ -215,6 +215,11 @@ function PlayState(){
     // show the songs info
     info = new InfoView();
     MusicApp.infoRegion.show(info);
+    // update the lyrics panel
+    song_details = {artist:this.current_song.attributes.display_artist, title:this.current_song.attributes.title};
+    socket.emit('fetch_lyrics', song_details);
+    lyrics = this.current_song.attributes.title;
+    $(".sidebar_lyrics").html(lyrics);
     // update the selected item
     $("tr").removeClass("light-blue");
     $("#"+id).addClass("light-blue");

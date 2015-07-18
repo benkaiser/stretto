@@ -9,6 +9,8 @@ var request = require('request').defaults({ encoding: null });
 var fs = require('fs');
 var path = require('path');
 var MobileDetect = require('mobile-detect');
+var lyrics = require(__dirname + '/../scraper.js');
+
 /*
  * GET home page.
  */
@@ -65,6 +67,8 @@ exports.createRoutes = function(app_ref){
   app.io.route('youtube_download', youtubeDownload);
   // settings updating
   app.io.route('update_settings', updateSettings);
+  // fetch lyrics
+  app.io.route('fetch_lyrics', fetchLyrics);
 };
 
 function musicRoute(req, res){
@@ -376,6 +380,12 @@ function rewriteTags(req) {
       }
     }
   });
+}
+
+//lyrics fetch
+function fetchLyrics(req){
+  //console.log(req.data.artist);
+  console.log(lyrics.findLyrics(req.data.artist, req.data.title));
 }
 
 // controller routes
