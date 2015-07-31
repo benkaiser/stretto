@@ -72,6 +72,7 @@ function PlayState(){
       this.scrub.slider('setValue', this.current_track.currentTime / this.current_track.duration * 100.0, false);
       var seconds = prettyPrintSeconds(this.current_track.currentTime);
       $(".current_time").html(seconds);
+      localStorage.setItem('currentTime', this.current_track.currentTime);
     }
   };
   this.findSongIndex = function(id){

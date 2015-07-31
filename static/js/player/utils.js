@@ -87,6 +87,11 @@ function loadedRestart(item){
     var song_id = localStorage.getItem('last_playing_id');
     if(song_id){
       player.playSong(song_id);
+      // set the currentTime
+      var currentTime = parseInt(localStorage.getItem('currentTime'));
+      if (currentTime) {
+        player.seekTo(currentTime);
+      }
     }
     // it is stored as a string
     if(play_state == "false"){
