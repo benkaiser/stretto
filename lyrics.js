@@ -58,12 +58,15 @@ var getLyrics = function(url, callback) {
       var cleanlyrics = cleanLyrics($('.lyricbox').html());
       callback(cleanlyrics);
     }
+    else{
+      console.log('Error at:' + url);
+    }
   });
 };
 
 
 exports.findLyrics2 = function(artist){
-
+//print all lyrics for an artist
   var url = 'http://lyrics.wikia.com/api.php?artist=' + artist;
   // get a list of songs
   request(url, function(error, response, html) {
@@ -88,7 +91,6 @@ exports.findLyrics = function(artist, song){
   var url = 'http://lyrics.wikia.com/api.php?artist=' + artist;
   // get a list of songs
   songName = song.toLowerCase().split(' ');
-  //console.log(songName);
 
   request(url, function(error, response, html) {
     if (!error) {
@@ -97,23 +99,19 @@ exports.findLyrics = function(artist, song){
       for (var i = 0; i < songs.length; i++) {
         
         song_name = ((($(songs[i]).find('a').attr('href')).split(':')[2]).toLowerCase().split('_'));
-
-        //song_name = song.split('_');
-        //console.log(song_name);
-
+        //add a better check for song name similarity
         if(songName[0] == song_name[0]){
           urls.push($(songs[i]).find('a').attr('href'));
-          //console.log(song_name);
         }
       }
-      //console.log(urls);
-      //urls.forEach(function(url) {
         getLyrics(urls.pop(), function(songLyrics) {
           console.log(songLyrics);
-          //socket.emit('lyrics_result', songLyrics);
+          return 'found';
         });
-      //});
+    }
+    else{
+      console.log('error in song: ' + url);
     }
   });
-//  return 'not found';
+return 'not found';
 };
