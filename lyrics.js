@@ -88,6 +88,7 @@ exports.findLyrics = function(artist, song){
   var url = 'http://lyrics.wikia.com/api.php?artist=' + artist;
   // get a list of songs
   songName = song.toLowerCase().split(' ');
+  //console.log(songName);
 
   request(url, function(error, response, html) {
     if (!error) {
@@ -97,15 +98,22 @@ exports.findLyrics = function(artist, song){
         
         song_name = ((($(songs[i]).find('a').attr('href')).split(':')[2]).toLowerCase().split('_'));
 
+        //song_name = song.split('_');
+        //console.log(song_name);
+
         if(songName[0] == song_name[0]){
           urls.push($(songs[i]).find('a').attr('href'));
+          //console.log(song_name);
         }
       }
+      //console.log(urls);
+      //urls.forEach(function(url) {
         getLyrics(urls.pop(), function(songLyrics) {
           console.log(songLyrics);
-          return 'found';
+          //socket.emit('lyrics_result', songLyrics);
         });
+      //});
     }
   });
-return 'not found';
+//  return 'not found';
 };

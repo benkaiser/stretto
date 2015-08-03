@@ -9,7 +9,7 @@ var request = require('request').defaults({ encoding: null });
 var fs = require('fs');
 var path = require('path');
 var MobileDetect = require('mobile-detect');
-var lyrics = require(__dirname + '/../scraper.js');
+var lyrics = require(__dirname + '/../lyrics.js');
 
 /*
  * GET home page.
