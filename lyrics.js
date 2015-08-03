@@ -51,17 +51,20 @@ var cleanLyrics = function(lyrics) {
     
 // get the lyrics for an individual song 
 var getLyrics = function(url, callback) {
-  request(url, function(error, response, html) {
-    if (!error) {
-      var $ = cheerio.load(html);
-      $('script').remove()
-      var cleanlyrics = cleanLyrics($('.lyricbox').html());
-      callback(cleanlyrics);
-    }
-    else{
-      console.log('Error at:' + url);
-    }
-  });
+  if(url){
+    request(url, function(error, response, html) {
+      if (!error) {
+        var $ = cheerio.load(html);
+        $('script').remove()
+        var cleanlyrics = cleanLyrics($('.lyricbox').html());
+        callback(cleanlyrics);
+      }
+      else{
+        console.log('Error at getLyrics:' + url);
+      }
+    }); 
+  }
+  else console.log('error in getLyrics');
 };
 
 
@@ -81,6 +84,9 @@ exports.findLyrics2 = function(artist){
           console.log(songLyrics);
         });
       });
+    }
+    else {
+      console.log('Error at 2: ' + url)
     }
   });
 
