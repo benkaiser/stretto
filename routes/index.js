@@ -384,12 +384,12 @@ function rewriteTags(req) {
 
 //lyrics fetch
 function fetchLyrics(req){
-    
+
   lyrics.findLyrics(req.data.artist, req.data.title, function(received_lyrics){
-    console.log(received_lyrics);
+    req.io.emit('lyrics', {lyrics: received_lyrics, track_id: req.data._id})
   });
 
-  
+
 }
 
 // controller routes

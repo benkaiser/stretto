@@ -192,6 +192,13 @@ socket.on('message', function(data){
   Messenger().post(data.message);
 });
 
+// lyrics update
+socket.on('lyrics', function(data) {
+  if (player.playing_id === data.track_id) {
+    $('.sidebar_lyrics').html(data.lyrics);
+  }
+});
+
 function redrawSongsChangedModel(){
   MusicApp.router.songview.render();
 }
