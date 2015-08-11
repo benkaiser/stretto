@@ -1,5 +1,6 @@
 $(document).ready(function(){
   player.setScubElem($("#scrub_bar"));
+  localStorage.setItem('current_song_lyrics', "Test");
   // variable for keeping track of seeking
   var is_seeking = false;
   var seek_interval = 0;

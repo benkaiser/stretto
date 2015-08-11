@@ -223,6 +223,13 @@ function PlayState(){
     // show the songs info
     info = new InfoView();
     MusicApp.infoRegion.show(info);
+    // update the lyrics panel
+    song_details = {artist:this.current_song.attributes.display_artist, title:this.current_song.attributes.title};
+    socket.emit('fetch_lyrics', song_details);
+    //lyrics = this.current_song.attributes.title;
+    socket.on('lyrics_result', function(data) {
+      $('.sidebar_lyrics').html('data');
+    });
     // update the selected item
     $("tr").removeClass("light-blue");
     $("#"+id).addClass("light-blue");
