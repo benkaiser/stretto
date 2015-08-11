@@ -195,7 +195,7 @@ socket.on('message', function(data){
 // lyrics update
 socket.on('lyrics', function(data) {
   if (player.playing_id === data.track_id) {
-    $('.sidebar_lyrics').html(data.lyrics);
+    $('.sidebar_lyrics').html(JSON.parse(data.lyrics).lyric);
   }
 });
 
