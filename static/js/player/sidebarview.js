@@ -11,7 +11,7 @@ SidebarView = Backbone.View.extend({
   },
   addPlaylist: function(){
     bootbox.prompt("Playlist title?", function(result){
-      if (result !== null) {
+      if (result !== null && result !== "") {
         socket.emit('create_playlist', {title: result, songs: []});
       }
     });
