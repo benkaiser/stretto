@@ -38,10 +38,12 @@ body{
   left: 0;
   box-shadow: 0 0 20px #ccc;
 }
-.sidebar_controls{
-  bottom: 120px;
+.sidebar_lyrics{
+  max-height: 53px;
+  bottom: 90px;
   position: absolute;
   text-align: center;
+  overflow-y: auto;
   width: 100%;
 }
 #sidebar .input-group{
