@@ -341,7 +341,7 @@ exports.addToPlaylist = addToPlaylist;
 
 exports.scDownload = function(url){
   // init the soundcloud resolver with the clientid
-  var scres = new SoundcloudResolver(app.get('config').sc_client_id);
+  var scres = new SoundcloudResolver(app.get('config').soundcloud.client_id);
   // set the time these songs are added
   now_milli = Date.now();
   // resolve the tracks
@@ -369,7 +369,7 @@ exports.scDownload = function(url){
         completed: 0
       });
       // make sure the dl dir is existent
-      var out_dir = path.join(app.get('config').music_dir, app.get('config').sc_dl_dir);
+      var out_dir = path.join(app.get('config').music_dir, app.get('config').soundcloud.dl_dir);
       mkdirp(out_dir, function(){
         // start an async loop to download the songs
         var finished = false;
@@ -416,7 +416,7 @@ exports.scDownload = function(url){
           fs.exists(location, function(exists){
             if(!exists){
               // download the song
-              request(current_track.stream_url + "?client_id=" + app.get('config').sc_client_id, function(error, response, body){
+              request(current_track.stream_url + "?client_id=" + app.get('config').soundcloud.client_id, function(error, response, body){
                 if(error){
                   console.log("Error downloading soundcloud track: " + error);
                 }
