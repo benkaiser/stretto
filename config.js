@@ -14,7 +14,7 @@ function Config(app){
   this.music_dir_set = false;
   this.soundcloud = {
     dl_dir: "soundcloud",
-    client_id = "062e8dac092fe1ed9e16ee10dd88d566"
+    client_id: "062e8dac092fe1ed9e16ee10dd88d566"
   };
   this.youtube = {
     dl_dir: "youtube",
