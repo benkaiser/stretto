@@ -133,6 +133,8 @@ function findSong(relative_location, callback){
             display_artist: normaliseArtist(result.albumartist, result.artist),
             genre: result.genre,
             year: result.year,
+            discnr: (result.disk||{no:0}).no||0,
+            tracknr: (result.track||{no:0}).no||0,
             duration: -1,
             play_count: (doc === null) ? 0 : doc.play_count || 0,
             location: relative_location,
