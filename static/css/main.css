@@ -16,8 +16,8 @@ body{
 }
 #content{
   height: 90%;
-  height: calc(100% - 100px);
-  margin-top: 40px;
+  height: calc(100% - 93px);
+  margin-top: 31px;
   margin-left: 200px;
   padding: 20px;
   padding-bottom: 0px;
