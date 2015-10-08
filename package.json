@@ -1,6 +1,7 @@
 {
   "name": "node-music-player",
   "version": "0.0.1",
+  "main": "app.js",
   "private": true,
   "scripts": {
     "start": "nodemon app.js -e 'html css js'"
