@@ -12,6 +12,9 @@ var path = require('path');
 var util = require(__dirname + '/util.js');
 var mkdirp = require('mkdirp');
 var proxy = require('express-http-proxy');
+
+var eapp = express();
+
 // Electron Specific
 if(ELECTRON) {
 var app = require('app');  // Module to control application life.
@@ -50,7 +53,6 @@ app.on('ready', function() {
   init();
 }
 function init() {
-var eapp = express();
 eapp.http().io();
 eapp.io.set('authorization', function (handshakeData, accept) {
   // accept all requests
