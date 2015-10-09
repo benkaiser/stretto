@@ -1,6 +1,6 @@
 
 // Electron build
-var ELECTRON = true;
+var ELECTRON = process.argv[2]=="electron";
 
 /**
  * Module dependencies.
@@ -13,7 +13,7 @@ var util = require(__dirname + '/util.js');
 var mkdirp = require('mkdirp');
 var proxy = require('express-http-proxy');
 
-var eapp = express();
+var eapp;
 
 // Electron Specific
 if(ELECTRON) {
@@ -53,6 +53,7 @@ app.on('ready', function() {
   init();
 }
 function init() {
+eapp = express();
 eapp.http().io();
 eapp.io.set('authorization', function (handshakeData, accept) {
   // accept all requests
