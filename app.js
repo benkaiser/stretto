@@ -1,4 +1,7 @@
 
+// Electron build
+var ELECTRON = process.argv[2]=="electron";
+
 /**
  * Module dependencies.
  */
@@ -10,57 +13,98 @@ var util = require(__dirname + '/util.js');
 var mkdirp = require('mkdirp');
 var proxy = require('express-http-proxy');
 
-var app = express();
-app.http().io();
-app.io.set('authorization', function (handshakeData, accept) {
+var eapp;
+
+// Electron Specific
+if(ELECTRON) {
+var app = require('app');  // Module to control application life.
+var BrowserWindow = require('browser-window');  // Module to create native browser window.
+var mainWindow = null;
+app.on('window-all-closed', function() {
+  // On OS X it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform != 'darwin') {
+    app.quit();
+  }
+});
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function() {
+  // Create the browser window.
+  mainWindow = new BrowserWindow({width: 800, height: 600});
+
+  // init everything
+  init();
+  // and load the index.html of the app.
+  mainWindow.loadUrl('http://localhost:'+eapp.get('port')+'/');
+
+  // Open the DevTools.
+  mainWindow.openDevTools();
+
+  // Emitted when the window is closed.
+  mainWindow.on('closed', function() {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    mainWindow = null;
+  });
+});
+} else {
+  init();
+}
+function init() {
+eapp = express();
+eapp.http().io();
+eapp.io.set('authorization', function (handshakeData, accept) {
   // accept all requests
   accept(null, true);
 });
 // make sure the dbs directory is present
 mkdirp(__dirname + '/dbs/covers', function(){
   // attach the db to the app
-  require(__dirname + '/db.js')(app);
+  require(__dirname + '/db.js')(eapp);
   // patch the app
-  require(__dirname + '/patches.js')(app);
+  require(__dirname + '/patches.js')(eapp);
   // attach the config
-  app.set('config', require(__dirname + '/config')(app));
+  eapp.set('config', require(__dirname + '/config')(eapp));
 });
 
 
 // all environments
-app.set('port', process.env.PORT || 2000);
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'html');
-app.set('root', __dirname);
-app.set('started', Date.now());
-app.engine('html', require('swig').renderFile);
-app.use(express.favicon());
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(express.methodOverride());
-app.use(express.cookieParser());
-app.use(express.bodyParser());
-app.use(express.session({secret: 'maisecret'}));
-app.use(app.router);
-app.use('/static', express.static(__dirname + '/static'));
+eapp.set('port', process.env.PORT || 2000);
+eapp.set('views', path.join(__dirname, 'views'));
+eapp.set('view engine', 'html');
+eapp.set('root', __dirname);
+eapp.set('started', Date.now());
+eapp.engine('html', require('swig').renderFile);
+eapp.use(express.favicon());
+eapp.use(express.json());
+eapp.use(express.urlencoded());
+eapp.use(express.methodOverride());
+eapp.use(express.cookieParser());
+eapp.use(express.bodyParser());
+eapp.use(express.session({secret: 'maisecret'}));
+eapp.use(eapp.router);
+eapp.use('/static', express.static(__dirname + '/static'));
 // proxy for itunes requests
-app.use('/proxy', proxy('https://itunes.apple.com', {
+eapp.use('/proxy', proxy('https://itunes.apple.com', {
   forwardPath: function(req, res) {
     return require('url').parse(req.url).path;
   }
 }));
 
 // development only
-if ('development' == app.get('env')) {
+if ('development' == eapp.get('env')) {
   // uncomment to nuke songs database
-  // app.db.songs.remove({}, { multi: true }, function(err, numRemoved){
+  // eapp.db.songs.remove({}, { multi: true }, function(err, numRemoved){
   //   console.log(numRemoved + " songs removed");
   // })
-  app.use(express.errorHandler());
+  eapp.use(express.errorHandler());
 }
 
-require(__dirname + '/routes').createRoutes(app);
+require(__dirname + '/routes').createRoutes(eapp);
 
-app.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+eapp.listen(eapp.get('port'), function(){
+  console.log('Express server listening on port ' + eapp.get('port'));
 });
+}
