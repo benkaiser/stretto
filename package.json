@@ -6,7 +6,7 @@
     "start": "nodemon app.js -e 'html css js'"
   },
   "dependencies": {
-    "MD5": "*",
+    "md5": "*",
     "adm-zip": "*",
     "async": "*",
     "express-http-proxy": "^0.3.0",
