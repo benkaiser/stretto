@@ -46,7 +46,6 @@ module.exports = function(grunt) {
             'static/lib/seiyria-bootstrap-slider/bootstrap-slider.js',
             'static/lib/bootbox/bootbox.js',
             'static/lib/messenger/messenger.js',
-            'static/lib/socket.io-client/dist/socket.io.min.js',
             'static/lib/civswig/swig.js',
             'static/lib/DateJS/date.min.js',
             'static/lib/lastfm-api/lastfm-api.js'
