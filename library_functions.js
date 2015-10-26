@@ -689,5 +689,5 @@ function saveID3(songData){
 exports.saveID3 = saveID3;
 
 function broadcast(id, message){
-  app.io.broadcast(id, message);
+  app.io.sockets.emit(id, message);
 }

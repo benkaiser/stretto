@@ -28,11 +28,11 @@ exports.createRoutes = function(app_ref){
   app.get('/downloadplaylist/:id', downloadPlaylist);
   // remote control commands
   app.get('/command/:name/:command', remoteCommand);
-  app.io.route('player_page_connected', function(req){ req.io.join('players'); });
+  app.io.route('player_page_connected', function(req){ req.socket.join('players'); });
   // remote functions
   app.io.route('set_comp_name', setCompName);
   // scanning signals
-  app.io.route('scan_page_connected', function(req){ req.io.join('scanners'); });
+  app.io.route('scan_page_connected', function(req){ req.socket.join('scanners'); });
   app.io.route('start_scan', function(req){ lib_func.scanLibrary(false); });
   app.io.route('start_scan_hard', function(req){ lib_func.scanLibrary(true); });
   app.io.route('stop_scan', function(req){ lib_func.stopScan(); });
@@ -99,7 +99,7 @@ function sendSong(req, res){
     if(err || !song){
       res.status(404).send();
     } else {
-      res.sendfile(path.join(app.get('config').music_dir, encodeURIComponent(song.location)));
+      res.sendFile(path.join(app.get('config').music_dir, song.location));
     }
   });
 }
@@ -107,9 +107,9 @@ function sendSong(req, res){
 function sendCover(req, res){
   // if they passed the location of the cover, fetch it
   if(req.params.id.length > 0){
-    res.sendfile(app.get('root') + '/dbs/covers/' + encodeURIComponent(req.params.id));
+    res.sendFile(app.get('root') + '/dbs/covers/' + req.params.id);
   } else {
-    res.sendfile(app.get('root') + "/static/images/unknown.png");
+    res.sendFile(app.get('root') + "/static/images/unknown.png");
   }
 }
 
@@ -144,7 +144,7 @@ function downloadPlaylist(req, res){
 
 function returnSongs(req){
   get_songs(function(songs){
-    req.io.emit('songs', {"songs": songs});
+    req.socket.emit('songs', {"songs": songs});
   });
 }
 
@@ -161,7 +161,7 @@ function get_songs(callback){
 function returnPlaylists(req){
   // send the playlists back to the user
   get_playlists(function(playlists){
-    req.io.emit('playlists', {"playlists": playlists});
+    req.socket.emit('playlists', {"playlists": playlists});
   });
 }
 
@@ -388,15 +388,16 @@ function remoteCommand(req, res){
   var command_sent = false;
   // find destination machine and send the command
   var receivers = getReceiverList();
-  receivers.forEach(function(client){
-    if(client.store.data.name &&
-      client.store.data.name.length > 0 &&
-      client.store.data.name == name){
+  for (var index in receivers) {
+    var client = receivers[index];
+    if(client.name &&
+      client.name.length > 0 &&
+      client.name == name){
       client.emit("command", {command: command});
       // mark it as sent
       command_sent = true;
     }
-  });
+  }
   if(command_sent){
     res.send("OK");
   } else {
@@ -405,25 +406,35 @@ function remoteCommand(req, res){
 }
 
 function setCompName(req){
-  req.io.join('receivers');
-  req.socket.set('name', req.data.name);
+  req.socket.join('receivers');
+  req.socket.name = req.data.name;
 }
 
 function getReceiverList(req){
-  return app.io.sockets.clients('receivers');
+  var namespace = '/';
+  var receiversRoom = 'receivers';
+  var users = [];
+
+  for (var id in app.io.of(namespace).adapter.rooms[receiversRoom]) {
+    users.push(app.io.of(namespace).adapter.nsp.connected[id]);
+  }
+  return users;
 }
 
 function getReceiversMinusThis(req){
   var receivers = getReceiverList();
   var validReceivers = [];
-  receivers.forEach(function(client){
-    if(client.store.data.name && client.store.data.name.length > 0){
+  console.log(receivers);
+  for (var index in receivers) {
+    var client = receivers[index];
+    if(client.name && client.name.length > 0){
       validReceivers.push({
         id: client.id,
-        name: client.store.data.name
+        name: client.name
       });
     }
-  });
+  }
+
   req.io.emit('recievers', {"recievers": validReceivers});
 }
 

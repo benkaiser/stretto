@@ -3,19 +3,31 @@
  * Module dependencies.
  */
 
-var express = require('express.io');
+var express = require('express.oi');
+var favicon = require('serve-favicon');
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var errorhandler = require('errorhandler');
 var http = require('http');
 var path = require('path');
 var util = require(__dirname + '/util.js');
 var mkdirp = require('mkdirp');
 var proxy = require('express-http-proxy');
 
-var app = express();
-app.http().io();
-app.io.set('authorization', function (handshakeData, accept) {
+var app = express().http().io();
+
+var sessionOpts = {
+  secret: 'nmpsecret',
+  resave: true,
+  saveUninitialized: true,
+};
+app.io.session(sessionOpts);
+
+app.io.set('authorization', function(handshakeData, accept) {
   // accept all requests
   accept(null, true);
 });
+
 // make sure the dbs directory is present
 mkdirp(__dirname + '/dbs/covers', function(){
   // attach the db to the app
@@ -34,14 +46,11 @@ app.set('view engine', 'html');
 app.set('root', __dirname);
 app.set('started', Date.now());
 app.engine('html', require('swig').renderFile);
-app.use(express.favicon());
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(express.methodOverride());
-app.use(express.cookieParser());
-app.use(express.bodyParser());
-app.use(express.session({secret: 'maisecret'}));
-app.use(app.router);
+app.use(favicon(__dirname + '/static/images/favicon.ico'));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(express.session(sessionOpts));
 app.use('/static', express.static(__dirname + '/static'));
 // proxy for itunes requests
 app.use('/proxy', proxy('https://itunes.apple.com', {
@@ -52,11 +61,7 @@ app.use('/proxy', proxy('https://itunes.apple.com', {
 
 // development only
 if ('development' == app.get('env')) {
-  // uncomment to nuke songs database
-  // app.db.songs.remove({}, { multi: true }, function(err, numRemoved){
-  //   console.log(numRemoved + " songs removed");
-  // })
-  app.use(express.errorHandler());
+  app.use(errorhandler());
 }
 
 require(__dirname + '/routes').createRoutes(app);
