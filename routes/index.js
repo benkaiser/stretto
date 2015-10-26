@@ -435,7 +435,7 @@ function getReceiversMinusThis(req){
     }
   }
 
-  req.io.emit('recievers', {"recievers": validReceivers});
+  req.socket.emit('recievers', {"recievers": validReceivers});
 }
 
 // sync routes
@@ -444,7 +444,7 @@ function syncPageConnected(req){
   get_playlists(function(playlists){
     // get the songs data
     get_songs(function(songs){
-      req.io.emit('alldata', {"playlists": playlists, "songs": songs});
+      req.socket.emit('alldata', {"playlists": playlists, "songs": songs});
     });
   });
 }
@@ -485,7 +485,7 @@ function youtubeDownload(req){
 // update the app settings
 function updateSettings(req){
   // emit the settings updated message to the client
-  req.io.emit("message", {message: "Settings Updated"});
+  req.socket.emit("message", {message: "Settings Updated"});
   // update the settings
   if(req.data.music_dir){
     // first remove all music_dir settings
