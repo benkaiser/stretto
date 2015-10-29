@@ -343,7 +343,7 @@ function updateSongInfo(req){
           }
         }, { multi: true }, function (err, numReplaced) {
           app.db.songs.find({display_artist: req.data.artist, album: req.data.album}, function(err, tracks){
-            app.io.broadcast("song_update", tracks);
+            app.io.sockets.emit("song_update", tracks);
           });
         });
       });
