@@ -169,11 +169,75 @@ function PlayState(){
 
   // function to perform the sort based on current sorting attributes
   this.songSortFunc = function(a, b){
-    if(a.attributes[player.sort_col] < b.attributes[player.sort_col])
-       return (player.sort_asc) ? -1 : 1;
-    if(a.attributes[player.sort_col] > b.attributes[player.sort_col])
-      return (player.sort_asc) ? 1 : -1;
+    a = a.attributes;
+    b = b.attributes;
+    switch(player.sort_col){
+      case 'album':
+        return sortAlbums(a,b);
+      case 'title':
+        return sortTitle(a,b)
+      case 'display_artist':
+        if(a.display_artist.toLowerCase() > b.display_artist.toLowerCase()){
+          return (player.sort_asc) ? 1 : -1;
+        }else if(a.display_artist.toLowerCase() < b.display_artist.toLowerCase()){
+          return (player.sort_asc) ? -1 : 1;
+        }
+        return sortAlbums(a,b);
+      case 'play_count':
+        if(a.play_count > b.play_count){
+          return (player.sort_asc) ? 1 : -1;
+        }else if(a.play_count < b.play_count){
+          return (player.sort_asc) ? -1 : 1;
+        }
+        return sortTitle(a,b);
+      case 'date_added':
+        if(a.date_added > b.date_added){
+          return (player.sort_asc) ? 1 : -1;
+        }else if(a.date_added < b.date_added){
+          return (player.sort_asc) ? -1 : 1;
+        }else
+          return sortAlbums(a,b);
+      case 'duration':
+        if(a.duration > b.duration){
+          return (player.sort_asc) ? 1 : -1;
+        }else if(a.duration < b.duration){
+          return (player.sort_asc) ? -1 : 1;
+        }
+        return sortTitle(a,b);
+    }
     return 0;
+    // sort functions
+    function sortTitle(a,b){
+      if(a.title.toLowerCase() > b.title.toLowerCase()){
+        return (player.sort_asc) ? 1 : -1;
+      }else if(a.title.toLowerCase() < b.title.toLowerCase()){
+        return(player.sort_asc) ? -1 : 1;
+      }
+      return  sortAlbums(a,b);
+    }
+
+    function sortInsideAlbum(a,b){
+      if(a.discnr > b.discnr){
+        return (player.sort_asc) ? 1 : -1;
+      }else if(a.discnr < b.discnr){
+        return (player.sort_asc) ? -1 : 1;
+      }
+      if(a.tracknr > b.tracknr){
+        return (player.sort_asc) ? 1 : -1;
+      }else if (a.tracknr < b.tracknr) {
+        return (player.sort_asc) ? -1 : 1;
+      }
+      return 0;
+    }
+
+    function sortAlbums(a,b){
+      if(a.album.toLowerCase() > b.album.toLowerCase()){
+        return (player.sort_asc) ? 1 : -1;
+      }else if(a.album.toLowerCase() < b.album.toLowerCase()){
+        return (player.sort_asc) ? -1 : 1;
+      }
+      return sortInsideAlbum(a,b);
+    }
   };
   this.durationChanged = function(){
     var seconds = prettyPrintSeconds(this.current_track.duration);
