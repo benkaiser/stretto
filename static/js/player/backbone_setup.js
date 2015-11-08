@@ -83,8 +83,10 @@ MusicAppRouter = Backbone.Router.extend({
 MusicApp.addInitializer(function(options) {
   this.router = new MusicAppRouter();
 
-  // setup the settings bar section
-  MusicApp.router.settingsbar();
+  // setup the settings bar section only if not on mobile
+  if (!on_mobile) {
+    MusicApp.router.settingsbar();
+  }
 
   // load the history api
   Backbone.history.start({pushState: false});
