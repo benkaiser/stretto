@@ -29,15 +29,16 @@ app.io.set('authorization', function(handshakeData, accept) {
 });
 
 // make sure the dbs directory is present
-mkdirp(__dirname + '/dbs/covers', function(){
+mkdirp(__dirname + '/dbs/covers', function() {
   // attach the db to the app
   require(__dirname + '/db.js')(app);
+
   // patch the app
   require(__dirname + '/patches.js')(app);
+
   // attach the config
   app.set('config', require(__dirname + '/config')(app));
 });
-
 
 // all environments
 app.set('port', process.env.PORT || 2000);
@@ -52,20 +53,21 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.session(sessionOpts));
 app.use('/static', express.static(__dirname + '/static'));
+
 // proxy for itunes requests
 app.use('/proxy', proxy('https://itunes.apple.com', {
   forwardPath: function(req, res) {
     return require('url').parse(req.url).path;
-  }
+  },
 }));
 
 // development only
-if ('development' == app.get('env')) {
+if (app.get('env') == 'development') {
   app.use(errorhandler());
 }
 
 require(__dirname + '/routes').createRoutes(app);
 
-app.listen(app.get('port'), function(){
+app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
 });

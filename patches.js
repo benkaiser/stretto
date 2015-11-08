@@ -4,30 +4,32 @@
  * little overhead.
 */
 
-module.exports = function(app){
+module.exports = function(app) {
   // update the dates
   var now_milli = Date.now();
+
   // fix the date_added values
   app.db.songs.update(
     {date_added: {$exists: false}},
-    {$set: {date_added: now_milli}}, {multi: true}, function(err, numReplaced){
-    if(err){
+    {$set: {date_added: now_milli}}, {multi: true}, function(err, numReplaced) {
+    if (err) {
       console.log(err);
     } else {
-      if(numReplaced > 0){
-        console.log("Date added patch applied to: " + numReplaced + " rows");
+      if (numReplaced > 0) {
+        console.log('Date added patch applied to: ' + numReplaced + ' rows');
       }
     }
   });
+
   // fix the date_modified values
   app.db.songs.update(
     {date_modified: {$exists: false}},
-    {$set: {date_modified: now_milli}}, {multi: true}, function(err, numReplaced){
-    if(err){
+    {$set: {date_modified: now_milli}}, {multi: true}, function(err, numReplaced) {
+    if (err) {
       console.log(err);
     } else {
-      if(numReplaced > 0){
-        console.log("Date modified patch applied to: " + numReplaced + " rows");
+      if (numReplaced > 0) {
+        console.log('Date modified patch applied to: ' + numReplaced + ' rows');
       }
     }
   });

@@ -10,10 +10,11 @@ var walk = function(dir, done) {
     var pending = list.length;
     if (!pending) return done(null, results);
     list.forEach(function(file) {
-      if(file[0] === '.') {
+      if (file[0] === '.') {
         if (!--pending) done(null, results, strip_results);
         return;
       }
+
       file = path.join(dir, file);
       fs.stat(file, function(err, stat) {
         if (stat && stat.isDirectory()) {
@@ -28,40 +29,45 @@ var walk = function(dir, done) {
       });
     });
   });
-}
+};
+
 exports.walk = walk;
 
-var contains = function(a, obj){
-    var i = a.length;
-    while (i--) {
-       if (a[i] === obj) {
-           return true;
-       }
+var contains = function(a, obj) {
+  var i = a.length;
+  while (i--) {
+    if (a[i] === obj) {
+      return true;
     }
-    return false;
-}
+  }
+
+  return false;
+};
+
 exports.contains = contains;
 
 // function to get the IP of the current machine on the network
 var cached_ip = null;
-var getip = function(callback){
-  if (cached_ip == null) {
-    require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+var getip = function(callback) {
+  if (cached_ip === null) {
+    require('dns').lookup(require('os').hostname(), function(err, add, fam) {
       callback(add);
+
       // save it for the next call
       cached_ip = add;
     });
   } else {
     callback(cached_ip);
   }
-}
+};
+
 exports.getip = getip;
 
 exports.decodeBase64Image = function(dataString) {
-  var matches = dataString.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/),
-    response = {};
+  var matches = dataString.match(/^data:image\/([A-Za-z-+\/]+);base64,(.+)$/);
+  var response = {};
 
-  if (matches == null) {
+  if (matches === null) {
     console.log(dataString);
     console.log('Invalid file uploaded');
   }
@@ -70,4 +76,4 @@ exports.decodeBase64Image = function(dataString) {
   response.data = new Buffer(matches[2], 'base64');
 
   return response;
-}
+};

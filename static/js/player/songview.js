@@ -21,7 +21,7 @@ SongView = Backbone.View.extend({
       sort_asc: player.sort_asc,
       songs: player.songs,
       numSongs: player.songs.length,
-      totalDuration: prettyPrintSecondsorNA(totalDuration)
+      totalDuration: prettyPrintSecondsorNA(totalDuration),
     }));
     this.$el.addClass('custom_scrollbar');
 
@@ -58,9 +58,9 @@ SongView = Backbone.View.extend({
           socket.emit('song_moved_in_playlist', {
             playlist_id: player.playlist._id,
             oldIndex: oldIndex,
-            newIndex: newIndex
+            newIndex: newIndex,
           });
-        }
+        },
       });
     }
 
@@ -135,7 +135,7 @@ SongView = Backbone.View.extend({
     'contextmenu td': 'triggerOptions',
     'click .cover': 'triggerCover',
     'click .rename_playlist': 'renamePlaylist',
-    'click .delete_playlist': 'deletePlaylist'
+    'click .delete_playlist': 'deletePlaylist',
   },
 
   triggerSearch: function(ev) {
@@ -251,11 +251,11 @@ SongView = Backbone.View.extend({
         if (result !== null) {
           socket.emit('rename_playlist', {
             title: result,
-            id: player.playlist._id
+            id: player.playlist._id,
           });
           $('#playlist_header').text(result);
         }
-      }
+      },
     });
   },
 
@@ -266,7 +266,7 @@ SongView = Backbone.View.extend({
       buttons: {
         cancel: {
           label: 'Cancel',
-          className: 'btn-default'
+          className: 'btn-default',
         },
 
         del: {
@@ -275,9 +275,9 @@ SongView = Backbone.View.extend({
           callback: function() {
             socket.emit('delete_playlist', {del: player.playlist._id});
             MusicApp.router.playlist('LIBRARY');
-          }
-        }
-      }
+          },
+        },
+      },
     });
   },
 
@@ -326,7 +326,7 @@ SongView = Backbone.View.extend({
             render_item = this.song_template({
               song: player.songs[index],
               selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
-              index: index
+              index: index,
             });
 
             // if we are redrawing, remove from the other side
@@ -347,7 +347,7 @@ SongView = Backbone.View.extend({
             render_item = this.song_template({
               song: player.songs[index],
               selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
-              index: index
+              index: index,
             });
 
             // if we are redrawing, remove from the other side
@@ -385,5 +385,5 @@ SongView = Backbone.View.extend({
       // now replace the item
       this.$el.find('#' + _id).replaceWith(this.song_template({ song: player.song_collection.findBy_Id(_id)}));
     }
-  }
+  },
 });
