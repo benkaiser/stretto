@@ -69,7 +69,7 @@ function PlayState() {
 
     this.current_track.addEventListener('durationchange', function() { player.durationChanged(); });
 
-    this.shuffle_state = localStorage.getItem('shuffle') || false;
+    this.shuffle_state = localStorage.getItem('shuffle') == 'true' || false;
     this.redrawShuffle();
     this.repeat_state = localStorage.getItem('repeat') || this.repeat_states.all;
     this.redrawRepeat();
