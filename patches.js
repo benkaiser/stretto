@@ -4,7 +4,9 @@
  * little overhead.
  *
  * The comment above applies to the date_added and date_modified components,
- * however the below components regarding the disc / track fixes could be slow.
+ * however the below components regarding the disc / track fixes are much
+ * slower (requires reading all the tracks again).
+ * This patch relatest to versions <= 367bdeb (2015-11-09)
 */
 var async = require('async');
 var MM = require('musicmetadata');
