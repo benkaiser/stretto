@@ -75,7 +75,6 @@ function PlayState() {
     this.redrawRepeat();
     this.comp_name = localStorage.getItem('comp_name') || '';
     this.onMobile = on_mobile;
-    socket.emit('set_comp_name', {name: this.comp_name});
   };
 
   this.setupCollections = function() {

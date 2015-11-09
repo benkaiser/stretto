@@ -1,10 +1,13 @@
 // soccet connection and events
-var loaded = false;
 socket.on('connect', function() {
   console.log('Socket connected');
+
+  // notify the server we have connected
   socket.emit('player_page_connected');
-  if (!loaded) {
-    loaded = !loaded;
+
+  // let the server know our remote name (if set)
+  if (player.comp_name) {
+    socket.emit('set_comp_name', {name: player.comp_name});
   }
 });
 
