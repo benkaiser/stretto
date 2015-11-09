@@ -281,43 +281,7 @@ function PlayState() {
       showCover('/cover/' + this.current_song.attributes.cover_location);
     }
 
-    // send a song change notification to the desktop:
-    if ('Notification' in window) {
-      var showNotifiaction = function() {
-        // build the notification data
-        var notifTitle = 'Playing: ' + this.current_song.attributes.title;
-        var notifOptions = {
-          dir: 'auto',
-          body: 'Album: ' + this.current_song.attributes.album + '\nArtist: ' + this.current_song.attributes.display_artist,
-          icon: '/cover/' + this.current_song.attributes.cover_location,
-        };
-        if (this.lastNotificationTimeout) {
-          clearTimeout(this.lastNotificationTimeout);
-          this.lastNotification.close();
-        }
-
-        // show the notifiaction
-        try {
-          this.lastNotification = new Notification(notifTitle, notifOptions);
-
-          // close the notification after a timeout
-          this.lastNotificationTimeout = setTimeout(this.lastNotification.close.bind(this.lastNotification), 4321);
-        } catch (exception) {
-          console.log('Error using old notification style on device.');
-        }
-      };
-
-      // check if we have permission, if not, ask for it
-      if (Notification.permission === 'granted') {
-        showNotifiaction.bind(this)();
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission(function(permission) {
-          if (permission === 'granted') {
-            showNotifiaction().bind(this)();
-          }
-        });
-      }
-    }
+    this.displayNotification();
   };
 
   this.setIsPlaying = function(isPlaying) {
@@ -543,6 +507,46 @@ function PlayState() {
 
     // update the name with the server
     socket.emit('set_comp_name', {name: this.comp_name});
+  };
+
+  this.displayNotification = function() {
+    // send a song change notification to the desktop:
+    if ('Notification' in window) {
+      var showNotifiaction = function() {
+        // build the notification data
+        var notifTitle = 'Playing: ' + this.current_song.attributes.title;
+        var notifOptions = {
+          dir: 'auto',
+          body: 'Album: ' + this.current_song.attributes.album + '\nArtist: ' + this.current_song.attributes.display_artist,
+          icon: '/cover/' + this.current_song.attributes.cover_location,
+        };
+        if (this.lastNotificationTimeout) {
+          clearTimeout(this.lastNotificationTimeout);
+          this.lastNotification.close();
+        }
+
+        // show the notifiaction
+        try {
+          this.lastNotification = new Notification(notifTitle, notifOptions);
+
+          // close the notification after a timeout
+          this.lastNotificationTimeout = setTimeout(this.lastNotification.close.bind(this.lastNotification), 4321);
+        } catch (exception) {
+          console.log('Error using old notification style on device.');
+        }
+      };
+
+      // check if we have permission, if not, ask for it
+      if (Notification.permission === 'granted') {
+        showNotifiaction.bind(this)();
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission(function(permission) {
+          if (permission === 'granted') {
+            showNotifiaction.bind(this)();
+          }
+        });
+      }
+    }
   };
 }
 
