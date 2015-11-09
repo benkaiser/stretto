@@ -203,10 +203,63 @@ function PlayState() {
 
   // function to perform the sort based on current sorting attributes
   this.songSortFunc = function(a, b) {
-    if (a.attributes[player.sort_col] < b.attributes[player.sort_col])
-       return (player.sort_asc) ? -1 : 1;
-    if (a.attributes[player.sort_col] > b.attributes[player.sort_col])
-      return (player.sort_asc) ? 1 : -1;
+    a = a.attributes;
+    b = b.attributes;
+
+    // function to determine sway based on two sides
+    var decide = function(lhs, rhs, sortAsc) {
+      if (lhs < rhs) {
+        return (sortAsc) ? -1 : 1;
+      } else if (rhs < lhs) {
+        return (sortAsc) ? 1 : -1;
+      } else {
+        return 0;
+      }
+    };
+
+    // sort by the sorting column
+    var deciderVal;
+
+    // sorting based on original sorting column
+    deciderVal = decide(a[player.sort_col], b[player.sort_col], player.sort_asc);
+
+    if (deciderVal) {
+      return deciderVal;
+    }
+
+    // if they share the same arist, sort by album, disc number, track number
+    if (a.display_artist == b.display_artist) {
+      // the albums are different, sort by them
+      if (a.album != b.album) {
+        deciderVal = decide(a.album, b.album, player.sort_asc);
+
+        if (deciderVal) {
+          return deciderVal;
+        }
+      }
+
+      // if the above failed (they are the same), sort by disc
+      deciderVal = decide(a.disc, b.disc, player.sort_asc);
+
+      if (deciderVal) {
+        return deciderVal;
+      }
+
+      // if they above still failed, sort by track
+      deciderVal = decide(a.track, b.track, player.sort_asc);
+
+      if (deciderVal) {
+        return deciderVal;
+      }
+    } else {
+      // otherwise sort by track title
+      deciderVal = decide(a.title, b.title, player.sort_asc);
+
+      if (deciderVal) {
+        return deciderVal;
+      }
+    }
+
     return 0;
   };
 

@@ -69,6 +69,9 @@ function findSong(relative_location, callback) {
     if (doc === null || hard_rescan) {
       // insert the new song
       var parser = new MM(fs.createReadStream(full_location), function(err, result) {
+
+        console.log(result);
+
         if (err) {
           // get the file extension
           var ext = '';
@@ -90,12 +93,15 @@ function findSong(relative_location, callback) {
               display_artist: 'Unknown (no tags)',
               genre: 'Unknown',
               year: 'Unknown',
+              disc: 0,
+              track: 0,
               duration: -1,
               play_count: (doc === null) ? 0 : doc.play_count || 0,
               location: relative_location,
               date_added: now_milli,
               date_modified: now_milli,
             };
+
             if (doc === null) {
               app.db.songs.insert(song, function(err, newDoc) {
                 duration_fetch(relative_location, newDoc._id);
@@ -143,6 +149,8 @@ function findSong(relative_location, callback) {
             display_artist: normaliseArtist(result.albumartist, result.artist),
             genre: result.genre,
             year: result.year,
+            disc: (result.disk || {no:0}).no || 0,
+            track: (result.track || {no:0}).no || 0,
             duration: -1,
             play_count: (doc === null) ? 0 : doc.play_count || 0,
             location: relative_location,
@@ -416,6 +424,8 @@ exports.scDownload = function(url) {
             display_artist: current_track.user.username || 'Unknown Artist',
             genre: current_track.genre,
             year: current_track.release_year  || '2014',
+            disc: 0,
+            track: 0,
             duration: current_track.duration / 1000, // in milliseconds
             play_count: 0,
             location: location.replace(app.get('config').music_dir, ''),
@@ -587,6 +597,8 @@ exports.ytDownload = function(url, callback) {
             display_artist: artist || 'Unknown Artist',
             genre: 'Unknown Genre',
             year: new Date().getFullYear(),
+            disc: 0,
+            track: 0,
             duration: trackInfo.length_seconds,
             play_count: 0,
             location: location.replace(app.get('config').music_dir, ''),
