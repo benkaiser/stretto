@@ -118,7 +118,7 @@ $(document).ready(function() {
 
   $('#youtube_fetch').click(function() {
     bootbox.prompt({
-      title: 'Enter the Youtube URL',
+      title: 'Enter the Youtube URL (also works for playlist downloads)',
       callback: function(result) {
         if (result !== null) {
           socket.emit('youtube_download', {url: result});

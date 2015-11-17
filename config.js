@@ -20,6 +20,8 @@ function Config(app) {
   this.youtube = {
     dl_dir: 'youtube',
     quality: 'highest',
+    api: 'AIzaSyBzVTAJq_j_WsltEa45EUaMHHmXlz8F_PM',
+    parallel_download: 5,
   };
 
   // used for itunes metadata fetching (to select the store to search)

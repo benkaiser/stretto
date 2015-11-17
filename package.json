@@ -28,6 +28,7 @@
     "serve-favicon": "^2.3.0",
     "soundcloud-resolver": "*",
     "swig": "*",
+    "youtube-playlist-info": "^0.1.0",
     "ytdl-core": "*"
   },
   "optionalDependencies": {
