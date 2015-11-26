@@ -651,7 +651,8 @@ exports.ytDownload = function(url, finalCallback) {
               saveID3(song);
 
               // call the final callback because we are finished downloading
-              finalCallback();
+              if (finalCallback)
+                finalCallback();
             });
           } else {
             if (typeof error != Object) {
@@ -665,7 +666,8 @@ exports.ytDownload = function(url, finalCallback) {
               type: 'error',
               content: error.message,
             });
-            finalCallback();
+            if (finalCallback)
+              finalCallback();
           }
         });
       });
