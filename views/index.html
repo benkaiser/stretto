@@ -10,7 +10,6 @@
     <li><a class='pointer' id='youtube_fetch'>From Youtube</a></li>
   </ul>
 </li>
-<li><a id='open_settings' class='pointer'><i class="fa fa-cog"></i> Settings</a></li>
 {% endblock %}
 
 {% block content %}
@@ -213,7 +212,6 @@
 <script type="text/swig" id="settings_bar_template">
   <i class="fa fa-volume-up fa-2x volume_icon"></i>
   <input type="text" id="vol_bar" data-slider-id="vol_bar_slider" data-slider-max="100" data-slider-step="0.1" data-slider-value="{{vol}}" data-slider-tooltip="hide" />
-  <button id='remote_setup' class='btn btn-primary'>Remote Setup</button>
 </script>
 <script type="text/swig" id="control_template">
   <p>This functionality allows you to control you music player by going to <code>{{host}}/remote</code></p>
