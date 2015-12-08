@@ -86,25 +86,52 @@ function findSong(relative_location, callback) {
           // if it was a metadata error and the file appears to be audio, add it
           if (err.toString().indexOf('Could not find metadata header') > 0 &&
               util.contains(song_extentions, ext)) {
+
             console.log('Could not find metadata. Adding the song by filename.');
 
             // create a song with the filename as the title
+            var title = relative_location.substr(relative_location.lastIndexOf(path.sep) + 1, relative_location.length);
+            console.log('Parsing', title, relative_location);
+            var track = title.match(/^(\d+)\s-\s/);
+            if (track){
+              title = title.replace(track[0],'').split('.')[0];
+              track = Number(track[1]);
+            }else{
+              track = 0;
+            }
+            var artist = relative_location.match(/^[^-]*/);
+            if (artist){
+              artist = artist[0].replace(path.sep,'').trim();
+            } else {
+              artist = 'Unknown (no tags)';
+            }
+
+            var album = relative_location.match(/-\s([\w\s]*)/);
+            if (album){
+              album = album[1].trim();
+            } else {
+              album = 'Unknown (no tags)';
+            }
+
+console.log('Parsed', title, artist, album, track);
             song = {
-              title: relative_location.substr(relative_location.lastIndexOf(path.sep) + 1, relative_location.length),
-              album: 'Unknown (no tags)',
-              artist: 'Unknown (no tags)',
+              title: title,
+              album: album,
+              artist: artist,
               albumartist: 'Unknown (no tags)',
-              display_artist: 'Unknown (no tags)',
+              display_artist: artist,
               genre: 'Unknown',
               year: 'Unknown',
               disc: 0,
-              track: 0,
+              track: track,
               duration: -1,
               play_count: (doc === null) ? 0 : doc.play_count || 0,
               location: relative_location,
               date_added: now,
               date_modified: now,
             };
+
+            console.log('SONG', song);
 
             if (doc === null) {
               app.db.songs.insert(song, function(err, newDoc) {
