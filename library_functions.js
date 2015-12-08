@@ -816,3 +816,53 @@ exports.saveID3 = saveID3;
 function broadcast(id, message) {
   app.io.sockets.emit(id, message);
 }
+
+var supportedMedia = ['.mp3', '.wav'];
+function isPlayableMediaType(file){
+  // TODO: this could become more advanced and determine which media
+  // formats the client browser supports, for now, just use mp3 & wav
+  // since it's accepted everywhere
+  var ext = path.extname(file);
+  return supportedMedia.indexOf(ext) > -1;
+}
+
+function getPlayableMediaFile(source, cb){
+  if (isPlayableMediaType(source) == true){
+    cb(null, source);
+  } else {
+    var parsed = path.parse(source);
+    var relativeSourcePath = parsed.dir.replace(parsed.root,'');
+    // TODO: add configuration setting for these tmp files
+    var folder = path.join(__dirname,'_tmp',relativeSourcePath);
+    var fileName = parsed.name + '.mp3';
+    mkdirp(folder, function(){
+      var destination = path.join(folder, fileName);
+      try{
+        fs.accessSync(destination, fs.F_OK)
+        cb(null, destination);
+      } catch(ex){
+        _convertToMp3(source, destination, function(){
+          console.log('done', destination);
+          cb(null, destination);
+        });
+      }
+    });
+  }
+}
+exports.getPlayableMediaFile = getPlayableMediaFile;
+
+function _convertToMp3(source, destination, done){
+  ffmpeg(source)
+  .noVideo()
+  .audioCodec('libmp3lame')
+  .audioQuality(1)
+  .output(destination)
+  .on('progress', function(progress){
+    console.log('Converting', source, progress.percent);
+  })
+  .on('error', function(err){
+    console.log('ffmpeg-error', arguments);
+    done(err);
+  })
+  .on('end', done).run();
+}
