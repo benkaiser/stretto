@@ -16,11 +16,15 @@ function createOptions(x, y) {
       current_playlist: player.playlist,
       recents: recentPlaylists,
       dropup: dropup,
+      numSelected: selectedItems.length,
     }))
     .css({top: y + 'px', left: x + 'px'});
   $('.add_to_queue').click(function(ev) {
-    player.play_history.unshift(lastSelection);
-    player.play_history_idx++;
+    for (var x = 0; x < selectedItems.length; x++) {
+      player.play_history.unshift(selectedItems[x]);
+      player.play_history_idx++;
+    }
+
     hideOptions();
   });
 
@@ -86,7 +90,21 @@ function createOptions(x, y) {
   });
 
   $('.view_info').click(function(ev) {
-    shoInfoView(selectedItems);
+    showInfoView(selectedItems);
+    hideOptions();
+  });
+
+  $('.similar_songs').click(function(ev) {
+    // use the first selected option
+    var song = player.song_collection.findBy_Id(lastSelection);
+
+    // send it to the server to start the search
+    socket.emit('similar_songs', {title: song.attributes.title, artist: song.attributes.display_artist});
+
+    // notify the user that we are looking for a mix
+    Messenger().post('Searching for similar songs...');
+
+    // hide the context menu
     hideOptions();
   });
 

@@ -186,12 +186,15 @@
 <div class="dropdown open {{dropup}}">
   <ul class="dropdown-menu options-menu custom_scrollbar" role="menu">
     <li class='add_to_queue'><a>Add to Queue</a></li>
+    {% if numSelected == 1 %}
+      <li class="view_info"><a>Detailed Info</a></li>
+      <li class="similar_songs"><a>Generate Mix</a></li>
+    {% endif %}
+    <li class="rewrite_tags"><a>Write metadata to file</a></li>
     {% if current_playlist.editable %}
       <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
     {% endif %}
-    <li class="view_info"><a>Detailed Info</a></li>
     <li class="hard_rescan"><a>Hard Rescan</a></li>
-    <li class="rewrite_tags"><a>Write metadata to file</a></li>
     <li class="divider"></li>
     {% if recents.length %}
       <li role="presentation" class="dropdown-header">Recents</li>
