@@ -9,6 +9,8 @@ var request = require('request').defaults({ encoding: null });
 var fs = require('fs');
 var path = require('path');
 var MobileDetect = require('mobile-detect');
+var similarSongs = require('similar-songs');
+
 /*
  * GET home page.
  */
@@ -82,6 +84,9 @@ exports.createRoutes = function(app_ref) {
 
   // settings updating
   app.io.route('update_settings', updateSettings);
+
+  // get similar songs
+  app.io.route('similar_songs', getSimilarSongs);
 };
 
 function musicRoute(req, res) {
@@ -558,4 +563,31 @@ function updateSettings(req) {
       });
     });
   }
+}
+
+// fetch the similar songs for a given title and artist
+function getSimilarSongs(req) {
+  var title = req.data.title;
+  var artist = req.data.artist;
+
+  similarSongs.find({
+    title: title,
+    artist: artist,
+    limit: req.data.limit || 50,
+    lastfmAPIKey: '4795cbddcdec3a6b3f622235caa4b504',
+    lastfmAPISecret: 'cbe22daa03f35df599746f590bf015a5',
+    youtubeAPIKey: app.get('config').youtube.api,
+  }, function(err, songs) {
+    if (err) {
+      console.log(err);
+
+      // if it couldn't find it, just pass that through
+      if (err.message == 'Track not found') {
+        err = null;
+        songs = [];
+      }
+    }
+
+    req.socket.emit('similar_songs', {error: err, songs: songs});
+  });
 }

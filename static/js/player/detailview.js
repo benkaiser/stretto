@@ -1,11 +1,9 @@
 // view for showing / editing the detailed info of a selected track
 
-function shoInfoView(items) {
+function showInfoView(items) {
   // input checking
-  if (items.length > 1) {
-    console.log('Currently we only support editing of one item at a time');
-  } else if (items.length === 0) {
-    console.log('Error: 0 items selected');
+  if (items.length === 0) {
+    Messenger().post('Error: 0 items selected');
     return;
   }
 
