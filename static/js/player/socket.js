@@ -242,16 +242,19 @@ socket.on('similar_songs', function(data) {
           cover_location: song.coverUrl,
           disc: song.discNumber,
           track: song.trackNumber,
+          duration: 0,
+          play_count: 0,
           is_youtube: true,
           youtube_id: song.youtubeId,
         };
       });
 
-      // log them
-      console.log(data.songs, songsConverted);
+      // add the tracks into the song_collection
+      // NOTE: this doesn't add them to the library playlist
+      player.song_collection.add(songsConverted);
 
-      // TODO implement how these songs are played
-      player.song_collection.add(data.songs);
+      // instruct the player to create a view for the mix
+      player.showMix(data.reqData, songsConverted);
     }
   }
 });

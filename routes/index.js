@@ -588,6 +588,6 @@ function getSimilarSongs(req) {
       }
     }
 
-    req.socket.emit('similar_songs', {error: err, songs: songs});
+    req.socket.emit('similar_songs', {error: err, songs: songs, reqData: req.data});
   });
 }

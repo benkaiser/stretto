@@ -37,8 +37,10 @@
   </div>
 </div>
 <audio id='current_track'><source id="current_src" type='audio/mpeg'></audio>
-<audio id='fade_track'><source id="fade_src" type='audio/mpeg'></audio>
 <div class="options_container"></div>
+<div class='hidden'>
+  <div id="player"></div>
+</div>
 {% raw %}
 <script type="text/swig" id='sidebar_template'>
   <div id="sidebar_height_wrapper">
@@ -89,6 +91,7 @@
       <th class='album_th'>Album
         {% if sort_col == 'album' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
+      {% if !is_youtube %}
       <th class='date_added_th'>Date Added
         {% if sort_col == 'date_added' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
@@ -98,6 +101,7 @@
       <th class='play_count_th'>Plays
         {% if sort_col == 'play_count' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
+      {% endif %}
     </thead>
     <tbody class='song_body'>
       <tr id="top-spacer" data-index='spacer' style="height: 0"/>
@@ -112,7 +116,7 @@
     <i class='fa fa-plus-square-o options'></i>
   </div>
   {% if song.attributes.hasOwnProperty('cover_location') %}
-    <img class='cover' src='/cover/{{song.attributes.cover_location}}'/>
+    <img class='cover' src='{% if song.attributes.cover_location.indexOf("://") > 0 %}{{song.attributes.cover_location}}{% else %}/cover/{{song.attributes.cover_location}}{% endif %}'/>
   {% else %}
     <i class='fa fa-question unknown_cover'></i>
   {% endif %}
@@ -120,14 +124,16 @@
 </td>
 <td><span class='colsearch'>{{song.attributes.display_artist}}</span></td>
 <td><span class='colsearch'>{{song.attributes.album}}</span></td>
-<td>{{song.attributes.date_added|prettyPrintDateAdded}}</td>
-<td>{{song.attributes.duration|prettyPrintSeconds}}</td>
-<td>{{song.attributes.play_count}}</td>
+{% if !song.attributes.is_youtube %}
+  <td>{{song.attributes.date_added|prettyPrintDateAdded}}</td>
+  <td>{{song.attributes.duration|prettyPrintSeconds}}</td>
+  <td>{{song.attributes.play_count}}</td>
+{% endif %}
 </tr>
 </script>
 <script type="text/swig" id="current_info_template">
   {% if attributes.hasOwnProperty('cover_location') %}
-    <img class='info_cover' src='/cover/{{attributes.cover_location}}'/>
+    <img class='info_cover' src='{% if attributes.cover_location.indexOf("://") > 0 %}{{attributes.cover_location}}{% else %}/cover/{{attributes.cover_location}}{% endif %}'/>
   {% else %}
     <i class='fa fa-question info_unknown_cover'></i>
   {% endif %}

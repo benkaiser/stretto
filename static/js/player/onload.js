@@ -29,7 +29,7 @@ $(document).ready(function() {
           // call function every HOLD_TIME, if we don't get called, then it wasn't held down
           seek_interval = setInterval(function() {
             is_seeking = true;
-            player.seekTo(player.current_track.currentTime + 5);
+            player.PlayMethodAbstracter.setCurrentTime(player.PlayMethodAbstracter.getCurrentTime() + 5);
           }, HOLD_TIME);
         }
 
@@ -43,7 +43,7 @@ $(document).ready(function() {
           // call function every HOLD_TIME, if we don't get called, then it wasn't held down
           seek_interval = setInterval(function() {
             is_seeking = true;
-            player.seekTo(player.current_track.currentTime - 5);
+            player.PlayMethodAbstracter.setCurrentTime(player.PlayMethodAbstracter.getCurrentTime() - 5);
           }, HOLD_TIME);
         }
 
@@ -155,5 +155,8 @@ $(document).ready(function() {
   Messenger.options = {
     extraClasses: 'messenger-fixed messenger-on-top',
     theme: 'air',
+    messageDefaults: {
+      showCloseButton: true,
+    },
   };
 });
