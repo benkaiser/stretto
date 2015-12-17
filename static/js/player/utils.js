@@ -102,7 +102,7 @@ function loadedRestart(item) {
       // set the currentTime
       var currentTime = parseInt(localStorage.getItem('currentTime'));
       if (currentTime) {
-        player.seekTo(currentTime);
+        player.PlayMethodAbstracter.setCurrentTime(currentTime);
       }
     }
 

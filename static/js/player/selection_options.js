@@ -99,7 +99,7 @@ function createOptions(x, y) {
     var song = player.song_collection.findBy_Id(lastSelection);
 
     // send it to the server to start the search
-    socket.emit('similar_songs', {title: song.attributes.title, artist: song.attributes.display_artist});
+    socket.emit('similar_songs', {title: song.attributes.title, artist: song.attributes.display_artist, _id: song.attributes._id});
 
     // notify the user that we are looking for a mix
     Messenger().post('Searching for similar songs...');

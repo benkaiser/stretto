@@ -16,6 +16,7 @@ SongView = Backbone.View.extend({
     this.$el.html(render(this.template, {
       title: player.playlist.title,
       editable: player.playlist.editable,
+      is_youtube: player.playlist.is_youtube,
       _id: player.playlist._id,
       sort_col: player.sort_col,
       sort_asc: player.sort_asc,
