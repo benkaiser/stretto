@@ -694,7 +694,7 @@ function PlayState() {
 
     this.pause = function() {
       if (this.isYT) {
-        this.ytplayer.pause();
+        this.ytplayer.pauseVideo();
       } else {
         this.audio_elem.pause();
       }
