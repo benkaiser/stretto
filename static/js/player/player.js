@@ -701,7 +701,11 @@ function PlayState() {
     };
 
     this.play = function() {
-      this.audio_elem.play();
+      if (this.isYT) {
+        this.ytplayer.playVideo();
+      } else {
+        this.audio_elem.play();
+      }
     };
 
     this.setVolume = function(volume) {
