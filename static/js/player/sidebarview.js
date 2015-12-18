@@ -65,7 +65,7 @@ SettingsBarView = Backbone.View.extend({
 InfoView = Backbone.View.extend({
   template: '#current_info_template',
   render: function() {
-    this.$el.html(render(this.template, player.current_song));
+    this.$el.html(render(this.template, {song: player.current_song}));
   },
 
   events: {
@@ -80,6 +80,10 @@ InfoView = Backbone.View.extend({
 
   triggerOptions: function(ev) {
     if (!optionsVisible) {
+      // clear the options, they selected this indiviual item
+      clearSelection();
+
+      // add the current selection and display the options
       addToSelection(player.playing_id, false);
       createOptions(ev.clientX, ev.clientY);
     }

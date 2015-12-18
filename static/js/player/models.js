@@ -30,7 +30,25 @@ var PlaylistCollection = Backbone.Collection.extend({
   },
 });
 
+var SongModel = Backbone.Model.extend({
+  getCover: function() {
+    if (this.get('is_youtube')) {
+      return this.attributes.cover_location;
+    } else if (this.get('cover_location')) {
+      return '/cover/' + this.attributes.cover_location;
+    } else {
+      return '/static/images/unknown.jpg';
+    }
+  },
+
+  isYoutube: function() {
+    return this.get('is_youtube') === true;
+  },
+});
+
 var SongCollection = Backbone.Collection.extend({
+  model: SongModel,
+
   fetch: function(options) {
     socket.emit('fetch_songs');
   },
