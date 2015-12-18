@@ -154,9 +154,7 @@ function PlayState() {
 
   this.showMix = function(originalSong, similarSongs) {
     this.songs = similarSongs.map(function(songMeta) {
-      return {
-        attributes: songMeta,
-      };
+      return new SongModel(songMeta);
     });
 
     // set the mix as the current pool of songs
@@ -625,17 +623,10 @@ function PlayState() {
     }.bind(this));
 
     this.audio_elem.addEventListener('durationchange', function() {
-      // update the current time only if it's not a youtube video
-      // since we will lose the youtube video on refresh
-      if (!this.isYoutubeElement) {
-        localStorage.setItem('currentTime', this.getCurrentTime());
-      }
-
       // fire the handler
       if (this.durationChangeHandler)
         this.durationChangeHandler();
     }.bind(this));
-
 
     this.playTrack = function(songInfo) {
       if (!songInfo.attributes.is_youtube) {
@@ -646,7 +637,6 @@ function PlayState() {
         if (this.ytplayer && this.ytplayer.stopVideo) {
           this.ytplayer.stopVideo();
         }
-
 
         // load in the new audio track
         this.audio_elem.pause();
@@ -668,13 +658,32 @@ function PlayState() {
       }
     };
 
+    var lastYoutubeTime = -1;
+    var lastYoutubeUpdate = (+new Date());
+
     this.getCurrentTime = function() {
       if (this.isYT) {
-        return this.ytplayer.getCurrentTime();
+        // get the time from youtube
+        var youtubeTime = this.ytplayer.getCurrentTime();
+
+        // because it is jagged, update the time smoothly
+        // by guessing the time in between updates
+        if (youtubeTime != lastYoutubeTime) {
+          lastYoutubeTime = youtubeTime;
+          lastYoutubeUpdate = (+new Date());
+          return youtubeTime;
+        } else {
+          return lastYoutubeTime + ((+new Date()) - lastYoutubeUpdate) / 1000;
+        }
       } else {
+        // update the current time only if it's not a youtube video
+        // since we will lose the youtube video on refresh
+        localStorage.setItem('currentTime', this.audio_elem.currentTime);
+
+        // return the current time
         return this.audio_elem.currentTime;
       }
-    }
+    };
 
     this.setCurrentTime = function(currentTime) {
       if (this.isYT) {
@@ -690,7 +699,7 @@ function PlayState() {
       } else {
         return this.audio_elem.duration;
       }
-    }
+    };
 
     this.pause = function() {
       if (this.isYT) {
@@ -730,9 +739,9 @@ function PlayState() {
         width: '853',
         videoId: '',
         events: {
-          'onReady': this.onYoutubePlayerReady.bind(this),
-          'onStateChange': this.onYoutubeStateChange.bind(this),
-        }
+          onReady: this.onYoutubePlayerReady.bind(this),
+          onStateChange: this.onYoutubeStateChange.bind(this),
+        },
       });
     }; // force this method to be called with the current context
   });

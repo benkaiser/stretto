@@ -80,7 +80,13 @@ exports.createRoutes = function(app_ref) {
 
   // soundcloud downloading
   app.io.route('soundcloud_download', soundcloudDownload);
+
+  // youtube downloading
   app.io.route('youtube_download', youtubeDownload);
+
+  // youtube downloading for bunch of songs with pre-filled info
+  // (i.e. they were viewing from a mix)
+  app.io.route('youtube_import', youtubeImport);
 
   // settings updating
   app.io.route('update_settings', updateSettings);
@@ -532,7 +538,18 @@ function soundcloudDownload(req) {
 
 // download the youtube song
 function youtubeDownload(req) {
-  lib_func.ytDownload(req.data.url);
+  lib_func.ytDownload({url: req.data.url});
+}
+
+function youtubeImport(req) {
+  var queue = async.queue(function(result, next) {
+    // augment the song info object with the url needed
+    result.url = 'https://www.youtube.com/watch?v=' + result.youtube_id;
+    lib_func.ytDownload(result, next);
+  }, app.get('config').youtube.parallel_download);
+
+  // add all the items to the queue
+  queue.push(req.data.songs);
 }
 
 // update the app settings

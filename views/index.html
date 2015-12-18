@@ -90,7 +90,6 @@
       <th class='album_th'>Album
         {% if sort_col == 'album' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
-      {% if !is_youtube %}
       <th class='date_added_th'>Date Added
         {% if sort_col == 'date_added' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
@@ -100,7 +99,6 @@
       <th class='play_count_th'>Plays
         {% if sort_col == 'play_count' %}{% if sort_asc %}<i class="fa fa-chevron-up"></i>{% else %}<i class="fa fa-chevron-down"></i>{% endif %}{% endif %}
       </th>
-      {% endif %}
     </thead>
     <tbody class='song_body'>
       <tr id="top-spacer" data-index='spacer' style="height: 0"/>
@@ -114,16 +112,16 @@
   <div class='option_div'>
     <i class='fa fa-plus-square-o options'></i>
   </div>
-  {% if song.attributes.hasOwnProperty('cover_location') %}
-    <img class='cover' src='{% if song.attributes.cover_location.indexOf("://") > 0 %}{{song.attributes.cover_location}}{% else %}/cover/{{song.attributes.cover_location}}{% endif %}'/>
-  {% else %}
-    <i class='fa fa-question unknown_cover'></i>
-  {% endif %}
+  <img class='cover' src='{{song.getCover()}}'/>
   <span class='song_text'>{{song.attributes.title}}</span>
 </td>
 <td><span class='colsearch'>{{song.attributes.display_artist}}</span></td>
 <td><span class='colsearch'>{{song.attributes.album}}</span></td>
-{% if !song.attributes.is_youtube %}
+{% if song.attributes.is_youtube %}
+  <td>(not in library)</td>
+  <td></td>
+  <td></td>
+{% else %}
   <td>{{song.attributes.date_added|prettyPrintDateAdded}}</td>
   <td>{{song.attributes.duration|prettyPrintSeconds}}</td>
   <td>{{song.attributes.play_count}}</td>
@@ -131,14 +129,10 @@
 </tr>
 </script>
 <script type="text/swig" id="current_info_template">
-  {% if attributes.hasOwnProperty('cover_location') %}
-    <img class='info_cover' src='{% if attributes.cover_location.indexOf("://") > 0 %}{{attributes.cover_location}}{% else %}/cover/{{attributes.cover_location}}{% endif %}'/>
-  {% else %}
-    <i class='fa fa-question info_unknown_cover'></i>
-  {% endif %}
+  <img class='info_cover' src='{{song.getCover()}}'/>
   <div class='info_wrapper'>
-    <p class="info_title">{{attributes.title}}</p>
-    <p class="info_detail"><span class='colsearch'>{{attributes.display_artist}}</span> - <span class='colsearch'>{{attributes.album}}</span> <i class='fa fa-plus-square-o info_options'></i></p>
+    <p class="info_title">{{song.attributes.title}}</p>
+    <p class="info_detail"><span class='colsearch'>{{song.attributes.display_artist}}</span> - <span class='colsearch'>{{song.attributes.album}}</span> <i class='fa fa-plus-square-o info_options'></i></p>
   </div>
 </script>
 <script type="text/swig" id="info_template">
@@ -148,11 +142,7 @@
   <div class="form-group">
     <label class="col-sm-2 control-label">Cover</label>
     <div class="col-sm-10 img_block">
-      {% if track.attributes.hasOwnProperty('cover_location') %}
-        <img class='info_cover detailed' src='/cover/{{track.attributes.cover_location}}'/>
-      {% else %}
-        <i class="fa fa-question info_unknown_cover"></i>
-      {% endif %}
+      <img class='info_cover detailed' src='{{track.getCover()}}'/>
       <div class='drop_placeholder'>Drop Artwork Here</div>
       <div class='btn btn-default find_cover_art'>Find Cover Art</div>
     </div>
@@ -190,31 +180,38 @@
 <script type="text/swig" id="options_template">
 <div class="dropdown open {{dropup}}">
   <ul class="dropdown-menu options-menu custom_scrollbar" role="menu">
+    {% if type == 'youtube' %}
+      <li class="save_youtube"><a>Save to Library</a></li>
+    {% endif %}
     <li class='add_to_queue'><a>Add to Queue</a></li>
     {% if numSelected == 1 %}
-      <li class="view_info"><a>Detailed Info</a></li>
+      {% if type == 'normal' %}
+        <li class="view_info"><a>Detailed Info</a></li>
+      {% endif %}
       <li class="similar_songs"><a>Generate Mix</a></li>
     {% endif %}
-    <li class="rewrite_tags"><a>Write metadata to file</a></li>
-    {% if current_playlist.editable %}
-      <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
-    {% endif %}
-    <li class="hard_rescan"><a>Hard Rescan</a></li>
-    <li class="divider"></li>
-    {% if recents.length %}
-      <li role="presentation" class="dropdown-header">Recents</li>
-      {% for playlist in recents %}
+    {% if type == 'normal' %}
+      <li class="rewrite_tags"><a>Write metadata to file</a></li>
+      {% if current_playlist.editable %}
+        <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
+      {% endif %}
+      <li class="hard_rescan"><a>Hard Rescan</a></li>
+      <li class="divider"></li>
+      {% if recents.length %}
+        <li role="presentation" class="dropdown-header">Recents</li>
+        {% for playlist in recents %}
+          {% if playlist.attributes.editable %}
+          <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <li role="presentation" class="dropdown-header">Add to Playlist</li>
+      {% for playlist in playlists %}
         {% if playlist.attributes.editable %}
         <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
         {% endif %}
       {% endfor %}
     {% endif %}
-    <li role="presentation" class="dropdown-header">Add to Playlist</li>
-    {% for playlist in playlists %}
-      {% if playlist.attributes.editable %}
-      <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
-      {% endif %}
-    {% endfor %}
   </ul>
 </div>
 </script>

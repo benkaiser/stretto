@@ -7,15 +7,30 @@ var lastSelection = '';
 function createOptions(x, y) {
   // calculate if the menu should 'drop up'
   var dropup = '';
+  console.log(y);
   if (y + 300 > $(window).height()) {
     dropup = 'dropup';
   }
+
+  var foundYoutube = false;
+  var foundNormal = false;
+  selectedItems.forEach(function(item) {
+    var model = player.song_collection.findBy_Id(item);
+    if (model.isYoutube()) {
+      foundYoutube = true;
+    } else {
+      foundNormal = true;
+    }
+  });
+
+  var type = foundYoutube ? (foundNormal ? 'mix' : 'youtube') : 'normal';
 
   $('.options_container').html(render('#options_template', {
       playlists: player.playlist_collection.models,
       current_playlist: player.playlist,
       recents: recentPlaylists,
       dropup: dropup,
+      type: type,
       numSelected: selectedItems.length,
     }))
     .css({top: y + 'px', left: x + 'px'});
@@ -103,6 +118,18 @@ function createOptions(x, y) {
 
     // notify the user that we are looking for a mix
     Messenger().post('Searching for similar songs...');
+
+    // hide the context menu
+    hideOptions();
+  });
+
+  $('.save_youtube').click(function(ev) {
+    var results = selectedItems.map(function(id) {
+      return player.song_collection.findBy_Id(id).attributes;
+    });
+
+    console.log(results);
+    socket.emit('youtube_import', {songs: results});
 
     // hide the context menu
     hideOptions();
