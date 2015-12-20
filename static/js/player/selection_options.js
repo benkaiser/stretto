@@ -128,7 +128,6 @@ function createOptions(x, y) {
       return player.song_collection.findBy_Id(id).attributes;
     });
 
-    console.log(results);
     socket.emit('youtube_import', {songs: results});
 
     // hide the context menu
