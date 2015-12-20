@@ -221,6 +221,44 @@ socket.on('command', function(data) {
   }
 });
 
+// similar songs data received
+socket.on('similar_songs', function(data) {
+  if (data.error) {
+    Messenger().post('Error generating mix, see log for more info');
+  } else {
+    if (data.songs.length === 0) {
+      Messenger().post('Error generating mix, lastfm failed to find similar songs');
+    } else {
+      // map them to models we understand
+      var songsConverted = data.songs.map(function(song) {
+        return {
+          _id: 'YOUTUBE_' + song.youtubeId,
+          title: song.title,
+          album: song.album,
+          artist: song.artist,
+          albumartist: song.artist,
+          display_artist: song.artist,
+          genre: song.genre,
+          cover_location: song.coverUrl,
+          disc: song.discNumber,
+          track: song.trackNumber,
+          duration: 0,
+          play_count: 0,
+          is_youtube: true,
+          youtube_id: song.youtubeId,
+        };
+      });
+
+      // add the tracks into the song_collection
+      // NOTE: this doesn't add them to the library playlist
+      player.song_collection.add(songsConverted);
+
+      // instruct the player to create a view for the mix
+      player.showMix(data.reqData, songsConverted);
+    }
+  }
+});
+
 // generic info message reciever
 socket.on('message', function(data) {
   Messenger().post(data.message);

@@ -124,9 +124,6 @@ body{
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.song_table tbody > tr > td .unknown_cover {
-  vertical-align: top;
-}
 tr:hover{
   background-color: #eeeeee;
 }
@@ -151,13 +148,18 @@ tr:hover .options{
 }
 .options-menu{
   max-height: 300px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 .song_text{
   z-index: 0;
 }
 .colsearch:hover{
   text-decoration: underline;
+}
+.unknown_cover {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
 }
 .cover{
   width: 40px;
@@ -168,11 +170,6 @@ tr:hover .options{
   max-width: 400px;
   max-height: 400px;
   border-radius: 20px;
-}
-.unknown_cover{
-  font-size: 41px;
-  margin-right: 18px;
-  margin-left: 8px;
 }
 .drop_placeholder{
   float: right;
@@ -308,6 +305,7 @@ tr:hover .options{
 /*** options dialog ***/
 .options_container{
   position: fixed;
+  z-index: 1030;
 }
 /*** color definitions ***/
 .blue{

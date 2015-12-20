@@ -485,21 +485,9 @@ exports.scDownload = function(url) {
                 if (current_track.artwork_url) {
                   // download it's cover art
                   var large_cover_url = current_track.artwork_url.replace('large.jpg', 't500x500.jpg');
-                  request({url: large_cover_url, encoding: null}, function(error, response, body) {
-                    // where are we storing the cover art?
-                    song.cover_location = md5(body) + '.jpg';
-                    var filename = __dirname + '/dbs/covers/' + song.cover_location;
-
-                    // does it exist?
-                    fs.exists(filename, function(exists) {
-                      if (!exists) {
-                        fs.writeFile(filename, body, function(err) {
-                          finish_add();
-                        });
-                      } else {
-                        finish_add();
-                      }
-                    });
+                  downloadCoverArt(large_cover_url, function(cover_location) {
+                    song.cover_location = cover_location;
+                    finish_add();
                   });
                 } else {
                   // add without artwork to the database
@@ -531,7 +519,7 @@ function ytPlaylistDownload(playlistId, callback) {
     // setup a queue, to run this function in parallel, the concurrency
     // of this is definied as youtube.parallel_download in config.js
     var queue = async.queue(function(result, next) {
-      module.exports.ytDownload('https://www.youtube.com/watch?v=' + result.resourceId.videoId, next);
+      module.exports.ytDownload({url: 'https://www.youtube.com/watch?v=' + result.resourceId.videoId}, next);
     }, app.get('config').youtube.parallel_download);
 
     // when done, call the callback
@@ -545,15 +533,14 @@ function ytPlaylistDownload(playlistId, callback) {
 }
 
 var playlistRegex = /playlist\?list=(.*)(\&|$)/g;
-exports.ytDownload = function(url, finalCallback) {
+exports.ytDownload = function(data, finalCallback) {
   // check to see if this is a playlist download
-  var playlistId = playlistRegex.exec(url);
+  var playlistId = playlistRegex.exec(data.url);
 
   // if it was a playlist, trigger the playlist download
   if (playlistId && playlistId.length > 2) {
     ytPlaylistDownload(playlistId[1], finalCallback);
   } else {
-    console.log(url);
     // othwerwise, the url must be an invidual video, download that
     if (ffmpeg) {
       var trackInfo = null;
@@ -569,7 +556,7 @@ exports.ytDownload = function(url, finalCallback) {
           },
 
           function(callback) {
-            ytdl.getInfo(url, function(err, info) {
+            ytdl.getInfo(data.url, function(err, info) {
               if (!err) {
                 trackInfo = info;
                 location = path.join(out_dir, trackInfo.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.mp3');
@@ -591,7 +578,7 @@ exports.ytDownload = function(url, finalCallback) {
           },
 
           function(callback) {
-            ffmpeg(ytdl(url, {
+            ffmpeg(ytdl(data.url, {
                 quality: 'highest',
                 filter: function(format) { return format.resolution === null; },
               }))
@@ -611,49 +598,81 @@ exports.ytDownload = function(url, finalCallback) {
           },
         ], function(error, errorMessage) {
           if (!error) {
-            var dashpos = trackInfo.title.indexOf('-');
-            var title = trackInfo.title;
-            var artist = trackInfo.title;
+            var now = Date.now();
+            var song;
 
-            // if there is a dash, set them in the assumed format [title] - [artist]
-            if (dashpos != -1) {
-              title = trackInfo.title.substr(0, dashpos);
-              artist = trackInfo.title.substr(dashpos + 1);
+            // decide how to build the metadata based on if we have it or not
+            if (!data.title) {
+              var dashpos = trackInfo.title.indexOf('-');
+              var title = trackInfo.title;
+              var artist = trackInfo.title;
+
+              // if there is a dash, set them in the assumed format [title] - [artist]
+              if (dashpos != -1) {
+                title = trackInfo.title.substr(0, dashpos);
+                artist = trackInfo.title.substr(dashpos + 1);
+              }
+
+              song = {
+                title: title || 'Unknown Title',
+                album: trackInfo.title || 'Unknown Album',
+                artist: artist || 'Unknown Artist',
+                albumartist: artist || 'Unknown Artist',
+                display_artist: artist || 'Unknown Artist',
+                genre: 'Unknown Genre',
+                year: new Date().getFullYear(),
+                disc: 0,
+                track: 0,
+                duration: trackInfo.length_seconds,
+                play_count: 0,
+                location: location.replace(app.get('config').music_dir, ''),
+                date_added: now,
+                date_modified: now,
+              };
+
+              saveData(song);
+            } else {
+              song = {
+                title: data.title || 'Unknown Title',
+                album: data.album || 'Unknown Album',
+                artist: data.artist || 'Unknown Artist',
+                albumartist: data.album || 'Unknown Artist',
+                display_artist: data.artist || 'Unknown Artist',
+                genre: data.genre,
+                year: new Date().getFullYear(),
+                disc: data.disc,
+                track: data.track,
+                duration: trackInfo.length_seconds,
+                play_count: 0,
+                location: location.replace(app.get('config').music_dir, ''),
+                date_added: now,
+                date_modified: now,
+              };
+
+              downloadCoverArt(data.cover_location, function(cover_location) {
+                song.cover_location = cover_location;
+                saveData(song);
+              });
             }
 
-            var now = Date.now();
-            var song = {
-              title: title || 'Unknown Title',
-              album: trackInfo.title || 'Unknown Album',
-              artist: artist || 'Unknown Artist',
-              albumartist: artist || 'Unknown Artist',
-              display_artist: artist || 'Unknown Artist',
-              genre: 'Unknown Genre',
-              year: new Date().getFullYear(),
-              disc: 0,
-              track: 0,
-              duration: trackInfo.length_seconds,
-              play_count: 0,
-              location: location.replace(app.get('config').music_dir, ''),
-              date_added: now,
-              date_modified: now,
-            };
-            app.db.songs.insert(song, function(err, newDoc) {
-              addToPlaylist(newDoc._id, 'Youtube');
+            var saveData = function(song) {
+              app.db.songs.insert(song, function(err, newDoc) {
+                addToPlaylist(newDoc._id, 'Youtube');
 
-              // update the browser the song has been added
-              broadcast('yt_update', {
-                type: 'added',
-                content: newDoc,
+                // update the browser the song has been added
+                broadcast('yt_update', {
+                  type: 'added',
+                  content: newDoc,
+                });
+
+                // lazy save the id3 tags to the file
+                saveID3(song);
+
+                // call the final callback because we are finished downloading
+                if (finalCallback)
+                  finalCallback();
               });
-
-              // lazy save the id3 tags to the file
-              saveID3(song);
-
-              // call the final callback because we are finished downloading
-              if (finalCallback)
-                finalCallback();
-            });
+            };
           } else {
             if (typeof error != Object) {
               error = {
@@ -781,6 +800,26 @@ function saveID3(songData) {
       }
     });
   }
+}
+
+// fetch coverart for url
+function downloadCoverArt(url, callback) {
+  request({url: url, encoding: null}, function(error, response, body) {
+    // where are we storing the cover art?
+    var cover_location = md5(body) + '.jpg';
+    var filename = __dirname + '/dbs/covers/' + cover_location;
+
+    // does it exist?
+    fs.exists(filename, function(exists) {
+      if (!exists) {
+        fs.writeFile(filename, body, function(err) {
+          callback(cover_location);
+        });
+      } else {
+        callback(cover_location);
+      }
+    });
+  });
 }
 
 // make the function visible outside this module

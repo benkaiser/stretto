@@ -9,6 +9,8 @@ var request = require('request').defaults({ encoding: null });
 var fs = require('fs');
 var path = require('path');
 var MobileDetect = require('mobile-detect');
+var similarSongs = require('similar-songs');
+
 /*
  * GET home page.
  */
@@ -78,10 +80,19 @@ exports.createRoutes = function(app_ref) {
 
   // soundcloud downloading
   app.io.route('soundcloud_download', soundcloudDownload);
+
+  // youtube downloading
   app.io.route('youtube_download', youtubeDownload);
+
+  // youtube downloading for bunch of songs with pre-filled info
+  // (i.e. they were viewing from a mix)
+  app.io.route('youtube_import', youtubeImport);
 
   // settings updating
   app.io.route('update_settings', updateSettings);
+
+  // get similar songs
+  app.io.route('similar_songs', getSimilarSongs);
 };
 
 function musicRoute(req, res) {
@@ -527,7 +538,18 @@ function soundcloudDownload(req) {
 
 // download the youtube song
 function youtubeDownload(req) {
-  lib_func.ytDownload(req.data.url);
+  lib_func.ytDownload({url: req.data.url});
+}
+
+function youtubeImport(req) {
+  var queue = async.queue(function(result, next) {
+    // augment the song info object with the url needed
+    result.url = 'https://www.youtube.com/watch?v=' + result.youtube_id;
+    lib_func.ytDownload(result, next);
+  }, app.get('config').youtube.parallel_download);
+
+  // add all the items to the queue
+  queue.push(req.data.songs);
 }
 
 // update the app settings
@@ -558,4 +580,31 @@ function updateSettings(req) {
       });
     });
   }
+}
+
+// fetch the similar songs for a given title and artist
+function getSimilarSongs(req) {
+  var title = req.data.title;
+  var artist = req.data.artist;
+
+  similarSongs.find({
+    title: title,
+    artist: artist,
+    limit: req.data.limit || 50,
+    lastfmAPIKey: '4795cbddcdec3a6b3f622235caa4b504',
+    lastfmAPISecret: 'cbe22daa03f35df599746f590bf015a5',
+    youtubeAPIKey: app.get('config').youtube.api,
+  }, function(err, songs) {
+    if (err) {
+      console.log(err);
+
+      // if it couldn't find it, just pass that through
+      if (err.message == 'Track not found') {
+        err = null;
+        songs = [];
+      }
+    }
+
+    req.socket.emit('similar_songs', {error: err, songs: songs, reqData: req.data});
+  });
 }

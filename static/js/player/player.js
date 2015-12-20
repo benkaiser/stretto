@@ -40,8 +40,6 @@ function PlayState() {
   this.is_playing = false;
   this.shuffle_state = false;
   this.repeat_state = 0;
-  this.current_track = document.getElementById('current_track');
-  this.fade_track = document.getElementById('fade_track');
   this.scrub = null;
 
   // keep track of play next and history
@@ -63,12 +61,6 @@ function PlayState() {
 
     $(this.names.shuffle).click(function() { player.toggleShuffle(); });
 
-    this.current_src = $('#current_src');
-    this.fade_src = $('#fade_src');
-    this.current_track.addEventListener('ended', function() { player.trackEnded(); });
-
-    this.current_track.addEventListener('durationchange', function() { player.durationChanged(); });
-
     this.shuffle_state = localStorage.getItem('shuffle') == 'true' || false;
     this.redrawShuffle();
     this.repeat_state = localStorage.getItem('repeat') || this.repeat_states.all;
@@ -85,11 +77,10 @@ function PlayState() {
   };
 
   this.update = function() {
-    if (this.is_playing && !this.isSeeking) {
-      this.scrub.slider('setValue', this.current_track.currentTime / this.current_track.duration * 100.0, false);
-      var seconds = prettyPrintSeconds(this.current_track.currentTime);
+    if (this.is_playing && !this.isSeeking && this.scrub) {
+      this.scrub.slider('setValue', this.PlayMethodAbstracter.getCurrentTime() / this.PlayMethodAbstracter.getDuration() * 100.0, false);
+      var seconds = prettyPrintSeconds(this.PlayMethodAbstracter.getCurrentTime());
       $('.current_time').html(seconds);
-      localStorage.setItem('currentTime', this.current_track.currentTime);
     }
   };
 
@@ -159,6 +150,29 @@ function PlayState() {
       MusicApp.router.songview = new SongView();
       MusicApp.contentRegion.show(MusicApp.router.songview);
     }
+  };
+
+  this.showMix = function(originalSong, similarSongs) {
+    this.songs = similarSongs.map(function(songMeta) {
+      return new SongModel(songMeta);
+    });
+
+    // set the mix as the current pool of songs
+    this.queue_pool = this.songs.slice(0);
+    this.genShufflePool();
+
+    // create a mock playlist for the search results
+    this.playlist = {
+      title: 'Instant mix for: \'' + originalSong.title + '\' by \'' + originalSong.artist + '\'',
+      editable: false,
+      is_youtube: true,
+      songs: deAttribute(this.songs),
+    };
+
+    // musicapp should already be defined before they arrive here
+    // so scroll it to the top and re-render it
+    MusicApp.router.songview.scrollTop = 0;
+    MusicApp.router.songview.render();
   };
 
   // note: this is a very expensive method of searching
@@ -264,7 +278,7 @@ function PlayState() {
   };
 
   this.durationChanged = function() {
-    var seconds = prettyPrintSeconds(this.current_track.duration);
+    var seconds = prettyPrintSeconds(this.PlayMethodAbstracter.getCurrentTime());
     $('.duration').html(seconds);
   };
 
@@ -305,14 +319,10 @@ function PlayState() {
       return;
     } else {
       this.playing_id = id;
-      localStorage.setItem('last_playing_id', id);
     }
 
     // update the audio element
-    this.current_track.pause();
-    this.current_src.attr('src', '/songs/' + this.playing_id);
-    this.current_track.load();
-    this.current_track.play();
+    this.PlayMethodAbstracter.playTrack(this.current_song);
 
     // set the state to playing
     this.setIsPlaying(true);
@@ -349,9 +359,9 @@ function PlayState() {
 
   this.togglePlayState = function() {
     if (this.is_playing) {
-      current_track.pause();
+      this.PlayMethodAbstracter.pause();
     } else {
-      current_track.play();
+      this.PlayMethodAbstracter.play();
     }
 
     this.setIsPlaying(!this.is_playing);
@@ -428,8 +438,8 @@ function PlayState() {
   this.nextTrack = function() {
     // repeat the current song if the repeat state is on one
     if (this.repeat_state == this.repeat_states.one) {
-      this.current_track.currentTime = 0;
-      this.current_track.play();
+      this.PlayMethodAbstracter.setCurrentTime(0);
+      this.PlayMethodAbstracter.play();
       return;
     }
 
@@ -471,9 +481,9 @@ function PlayState() {
 
   this.prevTrack = function() {
     // should we just start this song again
-    if (this.current_track.currentTime > 5.00 || this.repeat_state == this.repeat_states.one) {
-      this.current_track.currentTime = 0;
-      this.current_track.play();
+    if (this.PlayMethodAbstracter.getCurrentTime() > 5.00 || this.repeat_state == this.repeat_states.one) {
+      this.PlayMethodAbstracter.setCurrentTime(0);
+      this.PlayMethodAbstracter.play();
     } else {
       // find the previous song if it exists
       if (this.play_history.length > 0 && this.play_history_idx + 1 < this.play_history.length) {
@@ -518,7 +528,7 @@ function PlayState() {
   };
 
   this.setVolume = function(value) {
-    this.current_track.volume = value / 100.00;
+    this.PlayMethodAbstracter.setVolume(value / 100.00);
   };
 
   this.scrubTimeout = function() {
@@ -531,7 +541,7 @@ function PlayState() {
     this.isSeeking = true;
 
     // update the time to show the current scrub value
-    var seconds = prettyPrintSeconds(this.current_track.duration * this.scrub_value / 100.00);
+    var seconds = prettyPrintSeconds(this.PlayMethodAbstracter.getDuration() * this.scrub_value / 100.00);
     $('.current_time').html(seconds);
   };
 
@@ -543,13 +553,8 @@ function PlayState() {
 
   // scrub to percentage in current track
   this.scrubTo = function(value) {
-    var length = this.current_track.duration;
-    this.seekTo(length * value / 100.00);
-  };
-
-  // seek to specific time in track
-  this.seekTo = function(value) {
-    this.current_track.currentTime = value;
+    var length = this.PlayMethodAbstracter.getDuration();
+    this.PlayMethodAbstracter.setCurrentTime(length * value / 100.00);
   };
 
   this.setCompName = function(name) {
@@ -600,8 +605,158 @@ function PlayState() {
       }
     }
   };
+
+  this.PlayMethodAbstracter = new (function() {
+    this.isYoutubeElement = false;
+
+    // html5 audio element
+    this.audio_elem = document.getElementById('current_track');
+    this.srcElem = $('#current_src');
+
+    // youtube element
+    this.ytplayer = null;
+
+    // event listeners that dispatch the events
+    this.audio_elem.addEventListener('ended', function() {
+      if (this.endHandler)
+        this.endHandler();
+    }.bind(this));
+
+    this.audio_elem.addEventListener('durationchange', function() {
+      // fire the handler
+      if (this.durationChangeHandler)
+        this.durationChangeHandler();
+    }.bind(this));
+
+    this.playTrack = function(songInfo) {
+      if (!songInfo.attributes.is_youtube) {
+        // set the state
+        this.isYT = false;
+
+        // stop the youtube video
+        if (this.ytplayer && this.ytplayer.stopVideo) {
+          this.ytplayer.stopVideo();
+        }
+
+        // load in the new audio track
+        this.audio_elem.pause();
+        this.srcElem.attr('src', '/songs/' + songInfo.attributes._id);
+        this.audio_elem.load();
+        this.audio_elem.play();
+
+        // only set this for tracks as youtube ones won't be avialable on refresh
+        localStorage.setItem('last_playing_id', songInfo.attributes._id);
+      } else {
+        // set the state
+        this.isYT = true;
+
+        // pause the audio element
+        this.audio_elem.pause();
+
+        // load in the youtube video
+        this.ytplayer.loadVideoById(songInfo.attributes.youtube_id, 0, 'default');
+      }
+    };
+
+    var lastYoutubeTime = -1;
+    var lastYoutubeUpdate = (+new Date());
+
+    this.getCurrentTime = function() {
+      if (this.isYT) {
+        // get the time from youtube
+        var youtubeTime = this.ytplayer.getCurrentTime();
+
+        // because it is jagged, update the time smoothly
+        // by guessing the time in between updates
+        if (youtubeTime != lastYoutubeTime) {
+          lastYoutubeTime = youtubeTime;
+          lastYoutubeUpdate = (+new Date());
+          return youtubeTime;
+        } else {
+          return lastYoutubeTime + ((+new Date()) - lastYoutubeUpdate) / 1000;
+        }
+      } else {
+        // update the current time only if it's not a youtube video
+        // since we will lose the youtube video on refresh
+        localStorage.setItem('currentTime', this.audio_elem.currentTime);
+
+        // return the current time
+        return this.audio_elem.currentTime;
+      }
+    };
+
+    this.setCurrentTime = function(currentTime) {
+      if (this.isYT) {
+        this.ytplayer.seekTo(currentTime, true);
+      } else {
+        this.audio_elem.currentTime = currentTime;
+      }
+    };
+
+    this.getDuration = function() {
+      if (this.isYT) {
+        return this.ytplayer.getDuration();
+      } else {
+        return this.audio_elem.duration;
+      }
+    };
+
+    this.pause = function() {
+      if (this.isYT) {
+        this.ytplayer.pauseVideo();
+      } else {
+        this.audio_elem.pause();
+      }
+    };
+
+    this.play = function() {
+      if (this.isYT) {
+        this.ytplayer.playVideo();
+      } else {
+        this.audio_elem.play();
+      }
+    };
+
+    this.setVolume = function(volume) {
+      this.audio_elem.volume = value;
+    };
+
+    this.onYoutubePlayerReady = function() {
+
+    };
+
+    this.onYoutubeStateChange = function(event) {
+      // when the song ends, call the player function for onend
+      if (event.data == YT.PlayerState.ENDED) {
+        if (this.endHandler)
+          this.endHandler();
+      }
+    };
+
+    this.setupYoutube = function() {
+      this.ytplayer = new YT.Player('player', {
+        height: '480',
+        width: '853',
+        videoId: '',
+        events: {
+          onReady: this.onYoutubePlayerReady.bind(this),
+          onStateChange: this.onYoutubeStateChange.bind(this),
+        },
+      });
+    }; // force this method to be called with the current context
+  });
+
+  // attach to the PlayMethodAbstracter events
+  this.PlayMethodAbstracter.endHandler = this.trackEnded.bind(this);
+  this.PlayMethodAbstracter.durationChangeHandler = this.durationChanged.bind(this);
 }
 
 var player = new PlayState();
 player.init();
 player.setupCollections();
+
+// link in the youtube iframe API, this method must be global
+// so the youtube iframe API can call it when ready
+function onYouTubeIframeAPIReady() {
+  player.PlayMethodAbstracter.setupYoutube();
+}

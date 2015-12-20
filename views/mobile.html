@@ -24,8 +24,10 @@
   </div>
 </div>
 <audio id='current_track'><source id="current_src" type='audio/mpeg'></audio>
-<audio id='fade_track'><source id="fade_src" type='audio/mpeg'></audio>
 <div class="options_container"></div>
+<div class='hidden'>
+  <div id="player"></div>
+</div>
 {% raw %}
 <script type="text/swig" id='sidebar_template'>
   <div id="sidebar_height_wrapper">
@@ -81,42 +83,54 @@
   <div class='option_div'>
     <i class='fa fa-plus-square-o options'></i>
   </div>
-  {% if song.attributes.hasOwnProperty('cover_location') %}
-    <img class='cover' src='/cover/{{song.attributes.cover_location}}'/>
-  {% else %}
-    <i class='fa fa-question unknown_cover'></i>
-  {% endif %}
+  <img class='cover' src='{{song.getCover()}}'/>
   <span class='song_text'>{{song.attributes.title}}</span>
 </td>
 <td>{{song.attributes.display_artist}}</td>
 </tr>
 </script>
 <script type="text/swig" id="current_info_template">
-  {% if attributes.hasOwnProperty('cover_location') %}
-    <img class='info_cover' src='/cover/{{attributes.cover_location}}'/>
-  {% else %}
-    <i class='fa fa-question info_unknown_cover'></i>
-  {% endif %}
+  <img class='info_cover' src='{{song.getCover()}}'/>
   <div class='info_wrapper'>
-    <p class="info_title">{{attributes.title}}</p>
-    <p class="info_detail"><span class='colsearch'>{{attributes.display_artist}}</span> - <span class='colsearch'>{{attributes.album}}</span></p>
+    <p class="info_title">{{song.attributes.title}}</p>
+    <p class="info_detail"><span class='colsearch'>{{song.attributes.display_artist}}</span> - <span class='colsearch'>{{song.attributes.album}}</span></p>
   </div>
 </script>
 <script type="text/swig" id="options_template">
 <div class="dropdown open {{dropup}}">
   <ul class="dropdown-menu options-menu custom_scrollbar" role="menu">
-    <li class='add_to_queue'><a>Add to Queue</a></li>
-    {% if current_playlist.editable %}
-      <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
+    {% if type == 'youtube' %}
+      <li class="save_youtube"><a>Save to Library</a></li>
     {% endif %}
-    <li class='hard_rescan'><a>Hard Rescan</a></li>
-    <li class="divider"></li>
-    <li role="presentation" class="dropdown-header">Add to Playlist</li>
-    {% for playlist in playlists %}
-      {% if playlist.attributes.editable %}
-      <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
+    <li class='add_to_queue'><a>Add to Queue</a></li>
+    {% if numSelected == 1 %}
+      {% if type == 'normal' %}
+        <li class="view_info"><a>Detailed Info</a></li>
       {% endif %}
-    {% endfor %}
+      <li class="similar_songs"><a>Generate Mix</a></li>
+    {% endif %}
+    {% if type == 'normal' %}
+      <li class="rewrite_tags"><a>Write metadata to file</a></li>
+      {% if current_playlist.editable %}
+        <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
+      {% endif %}
+      <li class="hard_rescan"><a>Hard Rescan</a></li>
+      <li class="divider"></li>
+      {% if recents.length %}
+        <li role="presentation" class="dropdown-header">Recents</li>
+        {% for playlist in recents %}
+          {% if playlist.attributes.editable %}
+          <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <li role="presentation" class="dropdown-header">Add to Playlist</li>
+      {% for playlist in playlists %}
+        {% if playlist.attributes.editable %}
+        <li class='add_to_playlist' id="{{playlist.attributes._id}}"><a>{{playlist.attributes.title}}</a></li>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
   </ul>
 </div>
 </script>
