@@ -524,11 +524,12 @@ function PlayState() {
   this.setVolElem = function(elem) {
     this.vol = elem;
     this.vol.slider()
-      .on('slide', function() { player.setVolume(player.vol.slider('getValue')); });
+      .on('slide', function() { this.setVolume(this.vol.slider('getValue')); }.bind(this))
+      .on('slideStop', function() { this.setVolume(this.vol.slider('getValue'));}.bind(this));
   };
 
   this.setVolume = function(value) {
-    this.PlayMethodAbstracter.setVolume(value / 100.00);
+    this.PlayMethodAbstracter.setVolume(value);
   };
 
   this.scrubTimeout = function() {
@@ -717,8 +718,14 @@ function PlayState() {
       }
     };
 
+    // set the volume
+    // @param volume: number between 0 and 100
     this.setVolume = function(volume) {
-      this.audio_elem.volume = value;
+      if (this.isYT) {
+        this.ytplayer.setVolume(volume);
+      } else {
+        this.audio_elem.volume = volume / 100.00;
+      }
     };
 
     this.onYoutubePlayerReady = function() {
