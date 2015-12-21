@@ -6,7 +6,7 @@
 
   <title>{% block title %}Desktop Command Remote{% endblock %}</title>
 
-  <script type="text/javascript" src="/static/lib/headjs/head.min.js"></script>
+  <script type="text/javascript" src="/static/lib/head.min.js"></script>
 
   <script type="text/javascript">
   head.load(
@@ -14,7 +14,7 @@
     "/static/lib/libs.min.css",
     "/static/css/main.css"
     );
-  var music_dir = "{{music_dir}}";
+  var music_dir = "{{music_dir|addslashes}}";
   var music_dir_set = "{{music_dir_set}}" === "true";
   </script>
   {% block head %}
