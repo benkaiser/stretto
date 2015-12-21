@@ -99,5 +99,5 @@ function Config(app) {
 }
 
 function getUserHome() {
-  return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+  return process.env.HOME || process.env.USERPROFILE || process.env.HOMEPATH;
 }

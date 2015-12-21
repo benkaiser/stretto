@@ -2,11 +2,13 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    bower: {
-      install: {
-        options: {
-          targetDir: 'static/lib/',
-        },
+    'bower-install-simple': {
+      options: {
+        color: true,
+        directory: 'bower_components',
+      },
+      def: {
+        production: true,
       },
     },
 
@@ -22,6 +24,10 @@ module.exports = function(grunt) {
         dest: 'static/lib/font-awesome-bower/css/',
         expand: true, flatten: true, filter: 'isFile',
       },
+      headjs: {
+        src: 'bower_components/headjs/dist/1.0.0/head.min.js',
+        dest: 'static/lib/head.min.js',
+      },
     },
     uglify: {
       options: {
@@ -30,26 +36,25 @@ module.exports = function(grunt) {
       my_target: {
         files: {
           'static/lib/libs.min.js': [
-            'static/lib/jquery/jquery.js',
-            'static/lib/bootstrap/bootstrap.js',
-            'static/lib/jquery.ui/ui/core.js',
-            'static/lib/jquery.ui/ui/widget.js',
-            'static/lib/jquery.ui/ui/position.js',
-            'static/lib/jquery.ui/ui/menu.js',
-            'static/lib/jquery.ui/ui/mouse.js',
-            'static/lib/jquery.ui/ui/sortable.js',
-            'static/lib/underscore/underscore.js',
-            'static/lib/backbone/backbone.js',
-            'static/lib/backbone.babysitter/backbone.babysitter.js',
-            'static/lib/backbone.wreqr/backbone.wreqr.js',
-            'static/lib/marionette/backbone.marionette.js',
-            'static/lib/bootstrap/bootstrap.js',
-            'static/lib/seiyria-bootstrap-slider/bootstrap-slider.js',
-            'static/lib/bootbox/bootbox.js',
-            'static/lib/messenger/messenger.js',
-            'static/lib/civswig/swig.js',
-            'static/lib/DateJS/date.min.js',
-            'static/lib/lastfm-api/lastfm-api.js',
+            'bower_components/jquery/dist/jquery.min.js',
+            'bower_components/bootstrap/dist/js/bootstrap.min.js',
+            'bower_components/jquery.ui/ui/core.js',
+            'bower_components/jquery.ui/ui/widget.js',
+            'bower_components/jquery.ui/ui/position.js',
+            'bower_components/jquery.ui/ui/menu.js',
+            'bower_components/jquery.ui/ui/mouse.js',
+            'bower_components/jquery.ui/ui/sortable.js',
+            'bower_components/underscore/underscore-min.js',
+            'bower_components/backbone/backbone.js',
+            'bower_components/backbone.babysitter/lib/backbone.babysitter.min.js',
+            'bower_components/backbone.wreqr/lib/backbone.wreqr.min.js',
+            'bower_components/marionette/lib/backbone.marionette.min.js',
+            'bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js',
+            'bower_components/bootbox/bootbox.js',
+            'bower_components/messenger/build/js/messenger.min.js',
+            'bower_components/civswig/swig.min.js',
+            'bower_components/DateJS/build/production/date.min.js',
+            'bower_components/lastfm-api/lastfm-api.js',
           ],
         },
       },
@@ -62,20 +67,20 @@ module.exports = function(grunt) {
       target: {
         files: {
           'static/lib/libs.min.css': [
-            'static/lib/bootswatch/cerulean/bootstrap.min.css',
-            'static/lib/seiyria-bootstrap-slider/bootstrap-slider.css',
-            'static/lib/messenger/messenger.css',
-            'static/lib/messenger/messenger-theme-air.css',
+            'bower_components/bootswatch/cerulean/bootstrap.min.css',
+            'bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css',
+            'bower_components/messenger/build/css/messenger.css',
+            'bower_components/messenger/build/css/messenger-theme-air.css',
           ],
         },
       },
     },
   });
 
-  grunt.loadNpmTasks('grunt-bower-task');
+  grunt.loadNpmTasks('grunt-bower-install-simple');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
 
-  grunt.registerTask('default', ['bower', 'copy', 'uglify', 'cssmin']);
+  grunt.registerTask('default', ['bower-install-simple:def', 'copy', 'uglify', 'cssmin']);
 };
