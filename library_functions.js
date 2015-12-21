@@ -601,6 +601,25 @@ exports.ytDownload = function(data, finalCallback) {
             var now = Date.now();
             var song;
 
+            var saveData = function(song) {
+              app.db.songs.insert(song, function(err, newDoc) {
+                addToPlaylist(newDoc._id, 'Youtube');
+
+                // update the browser the song has been added
+                broadcast('yt_update', {
+                  type: 'added',
+                  content: newDoc,
+                });
+
+                // lazy save the id3 tags to the file
+                saveID3(song);
+
+                // call the final callback because we are finished downloading
+                if (finalCallback)
+                  finalCallback();
+              });
+            };
+
             // decide how to build the metadata based on if we have it or not
             if (!data.title) {
               var dashpos = trackInfo.title.indexOf('-');
@@ -652,25 +671,6 @@ exports.ytDownload = function(data, finalCallback) {
               downloadCoverArt(data.cover_location, function(cover_location) {
                 song.cover_location = cover_location;
                 saveData(song);
-              });
-            }
-
-            var saveData = function(song) {
-              app.db.songs.insert(song, function(err, newDoc) {
-                addToPlaylist(newDoc._id, 'Youtube');
-
-                // update the browser the song has been added
-                broadcast('yt_update', {
-                  type: 'added',
-                  content: newDoc,
-                });
-
-                // lazy save the id3 tags to the file
-                saveID3(song);
-
-                // call the final callback because we are finished downloading
-                if (finalCallback)
-                  finalCallback();
               });
             };
           } else {
