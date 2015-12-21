@@ -314,36 +314,39 @@ function PlayState() {
       this.current_song = this.queue_pool[this.current_index];
     }
 
-    // skip resetting the song if it's the same song playing and we don't need to force restart
-    if (id == this.playing_id && !force_restart) {
-      return;
-    } else {
-      this.playing_id = id;
+    // only continue if the song was defined
+    if (this.current_song) {
+      // skip resetting the song if it's the same song playing and we don't need to force restart
+      if (id == this.playing_id && !force_restart) {
+        return;
+      } else {
+        this.playing_id = id;
+      }
+
+      // update the audio element
+      this.PlayMethodAbstracter.playTrack(this.current_song);
+
+      // set the state to playing
+      this.setIsPlaying(true);
+
+      // show the songs info
+      info = new InfoView();
+      MusicApp.infoRegion.show(info);
+
+      // update the selected item
+      $('tr').removeClass('light-blue');
+      $('#' + id).addClass('light-blue');
+
+      // update the window title
+      window.document.title = this.current_song.attributes.title + ' - ' + this.current_song.attributes.display_artist;
+
+      // update the cover photo if it's showing fullscreen and the new song has cover art
+      if (cover_is_visible && cover_is_current && this.current_song.attributes.cover_location) {
+        showCover('/cover/' + this.current_song.attributes.cover_location);
+      }
+
+      this.displayNotification();
     }
-
-    // update the audio element
-    this.PlayMethodAbstracter.playTrack(this.current_song);
-
-    // set the state to playing
-    this.setIsPlaying(true);
-
-    // show the songs info
-    info = new InfoView();
-    MusicApp.infoRegion.show(info);
-
-    // update the selected item
-    $('tr').removeClass('light-blue');
-    $('#' + id).addClass('light-blue');
-
-    // update the window title
-    window.document.title = this.current_song.attributes.title + ' - ' + this.current_song.attributes.display_artist;
-
-    // update the cover photo if it's showing fullscreen and the new song has cover art
-    if (cover_is_visible && cover_is_current && this.current_song.attributes.cover_location) {
-      showCover('/cover/' + this.current_song.attributes.cover_location);
-    }
-
-    this.displayNotification();
   };
 
   this.setIsPlaying = function(isPlaying) {
