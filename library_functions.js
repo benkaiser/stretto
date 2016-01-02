@@ -8,6 +8,13 @@ var async = require('async');
 var SoundcloudResolver = require('soundcloud-resolver');
 var ytdl = require('ytdl-core');
 var youtubePlaylistInfo = require('youtube-playlist-info').playlistInfo;
+var os = require('os');
+
+// if the platform is windows, set these
+if (os.platform() === 'win32') {
+  process.env.FFMPEG_PATH = path.join(__dirname, 'ffmpeg.exe');
+  process.env.FFPROBE_PATH = path.join(__dirname, 'ffprobe.exe');
+}
 
 // ffmpeg is optional, allow failure of loading
 try {
