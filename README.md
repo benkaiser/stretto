@@ -4,20 +4,21 @@ Node Music Player
 
 [![Join the chat at https://gitter.im/benkaiser/node-music-player](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/benkaiser/node-music-player?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-![screenshot](https://cloud.githubusercontent.com/assets/608054/3919259/b1ab3a00-23a5-11e4-94ad-859051b06626.jpg)
+![screenshot](https://cloud.githubusercontent.com/assets/608054/12073955/0b9a34c6-b0ef-11e5-83f5-04c6f3fed33c.png)
 
 ### Live Demo
-You can view a version I have hosted on one of my personal server at [http://music.kaiserapps.com/](http://music.kaiserapps.com/).
+You can view a version I have hosted on my personal server at [http://music.kaiserapps.com/](http://music.kaiserapps.com/).
 
 To have the full functionality and to use your own music please follow the install instructions below.
 
 The music I have used for the hosted version is copyright of [Social Club](http://martymar.goodcitymusic.com/).
-To purchase or download their music visit [their website](http://martymar.goodcitymusic.com/).
+To purchase or download their music visit [their website](https://socialxclub.bandcamp.com).
 
-### How does it work?
-Run it on your computer or server containing your music library and then access it through `<ip of computer>:2000`, for example if you run it on your local computer you would use `localhost:2000`.
+### User Installation Instructions
 
-### Installation Instructions
+Visit the [releases page](https://github.com/benkaiser/node-music-player/releases) for the latest release, and select the download for your platform. Unzip the download and run either the `Node Music Player.exe` on Windows, `Node Music Player.app` on Mac or the `Node Music Player` executable on Linux.
+
+### Dev Installation Instructions
 ##### Dependencies
 [node](http://nodejs.org/), [git](http://git-scm.com/)
 
@@ -70,8 +71,14 @@ bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
 
 ### Features Implemented
 
-- Sync between computers (servers running on different computers)
+#### Defining Features
+
+- Sync between computers (share your library with your friends!)
+- Generate mix from songs streamed from youtube, allowing you to explore new music from your current library
 - Download from youtube and soundcloud
+- Built in the open with other open source libraries
+
+#### Simple Features
 - View full-resolution cover art
 - Full playlist support
 - Multiple selection
@@ -81,3 +88,7 @@ bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
 ### Planned features
 
 - See the projects public [Trello board](https://trello.com/b/cXdOSOoR/node-music-player) for features planned / implemented. If you want to request a feature, please [create an issue](https://github.com/benkaiser/node-music-player/issues/new).
+
+### License
+
+[MIT](https://opensource.org/licenses/MIT)
