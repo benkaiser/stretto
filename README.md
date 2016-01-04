@@ -1,8 +1,8 @@
-Node Music Player
+Stretto (previously Node Music Player)
 =================
 #### An open source web-based music player
 
-[![Join the chat at https://gitter.im/benkaiser/node-music-player](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/benkaiser/node-music-player?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/benkaiser/stretto](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/benkaiser/stretto?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ![screenshot](https://cloud.githubusercontent.com/assets/608054/12073955/0b9a34c6-b0ef-11e5-83f5-04c6f3fed33c.png)
 
@@ -16,7 +16,7 @@ To purchase or download their music visit [their website](https://socialxclub.ba
 
 ### User Installation Instructions
 
-Visit the [releases page](https://github.com/benkaiser/node-music-player/releases) for the latest release, and select the download for your platform. Unzip the download and run either the `Node Music Player.exe` on Windows, `Node Music Player.app` on Mac or the `Node Music Player` executable on Linux.
+Visit the [releases page](https://github.com/benkaiser/stretto/releases) for the latest release, and select the download for your platform. Unzip the download and run either the `Stretto.exe` on Windows, `Stretto.app` on Mac or the `Stretto` executable on Linux.
 
 ### Dev Installation Instructions
 ##### Dependencies
@@ -35,8 +35,8 @@ Windows support is not guaranteed and is up to someone else to submit any pull r
 
 After all the dependencies have been installed, run these commands to install the music player:
 ```
-git clone https://github.com/benkaiser/node-music-player.git
-cd node-music-player/
+git clone https://github.com/benkaiser/stretto.git
+cd stretto/
 npm install
 grunt
 ```
@@ -49,7 +49,7 @@ Go to `localhost:2000` in your browser (or known ip of server if it is on a diff
 
 ### Android Sync App
 
-If you want to sync your Node Music Player playlists to your phone, [check out the android sync app repository](https://github.com/benkaiser/android-node-music-sync).
+If you want to sync your Stretto playlists to your phone, [check out the android sync app repository](https://github.com/benkaiser/android-node-music-sync).
 
 ### Remote Control Shortcuts
 
@@ -87,7 +87,7 @@ bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
 
 ### Planned features
 
-- See the projects public [Trello board](https://trello.com/b/cXdOSOoR/node-music-player) for features planned / implemented. If you want to request a feature, please [create an issue](https://github.com/benkaiser/node-music-player/issues/new).
+- See the projects public [Trello board](https://trello.com/b/cXdOSOoR/stretto) for features planned / implemented. If you want to request a feature, please [create an issue](https://github.com/benkaiser/stretto/issues/new).
 
 ### License
 
