@@ -1,5 +1,5 @@
 {
-  "name": "node-music-player",
+  "name": "stretto",
   "version": "0.0.1",
   "main": "electron.js",
   "private": true,

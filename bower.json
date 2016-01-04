@@ -1,7 +1,7 @@
 {
-  "name": "node-music-player",
-  "version": "0.0.1",
-  "description": "Nodejs based music player",
+  "name": "stretto",
+  "version": "0.0.2",
+  "description": "Web based music player",
   "main": "server.js",
   "private": true,
   "dependencies": {
