@@ -355,7 +355,9 @@ var addToPlaylist = function(song_id, playlist_name) {
         songs: [{_id: song_id}],
         editable: true,
       };
-      app.db.playlists.insert(plist);
+      app.db.playlists.insert(plist, function(err, newDoc) {
+        broadcast('addPlaylist', newDoc);
+      });
     } else {
       // playlist does exist, inser the song if it isn't already in there
       var found = false;

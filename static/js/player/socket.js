@@ -55,22 +55,32 @@ socket.on('sc_update', function(data) {
 
     SCMessenger = updateMask(SCMessenger, 'Added ' + msg + ' (' + data.content.title + ')');
 
-    // add the song to the SoundCloud playlist
-    var sc_plist = player.playlist_collection.getByTitle('SoundCloud').attributes;
-    sc_plist.songs.push({_id: data.content._id});
+    // grab the soundcloud playlist from the collection
+    var sc_plist = player.playlist_collection.getByTitle('SoundCloud');
 
-    // render if we are on the SoundCloud playlist
-    if (player.playlist.title == 'SoundCloud') {
-      // update the model data
-      player.playlist = sc_plist;
-      player.songs = player.song_collection.getByIds(player.playlist);
-      player.queue_pool = player.songs.slice(0);
-      player.genShufflePool();
+    // if it existed, do something, otherwise wait for the addPlaylist event
+    if (sc_plist) {
+      sc_plist = sc_plist.attributes;
 
-      // resort the model data
-      player.resortSongs();
-      redrawSongsChangedModel();
+      // add the track to the soundcloud playlist
+      sc_plist.songs.push({_id: data.content._id});
+
+      // render if we are on the SoundCloud playlist
+      if (player.playlist.title == 'SoundCloud') {
+        // update the model data
+        player.playlist = sc_plist;
+        player.songs = player.song_collection.getByIds(player.playlist);
+        player.queue_pool = player.songs.slice(0);
+        player.genShufflePool();
+
+        // resort the model data
+        player.resortSongs();
+        redrawSongsChangedModel();
+      }
     }
+
+    // add the track to the library playlist
+    addToLibraryPlaylist(data.content._id);
   } else if (data.type == 'skipped') {
     SCMessenger = updateMask(SCMessenger, 'Skipped song ' + data.completed + '. Unable to read from SoundCloud');
   } else if (data.type == 'error') {
@@ -86,21 +96,31 @@ socket.on('yt_update', function(data) {
   } else if (data.type == 'added') {
     player.song_collection.add(data.content);
     YTMessenger = updateMask(YTMessenger, 'Added ' + data.content.title);
-    var yt_plist = player.playlist_collection.getByTitle('Youtube').attributes;
-    yt_plist.songs.push({_id: data.content._id});
-    if (player.playlist.title == 'Youtube') {
-      // update the model data
-      player.playlist = yt_plist;
-      player.songs = player.song_collection.getByIds(player.playlist);
-      player.queue_pool = player.songs.slice(0);
-      player.genShufflePool();
+    var yt_plist = player.playlist_collection.getByTitle('Youtube');
+    if (yt_plist) {
+      yt_plist = yt_plist.attributes;
 
-      // resort the model data
-      player.resortSongs();
+      // add the track to the youtube playlist
+      yt_plist.songs.push({_id: data.content._id});
 
-      // redraw the songs view
-      redrawSongsChangedModel();
+      // if the user currently has the youtube playlist focussed, refresh it
+      if (player.playlist.title == 'Youtube') {
+        // update the model data
+        player.playlist = yt_plist;
+        player.songs = player.song_collection.getByIds(player.playlist);
+        player.queue_pool = player.songs.slice(0);
+        player.genShufflePool();
+
+        // resort the model data
+        player.resortSongs();
+
+        // redraw the songs view
+        redrawSongsChangedModel();
+      }
     }
+
+    // add the track to the library playlist
+    addToLibraryPlaylist(data.content._id);
   } else if (data.type == 'error') {
     YTMessenger = updateMask(YTMessenger, data.content);
   }
@@ -255,8 +275,20 @@ socket.on('similar_songs', function(data) {
 
       // instruct the player to create a view for the mix
       player.showMix(data.reqData, songsConverted);
+
+      // update the url without navigating
+      MusicApp.router.navigate('mix/' + encodeURIComponent(data.reqData.title), true);
     }
   }
+});
+
+// add a new playlist
+socket.on('addPlaylist', function(data) {
+  // add the playlist to the collection
+  player.playlist_collection.add(data);
+
+  // redraw the sidebar
+  MusicApp.router.sidebar();
 });
 
 // generic info message reciever
@@ -273,5 +305,19 @@ function redrawInfoView() {
 }
 
 function addToLibraryPlaylist(id) {
-  player.playlist_collection.where({_id: 'LIBRARY'})[0].attributes.songs.push({_id: id});
+  var libraryPlaylist = player.playlist_collection.where({_id: 'LIBRARY'})[0].attributes;
+  libraryPlaylist.songs.push({_id: id});
+
+  // if they are focussed on the Library playlist, refresh it
+  if (player.playlist.title == 'Library') {
+    // update the model data
+    player.playlist = libraryPlaylist;
+    player.songs = player.song_collection.getByIds(player.playlist);
+    player.queue_pool = player.songs.slice(0);
+    player.genShufflePool();
+
+    // resort the model data
+    player.resortSongs();
+    redrawSongsChangedModel();
+  }
 }

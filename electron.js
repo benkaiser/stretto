@@ -25,7 +25,9 @@ electronApp.on('ready', function() {
   mainWindow.loadUrl('http://localhost:' + app.get('port') + '/');
 
   // show the dev tool
-  // mainWindow.toggleDevTools();
+  if (process.env.DEVTOOLS) {
+    mainWindow.toggleDevTools();
+  }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
