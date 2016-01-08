@@ -20,7 +20,10 @@ Visit the [releases page](https://github.com/benkaiser/stretto/releases) for the
 
 ### Dev Installation Instructions
 ##### Dependencies
-[node](http://nodejs.org/), [git](http://git-scm.com/), [npm v3+](http://npmjs.org)
+
+[node](http://nodejs.org/), [git](http://git-scm.com/), [npm](http://npmjs.org)
+
+If you have any issues during install, make sure you are running the latest version of Nodejs and Npm.
 
 ##### NPM Global Dependencies
 [grunt-cli](http://gruntjs.com/getting-started#installing-the-cli), [nodemon](http://nodemon.io/)
@@ -51,6 +54,17 @@ Alternatively, install PM2 (read more about PM2 at [pm2.keymetrics.io](http://ht
 pm2 start app.js
 ```
 Go to `localhost:2000` in your browser (or known IP of server if it is on a different machine). From there a prompt will allow you to change your music directory, after saving your music directory you can click `Scan Library -> Regular Scan` at the top of the page. From there select `Start Scan` and let it do it's magic adding all the songs to your library. Happy listening!
+
+### Submitting issues
+
+Please include:
+
+- operating system
+- architecture (32bit or 64bit)
+- nodejs version `node --version`
+- npm version `npm --version`
+
+Then include steps to reproduce followed by what you were aiming to do / expected to happen, and what did happen.
 
 ### Android Sync App
 
