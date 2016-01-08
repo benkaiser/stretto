@@ -20,7 +20,7 @@ Visit the [releases page](https://github.com/benkaiser/stretto/releases) for the
 
 ### Dev Installation Instructions
 ##### Dependencies
-[node](http://nodejs.org/), [git](http://git-scm.com/)
+[node](http://nodejs.org/), [git](http://git-scm.com/), [npm v3+](http://npmjs.org)
 
 ##### NPM Global Dependencies
 [grunt-cli](http://gruntjs.com/getting-started#installing-the-cli), [nodemon](http://nodemon.io/)
@@ -45,7 +45,12 @@ Then run the server with:
 ```
 node app.js
 ```
-Go to `localhost:2000` in your browser (or known ip of server if it is on a different machine). From there a prompt will show so you can change your music directory, after saving your music directory you can click `Scan Library -> Regular Scan` at the top of the page. From there select `Start Scan` and let it do it's magic adding all the songs to your library. Happy listening!
+
+Alternatively, install PM2 (read more about PM2 at [pm2.keymetrics.io](http://http://pm2.keymetrics.io/))with `npm install -g pm2` and run the server persistently with:
+```
+pm2 start app.js
+```
+Go to `localhost:2000` in your browser (or known IP of server if it is on a different machine). From there a prompt will allow you to change your music directory, after saving your music directory you can click `Scan Library -> Regular Scan` at the top of the page. From there select `Start Scan` and let it do it's magic adding all the songs to your library. Happy listening!
 
 ### Android Sync App
 
@@ -74,8 +79,8 @@ bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
 #### Defining Features
 
 - Sync between computers (share your library with your friends!)
-- Generate mix from songs streamed from youtube, allowing you to explore new music from your current library
-- Download from youtube and soundcloud
+- Generate mix from songs streamed from YouTube, allowing you to explore new music from your current library
+- Download from YouTube and SoundCloud
 - Built in the open with other open source libraries
 
 #### Simple Features
