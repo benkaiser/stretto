@@ -39,8 +39,6 @@ body{
   box-shadow: 0 0 20px #ccc;
 }
 .sidebar_controls{
-  bottom: 120px;
-  position: absolute;
   text-align: center;
   width: 100%;
 }
@@ -58,7 +56,10 @@ body{
 #sidebar_height_wrapper > ul{
   height: 90%;
   height: calc(100% - 50px);
-  overflow-y: auto;
+  overflow-y: hidden;
+}
+#sidebar_height_wrapper > ul:hover{
+  overflow-y: scroll;
 }
 #bottom_bar{
   position: fixed;

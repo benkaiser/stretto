@@ -138,6 +138,12 @@ socket.on('song_update', function(data) {
 
     // add the track
     player.song_collection.add(data[x]);
+
+    // if it was the current track, update the player reference
+    if (data[x]._id == player.current_song.attributes._id) {
+      // refetch it from the song collection
+      player.current_song = player.song_collection.where({_id: player.current_song.attributes._id})[0];
+    }
   }
 
   // regenerate the list of current songs
