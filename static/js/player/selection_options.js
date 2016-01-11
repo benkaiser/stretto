@@ -7,7 +7,6 @@ var lastSelection = '';
 function createOptions(x, y) {
   // calculate if the menu should 'drop up'
   var dropup = '';
-  console.log(y);
   if (y + 300 > $(window).height()) {
     dropup = 'dropup';
   }

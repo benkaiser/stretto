@@ -278,7 +278,7 @@ function PlayState() {
   };
 
   this.durationChanged = function() {
-    var seconds = prettyPrintSeconds(this.PlayMethodAbstracter.getCurrentTime());
+    var seconds = prettyPrintSeconds(this.PlayMethodAbstracter.getDuration());
     $('.duration').html(seconds);
   };
 
@@ -732,7 +732,8 @@ function PlayState() {
     };
 
     this.onYoutubePlayerReady = function() {
-
+      // call the duration changed handler
+      this.durationChangeHandler();
     };
 
     this.onYoutubeStateChange = function(event) {
