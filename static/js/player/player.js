@@ -432,7 +432,7 @@ function PlayState() {
 
     if (player.playlist && player.playlist._id == 'QUEUE') {
       player.songs = player.shuffle_pool;
-      if (MusicApp.router.songview) {
+      if (MusicApp.router.songview && player.shuffle_state) {
         MusicApp.router.songview.render();
       }
     }
