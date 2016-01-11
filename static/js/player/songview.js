@@ -305,7 +305,7 @@ SongView = Backbone.View.extend({
 
       if (max > player.songs.length - 1) {
         max = player.songs.length - 1;
-        min = max - this.how_many_drawn + 1;
+        min = max - this.how_many_drawn;
       }
 
       if (min != this.lastmin || max != this.lastmax) {
