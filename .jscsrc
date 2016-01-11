@@ -2,5 +2,6 @@
   "preset": "airbnb",
   "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
   "safeContextKeyword": null,
-  "requireCamelCaseOrUpperCaseIdentifiers": null
+  "requireCamelCaseOrUpperCaseIdentifiers": null,
+  "requirePaddingNewLinesAfterBlocks": false
 }
