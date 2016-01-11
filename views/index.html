@@ -6,8 +6,8 @@
 <li class='dropdown'>
   <a class='pointer dropdown-toggle' data-toggle='dropdown'>Fetch New Music <span class="caret"></span></a>
   <ul class='dropdown-menu' role='menu'>
-    <li><a class='pointer' id='soundcloud_fetch'>From SoundCloud</a></li>
-    <li><a class='pointer' id='youtube_fetch'>From Youtube</a></li>
+    <li class='disabled'><a class='pointer'>From SoundCloud (disabled for demo)</a></li>
+    <li class='disabled'><a class='pointer'>From Youtube (disabled for demo)</a></li>
   </ul>
 </li>
 {% endblock %}
@@ -59,7 +59,7 @@
       {% endfor %}
     </ul>
     <div class='sidebar_controls'>
-    <button class='add_playlist btn btn-default'>Add Playlist</button>
+    <button class='add_playlist btn btn-default disabled'>Add Playlist</button>
     </div>
   </div>
 </script>
@@ -195,7 +195,7 @@
       {% if current_playlist.editable %}
         <li class='remove_from_playlist' id='{{current_playlist._id}}'><a>Remove from playlist</a></li>
       {% endif %}
-      <li class="hard_rescan"><a>Hard Rescan</a></li>
+      <li class="disabled"><a>Hard Rescan (disabled for demo)</a></li>
       <li class="divider"></li>
       {% if recents.length %}
         <li role="presentation" class="dropdown-header">Recents</li>
