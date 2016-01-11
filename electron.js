@@ -1,5 +1,7 @@
 var electronApp = require('app');  // Module to control application life.
 var BrowserWindow = require('browser-window');  // Module to create native browser window.
+var globalShortcut = require('global-shortcut');
+
 var mainWindow = null;
 electronApp.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
@@ -28,6 +30,11 @@ electronApp.on('ready', function() {
   if (process.env.DEVTOOLS) {
     mainWindow.toggleDevTools();
   }
+
+  // attach the keyboard shortucts
+  globalShortcut.register('MediaPlayPause', function() { app.io.sockets.emit('command', {command: 'playpause'}); });
+  globalShortcut.register('MediaNextTrack', function() { app.io.sockets.emit('command', {command: 'next'}); });
+  globalShortcut.register('MediaPreviousTrack', function() { app.io.sockets.emit('command', {command: 'prev'}); });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
