@@ -3,12 +3,23 @@ $(document).ready(function() {
 
   // variable for keeping track of seeking
   var is_seeking = false;
+  /*
+   * use this flag to mark a keydown has happened before a keyup happens
+   * this is to work with a stupid bug in windows that lets the desktop-level
+   * workspace change shortcuts leak keys (like right/left arrow) though to the
+   * application...
+   */
+  var prevNextDown = false;
   var seek_interval = 0;
   var HOLD_TIME = 500;
   $('body').keydown(function(event) {
     // don't fire the controls if the user is editing an input
     if (event.target.localName == 'input') {
       return;
+    }
+
+    if (event.which == 37 || event.which == 39) {
+      prevNextDown = true;
     }
 
     switch (event.which){
@@ -73,31 +84,25 @@ $(document).ready(function() {
       return;
     }
 
-    switch (event.which){
-      case 39: // right key
-        // reset the seeking state and remove interval function
-        clearInterval(seek_interval);
-        seek_interval = 0;
+    // left or right repectively
+    if (event.which == 37 || event.which == 39) {
+      // clear the seeking interval
+      clearInterval(seek_interval);
+      seek_interval = 0;
 
-        // if they are now seeking (i.e. haven't been holding the key down) skip to next
+      // decide if we should move to the next/prev track
+      if (prevNextDown) {
+        prevNextDown = false;
+
+        // don't go next if we are seeking
         if (!is_seeking) {
-          player.nextTrack();
+          // based on the keycode, call prev/next on the player
+          event.which == 37 ? player.prevTrack() : player.nextTrack();
         }
+      }
 
-        event.preventDefault();
-        break;
-      case 37: // left key
-        // reset the seeking state and remove interval function
-        clearInterval(seek_interval);
-        seek_interval = 0;
-
-        // if they are now seeking (i.e. haven't been holding the key down) move to previous
-        if (!is_seeking) {
-          player.prevTrack();
-        }
-
-        event.preventDefault();
-        break;
+      // prevent the event from propagating
+      event.preventDefault();
     }
   });
 
