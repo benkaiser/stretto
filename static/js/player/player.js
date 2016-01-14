@@ -746,16 +746,20 @@ function PlayState() {
     // set the volume
     // @param volume: number between 0 and 100
     this.setVolume = function(volume) {
-      if (this.isYT) {
+      // set both of them, even if we aren't playing from them right now
+      this.audio_elem.volume = volume / 100.00;
+
+      // only the youtube player if it's defined
+      if (this.ytplayer) {
         this.ytplayer.setVolume(volume);
-      } else {
-        this.audio_elem.volume = volume / 100.00;
       }
     };
 
     this.onYoutubePlayerReady = function() {
       // call the duration changed handler
       this.durationChangeHandler();
+
+      this.setVolume(player.volume);
     };
 
     this.onYoutubeStateChange = function(event) {
