@@ -28,7 +28,7 @@ SidebarView = Backbone.View.extend({
 SettingsBarView = Backbone.View.extend({
   template: '#settings_bar_template',
   render: function() {
-    this.$el.html(render(this.template, {vol: 100}));
+    this.$el.html(render(this.template, {vol: player.getVolume()}));
     _.defer(function() {
       var volElem = $('#vol_bar');
       if (volElem.length > 0) {
