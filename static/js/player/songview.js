@@ -296,16 +296,19 @@ SongView = Backbone.View.extend({
       this.middle_item = Math.floor(middle_of_viewport / this.individual_height);
 
       // get the bounds of items to draw
-      var min = this.middle_item - this.how_many_drawn / 2;
-      var max = this.middle_item + this.how_many_drawn / 2;
+      var min = Math.floor(this.middle_item - this.how_many_drawn / 2);
+      var max = Math.floor(this.middle_item + this.how_many_drawn / 2);
+
+      // if the min is less than 0, set it to 0
       if (min < 0) {
         min = 0;
         max = this.how_many_drawn;
-      }
-
-      if (max > player.songs.length - 1) {
+      } else if (max > player.songs.length - 1) {
+        // set the max item to the last item
         max = player.songs.length - 1;
-        min = max - this.how_many_drawn;
+
+        // only let it go as low as 0
+        min = Math.max(max - this.how_many_drawn, 0);
       }
 
       if (min != this.lastmin || max != this.lastmax) {
@@ -326,7 +329,7 @@ SongView = Backbone.View.extend({
             index = max - diff;
             render_item = this.song_template({
               song: player.songs[index],
-              selected: (selectedItems.indexOf(player.songs[index].attributes._id) != -1),
+              selected: (player.songs[index] ? selectedItems.indexOf(player.songs[index].attributes._id) != -1 : false),
               index: index,
             });
 
