@@ -26,7 +26,7 @@ $(document).ready(function() {
       case 191: // '?' key
       case 83: // 's' key
         // focus search box
-        $('.search-input').focus();
+        $('.search-input').select();
         return false;
       case 32: // space key
         player.togglePlayState();
