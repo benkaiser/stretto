@@ -66,6 +66,8 @@ function PlayState() {
     this.repeat_state = localStorage.getItem('repeat') || this.repeat_states.all;
     this.redrawRepeat();
     this.comp_name = localStorage.getItem('comp_name') || '';
+    this.volume = parseInt(localStorage.getItem('currentVolume')) || 100;
+    this.PlayMethodAbstracter.setVolume(this.volume);
     this.onMobile = on_mobile;
   };
 
@@ -529,10 +531,30 @@ function PlayState() {
     this.vol.slider()
       .on('slide', function() { this.setVolume(this.vol.slider('getValue')); }.bind(this))
       .on('slideStop', function() { this.setVolume(this.vol.slider('getValue'));}.bind(this));
+
+    // update the slider with the current known volume
+    this.vol.slider('setValue', this.volume);
   };
 
-  this.setVolume = function(value) {
-    this.PlayMethodAbstracter.setVolume(value);
+  // sets the current volume
+  // @param volume: volume between 0 and 100
+  this.setVolume = function(volume) {
+    this.PlayMethodAbstracter.setVolume(volume);
+
+    // also update the slider if it's defined
+    if (this.vol) {
+      this.vol.slider('setValue', volume);
+    }
+
+    // commit it to local storage
+    localStorage.setItem('currentVolume', volume);
+
+    // keep the volume updated
+    this.volume = volume;
+  };
+
+  this.getVolume = function() {
+    return this.volume;
   };
 
   this.scrubTimeout = function() {
