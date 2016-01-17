@@ -25,23 +25,14 @@ Visit the [releases page](https://github.com/benkaiser/stretto/releases) for the
 
 If you have any issues during install, make sure you are running the latest version of Nodejs and Npm.
 
-##### NPM Global Dependencies
-[grunt-cli](http://gruntjs.com/getting-started#installing-the-cli), [nodemon](http://nodemon.io/)
-
-To install these, use:
-```
-sudo npm install -g grunt-cli nodemon
-```
-
 For the Youtube download and converison, make sure you have [ffmpeg](https://ffmpeg.org/) installed on your system (including all necessary encoding libraries like libmp3lame or libx264).
-Windows support is not guaranteed and is up to someone else to submit any pull requests for windows support.
+Windows users can install ffmpeg from [Zeranoe](http://ffmpeg.zeranoe.com/builds/).
 
 After all the dependencies have been installed, run these commands to install the music player:
 ```
 git clone https://github.com/benkaiser/stretto.git
 cd stretto/
-npm install
-grunt
+npm run setup
 ```
 
 Then run the server with:
@@ -53,6 +44,7 @@ Alternatively, install PM2 (read more about PM2 at [pm2.keymetrics.io](http://ht
 ```
 pm2 start app.js
 ```
+
 Go to `localhost:2000` in your browser (or known IP of server if it is on a different machine). From there a prompt will allow you to change your music directory, after saving your music directory you can click `Scan Library -> Regular Scan` at the top of the page. From there select `Start Scan` and let it do it's magic adding all the songs to your library. Happy listening!
 
 ### Submitting issues
