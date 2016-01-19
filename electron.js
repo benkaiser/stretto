@@ -20,6 +20,9 @@ electronApp.on('ready', function() {
   // disable the menu entirely
   mainWindow.setMenu(null);
 
+  // set the config directory in the users applicatin settings location
+  process.env.configDir = electronApp.getPath('userData');
+
   // init the server
   var app = require(__dirname + '/app.js');
 

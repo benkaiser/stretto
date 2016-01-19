@@ -137,7 +137,7 @@ function sendSong(req, res) {
 function sendCover(req, res) {
   // if they passed the location of the cover, fetch it
   if (req.params.id.length > 0) {
-    res.sendFile(app.get('root') + '/dbs/covers/' + req.params.id);
+    res.sendFile(app.get('configDir') + '/dbs/covers/' + req.params.id);
   } else {
     res.sendFile(app.get('root') + '/static/images/unknown.png');
   }
@@ -374,7 +374,7 @@ function updateSongInfo(req) {
     // function to be called by both download file and file upload methods
     var process_cover = function(type, content_buffer) {
       var cover_filename = md5(content_buffer) + '.' + type;
-      var location = app.get('root') + '/dbs/covers/' + cover_filename;
+      var location = app.get('configDir') + '/dbs/covers/' + cover_filename;
       fs.exists(location, function(exists) {
         if (!exists) {
           fs.writeFile(location, content_buffer, function(err) {

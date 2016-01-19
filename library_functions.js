@@ -174,7 +174,7 @@ function findSong(relative_location, callback) {
             pic = result.picture[0];
             pic.format = pic.format.replace(/[^a-z0-9]/gi, '_').toLowerCase();
             song.cover_location = md5(pic.data) + '.' + pic.format;
-            filename = __dirname + '/dbs/covers/' + song.cover_location;
+            filename = app.get('configDir') + '/dbs/covers/' + song.cover_location;
             fs.exists(filename, function(exists) {
               if (!exists) {
                 fs.writeFile(filename, pic.data, function(err) {
@@ -326,9 +326,11 @@ exports.scanLibrary = function(hard) {
 
     // list with paths with music_dir removed
     var stripped = [];
-    for (var cnt = 0; cnt < list.length; cnt++) {
-      stripped.push(list[cnt].replace(app.get('config').music_dir, ''));
-    }
+    list.forEach(function(item) {
+      if (item) {
+        stripped.push(item.replace(app.get('config').music_dir, ''));
+      }
+    });
 
     clearNotIn(stripped);
     if (!hard) {
@@ -758,7 +760,7 @@ exports.sync_import = function(songs, url) {
 
           // is there a cover?
           if (songs[cnt].cover_location !== undefined) {
-            var cover_file_url = __dirname + '/dbs/covers/' + songs[cnt].cover_location;
+            var cover_file_url = app.get('configDir') + '/dbs/covers/' + songs[cnt].cover_location;
             request(url + '/cover/' + songs[cnt].cover_location).on('end', function() {
               // once the cover has finished transferring add the song to the database
               addSong(songs[cnt]);
@@ -795,7 +797,7 @@ function saveID3(songData) {
     var options = {};
     if (songData.cover_location) {
       // assign it in array format with 1 element
-      options.attachments = [path.join(app.get('root') + '/dbs/covers/' + songData.cover_location)];
+      options.attachments = [path.join(app.get('configDir') + '/dbs/covers/' + songData.cover_location)];
     }
 
     var destinationFile = path.join(app.get('config').music_dir, songData.location);
@@ -816,7 +818,7 @@ function downloadCoverArt(url, callback) {
   request({url: url, encoding: null}, function(error, response, body) {
     // where are we storing the cover art?
     var cover_location = md5(body) + '.jpg';
-    var filename = __dirname + '/dbs/covers/' + cover_location;
+    var filename = app.get('configDir') + '/dbs/covers/' + cover_location;
 
     // does it exist?
     fs.exists(filename, function(exists) {

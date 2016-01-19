@@ -27,8 +27,11 @@ app.io.set('authorization', function(handshakeData, accept) {
   accept(null, true);
 });
 
+// fetch the config directory
+app.set('configDir', process.env.configDir || __dirname);
+
 // make sure the dbs directory is present
-mkdirp(__dirname + '/dbs/covers', function() {
+mkdirp(app.get('configDir') + '/dbs/covers', function() {
   // attach the db to the app
   require(__dirname + '/db.js')(app);
 

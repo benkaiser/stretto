@@ -31,14 +31,8 @@ function Config(app) {
   // based on iTunes defaults https://support.apple.com/en-au/HT1391
   var home_dir = getUserHome();
 
-  // platform
-  if (home_dir.indexOf('C:') === 0) {
-    // windows
-    this.music_dir = path.join(home_dir, 'My Music');
-  } else {
-    // Mac or Linux
-    this.music_dir = path.join(home_dir, 'Music');
-  }
+  // this works on all platforms
+  this.music_dir = path.join(home_dir, 'Music');
 
   // execute the two db calls in parrallel
   async.parallel([
