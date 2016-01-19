@@ -23,6 +23,16 @@ socket.on('playlists', function(data) {
   // redraw the sidebar
   MusicApp.router.sidebar();
 
+  // when they are viewing a playlist that has been updated, refresh it
+  data.playlists.forEach(function(playlist, index) {
+    if (player.playlist &&
+        player.playlist.title === playlist.title &&
+        player.playlist.songs.length !== playlist.songs.length) {
+      // trigger a re-route, this will refresh the songview
+      MusicApp.router.playlist(playlist._id);
+    }
+  });
+
   // restart the router if we are loading for the first time
   loadedRestart('playlists');
 });
