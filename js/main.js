@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  var latestRelease = 'https://github.com/benkaiser/stretto/releases/download/v0.0.2/Stretto-';
+  var latestRelease = 'https://github.com/benkaiser/stretto/releases/download/v0.0.3/Stretto-';
   var os;
 
   if (platform.os.family == 'Linux') {
