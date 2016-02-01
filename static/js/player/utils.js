@@ -195,4 +195,4 @@ var fixHelper = function(e, ui) {
 };
 
 // define things before they are used
-var socket = io.connect('http://' + window.location.host);
+var socket = io.connect('//' + window.location.host);
