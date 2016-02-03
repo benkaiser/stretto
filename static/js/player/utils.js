@@ -66,7 +66,7 @@ function showCover(src) {
   }
 
   // check if the new cover art is from the current track
-  cover_is_current = ('/cover/' + player.current_song.attributes.cover_location == src);
+  cover_is_current = ('cover/' + player.current_song.attributes.cover_location == src);
 
   // create and activate the cover art
   box = new CoverBox(src, function() {
@@ -195,4 +195,5 @@ var fixHelper = function(e, ui) {
 };
 
 // define things before they are used
-var socket = io.connect('//' + window.location.host);
+var socket = io.connect('//' + window.location.host, {path: window.location.pathname + 'socket.io'});
+
