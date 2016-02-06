@@ -40,7 +40,7 @@ Then run the server with:
 node app.js
 ```
 
-Alternatively, install PM2 (read more about PM2 at [pm2.keymetrics.io](http://http://pm2.keymetrics.io/))with `npm install -g pm2` and run the server persistently with:
+Alternatively, install PM2 (read more about PM2 at [pm2.keymetrics.io](http://pm2.keymetrics.io/))with `npm install -g pm2` and run the server persistently with:
 ```
 pm2 start app.js
 ```
