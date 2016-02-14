@@ -6,13 +6,13 @@
 
   <title>{% block title %}Desktop Command Remote{% endblock %}</title>
 
-  <script type="text/javascript" src="/static/lib/head.min.js"></script>
+  <script type="text/javascript" src="static/lib/head.min.js"></script>
 
   <script type="text/javascript">
   head.load(
-    "/static/lib/font-awesome-bower/css/font-awesome.css",
-    "/static/lib/libs.min.css",
-    "/static/css/main.css"
+    "static/lib/font-awesome-bower/css/font-awesome.css",
+    "static/lib/libs.min.css",
+    "static/css/main.css"
     );
   var music_dir = "{{music_dir|addslashes}}";
   var music_dir_set = "{{music_dir_set}}" === "true";
@@ -52,23 +52,23 @@
   {% endblock %}
   <script type="text/javascript">
     head.js(
-      "/static/lib/libs.min.js",
+      "static/lib/libs.min.js",
       "socket.io/socket.io.js",
-      "/static/js/player/utils.js",
-      "/static/js/player/models.js",
-      "/static/js/player/player.js",
-      "/static/js/player/socket.js",
-      "/static/js/player/backbone_setup.js",
-      "/static/js/player/settingsview.js",
-      "/static/js/player/onload.js",
-      "/static/js/player/songview.js",
-      "/static/js/player/selection_options.js",
-      "/static/js/player/detailview.js",
-      "/static/js/player/sidebarview.js",
-      "/static/js/player/infoview.js",
-      "/static/js/player/syncview.js",
-      "/static/js/player/footer.js",
-      "/static/js/player/coverbox.js",
+      "static/js/player/utils.js",
+      "static/js/player/models.js",
+      "static/js/player/player.js",
+      "static/js/player/socket.js",
+      "static/js/player/backbone_setup.js",
+      "static/js/player/settingsview.js",
+      "static/js/player/onload.js",
+      "static/js/player/songview.js",
+      "static/js/player/selection_options.js",
+      "static/js/player/detailview.js",
+      "static/js/player/sidebarview.js",
+      "static/js/player/infoview.js",
+      "static/js/player/syncview.js",
+      "static/js/player/footer.js",
+      "static/js/player/coverbox.js",
       "https://www.youtube.com/iframe_api"
       );
   </script>

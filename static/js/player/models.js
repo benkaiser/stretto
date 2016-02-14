@@ -35,9 +35,9 @@ var SongModel = Backbone.Model.extend({
     if (this.get('is_youtube')) {
       return this.attributes.cover_location;
     } else if (this.get('cover_location')) {
-      return '/cover/' + this.attributes.cover_location;
+      return 'cover/' + this.attributes.cover_location;
     } else {
-      return '/static/images/unknown.jpg';
+      return 'static/images/unknown.jpg';
     }
   },
 

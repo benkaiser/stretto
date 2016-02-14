@@ -344,7 +344,7 @@ function PlayState() {
 
       // update the cover photo if it's showing fullscreen and the new song has cover art
       if (cover_is_visible && cover_is_current && this.current_song.attributes.cover_location) {
-        showCover('/cover/' + this.current_song.attributes.cover_location);
+        showCover('cover/' + this.current_song.attributes.cover_location);
       }
 
       this.displayNotification();
@@ -601,7 +601,7 @@ function PlayState() {
         var notifOptions = {
           dir: 'auto',
           body: 'Album: ' + this.current_song.attributes.album + '\nArtist: ' + this.current_song.attributes.display_artist,
-          icon: '/cover/' + this.current_song.attributes.cover_location,
+          icon: 'cover/' + this.current_song.attributes.cover_location,
         };
         if (this.lastNotificationTimeout) {
           clearTimeout(this.lastNotificationTimeout);
@@ -666,7 +666,7 @@ function PlayState() {
 
         // load in the new audio track
         this.audio_elem.pause();
-        this.srcElem.attr('src', '/songs/' + songInfo.attributes._id);
+        this.srcElem.attr('src', 'songs/' + songInfo.attributes._id);
         this.audio_elem.load();
         this.audio_elem.play();
 
