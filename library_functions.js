@@ -637,10 +637,10 @@ exports.ytDownload = function(data, finalCallback) {
               var title = trackInfo.title;
               var artist = trackInfo.title;
 
-              // if there is a dash, set them in the assumed format [title] - [artist]
+              // if there is a dash, set them in the assumed format [artist] - [title]
               if (dashpos != -1) {
-                title = trackInfo.title.substr(0, dashpos);
-                artist = trackInfo.title.substr(dashpos + 1);
+                artist = trackInfo.title.substr(0, dashpos).trim();
+                title = trackInfo.title.substr(dashpos + 1).trim();
               }
 
               song = {
