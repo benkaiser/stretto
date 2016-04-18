@@ -1,7 +1,7 @@
 var util = require(__dirname + '/../util.js');
 var lib_func = require(__dirname + '/../library_functions.js');
 var async = require('async');
-var AdmZip = require('adm-zip');
+var archiver = require('archiver');
 var os = require('os');
 var opener = require('opener');
 var md5 = require('md5');
@@ -149,27 +149,24 @@ function downloadPlaylist(req, res) {
 
     // create zip
     var filename = os.tmpdir() + '/download.zip';
-    var zip = new AdmZip();
+    var archive = archiver('zip');
     async.forEach(playlist.songs, function(item, callback) {
       app.db.songs.findOne({_id: item._id}, function(err, song) {
         if (err) throw err;
-        var zip_location;
-        if (song.location.lastIndexOf(path.sep) > 0) {
-          zip_location = song.location.substring(0, song.location.lastIndexOf(path.sep));
-        } else {
-          zip_location = song.location;
-        }
+        var zip_location = song.location;
 
-        zip.addLocalFile(path.join(app.get('config').music_dir, song.location), zip_location);
+        var song_location = path.join(app.get('config').music_dir, song.location);
+
+        archive.append(fs.createReadStream(song_location), {name: zip_location});
         callback();
       });
     }, function(err) {
-      // convert the zip to a buffer
-      zip.toBuffer(function(buffer) {
-        // download the buffer
-        res.setHeader('Content-disposition', 'attachment; filename=download.zip');
-        res.end(buffer, 'binary');
-      });
+      // set the response headers and set the archiver to pipe on finish
+      res.setHeader('Content-disposition', 'attachment; filename=download.zip');
+      archive.pipe(res);
+
+      // trigger the piping of the archive
+      archive.finalize();
     });
   });
 }

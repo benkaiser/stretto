@@ -10,7 +10,7 @@
     "setup": "npm install && grunt"
   },
   "dependencies": {
-    "adm-zip": "*",
+    "archiver": "^1.0.0",
     "async": "*",
     "body-parser": "^1.14.1",
     "cookie-parser": "^1.4.0",

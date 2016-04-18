@@ -3,5 +3,6 @@
   "requireCamelCaseOrUpperCaseIdentifiers": "ignoreProperties",
   "safeContextKeyword": null,
   "requireCamelCaseOrUpperCaseIdentifiers": null,
-  "requirePaddingNewLinesAfterBlocks": false
+  "requirePaddingNewLinesAfterBlocks": false,
+  "requireSpacesInsideObjectBrackets": false,
 }
