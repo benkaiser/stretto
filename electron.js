@@ -15,7 +15,13 @@ electronApp.on('window-all-closed', function() {
 // initialization and is ready to create browser windows.
 electronApp.on('ready', function() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600, 'node-integration': false});
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: false,
+    },
+  });
 
   // disable the menu entirely
   mainWindow.setMenu(null);
@@ -26,8 +32,11 @@ electronApp.on('ready', function() {
   // init the server
   var app = require(__dirname + '/app.js');
 
+  // let the app know we are running under electron
+  app.set('electron', true);
+
   // and load the music player page on the server
-  mainWindow.loadUrl('http://localhost:' + app.get('port') + '/');
+  mainWindow.loadURL('http://localhost:' + app.get('port') + '/');
 
   // show the dev tool
   if (process.env.DEVTOOLS) {

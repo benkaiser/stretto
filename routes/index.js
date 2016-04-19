@@ -162,6 +162,7 @@ function downloadPlaylist(req, res) {
       });
     }, function(err) {
       // set the response headers and set the archiver to pipe on finish
+      res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-disposition', 'attachment; filename=download.zip');
       archive.pipe(res);
 
