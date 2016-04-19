@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node app.js",
     "nodemon": "nodemon app.js -e 'html css js'",
-    "setup": "npm install && grunt"
+    "setup": "npm install && grunt",
+    "build": "./electronres/buildpackages.sh"
   },
   "dependencies": {
     "archiver": "^1.0.0",
