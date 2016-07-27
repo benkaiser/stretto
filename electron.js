@@ -1,6 +1,6 @@
-var electronApp = require('app');  // Module to control application life.
-var BrowserWindow = require('browser-window');  // Module to create native browser window.
-var globalShortcut = require('global-shortcut');
+var electronApp = require('electron').app;  // Module to control application life.
+var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
+var globalShortcut = require('electron').globalShortcut;
 
 var mainWindow = null;
 electronApp.on('window-all-closed', function() {
@@ -29,11 +29,11 @@ electronApp.on('ready', function() {
   // set the config directory in the users applicatin settings location
   process.env.configDir = electronApp.getPath('userData');
 
+  // let the app know via an env variable we are running electron
+  process.env.ELECTRON_ENABLED = true;
+
   // init the server
   var app = require(__dirname + '/app.js');
-
-  // let the app know we are running under electron
-  app.set('electron', true);
 
   // and load the music player page on the server
   mainWindow.loadURL('http://localhost:' + app.get('port') + '/');
