@@ -24,6 +24,12 @@ function Config(app) {
     parallel_download: 5,
   };
 
+  // // Uncomment this block to set your own basic http authentication
+  // this.auth = {
+  //   username: 'username',
+  //   password: 'password',
+  // };
+
   // used for itunes metadata fetching (to select the store to search)
   this.country_code = 'us';
 
