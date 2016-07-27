@@ -65,7 +65,7 @@ async.series([function createDatabaseDirectory(next) {
     app.use(basicAuth(config.auth.username, config.auth.password));
   }
   next();
-}, function setupEverythinElse(next) {
+}, function setupEverythingElse(next) {
   // middleware to use in the app
   app.use(favicon(__dirname + '/static/images/favicon.ico'));
   app.use(bodyParser.urlencoded({extended: false}));
