@@ -1,0 +1,14 @@
+{% extends 'base/ts_base.html' %}
+
+{% block content %}
+<div id='root'></div>
+<script type="text/javascript">
+var music_dir = "{{music_dir|addslashes}}";
+var music_dir_set = "{{music_dir_set}}" === "true";
+var this_ip = "{{ip}}";
+var country_code = "{{country_code}}";
+var on_mobile = false;
+</script>
+<script src="dist/vendor.bundle.js"></script>
+<script src="dist/bundle.js"></script>
+{% endblock %}

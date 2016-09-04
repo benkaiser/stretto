@@ -38,11 +38,30 @@
     "fluent-ffmpeg": "~2.0.0-rc1"
   },
   "devDependencies": {
+    "bootstrap-sass": "^3.3.7",
+    "bootswatch": "^3.3.7",
+    "css-loader": "^0.24.0",
+    "expose-loader": "^0.7.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "font-awesome": "^4.6.3",
     "grunt": "^0.4.5",
     "grunt-bower-install-simple": "^1.2.0",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-cssmin": "^0.12.2",
-    "grunt-contrib-uglify": "^0.8.0"
+    "grunt-contrib-uglify": "^0.8.0",
+    "jquery": "^3.1.0",
+    "less": "^2.7.1",
+    "node-sass": "^3.8.0",
+    "nodemon": "^1.10.2",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1",
+    "sass-loader": "^4.0.1",
+    "source-map-loader": "^0.1.5",
+    "style-loader": "^0.13.1",
+    "ts-loader": "^0.8.2",
+    "typescript": "^1.8.10",
+    "webpack": "^1.13.2"
   }
 }

@@ -73,6 +73,7 @@ async.series([function createDatabaseDirectory(next) {
   app.use(cookieParser());
   app.use(express.session(sessionOpts));
   app.use('/static', express.static(__dirname + '/static'));
+  app.use('/dist', express.static(__dirname + '/dist'));
 
   // proxy for itunes requests
   app.use('/proxy', proxy('https://itunes.apple.com', {

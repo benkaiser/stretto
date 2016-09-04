@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./node_modules/nodemon/bin/nodemon.js app.js -e 'html css js'

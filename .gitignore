@@ -1,4 +1,6 @@
-node_modules/*
 bower_components/*
-static/lib/*
 dbs/*
+dist/*
+node_modules/*
+static/lib/*
+typings/*

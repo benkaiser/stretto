@@ -103,8 +103,12 @@ function musicRoute(req, res) {
   util.getip(function(ip) {
     // the function to send the homepage only when the config is finished initalizing
     var sendHome = function() {
+      var view = 'index';
+      if (md.mobile()) view = 'mobile';
+      if (req.query.ts) view = 'ts';
+
       // render the view
-      res.render((md.mobile() ? 'mobile' : 'index'), {
+      res.render(view, {
         menu: !md.mobile(),
         music_dir: app.get('config').music_dir,
         music_dir_set: app.get('config').music_dir_set,
