@@ -25,6 +25,7 @@
     "musicmetadata": "*",
     "nedb": "*",
     "opener": "*",
+    "react-router": "^2.7.0",
     "request": "*",
     "serve-favicon": "^2.3.0",
     "similar-songs": "^0.1.3",

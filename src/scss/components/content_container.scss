@@ -1,10 +1,19 @@
 @import 'utilities/scrollbar';
+@import "~bootswatch/cerulean/variables";
 
-.page-wrapper{
-  width: 100%;
+.content-container {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
   outline: 0;
+  padding-top: $navbar-height;
+  position: fixed;
+  width: 100%;
+}
+
+.content-container-body {
+  display: flex;
+  flex-direction: horizontal;
+  flex-grow: 1;
+  height: 100%;
 }
