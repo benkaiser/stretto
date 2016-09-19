@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node app.js",
     "nodemon": "nodemon app.js -e 'html css js'",
-    "setup": "npm install && grunt",
+    "postinstall": "./node_modules/grunt-cli/bin/grunt",
     "build": "./electronres/buildpackages.sh"
   },
   "dependencies": {

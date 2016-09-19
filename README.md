@@ -32,7 +32,7 @@ After all the dependencies have been installed, run these commands to install th
 ```
 git clone https://github.com/benkaiser/stretto.git
 cd stretto/
-npm run setup
+npm install
 ```
 
 Then run the server with:
