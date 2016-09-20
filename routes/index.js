@@ -36,16 +36,35 @@ exports.createRoutes = function(app_ref) {
   // remote functions
   app.io.route('set_comp_name', setCompName);
 
-  // scanning signals
-  app.io.route('scan_page_connected', function(req) { req.socket.join('scanners'); });
+  // routes protected in demo
+  if (!app.get('config').demo) {
+    // scanning signals
+    app.io.route('start_scan', function(req) { lib_func.scanLibrary(false); });
 
-  app.io.route('start_scan', function(req) { lib_func.scanLibrary(false); });
+    app.io.route('start_scan_hard', function(req) { lib_func.scanLibrary(true); });
 
-  app.io.route('start_scan_hard', function(req) { lib_func.scanLibrary(true); });
+    app.io.route('hard_rescan', rescanItem);
 
-  app.io.route('stop_scan', function(req) { lib_func.stopScan(); });
+    // rewrite tags of a track to the file
+    app.io.route('rewrite_tags', rewriteTags);
 
-  app.io.route('hard_rescan', rescanItem);
+    // sync routes
+    app.io.route('sync_page_connected', syncPageConnected);
+    app.io.route('sync_playlists', syncPlaylists);
+
+    // soundcloud downloading
+    app.io.route('soundcloud_download', soundcloudDownload);
+
+    // youtube downloading
+    app.io.route('youtube_download', youtubeDownload);
+
+    // youtube downloading for bunch of songs with pre-filled info
+    // (i.e. they were viewing from a mix)
+    app.io.route('youtube_import', youtubeImport);
+
+    // settings updating
+    app.io.route('update_settings', updateSettings);
+  }
 
   // send the songs to the client
   app.io.route('fetch_songs', returnSongs);
@@ -71,26 +90,6 @@ exports.createRoutes = function(app_ref) {
   // update the info of a song
   app.io.route('update_song_info', updateSongInfo);
 
-  // rewrite tags of a track to the file
-  app.io.route('rewrite_tags', rewriteTags);
-
-  // sync routes
-  app.io.route('sync_page_connected', syncPageConnected);
-  app.io.route('sync_playlists', syncPlaylists);
-
-  // soundcloud downloading
-  app.io.route('soundcloud_download', soundcloudDownload);
-
-  // youtube downloading
-  app.io.route('youtube_download', youtubeDownload);
-
-  // youtube downloading for bunch of songs with pre-filled info
-  // (i.e. they were viewing from a mix)
-  app.io.route('youtube_import', youtubeImport);
-
-  // settings updating
-  app.io.route('update_settings', updateSettings);
-
   // get similar songs
   app.io.route('similar_songs', getSimilarSongs);
 };
@@ -103,14 +102,16 @@ function musicRoute(req, res) {
   util.getip(function(ip) {
     // the function to send the homepage only when the config is finished initalizing
     var sendHome = function() {
+      var config = app.get('config');
       // render the view
       res.render((md.mobile() ? 'mobile' : 'index'), {
         menu: !md.mobile(),
-        music_dir: app.get('config').music_dir,
-        music_dir_set: app.get('config').music_dir_set,
-        country_code: app.get('config').country_code,
+        music_dir: config.music_dir,
+        music_dir_set: config.music_dir_set,
+        country_code: config.country_code,
         ip: ip + ':' + app.get('port'),
         remote_name: req.params.name,
+        demo: config.demo,
       });
     };
 

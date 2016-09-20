@@ -10,6 +10,7 @@ module.exports = function(app, callback) {
 // construct the object
 function Config(app) {
   var self = this;
+  this.demo = Boolean(process.env.DEMO || false);
   this.initialized = false;
   this.music_dir = '';
   this.music_dir_set = false;
