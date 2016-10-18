@@ -469,7 +469,7 @@ function getReceiverList(req) {
   var receiversRoom = 'receivers';
   var users = [];
 
-  for (var id in app.io.of(namespace).adapter.rooms[receiversRoom]) {
+  for (var id in app.io.of(namespace).adapter.rooms[receiversRoom].sockets) {
     users.push(app.io.of(namespace).adapter.nsp.connected[id]);
   }
 
@@ -479,7 +479,6 @@ function getReceiverList(req) {
 function getReceiversMinusThis(req) {
   var receivers = getReceiverList();
   var validReceivers = [];
-  console.log(receivers);
   for (var index in receivers) {
     var client = receivers[index];
     if (client.name && client.name.length > 0) {
