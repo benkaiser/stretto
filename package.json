@@ -34,7 +34,7 @@
     "ytdl-core": "*"
   },
   "optionalDependencies": {
-    "ffmetadata": "git+https://github.com/benkaiser/node-ffmetadata.git",
+    "ffmetadata-ohnx-fork": "*",
     "fluent-ffmpeg": "~2.0.0-rc1"
   },
   "devDependencies": {
