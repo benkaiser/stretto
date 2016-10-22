@@ -37,7 +37,7 @@ var SongModel = Backbone.Model.extend({
     } else if (this.get('cover_location')) {
       return 'cover/' + this.attributes.cover_location;
     } else {
-      return 'static/images/unknown.jpg';
+      return 'https://unsplash.it/g/512?random&'+this.attributes._id;
     }
   },
 
