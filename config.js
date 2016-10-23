@@ -11,6 +11,7 @@ module.exports = function(app, callback) {
 function Config(app) {
   var self = this;
   this.demo = Boolean(process.env.DEMO || false);
+  this.site_name = 'Stretto';
   this.initialized = false;
   this.music_dir = '';
   this.music_dir_set = false;
