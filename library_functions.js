@@ -25,7 +25,7 @@ try {
 
 // ffmetadata is also optional, allow failure of loading
 try {
-  var ffmetadata = require('ffmetadata');
+  var ffmetadata = require('ffmetadata-ohnx-fork');
 } catch (err) {
   var ffmetadata = null;
 }
@@ -783,11 +783,12 @@ exports.stopScan = function(app) {
 
 function saveID3(songData) {
   // did we successfully load the ffmetadata library
+  
   if (ffmetadata) {
     // only commit the fields ffmpeg will honor: http://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata#MP3
     var data = {
       title: songData.title,
-      author: songData.artist,
+      artist: [songData.display_artist],
       album: songData.album,
       year: songData.year,
       genre: songData.genre,
