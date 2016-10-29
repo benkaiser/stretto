@@ -60,7 +60,13 @@ Then include steps to reproduce followed by what you were aiming to do / expecte
 
 ### Android Sync App
 
-If you want to sync your Stretto playlists to your phone, [check out the android sync app repository](https://github.com/benkaiser/android-node-music-sync).
+If you want to sync your Stretto playlists to your Android phone, [check out Stretto Sync](https://github.com/benkaiser/stretto-android-sync).
+
+And if you like using Stretto, consider buying my a slurpee by purchasing the play store version:
+
+[![Stretto Sync on Google Play](https://cloud.githubusercontent.com/assets/608054/19828055/8d4ed4b0-9dff-11e6-8780-96564d414b3a.png)](https://play.google.com/store/apps/details?id=com.kaiserapps.benkaiser.strettoandroidsync)
+
+![sluree](https://cloud.githubusercontent.com/assets/608054/19828043/418046cc-9dff-11e6-936a-460d79b830ab.jpg)
 
 ### Remote Control Shortcuts
 
@@ -85,6 +91,7 @@ bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
 #### Defining Features
 
 - Sync between computers (share your library with your friends!)
+- Android sync application [Stretto Sync](https://github.com/benkaiser/stretto-android-sync)
 - Generate mix from songs streamed from YouTube, allowing you to explore new music from your current library
 - Download from YouTube and SoundCloud
 - Built in the open with other open source libraries
@@ -98,7 +105,7 @@ bindsym $mod+Prior exec curl http://localhost:2000/command/my_remote_name/next
 
 ### Planned features
 
-- See the projects public [Trello board](https://trello.com/b/cXdOSOoR/stretto) for features planned / implemented. If you want to request a feature, please [create an issue](https://github.com/benkaiser/stretto/issues/new).
+- See the [Github task  board](https://github.com/benkaiser/stretto/projects/1) for the product roadmap. If you want to request a feature, please [create an issue](https://github.com/benkaiser/stretto/issues/new).
 
 ### License
 
