@@ -613,22 +613,26 @@ exports.ytDownload = function(data, finalCallback) {
             var song;
 
             var saveData = function(song) {
-              app.db.songs.insert(song, function(err, newDoc) {
-                addToPlaylist(newDoc._id, 'Youtube');
+              app.db.songs.update({location: song.location}, song,
+                {upsert: true, returnUpdatedDocs: true},
+                function(err, numAffected, newDoc, upsert) {
+                  broadcast('yt_update', {
+                    type: upsert ? 'added': 'updated',
+                    content: newDoc,
+                  });
 
-                // update the browser the song has been added
-                broadcast('yt_update', {
-                  type: 'added',
-                  content: newDoc,
+                  addToPlaylist(newDoc._id, 'Youtube');
+
+                  // update the browser the song has been added
+
+
+                  // lazy save the id3 tags to the file
+                  saveID3(song);
+
+                  // call the final callback because we are finished downloading
+                  if (finalCallback)
+                    finalCallback();
                 });
-
-                // lazy save the id3 tags to the file
-                saveID3(song);
-
-                // call the final callback because we are finished downloading
-                if (finalCallback)
-                  finalCallback();
-              });
             };
 
             // decide how to build the metadata based on if we have it or not
@@ -783,7 +787,7 @@ exports.stopScan = function(app) {
 
 function saveID3(songData) {
   // did we successfully load the ffmetadata library
-  
+
   if (ffmetadata) {
     // only commit the fields ffmpeg will honor: http://wiki.multimedia.cx/index.php?title=FFmpeg_Metadata#MP3
     var data = {

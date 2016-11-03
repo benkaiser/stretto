@@ -133,42 +133,16 @@ socket.on('yt_update', function(data) {
     addToLibraryPlaylist(data.content._id);
   } else if (data.type == 'error') {
     YTMessenger = updateMask(YTMessenger, data.content);
+  } else if (data.type === 'updated') {
+    YTMessenger = updateMask(YTMessenger, 'Updated ' + data.content.title);
+    songUpdated([data]);
   }
 });
 
 var SongMessenger = null;
 socket.on('song_update', function(data) {
   console.log('Updating song info');
-  console.log(data);
-
-  // iterate over tracks and update them
-  for (var x = 0; x < data.length; x++) {
-    // remove the track
-    player.song_collection.remove(player.song_collection.where({_id: data[x]._id}));
-
-    // add the track
-    player.song_collection.add(data[x]);
-
-    // if it was the current track, update the player reference
-    if (data[x]._id == player.current_song.attributes._id) {
-      // refetch it from the song collection
-      player.current_song = player.song_collection.where({_id: player.current_song.attributes._id})[0];
-    }
-  }
-
-  // regenerate the list of current songs
-  player.songs = player.song_collection.getByIds(player.playlist);
-  player.queue_pool = player.songs.slice(0);
-  player.genShufflePool();
-
-  // resort the model data
-  player.resortSongs();
-
-  // redraw the view
-  redrawSongsChangedModel();
-
-  // redraw info view
-  redrawInfoView();
+  songUpdated(data);
 });
 
 var ScanMessenger = null;
@@ -336,4 +310,36 @@ function addToLibraryPlaylist(id) {
     player.resortSongs();
     redrawSongsChangedModel();
   }
+}
+
+function songUpdated(data) {
+
+  // iterate over tracks and update them
+  for (var x = 0; x < data.length; x++) {
+    // remove the track
+    player.song_collection.remove(player.song_collection.where({_id: data[x]._id}));
+
+    // add the track
+    player.song_collection.add(data[x]);
+
+    // if it was the current track, update the player reference
+    if (data[x]._id == player.current_song.attributes._id) {
+      // refetch it from the song collection
+      player.current_song = player.song_collection.where({_id: player.current_song.attributes._id})[0];
+    }
+  }
+
+  // regenerate the list of current songs
+  player.songs = player.song_collection.getByIds(player.playlist);
+  player.queue_pool = player.songs.slice(0);
+  player.genShufflePool();
+
+  // resort the model data
+  player.resortSongs();
+
+  // redraw the view
+  redrawSongsChangedModel();
+
+  // redraw info view
+  redrawInfoView();
 }
