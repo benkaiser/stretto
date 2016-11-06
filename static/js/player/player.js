@@ -154,8 +154,8 @@ function PlayState() {
     }
   };
 
-  this.showMix = function(originalSong, similarSongs) {
-    this.songs = similarSongs.map(function(songMeta) {
+  this.showMix = function(title, mixTracks) {
+    this.songs = mixTracks.map(function(songMeta) {
       return new SongModel(songMeta);
     });
 
@@ -165,7 +165,7 @@ function PlayState() {
 
     // create a mock playlist for the search results
     this.playlist = {
-      title: 'Instant mix for: \'' + originalSong.title + '\' by \'' + originalSong.artist + '\'',
+      title: title,
       editable: false,
       is_youtube: true,
       songs: deAttribute(this.songs),

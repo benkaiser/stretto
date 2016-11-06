@@ -8,6 +8,7 @@ SidebarView = Backbone.View.extend({
 
   events: {
     'click .add_playlist': 'addPlaylist',
+    'click .search-youtube': 'searchYoutube',
     'keyup .search-input': 'searchItems',
   },
   addPlaylist: function() {
@@ -22,6 +23,12 @@ SidebarView = Backbone.View.extend({
     searchText = $('.search-input').val();
     player.updateSearch(searchText);
     return true;
+  },
+
+  searchYoutube: function() {
+    var searchText = $('.search-input').val();
+    socket.emit('youtube_search', { search: searchText });
+    Messenger().post('Searching youtube for songs...');
   },
 });
 

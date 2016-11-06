@@ -17,6 +17,7 @@ MusicAppRouter = Backbone.Router.extend({
   routes: {
     'playlist/:id': 'playlist',
     'search/:search': 'search',
+    'searchyt/:search': 'searchyt',
   },
   playlist: function(id) {
     findId = player.playlist_collection.getBy_Id(id);

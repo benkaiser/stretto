@@ -240,7 +240,14 @@ socket.on('similar_songs', function(data) {
       Messenger().post('Error generating mix, lastfm failed to find similar songs');
     } else {
       // map them to models we understand
-      var songsConverted = data.songs.map(function(song) {
+      var songsConverted = data.songs.map(function (song) {
+        // remove the song from the song collection if it already exists
+        if (song.youtubeId && song.youtubeId.length > 0) {
+          player.song_collection.remove(
+            player.song_collection.where({youtube_id: song.youtubeId})
+          );
+        }
+
         return {
           _id: 'YOUTUBE_' + song.youtubeId,
           title: song.title,
@@ -264,10 +271,10 @@ socket.on('similar_songs', function(data) {
       player.song_collection.add(songsConverted);
 
       // instruct the player to create a view for the mix
-      player.showMix(data.reqData, songsConverted);
+      player.showMix(data.title, songsConverted);
 
       // update the url without navigating
-      MusicApp.router.navigate('mix/' + encodeURIComponent(data.reqData.title), true);
+      MusicApp.router.navigate(data.url, true);
     }
   }
 });

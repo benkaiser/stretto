@@ -28,6 +28,7 @@
     "request": "*",
     "serve-favicon": "^2.3.0",
     "similar-songs": "^0.1.3",
+    "song-search": "^0.1.0",
     "soundcloud-resolver": "*",
     "swig": "*",
     "youtube-playlist-info": "^0.1.0",

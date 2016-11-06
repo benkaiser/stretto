@@ -10,6 +10,7 @@ var fs = require('fs');
 var path = require('path');
 var MobileDetect = require('mobile-detect');
 var similarSongs = require('similar-songs');
+var songSearch = require('song-search');
 
 /*
  * GET home page.
@@ -92,6 +93,7 @@ exports.createRoutes = function(app_ref) {
 
   // get similar songs
   app.io.route('similar_songs', getSimilarSongs);
+  app.io.route('youtube_search', getYoutubeSongs);
 };
 
 function musicRoute(req, res) {
@@ -603,6 +605,35 @@ function getSimilarSongs(req) {
       }
     }
 
-    req.socket.emit('similar_songs', {error: err, songs: songs, reqData: req.data});
+    req.socket.emit('similar_songs', {
+      error: err,
+      songs: songs,
+      url: 'mix/' + encodeURIComponent(title),
+      title: "Instant mix for: '" + title + "' by '" + artist + "'",
+    });
+  });
+}
+
+function getYoutubeSongs(req) {
+  var search = req.data.search;
+
+  songSearch.search({
+    search: search,
+    limit: req.data.limit || 50,
+    itunesCountry: app.get('config').country_code,
+    youtubeAPIKey: app.get('config').youtube.api,
+  }, function(err, songs) {
+    if (err) {
+      console.log(err);
+      songs = [];
+      return;
+    }
+
+    req.socket.emit('similar_songs', {
+      error: err,
+      songs: songs,
+      url: 'searchyt/' + encodeURIComponent(search),
+      title: "Youtube listings for: '" + search + "'",
+    });
   });
 }
