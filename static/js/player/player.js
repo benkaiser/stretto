@@ -755,6 +755,13 @@ function PlayState() {
       }
     };
 
+    this.onYoutubePlayerError = function(errorEvent) {
+      if (this.endHandler) {
+        this.endHandler();
+      }
+      Messenger().post('Error playing track from youtube (' + errorEvent.data + ').');
+    };
+
     this.onYoutubePlayerReady = function() {
       // call the duration changed handler
       this.durationChangeHandler();
@@ -776,6 +783,7 @@ function PlayState() {
         width: '853',
         videoId: '',
         events: {
+          onError: this.onYoutubePlayerError.bind(this),
           onReady: this.onYoutubePlayerReady.bind(this),
           onStateChange: this.onYoutubeStateChange.bind(this),
         },
