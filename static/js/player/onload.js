@@ -1,4 +1,4 @@
-$(document).ready(function() {
+(function () {
   player.setScubElem($('#scrub_bar'));
 
   // variable for keeping track of seeking
@@ -164,4 +164,4 @@ $(document).ready(function() {
       showCloseButton: true,
     },
   };
-});
+})();
