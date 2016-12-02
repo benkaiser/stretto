@@ -1,6 +1,8 @@
-var electronApp = require('electron').app;  // Module to control application life.
-var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
-var globalShortcut = require('electron').globalShortcut;
+var electron = require('electron');
+var electronApp = electron.app;  // Module to control application life.
+var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
+var Menu = electron.Menu;
+var globalShortcut = electron.globalShortcut;
 
 var mainWindow = null;
 electronApp.on('window-all-closed', function() {
@@ -22,9 +24,6 @@ electronApp.on('ready', function() {
       nodeIntegration: false,
     },
   });
-
-  // disable the menu entirely
-  mainWindow.setMenu(null);
 
   // set the config directory in the users applicatin settings location
   process.env.configDir = electronApp.getPath('userData');
@@ -55,4 +54,24 @@ electronApp.on('ready', function() {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  // add menu to application
+  var menu = [
+    {
+      label: 'Edit',
+      submenu: [
+        { label: 'Undo', accelerator: 'CmdOrCtrl+Z', selector: 'undo:' },
+        { label: 'Redo', accelerator: 'Shift+CmdOrCtrl+Z', selector: 'redo:' },
+        { type: 'separator' },
+        { label: 'Cut', accelerator: 'CmdOrCtrl+X', selector: 'cut:' },
+        { label: 'Copy', accelerator: 'CmdOrCtrl+C', selector: 'copy:' },
+        { label: 'Paste', accelerator: 'CmdOrCtrl+V', selector: 'paste:' },
+        { label: 'Select All', accelerator: 'CmdOrCtrl+A', selector: 'selectAll:' },
+      ],
+    },
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+
+  // hide the menu
+  mainWindow.setMenuBarVisibility(false);
 });
