@@ -8,29 +8,56 @@ var async = require('async');
 var SoundcloudResolver = require('soundcloud-resolver');
 var ytdl = require('ytdl-core');
 var youtubePlaylistInfo = require('youtube-playlist-info').playlistInfo;
-var os = require('os');
-
-// if the platform is windows, set these
-if (os.platform() === 'win32') {
-  process.env.FFMPEG_PATH = path.join(__dirname, 'ffmpeg.exe');
-  process.env.FFPROBE_PATH = path.join(__dirname, 'ffprobe.exe');
-}
-
-// ffmpeg is optional, allow failure of loading
-try {
-  var ffmpeg = require('fluent-ffmpeg');
-} catch (er) {
-  var ffmpeg = null;
-}
-
-// ffmetadata is also optional, allow failure of loading
-try {
-  var ffmetadata = require('ffmetadata-ohnx-fork');
-} catch (err) {
-  var ffmetadata = null;
-}
+var hasbin = require('hasbin');
 
 var util = require(path.join(__dirname, 'util.js'));
+
+var ffmpeg = null;
+var ffmetadata = null;
+
+function binaryPath(extension) {
+  extension = extension || '';
+  return app.get('configDir') + '/binaries/' + extension;
+}
+
+function downloadFFMpeg(callback) {
+  var ffbinaries = require('ffbinaries');
+  var platform = ffbinaries.detectPlatform();
+
+  ffbinaries.downloadFiles(platform, {
+    components: ['ffmpeg', 'ffprobe'],
+    destination: binaryPath()
+  }, callback)
+}
+
+function loadFFMpegLibraries() {
+  ffmpeg = require('fluent-ffmpeg');
+  ffmetadata = require('ffmetadata-ohnx-fork');
+}
+
+function attemptFFMpegLoad() {
+  hasbin.all(['ffmpeg', 'ffprobe'], function (hasFFMpeg) {
+    if (hasFFMpeg) {
+      loadFFMpegLibraries();
+    } else {
+      // load the modules setting the binary path
+      process.env.FFMPEG_PATH = binaryPath('ffmpeg');
+      process.env.FFPROBE_PATH = binaryPath('ffprobe');
+      loadFFMpegLibraries();
+      // download the binaries if we haven't already
+      if (!fs.existsSync(binaryPath('ffmpeg')) ||
+          !fs.existsSync(binaryPath('ffprobe'))) {
+        console.log("FFMpeg binaries don't exist, downloading binaries...");
+        mkdirp(binaryPath(), function() {
+          downloadFFMpeg(function() {
+            console.log('Completed download of ffmpeg binaries to ' +
+                        binaryPath());
+          });
+        });
+      }
+    }
+  });
+}
 
 // init other variables
 var running = false;
@@ -308,6 +335,7 @@ function remove_scanned(list, callback) {
 // must be called before anything else
 exports.setApp = function(appRef) {
   app = appRef;
+  attemptFFMpegLoad();
 };
 
 exports.scanItems = function(locations) {

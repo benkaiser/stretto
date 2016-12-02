@@ -19,6 +19,8 @@
     "errorhandler": "^1.4.2",
     "express-http-proxy": "^0.3.0",
     "express.oi": "0.0.19",
+    "ffbinaries": "^0.1.2",
+    "hasbin": "^1.2.3",
     "md5": "*",
     "mkdirp": "*",
     "mobile-detect": "^0.4.3",
@@ -40,6 +42,7 @@
   },
   "devDependencies": {
     "electron-packager": "^8.2.0",
+    "electron-prebuilt": "^1.4.10",
     "grunt": "^0.4.5",
     "grunt-bower-install-simple": "^1.2.0",
     "grunt-cli": "^0.1.13",
