@@ -5,12 +5,8 @@ var Menu = electron.Menu;
 var globalShortcut = electron.globalShortcut;
 
 var mainWindow = null;
-electronApp.on('window-all-closed', function() {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform != 'darwin') {
-    electronApp.quit();
-  }
+electronApp.on('window-all-closed', function () {
+  electronApp.quit();
 });
 
 // This method will be called when Electron has finished
