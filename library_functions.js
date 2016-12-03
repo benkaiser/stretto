@@ -8,6 +8,7 @@ var async = require('async');
 var SoundcloudResolver = require('soundcloud-resolver');
 var ytdl = require('ytdl-core');
 var youtubePlaylistInfo = require('youtube-playlist-info').playlistInfo;
+var ffbinaries = require('ffbinaries');
 var hasbin = require('hasbin');
 
 var util = require(path.join(__dirname, 'util.js'));
@@ -17,11 +18,13 @@ var ffmetadata = null;
 
 function binaryPath(extension) {
   extension = extension || '';
-  return app.get('configDir') + '/binaries/' + extension;
+  if (extension && ffbinaries.detectPlatform().startsWith('win')) {
+    extension += '.exe';
+  }
+  return path.join(app.get('configDir'), 'binaries', extension);
 }
 
 function downloadFFMpeg(callback) {
-  var ffbinaries = require('ffbinaries');
   var platform = ffbinaries.detectPlatform();
 
   ffbinaries.downloadFiles(platform, {
