@@ -132,7 +132,10 @@ function sendSong(req, res) {
     if (err || !song) {
       res.status(404).send();
     } else {
-      res.sendFile(path.join(app.get('config').music_dir, song.location));
+      var requestedSong = path.join(app.get('config').music_dir, song.location);
+      lib_func.getPlayableMediaFile(requestedSong, function(err, payableSong){
+        res.sendFile(payableSong);
+      });
     }
   });
 }

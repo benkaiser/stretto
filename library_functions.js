@@ -123,25 +123,52 @@ function findSong(relative_location, callback) {
           // if it was a metadata error and the file appears to be audio, add it
           if (err.toString().indexOf('Could not find metadata header') > 0 &&
               util.contains(song_extentions, ext)) {
+
             console.log('Could not find metadata. Adding the song by filename.');
 
             // create a song with the filename as the title
+            var title = relative_location.substr(relative_location.lastIndexOf(path.sep) + 1, relative_location.length);
+            console.log('Parsing', title, relative_location);
+            var track = title.match(/^(\d+)\s-\s/);
+            if (track){
+              title = title.replace(track[0],'').split('.')[0];
+              track = Number(track[1]);
+            }else{
+              track = 0;
+            }
+            var artist = relative_location.match(/^[^-]*/);
+            if (artist){
+              artist = artist[0].replace(path.sep,'').trim();
+            } else {
+              artist = 'Unknown (no tags)';
+            }
+
+            var album = relative_location.match(/-\s([\w\s]*)/);
+            if (album){
+              album = album[1].trim();
+            } else {
+              album = 'Unknown (no tags)';
+            }
+
+console.log('Parsed', title, artist, album, track);
             song = {
-              title: relative_location.substr(relative_location.lastIndexOf(path.sep) + 1, relative_location.length),
-              album: 'Unknown (no tags)',
-              artist: 'Unknown (no tags)',
+              title: title,
+              album: album,
+              artist: artist,
               albumartist: 'Unknown (no tags)',
-              display_artist: 'Unknown (no tags)',
+              display_artist: artist,
               genre: 'Unknown',
               year: 'Unknown',
               disc: 0,
-              track: 0,
+              track: track,
               duration: -1,
               play_count: (doc === null) ? 0 : doc.play_count || 0,
               location: relative_location,
               date_added: now,
               date_modified: now,
             };
+
+            console.log('SONG', song);
 
             if (doc === null) {
               app.db.songs.insert(song, function(err, newDoc) {
@@ -874,4 +901,54 @@ exports.saveID3 = saveID3;
 
 function broadcast(id, message) {
   app.io.sockets.emit(id, message);
+}
+
+var supportedMedia = ['.mp3', '.wav'];
+function isPlayableMediaType(file){
+  // TODO: this could become more advanced and determine which media
+  // formats the client browser supports, for now, just use mp3 & wav
+  // since it's accepted everywhere
+  var ext = path.extname(file);
+  return supportedMedia.indexOf(ext) > -1;
+}
+
+function getPlayableMediaFile(source, cb){
+  if (isPlayableMediaType(source) == true){
+    cb(null, source);
+  } else {
+    var parsed = path.parse(source);
+    var relativeSourcePath = parsed.dir.replace(parsed.root,'');
+    // TODO: add configuration setting for these tmp files
+    var folder = path.join(__dirname,'_tmp',relativeSourcePath);
+    var fileName = parsed.name + '.mp3';
+    mkdirp(folder, function(){
+      var destination = path.join(folder, fileName);
+      try{
+        fs.accessSync(destination, fs.F_OK)
+        cb(null, destination);
+      } catch(ex){
+        _convertToMp3(source, destination, function(){
+          console.log('done', destination);
+          cb(null, destination);
+        });
+      }
+    });
+  }
+}
+exports.getPlayableMediaFile = getPlayableMediaFile;
+
+function _convertToMp3(source, destination, done){
+  ffmpeg(source)
+  .noVideo()
+  .audioCodec('libmp3lame')
+  .audioQuality(1)
+  .output(destination)
+  .on('progress', function(progress){
+    console.log('Converting', source, progress.percent);
+  })
+  .on('error', function(err){
+    console.log('ffmpeg-error', arguments);
+    done(err);
+  })
+  .on('end', done).run();
 }
