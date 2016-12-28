@@ -1,0 +1,18 @@
+mongo:
+  image: mongo
+web:
+  build: .
+  command: npm run nodemon
+  dockerfile: Dockerfile.local
+  environment:
+    PORT: 3000
+    ENV: development
+    APP_URL: 'http://localhost:3000'
+    MONGO_URL: 'mongodb://mongo:27017/stretto'
+  links:
+    - mongo
+  ports:
+    - "3000:3000"
+  volumes:
+    - .:/app
+    - /app/node_modules
