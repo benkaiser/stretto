@@ -13,7 +13,13 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015']
+          presets: ['es2015'],
+          plugins: [
+              [
+                'transform-react-jsx',
+                {'pragma': 'h'}
+              ]
+          ]
         }
       }
     ]
