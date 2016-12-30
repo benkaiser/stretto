@@ -1,6 +1,56 @@
 body, html {
+  height: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
+}
+
+.content {
+  height: 100%;
+  overflow: auto;
+  padding: 20px;
+  width: 100%;
+
+  div:first-child h1 {
+    margin-top: 0;
+  }
+}
+
+.logo {
+  margin-left: 14px;
+}
+
+.root {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
   height: 100%;
   width: 100%;
+}
+
+.sidebar {
+  box-shadow: 0 0 10px #ccc;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 200px;
+}
+
+.sidebar-bottom {
+  padding: 14px;
+}
+
+.sidebar-top {
+  margin-bottom: auto;
+  overflow: auto;
+
+
+  .nav-pills > li > a {
+    border-radius: 0;
+  }
+
+  .nav-pills > .dropdown-header {
+    padding-left: 14px;
+  }
 }

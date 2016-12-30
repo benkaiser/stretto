@@ -1,24 +1,21 @@
 import { h, Component } from 'preact';
 import Theme from '../theme.js';
 
-class ThemeSwitcher {
+class ThemeSwitcher extends Component {
   render() {
     return (
-      <div>
+      <div class='form-inline'>
+        Theme: <select class='form-control input-sm' onChange={this.loadTheme.bind(this)}>
         {Theme.themes().map((theme) =>
-          <p>
-            <div class='btn btn-default'
-                 onClick={this.loadTheme.bind(this, theme)} >
-              {theme}
-            </div>
-          </p>
+          <option value={theme}>{theme}</option>
         )}
+        </select>
       </div>
     );
   }
 
-  loadTheme(theme) {
-    let newTheme = new Theme(theme);
+  loadTheme(event) {
+    let newTheme = new Theme(event.target.value);
     newTheme.load();
   }
 }

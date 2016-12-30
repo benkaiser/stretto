@@ -1,8 +1,12 @@
 extends layout.pug
 
 block content
-  h1 Stretto
-  div#content
+  div#preact
 
 block scripts
   script(src='static/js/bundle.js', type='text/javascript')
+
+block stylesheets
+  link(id='theme' href='', rel='stylesheet')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css', rel='stylesheet')
+  link(href='static/css/main.css', rel='stylesheet')
