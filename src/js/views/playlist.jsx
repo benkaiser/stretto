@@ -42,7 +42,7 @@ class PlaylistView extends Component {
   }
 
   clickSong(song) {
-    Player.play(song);
+    Player.play(song, this.playlist);
     this.setState({});
   }
 }

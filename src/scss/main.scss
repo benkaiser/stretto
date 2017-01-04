@@ -16,6 +16,11 @@ body, html {
   }
 }
 
+.control-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
 .cover {
   height: 40px;
   margin-right: 10px;

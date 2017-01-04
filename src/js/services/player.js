@@ -1,5 +1,6 @@
 import Song from '../models/song';
-let listeners = [];
+let songListeners = [];
+let stateListeners = [];
 let player;
 
 class Player {
@@ -11,7 +12,11 @@ class Player {
   }
 
   static addOnSongChangeListener(listener) {
-    listeners.push(listener);
+    songListeners.push(listener);
+  }
+
+  static addOnStateChangeListener(listener) {
+    stateListeners.push(listener);
   }
 
   static currentSong() {
@@ -21,14 +26,32 @@ class Player {
   static initialise() {
   }
 
+  static isPlaying() {
+    return this.get().isPlaying;
+  }
+
   static play(song) {
     this.get().play(song);
   }
 
   static songChange(newSong) {
-    listeners.forEach((listener) => {
+    songListeners.forEach((listener) => {
       listener(newSong);
     });
+  }
+
+  static stateChange() {
+    stateListeners.forEach((listener) => {
+      listener();
+    });
+  }
+
+  static togglePlaying() {
+    this.get().togglePlaying();
+  }
+
+  isPlaying() {
+    return this.isPlaying;
   }
 
   onYoutubePlayerError(event) {
@@ -38,14 +61,18 @@ class Player {
   }
 
   onYoutubePlayerStateChange(event) {
+    this.isPlaying = this.ytplayer.getPlayerState() == YT.PlayerState.PLAYING;
+    Player.stateChange();
   }
 
-  play(song) {
-    console.log(song);
+  play(song, playlist) {
     if (this.currentSong && this.currentSong.id == song.id) {
       return;
     }
     this.updateSong(song);
+    if (playlist) {
+      this.playlist = playlist;
+    }
 
     if (this.currentSong.isYoutube) {
       this.ytplayer.loadVideoById(song.originalId, 0, 'default');
@@ -63,6 +90,14 @@ class Player {
         onStateChange: this.onYoutubePlayerStateChange.bind(this),
       },
     });
+  }
+
+  togglePlaying() {
+    if (this.isPlaying) {
+      this.ytplayer.pauseVideo();
+    } else {
+      this.ytplayer.playVideo();
+    }
   }
 
   updateSong(song) {

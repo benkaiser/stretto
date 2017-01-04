@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { Link } from 'react-router';
+import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
 import Playlist from '../models/playlist';
 
@@ -26,6 +27,7 @@ class Sidebar extends Component {
           </ul>
         </div>
         <div class='sidebar-bottom'>
+          <PlayerControls />
           <PlayerInfo />
         </div>
       </div>
