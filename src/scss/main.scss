@@ -16,8 +16,46 @@ body, html {
   }
 }
 
+.cover {
+  height: 40px;
+  margin-right: 10px;
+  width: 40px;
+}
+
+.hidden {
+  #player {
+    margin-right: 500px;
+  }
+}
+
 .logo {
   margin-left: 14px;
+}
+
+.playerinfo {
+  padding: 14px;
+  text-align: center;
+  width: 280px;
+
+  img {
+    height: 250px;
+    width: 250px;
+  }
+
+  .info {
+    margin-bottom: 5px;
+
+    p {
+      margin: 0;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .title {
+      font-size: 20px;
+    }
+  }
 }
 
 .root {
@@ -28,17 +66,20 @@ body, html {
   width: 100%;
 }
 
+.settings-button {
+  float: right;
+  font-size: 17px;
+  margin-right: 14px;
+}
+
 .sidebar {
   box-shadow: 0 0 10px #ccc;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  width: 200px;
-}
-
-.sidebar-bottom {
-  padding: 14px;
+  min-width: 280px;
+  max-width: 100%;
 }
 
 .sidebar-top {
@@ -52,5 +93,18 @@ body, html {
 
   .nav-pills > .dropdown-header {
     padding-left: 14px;
+  }
+}
+
+.song-table {
+  margin-bottom: 0;
+
+  tbody > tr > td {
+    line-height: 40px;
+    overflow: hidden;
+    padding: 0;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
   }
 }

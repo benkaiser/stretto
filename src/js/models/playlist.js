@@ -11,13 +11,26 @@ class Playlist {
     this.updatedAt = attrs.updatedAt || +new Date();
   }
 
-  decorate() {
+  serialize() {
     return {
+      createdAt: this.createdAt,
       title: this.title,
-      songs: this.songs
-                 .map((songId) => Song.findById(songId))
-                 .filter((song) => song !== undefined)
+      songs: this.songs,
+      updatedAt: this.updatedAt
     };
+  }
+
+  get songData() {
+    if (!this._songData) {
+      this._songData = this.songs
+                           .map((songId) => Song.findById(songId))
+                           .filter((song) => song !== undefined);
+    }
+    return this._songData;
+  }
+
+  url() {
+    return encodeURIComponent(this.title);
   }
 
   static addOnChangeListener(listener) {
@@ -39,6 +52,10 @@ class Playlist {
 
   static fetchAll() {
     return playlists;
+  }
+
+  static getByUrl(url) {
+    return playlists.filter((playlist) => playlist.url() === url)[0];
   }
 
   static initialise(initialData) {

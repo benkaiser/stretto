@@ -19,6 +19,22 @@ class Song {
     this.setId(attrs.id);
   }
 
+  serialize() {
+    return {
+      album: this.album,
+      artist: this.artist,
+      cover: this.cover,
+      createdAt: this.createdAt,
+      discNumber: this.discNumber,
+      explicit: this.explicit,
+      id: this.id,
+      isYoutube: this.isYoutube,
+      title: this.title,
+      trackNumber: this.trackNumber,
+      updatedAt: this.updatedAt
+    };
+  }
+
   setId(id) {
     this.id = id;
     if (this.isYoutube && id.indexOf('y_') !== 0) {
@@ -26,6 +42,10 @@ class Song {
     } else if (this.isSoundcloud && id.indexOf('s_') !== 0) {
       this.id = 's_' + this.id;
     }
+  }
+
+  get originalId() {
+    return this.id.slice(2);
   }
 
   static addOnChangeListener(listener) {

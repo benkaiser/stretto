@@ -5,7 +5,7 @@ import Song from './song';
 class ModelInitialiser {
   static createChangeListener(key) {
     return (data) => {
-      DataLayer.setItem(key, data);
+      DataLayer.setItem(key, data.map((item) => item.serialize()));
     };
   }
 
@@ -29,6 +29,7 @@ class ModelInitialiser {
       explicit: false,
       genre: 'Alternative',
       id: 'SYM-RJwSGQ8',
+      isYoutube: true,
       title: 'Habits (Stay High) [Hippie Sabotage Remix]',
       trackNumber: 16
     }));
@@ -40,6 +41,7 @@ class ModelInitialiser {
       explicit: false,
       genre: 'Alternative',
       id: 'iArXv64tCJA',
+      isYoutube: true,
       title: 'Young Folks',
       trackNumber: 3
     }));
@@ -51,6 +53,7 @@ class ModelInitialiser {
       explicit: false,
       genre: 'Dance',
       id: 'YAMEls7RYoc',
+      isYoutube: true,
       title: 'You Always Know the DJ',
       trackNumber: 4
     }));
