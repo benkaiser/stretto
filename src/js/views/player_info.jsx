@@ -5,6 +5,15 @@ class PlayerInfo extends Component {
   constructor(props) {
     super(props);
     Player.addOnSongChangeListener(this.newSong.bind(this));
+    this.state = {
+      hideCover: false
+    };
+  }
+
+  hideCover(hide) {
+    console.log(hide);
+    this.setState({hideCover: hide});
+    return false;
   }
 
   newSong(song) {
@@ -21,7 +30,17 @@ class PlayerInfo extends Component {
             <p class='title' title={this.state.song.title}>{this.state.song.title}</p>
             <p class='artist'>{this.state.song.artist} - {this.state.song.album}</p>
           </div>
-          <img class='cover' src={this.state.song.cover} />
+          { (!this.state.hideCover) ?
+          <div>
+            <img class='cover' src={this.state.song.cover} />
+            <div key='hide' class='btn btn-default btn-sm hide-button' onClick={this.hideCover.bind(this, true)}>
+              <i class='fa fa-angle-down' aria-hidden='true'></i>
+            </div>
+          </div>
+          : <div key='show' class='btn btn-default btn-xs show-button' onClick={this.hideCover.bind(this, false)}>
+              <i class='fa fa-angle-up' aria-hidden='true'></i>
+            </div>
+          }
         </div>
       );
     } else {

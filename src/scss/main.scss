@@ -33,6 +33,8 @@ body, html {
 }
 
 .playerinfo {
+  margin-bottom: -20px;
+  overflow: hidden;
   padding: 14px;
   text-align: center;
   width: 280px;
@@ -40,6 +42,19 @@ body, html {
   img {
     height: 250px;
     width: 250px;
+  }
+
+  img:hover + .hide-button {
+    visibility: visible;
+  }
+
+  img + .hide-button:hover {
+    visibility: visible;
+  }
+
+  .hide-button {
+    margin-top: -67px;
+    visibility: hidden;
   }
 
   .info {
@@ -55,6 +70,11 @@ body, html {
     .title {
       font-size: 20px;
     }
+  }
+
+  .show-button {
+    margin-bottom: -11px;
+    margin-top: -17px;
   }
 }
 
