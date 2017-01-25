@@ -1,5 +1,3 @@
-const shortid = require('shortid');
-
 let listeners = [];
 let songs = [];
 
