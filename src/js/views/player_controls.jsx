@@ -15,21 +15,17 @@ class PlayerControls extends Component {
       <div>
         <div class='control-buttons'>
           <div><i class="fa fa-2x fa-retweet" aria-hidden="true"></i></div>
-          <div><i class="fa fa-2x fa-fast-backward" aria-hidden="true"></i></div>
+          <div><i class="fa fa-2x fa-fast-backward" aria-hidden="true" onClick={Player.previous.bind(Player)}></i></div>
           { (this.state.playing) ?
             <div><i class="fa fa-2x fa-pause" aria-hidden="true" onClick={this.togglePlaying.bind(this)}></i></div>
             :
             <div><i class="fa fa-2x fa-play" aria-hidden="true" onClick={this.togglePlaying.bind(this)}></i></div>
           }
-          <div><i class="fa fa-2x fa-fast-forward" aria-hidden="true" onClick={this.next.bind(this)}></i></div>
+          <div><i class="fa fa-2x fa-fast-forward" aria-hidden="true" onClick={Player.next.bind(Player)}></i></div>
           <div><i class="fa fa-2x fa-random" aria-hidden="true"></i></div>
         </div>
       </div>
     );
-  }
-
-  next() {
-    Player.next();
   }
 
   stateChange() {

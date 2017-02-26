@@ -49,6 +49,13 @@ class Player {
     }
   }
 
+  previous() {
+    let previousIndex = this.songIndex() === 0 ?
+                        this.playlist.songs.length - 1 :
+                        this.songIndex() - 1;
+    this.play(this.playlist.songData[previousIndex]);
+  }
+
   removeOnSongChangeListener(listener) {
     this.songListeners.splice(this.songListeners.indexOf(listener), 1);
   }
