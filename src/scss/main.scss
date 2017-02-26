@@ -5,6 +5,12 @@ body, html {
   width: 100%;
 }
 
+.add-button {
+  float: right;
+  font-size: 17px;
+  margin-right: 14px;
+}
+
 .content {
   height: 100%;
   overflow: auto;
@@ -22,9 +28,19 @@ body, html {
 }
 
 .cover {
+  background-position: center center;
+  background-size: cover;
+  float: left;
   height: 40px;
   margin-right: 10px;
   width: 40px;
+}
+
+.image-preview {
+  background-position: center center;
+  background-size: cover;
+  height: 250px;
+  width: 250px;
 }
 
 .hidden {
@@ -44,16 +60,17 @@ body, html {
   text-align: center;
   width: 280px;
 
-  img {
+  .cover {
     height: 250px;
+    margin-right: 0;
     width: 250px;
   }
 
-  img:hover + .hide-button {
+  .cover:hover + .hide-button {
     visibility: visible;
   }
 
-  img + .hide-button:hover {
+  .cover + .hide-button:hover {
     visibility: visible;
   }
 

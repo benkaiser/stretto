@@ -12,6 +12,7 @@ class Sidebar extends Component {
           <h3 class='logo'>
             <Link to='/' style={{ textDecoration: 'none' }}>Stretto</Link>
             <Link class='settings-button' to='/settings/'><span class='glyphicon glyphicon-cog' aria-hidden='true'></span></Link>
+            <Link class='add-button' to='/add/'><span class='glyphicon glyphicon-plus' aria-hidden='true'></span></Link>
           </h3>
           <ul class='nav nav-pills nav-stacked'>
             <li class="dropdown-header">Find Music</li>

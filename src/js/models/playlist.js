@@ -11,6 +11,16 @@ class Playlist {
     this.updatedAt = attrs.updatedAt || +new Date();
   }
 
+  addSong(song) {
+    this.songs.push(song.id);
+    delete this._songData;
+    Playlist.change();
+  }
+
+  indexOf(song) {
+    return this.songs.indexOf(song.id);
+  }
+
   serialize() {
     return {
       createdAt: this.createdAt,

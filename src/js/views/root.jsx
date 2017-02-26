@@ -1,5 +1,6 @@
 import { h, render } from 'preact';
 import { IndexRedirect, Redirect, Router, Route, browserHistory } from 'react-router';
+import Add from './add';
 import Intro from './intro';
 import Layout from './layout';
 import Playlist from './playlist';
@@ -11,6 +12,7 @@ class RootViewLoader {
       <Router history={browserHistory}>
         <Route path="/" component={Layout}>
           <IndexRedirect to="welcome" />
+          <Route path="add" component={Add} />
           <Route path="welcome" component={Intro} />
           <Route path="settings" component={Settings} />
           <Route path="playlist/:playlist" component={Playlist} />

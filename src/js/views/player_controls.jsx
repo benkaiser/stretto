@@ -10,12 +10,6 @@ class PlayerControls extends Component {
     };
   }
 
-  stateChange() {
-    this.setState({
-      playing: Player.isPlaying()
-    });
-  }
-
   render() {
     return (
       <div>
@@ -27,11 +21,21 @@ class PlayerControls extends Component {
             :
             <div><i class="fa fa-2x fa-play" aria-hidden="true" onClick={this.togglePlaying.bind(this)}></i></div>
           }
-          <div><i class="fa fa-2x fa-fast-forward" aria-hidden="true"></i></div>
+          <div><i class="fa fa-2x fa-fast-forward" aria-hidden="true" onClick={this.next.bind(this)}></i></div>
           <div><i class="fa fa-2x fa-random" aria-hidden="true"></i></div>
         </div>
       </div>
     );
+  }
+
+  next() {
+    Player.next();
+  }
+
+  stateChange() {
+    this.setState({
+      playing: Player.isPlaying
+    });
   }
 
   togglePlaying() {

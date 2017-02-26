@@ -1,57 +1,26 @@
 import Song from '../models/song';
-let songListeners = [];
-let stateListeners = [];
-let player;
 
 class Player {
-  static get() {
-    if (!player) {
-      player = new Player();
-    }
-    return player;
+  constructor() {
+    this.songListeners = [];
+    this.stateListeners = [];
   }
 
-  static addOnSongChangeListener(listener) {
-    songListeners.push(listener);
+  addOnSongChangeListener(listener) {
+    this.songListeners.push(listener);
   }
 
-  static addOnStateChangeListener(listener) {
-    stateListeners.push(listener);
-  }
-
-  static currentSong() {
-    return this.get().currentSong;
-  }
-
-  static initialise() {
-  }
-
-  static isPlaying() {
-    return this.get().isPlaying;
-  }
-
-  static play(song) {
-    this.get().play(song);
-  }
-
-  static songChange(newSong) {
-    songListeners.forEach((listener) => {
-      listener(newSong);
-    });
-  }
-
-  static stateChange() {
-    stateListeners.forEach((listener) => {
-      listener();
-    });
-  }
-
-  static togglePlaying() {
-    this.get().togglePlaying();
+  addOnStateChangeListener(listener) {
+    this.stateListeners.push(listener);
   }
 
   isPlaying() {
     return this.isPlaying;
+  }
+
+  next() {
+    let nextIndex = (this.songIndex() + 1) % this.playlist.songs.length;
+    this.play(this.playlist.songData[nextIndex]);
   }
 
   onYoutubePlayerError(event) {
@@ -61,8 +30,9 @@ class Player {
   }
 
   onYoutubePlayerStateChange(event) {
-    this.isPlaying = this.ytplayer.getPlayerState() == YT.PlayerState.PLAYING;
-    Player.stateChange();
+    this.isPlaying = this.ytplayer.getPlayerState() === YT.PlayerState.PLAYING;
+    this.ytplayer.getPlayerState() === YT.PlayerState.ENDED && this.next();
+    this.stateChange();
   }
 
   play(song, playlist) {
@@ -79,6 +49,10 @@ class Player {
     }
   }
 
+  removeOnSongChangeListener(listener) {
+    this.songListeners.splice(this.songListeners.indexOf(listener), 1);
+  }
+
   setupYoutube() {
     this.ytplayer = new YT.Player('player', {
       height: '480',
@@ -92,6 +66,23 @@ class Player {
     });
   }
 
+
+  songChange(newSong) {
+    this.songListeners.forEach((listener) => {
+      listener(newSong);
+    });
+  }
+
+  songIndex() {
+    return this.playlist.indexOf(this.currentSong);
+  }
+
+  stateChange() {
+    this.stateListeners.forEach((listener) => {
+      listener();
+    });
+  }
+
   togglePlaying() {
     if (this.isPlaying) {
       this.ytplayer.pauseVideo();
@@ -102,13 +93,15 @@ class Player {
 
   updateSong(song) {
     this.currentSong = song;
-    Player.songChange(this.currentSong);
+    this.songChange(this.currentSong);
   }
 }
 
+let instance = new Player();
+
 window.onYouTubeIframeAPIReady = () => {
-  Player.get().setupYoutube();
+  instance.setupYoutube();
 };
 
 window.Player = Player;
-module.exports = Player;
+module.exports = instance;

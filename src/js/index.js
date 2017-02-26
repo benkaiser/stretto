@@ -7,7 +7,6 @@ class Loader {
   static loadAll() {
     Theme.initialise();
     ModelInitialiser.initialise();
-    Player.initialise();
     RootView.initialise();
   }
 }
