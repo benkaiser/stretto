@@ -14,6 +14,10 @@ class Player {
     this.stateListeners.push(listener);
   }
 
+  currentTime() {
+    return this.ytplayer.getCurrentTime() / this.ytplayer.getDuration();
+  }
+
   isPlaying() {
     return this.isPlaying;
   }
@@ -58,6 +62,10 @@ class Player {
 
   removeOnSongChangeListener(listener) {
     this.songListeners.splice(this.songListeners.indexOf(listener), 1);
+  }
+
+  setCurrentTime(timeFraction) {
+    this.ytplayer.seekTo(timeFraction * this.ytplayer.getDuration());
   }
 
   setupYoutube() {

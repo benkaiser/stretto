@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
-import Player from '../services/player.js';
+import Player from '../services/player';
+import Slider from './slider';
 
 class PlayerControls extends Component {
   constructor(props) {
@@ -13,6 +14,7 @@ class PlayerControls extends Component {
   render() {
     return (
       <div>
+        <Slider />
         <div class='control-buttons'>
           <div><i class="fa fa-2x fa-retweet" aria-hidden="true"></i></div>
           <div><i class="fa fa-2x fa-fast-backward" aria-hidden="true" onClick={Player.previous.bind(Player)}></i></div>
