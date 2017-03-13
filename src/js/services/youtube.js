@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import fetchJsonp from 'fetch-jsonp';
 
 let youtubeIdRegex = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
 let apiKey = 'AIzaSyBzVTAJq_j_WsltEa45EUaMHHmXlz8F_PM';
@@ -15,22 +15,31 @@ export default class Youtube {
       if (!id) {
         return reject({ error: 'not a youtube track' });
       }
-      $.ajax({
-        url: `https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${apiKey}&fields=items(snippet)&part=snippet`,
-        dataType: 'jsonp',
-        success: (data) => {
+      fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${apiKey}&fields=items(snippet)&part=snippet`)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
           let snippet = data.items[0].snippet;
           resolve({
             author: snippet.channelTitle,
             id: id,
             title: snippet.title,
-            thumbnail: snippet.thumbnails.maxres.url
+            thumbnail: this.maximumResolution(snippet.thumbnails)
           });
-        },
-        error: (jqXHR, textStatus, errorThrown) => {
-          reject({ error: errorThrown });
-        }
-      });
+        })
+        .catch((error) => {
+          throw(error);
+          reject({ error: error });
+        });
     });
+  }
+
+  static maximumResolution(thumbnails) {
+    if (thumbnails.maxres) return thumbnails.maxres.url;
+    if (thumbnails.standard) return thumbnails.standard.url;
+    if (thumbnails.high) return thumbnails.high.url;
+    if (thumbnails.medium) return thumbnails.medium.url;
+    if (thumbnails.default) return thumbnails.default.url;
   }
 }
