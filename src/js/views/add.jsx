@@ -89,7 +89,7 @@ class Add extends Component {
   }
 
   containsDash() {
-    return this.state.track.title.indexOf('-');
+    return this.state.track.title.indexOf('-') !== -1;
   }
 
   getAlbum() {

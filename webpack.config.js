@@ -27,6 +27,7 @@ module.exports = {
   resolve: {
     extensions: ['', '.js', '.jsx'],
     alias: {
+      'jquery': path.join(__dirname, 'stubs/jquery.js'),
       'react': 'preact-compat',
       'react-dom': 'preact-compat'
     }
