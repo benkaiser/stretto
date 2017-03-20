@@ -22,16 +22,15 @@
     "express-session": "^1.14.2",
     "fetch-jsonp": "^1.0.6",
     "node-sass": "^4.1.1",
+    "nodemon": "^1.11.0",
     "preact": "^7.1.0",
     "preact-compat": "^3.9.4",
     "pug": "^2.0.0-beta6",
-    "react-router": "^3.0.0"
-  },
-  "optionalDependencies": {},
-  "devDependencies": {
-    "nodemon": "^1.11.0",
+    "react-router": "^3.0.0",
     "webpack": "^1.14.0"
   },
+  "optionalDependencies": {},
+  "devDependencies": {},
   "jshintConfig": {
     "esversion": 6
   },
