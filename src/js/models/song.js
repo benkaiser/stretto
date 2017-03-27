@@ -3,17 +3,20 @@ let songs = [];
 
 class Song {
   constructor(attrs) {
-    this.title = attrs.title || '';
-    this.artist = attrs.artist || '';
     this.album = attrs.album || '';
+    this.artist = attrs.artist || '';
     this.cover = attrs.cover || 'https://unsplash.it/g/512?random&' + attrs.id;
     this.createdAt = attrs.createdAt || +new Date();
     this.discNumber = attrs.discNumber || 0;
+    this.duration = attrs.duration || 0;
     this.explicit = attrs.explicit || false;
+    this.isSoundcloud = attrs.isSoundcloud || false;
     this.isYoutube = attrs.isYoutube || false;
-    this.updatedAt = attrs.updatedAt || +new Date();
-    this.soundcloudId = attrs.isSoundcloud || false;
+    this.title = attrs.title || '';
     this.trackNumber = attrs.trackNumber || 0;
+    this.url = attrs.url || '';
+    this.year = attrs.year || new Date().getFullYear();
+    this.updatedAt = attrs.updatedAt || +new Date();
     this.setId(attrs.id);
   }
 
@@ -24,12 +27,16 @@ class Song {
       cover: this.cover,
       createdAt: this.createdAt,
       discNumber: this.discNumber,
+      duration: this.duration,
       explicit: this.explicit,
       id: this.id,
+      isSoundcloud: this.isSoundcloud,
       isYoutube: this.isYoutube,
       title: this.title,
       trackNumber: this.trackNumber,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
+      url: this.url,
+      year: this.year
     };
   }
 

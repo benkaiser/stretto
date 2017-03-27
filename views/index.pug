@@ -3,9 +3,11 @@ extends layout.pug
 block content
   div#preact
   .hidden
-    div#player
+    div#ytplayer
+    iframe#scplayer(src='https://w.soundcloud.com/player/?url=http://api.soundcloud.com/users/12574060')
 
 block scripts
+  script(src='https://w.soundcloud.com/player/api.js', type='text/javascript')
   script(src='/static/js/bundle.js', type='text/javascript')
   script(src='https://www.youtube.com/iframe_api', type='text/javascript')
 

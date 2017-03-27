@@ -22,14 +22,17 @@ export default class Youtube {
         .then((data) => {
           let snippet = data.items[0].snippet;
           resolve({
-            author: snippet.channelTitle,
+            channel: snippet.channelTitle,
             id: id,
+            isSoundcloud: false,
+            isYoutube: true,
             title: snippet.title,
-            thumbnail: this.maximumResolution(snippet.thumbnails)
+            thumbnail: this.maximumResolution(snippet.thumbnails),
+            url: `https://www.youtube.com/watch?v=${id}`,
+            year: (new Date(snippet.publishedAt)).getFullYear()
           });
         })
         .catch((error) => {
-          throw(error);
           reject({ error: error });
         });
     });

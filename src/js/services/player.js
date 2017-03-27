@@ -4,6 +4,7 @@ class Player {
   constructor() {
     this.songListeners = [];
     this.stateListeners = [];
+    this.setupSoundcloud();
   }
 
   addOnSongChangeListener(listener) {
@@ -15,7 +16,17 @@ class Player {
   }
 
   currentTime() {
-    return this.ytplayer.getCurrentTime() / this.ytplayer.getDuration();
+    return new Promise((resolve) => {
+      if (this.currentSong.isYoutube) {
+        resolve(this.ytplayer.getCurrentTime() / this.ytplayer.getDuration());
+      } else {
+        this.scplayer.getPosition((position) => {
+          this.scplayer.getDuration((duration) => {
+            resolve(position / duration);
+          })
+        });
+      }
+    });
   }
 
   isPlaying() {
@@ -49,7 +60,12 @@ class Player {
     }
 
     if (this.currentSong.isYoutube) {
+      this.scplayer.pause();
       this.ytplayer.loadVideoById(song.originalId, 0, 'default');
+    } else if (this.currentSong.isSoundcloud) {
+      this.ytplayer.stopVideo();
+      this.scplayer.load(this.currentSong.url, { auto_play: true });
+      this.scplayer.play();
     }
   }
 
@@ -65,11 +81,33 @@ class Player {
   }
 
   setCurrentTime(timeFraction) {
-    this.ytplayer.seekTo(timeFraction * this.ytplayer.getDuration());
+    if (this.currentSong.isYoutube) {
+      this.ytplayer.seekTo(timeFraction * this.ytplayer.getDuration());
+    } else if (this.currentSong.isSoundcloud) {
+      this.scplayer.getDuration((duration) => {
+        this.scplayer.seekTo(timeFraction * duration);
+      })
+    }
+  }
+
+  setupSoundcloud() {
+    this.scplayer = SC.Widget('scplayer');
+    this.scplayer.bind(SC.Widget.Events.PLAY, () => {
+      this.isPlaying = true;
+      this.stateChange();
+    });
+    this.scplayer.bind(SC.Widget.Events.PAUSE, () => {
+      this.isPlaying = false;
+      this.stateChange();
+    });
+    this.scplayer.bind(SC.Widget.Events.FINISH, () => {
+      this.next();
+      this.stateChange();
+    });
   }
 
   setupYoutube() {
-    this.ytplayer = new YT.Player('player', {
+    this.ytplayer = new YT.Player('ytplayer', {
       height: '480',
       width: '853',
       videoId: '',
@@ -99,10 +137,10 @@ class Player {
   }
 
   togglePlaying() {
-    if (this.isPlaying) {
-      this.ytplayer.pauseVideo();
-    } else {
-      this.ytplayer.playVideo();
+    if (this.currentSong.isYoutube) {
+      this.isPlaying ? this.ytplayer.pauseVideo() : this.ytplayer.playVideo();
+    } else if (this.currentSong.isSoundcloud) {
+      this.scplayer.toggle();
     }
   }
 

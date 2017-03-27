@@ -1,7 +1,9 @@
 import { h, Component } from 'preact';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
+import Soundcloud from '../services/soundcloud';
 import Youtube from '../services/youtube';
+import autobind from 'autobind-decorator';
 
 class Add extends Component {
   constructor() {
@@ -19,8 +21,8 @@ class Add extends Component {
           <div class="form-group">
             <label for="songurl">Song URL</label>
             <input class='form-control'
-                   onkeyup={this.onChange.bind(this)}
-                   placeholder='https://youtube.com/...'
+                   onkeyup={this.onChange}
+                   placeholder='https://youtube.com/... or https://soundcloud.com/...'
                    ref={(input) => { this.input = input; }}
                    type='text'
                    name='songurl'
@@ -36,7 +38,7 @@ class Add extends Component {
                 <label for="title">Title</label>
                 <input class='form-control'
                        name='title'
-                       onkeyup={this.attributeModified.bind(this)}
+                       onkeyup={this.attributeModified}
                        ref={(input) => { this.title = input; }}
                        type='text'
                        value={this.getTitle()}
@@ -46,7 +48,7 @@ class Add extends Component {
                 <label for="artist">Artist</label>
                 <input class='form-control'
                        name='artist'
-                       onkeyup={this.attributeModified.bind(this)}
+                       onkeyup={this.attributeModified}
                        ref={(input) => { this.artist = input; }}
                        type='text'
                        value={this.getArtist()}
@@ -56,7 +58,7 @@ class Add extends Component {
                 <label for="album">Album</label>
                 <input class='form-control'
                        name='album'
-                       onkeyup={this.attributeModified.bind(this)}
+                       onkeyup={this.attributeModified}
                        ref={(input) => { this.album = input; }}
                        type='text'
                        value={this.getAlbum()}
@@ -67,11 +69,12 @@ class Add extends Component {
           </div>
           <div class='col-lg-6'>
             <h3>Actions</h3>
-            <div class='btn btn-primary' onClick={this.importTrack.bind(this)}>Import this Track</div>
+            <div class='btn btn-primary' onClick={this.importTrack}>Import this Track</div>
             { this.containsDash() && <div>
               <h4>Format Options</h4>
-              <div class='btn btn-default' onClick={this.setTitleBeforeDash.bind(this, true)}>Title - Artist</div>
-              <div class='btn btn-default' onClick={this.setTitleBeforeDash.bind(this, false)}>Artist - Title</div>
+              <div class='btn btn-default' onClick={() => this.setTitleBeforeDash(!this.state.titleBeforeDash)}>
+                Switch title and artist
+              </div>
             </div>}
           </div>
         </div>
@@ -80,6 +83,7 @@ class Add extends Component {
     );
   }
 
+  @autobind
   attributeModified() {
     this.setState({
       artist: this.artist.value,
@@ -99,7 +103,7 @@ class Add extends Component {
 
   getArtist() {
     if (this.state.artist) return this.state.artist;
-    if (!this.containsDash()) return this.state.track.title;
+    if (!this.containsDash()) return this.state.track.channel || this.state.track.title;
     return this.state.track.title.split('-')[
       this.state.titleBeforeDash ? 1 : 0
     ].trim();
@@ -113,33 +117,49 @@ class Add extends Component {
     ].trim();
   }
 
+  @autobind
   importTrack() {
     let song = Song.create({
       album: this.getAlbum(),
       artist: this.getArtist(),
       cover: this.state.track.thumbnail,
       discNumber: 0,
+      duration: this.state.track.duration,
       explicit: false,
-      genre: 'Unknown',
+      genre: this.state.track.genre || 'Unknown',
       id: this.state.track.id,
-      isYoutube: true,
+      isSoundcloud: this.state.track.isSoundcloud,
+      isYoutube: this.state.track.isYoutube,
       title: this.getTitle(),
-      trackNumber: 0
+      trackNumber: 0,
+      url: this.state.track.url,
+      year: this.state.track.year
     })
     Playlist.getByUrl('Library').addSong(song);
   }
 
+  @autobind
   onChange() {
     this.timeout && clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
-      Youtube.getInfo(this.input.value).then((track) => {
+      (Soundcloud.isSoundcloudURL(this.input.value) ?
+        Soundcloud.getInfo(this.input.value) :
+        Youtube.getInfo(this.input.value)
+      ).then((track) => {
+        console.log(track);
         this.setState({
+          artist: undefined,
+          album: undefined,
+          title: undefined,
           track: track
         });
+      }).catch((error) => {
+        console.log(error);
       });
     }, 1000);
   }
 
+  @autobind
   setTitleBeforeDash(titleBeforeDash) {
     delete this.state.artist;
     delete this.state.title;

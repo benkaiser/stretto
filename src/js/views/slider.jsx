@@ -22,7 +22,9 @@ class PlayerControls extends Component {
       .on('slideStop', this.slideStop.bind(this));
     setInterval(() => {
       if (this.sliding) return;
-      this.slider.setValue(Player.currentTime(), false, false);
+      Player.currentTime().then((currentTime) => {
+        this.slider.setValue(currentTime, false, false);
+      })
     }, 1000);
   }
 

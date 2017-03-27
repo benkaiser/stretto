@@ -15,6 +15,7 @@ module.exports = {
         query: {
           presets: ['es2015'],
           plugins: [
+            'transform-decorators-legacy',
             [
               'transform-react-jsx',
               {'pragma': 'h'}
