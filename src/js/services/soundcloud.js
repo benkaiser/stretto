@@ -10,7 +10,7 @@ export default class Soundcloud {
       if (!Soundcloud.isSoundcloudURL(url)) {
         return reject({ error: 'not a soundcloud track' });
       }
-      fetch(`http://api.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
+      fetch(`https://api.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
         .then((response) => {
           return response.json();
         })

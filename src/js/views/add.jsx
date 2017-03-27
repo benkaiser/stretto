@@ -146,7 +146,6 @@ class Add extends Component {
         Soundcloud.getInfo(this.input.value) :
         Youtube.getInfo(this.input.value)
       ).then((track) => {
-        console.log(track);
         this.setState({
           artist: undefined,
           album: undefined,

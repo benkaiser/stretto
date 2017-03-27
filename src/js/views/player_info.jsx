@@ -11,7 +11,6 @@ class PlayerInfo extends Component {
   }
 
   hideCover(hide) {
-    console.log(hide);
     this.setState({hideCover: hide});
     return false;
   }
