@@ -1,10 +1,14 @@
 import Song from '../models/song';
+import SoundcloudPlayer from './soundcloud_player';
+import YoutubePlayer from './youtube_player';
+import autobind from 'autobind-decorator';
 
 class Player {
   constructor() {
     this.songListeners = [];
     this.stateListeners = [];
-    this.setupSoundcloud();
+    YoutubePlayer.injectHandlers(this.playstateChange, this.songEnded);
+    SoundcloudPlayer.injectHandlers(this.playstateChange, this.songEnded);
   }
 
   addOnSongChangeListener(listener) {
@@ -16,18 +20,17 @@ class Player {
   }
 
   currentTime() {
-    return new Promise((resolve) => {
-      if (!this.currentSong) return 0;
-      if (this.currentSong.isYoutube) {
-        resolve(this.ytplayer.getCurrentTime() / this.ytplayer.getDuration());
-      } else {
-        this.scplayer.getPosition((position) => {
-          this.scplayer.getDuration((duration) => {
-            resolve(position / duration);
-          })
-        });
-      }
-    });
+    return this.currentPlayer ?
+      this.currentPlayer.getPosition() :
+      Promise.resolve(0);
+  }
+
+  getPlayerFor(song) {
+    if (song.isYoutube) {
+      return new YoutubePlayer(song);
+    } else if (song.isSoundcloud) {
+      return new SoundcloudPlayer(song);
+    }
   }
 
   isPlaying() {
@@ -39,18 +42,6 @@ class Player {
     this.play(this.playlist.songData[nextIndex]);
   }
 
-  onYoutubePlayerError(event) {
-  }
-
-  onYoutubePlayerReady(event) {
-  }
-
-  onYoutubePlayerStateChange(event) {
-    this.isPlaying = this.ytplayer.getPlayerState() === YT.PlayerState.PLAYING;
-    this.ytplayer.getPlayerState() === YT.PlayerState.ENDED && this.next();
-    this.stateChange();
-  }
-
   play(song, playlist) {
     if (this.currentSong && this.currentSong.id == song.id) {
       return;
@@ -60,18 +51,15 @@ class Player {
       this.playlist = playlist;
     }
 
-    if (this.currentSong.isYoutube) {
-      this.scplayer.pause();
-      this.ytplayer.loadVideoById(song.originalId, 0, 'default');
-    } else if (this.currentSong.isSoundcloud) {
-      this.ytplayer.stopVideo();
-      this.scplayer.load(this.currentSong.url, {
-        auto_play: true,
-        callback: () => {
-          this.scplayer.play();
-        }
-      });
-    }
+    this.currentPlayer && this.currentPlayer.dispose();
+    this.currentPlayer = this.getPlayerFor(this.currentSong);
+  }
+
+  @autobind
+  playstateChange(isPlaying) {
+    const oldisPlaying = this.isPlaying;
+    this.isPlaying = isPlaying;
+    oldisPlaying != isPlaying && this.stateChange();
   }
 
   previous() {
@@ -86,49 +74,19 @@ class Player {
   }
 
   setCurrentTime(timeFraction) {
-    if (this.currentSong.isYoutube) {
-      this.ytplayer.seekTo(timeFraction * this.ytplayer.getDuration());
-    } else if (this.currentSong.isSoundcloud) {
-      this.scplayer.getDuration((duration) => {
-        this.scplayer.seekTo(timeFraction * duration);
-      })
-    }
+    this.currentPlayer && this.currentPlayer.setCurrentTime(timeFraction);
   }
-
-  setupSoundcloud() {
-    this.scplayer = SC.Widget('scplayer');
-    this.scplayer.bind(SC.Widget.Events.PLAY, () => {
-      this.isPlaying = true;
-      this.stateChange();
-    });
-    this.scplayer.bind(SC.Widget.Events.PAUSE, () => {
-      this.isPlaying = false;
-      this.stateChange();
-    });
-    this.scplayer.bind(SC.Widget.Events.FINISH, () => {
-      this.next();
-      this.stateChange();
-    });
-  }
-
-  setupYoutube() {
-    this.ytplayer = new YT.Player('ytplayer', {
-      height: '480',
-      width: '853',
-      videoId: '',
-      events: {
-        onError: this.onYoutubePlayerError.bind(this),
-        onReady: this.onYoutubePlayerReady.bind(this),
-        onStateChange: this.onYoutubePlayerStateChange.bind(this),
-      },
-    });
-  }
-
 
   songChange(newSong) {
     this.songListeners.forEach((listener) => {
       listener(newSong);
     });
+  }
+
+  @autobind
+  songEnded() {
+    this.next();
+    this.stateChange();
   }
 
   songIndex() {
@@ -142,11 +100,7 @@ class Player {
   }
 
   togglePlaying() {
-    if (this.currentSong.isYoutube) {
-      this.isPlaying ? this.ytplayer.pauseVideo() : this.ytplayer.playVideo();
-    } else if (this.currentSong.isSoundcloud) {
-      this.scplayer.toggle();
-    }
+    this.currentPlayer && this.currentPlayer.toggle();
   }
 
   updateSong(song) {
@@ -156,10 +110,6 @@ class Player {
 }
 
 let instance = new Player();
-
-window.onYouTubeIframeAPIReady = () => {
-  instance.setupYoutube();
-};
 
 window.Player = Player;
 module.exports = instance;
