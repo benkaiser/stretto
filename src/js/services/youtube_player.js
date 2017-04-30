@@ -1,24 +1,44 @@
 import autobind from 'autobind-decorator';
 
+let readyPromise;
+let readyResolve;
+
 export default class YoutubePlayer {
-  constructor(song) {
-    YoutubePlayer.player.loadVideoById(song.originalId, 0, 'default');
+  constructor(song, options = {}) {
+    if (options.autoPlay === undefined) options.autoPlay = true;
+    options.currentTime = options.currentTime || 0;
+    YoutubePlayer.readyPromise().then(() => {
+      YoutubePlayer.player.cueVideoById(song.originalId, options.currentTime, 'default');
+       options.autoPlay && YoutubePlayer.player.playVideo();
+    });
   }
 
   dispose() {
-    YoutubePlayer.player.stopVideo();
+    YoutubePlayer.player && YoutubePlayer.player.stopVideo();
   }
 
   getPosition() {
-    return Promise.resolve(YoutubePlayer.player.getCurrentTime() / YoutubePlayer.player.getDuration());
+    return YoutubePlayer.readyPromise().then(() => {
+      return Promise.resolve(YoutubePlayer.player.getCurrentTime());
+    });
+  }
+
+  getPositionFraction() {
+    return YoutubePlayer.readyPromise().then(() => {
+      return Promise.resolve(YoutubePlayer.player.getCurrentTime() / YoutubePlayer.player.getDuration());
+    });
   }
 
   setCurrentTime(timeFraction) {
-    YoutubePlayer.player.seekTo(timeFraction * YoutubePlayer.player.getDuration());
+    YoutubePlayer.readyPromise().then(() => {
+      YoutubePlayer.player.seekTo(timeFraction * YoutubePlayer.player.getDuration());
+    });
   }
 
   toggle() {
-    YoutubePlayer.isPlaying() ? YoutubePlayer.player.pauseVideo() : YoutubePlayer.player.playVideo();
+    YoutubePlayer.readyPromise().then(() => {
+      YoutubePlayer.isPlaying() ? YoutubePlayer.player.pauseVideo() : YoutubePlayer.player.playVideo();
+    });
   }
 
   static injectHandlers(playstateChange, onEnded) {
@@ -28,6 +48,12 @@ export default class YoutubePlayer {
 
   static isPlaying() {
     return YoutubePlayer.player.getPlayerState() === YT.PlayerState.PLAYING;
+  }
+
+  static readyPromise() {
+    return readyPromise || (readyPromise = new Promise((resolve) => {
+      readyResolve ? resolve() : readyResolve = resolve;
+    }));
   }
 
   static setupYoutube() {
@@ -49,7 +75,7 @@ export default class YoutubePlayer {
   }
 
   static onYoutubePlayerReady(event) {
-    // TODO: handle
+    readyResolve ? readyResolve() : readyResolve = true;
   }
 
   static onYoutubePlayerStateChange(event) {

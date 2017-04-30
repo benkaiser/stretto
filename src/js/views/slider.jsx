@@ -1,17 +1,17 @@
 import { h, Component } from 'preact';
 import Player from '../services/player';
-import Slider from 'bootstrap-slider';
+import BootstrapSlider from 'bootstrap-slider';
 
 const SCRUB_DELAY = 1000;
 
-class PlayerControls extends Component {
+class Slider extends Component {
   constructor(props) {
     super(props);
     this.sliding = false;
   }
 
   componentDidMount() {
-    this.slider = new Slider(this.sliderElement, {
+    this.slider = new BootstrapSlider(this.sliderElement, {
       max: 1,
       min: 0,
       step: 0.001,
@@ -63,4 +63,4 @@ class PlayerControls extends Component {
   }
 }
 
-module.exports = PlayerControls;
+module.exports = Slider;

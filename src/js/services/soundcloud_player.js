@@ -1,9 +1,10 @@
 export default class SoundcloudPlayer {
-  constructor(song) {
+  constructor(song, options = {}) {
+    if (options.autoPlay === undefined) options.autoPlay = true;
     SoundcloudPlayer.player.load(song.url, {
-      auto_play: true,
+      auto_play: options.autoPlay,
       callback: () => {
-        SoundcloudPlayer.player.play();
+        SoundcloudPlayer.timeToSeek = options.currentTime || 0;
       }
     });
   }
@@ -13,6 +14,14 @@ export default class SoundcloudPlayer {
   }
 
   getPosition() {
+    return new Promise((resolve) => {
+      SoundcloudPlayer.player.getPosition((position) => {
+        resolve(position);
+      });
+    });
+  }
+
+  getPositionFraction() {
     return new Promise((resolve) => {
       SoundcloudPlayer.player.getPosition((position) => {
         SoundcloudPlayer.player.getDuration((duration) => {
@@ -41,6 +50,10 @@ export default class SoundcloudPlayer {
     SoundcloudPlayer.player = SC.Widget('scplayer');
     SoundcloudPlayer.player.bind(SC.Widget.Events.PLAY, () => {
       SoundcloudPlayer.playstateChangeHandler(true);
+      if (SoundcloudPlayer.timeToSeek) {
+        SoundcloudPlayer.player.seekTo(SoundcloudPlayer.timeToSeek);
+        SoundcloudPlayer.timeToSeek = 0;
+      }
     });
     SoundcloudPlayer.player.bind(SC.Widget.Events.PAUSE, () => {
       SoundcloudPlayer.playstateChangeHandler(false);

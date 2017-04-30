@@ -1,4 +1,5 @@
 import DataLayer from './data_layer';
+import Player from '../services/player';
 import Playlist from './playlist';
 import Song from './song';
 
@@ -17,6 +18,7 @@ class ModelInitialiser {
     if (Playlist.isEmpty()) {
       ModelInitialiser.seed();
     }
+    Player.resumeOnLoad();
   }
 
   static seed() {

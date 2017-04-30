@@ -1,12 +1,14 @@
 import { h, Component } from 'preact';
 import Player from '../services/player.js';
+import autobind from 'autobind-decorator';
 
 class PlayerInfo extends Component {
   constructor(props) {
     super(props);
-    Player.addOnSongChangeListener(this.newSong.bind(this));
+    Player.addOnSongChangeListener(this.newSong);
     this.state = {
-      hideCover: false
+      hideCover: false,
+      song: Player.currentSong
     };
   }
 
@@ -15,6 +17,7 @@ class PlayerInfo extends Component {
     return false;
   }
 
+  @autobind
   newSong(song) {
     this.setState({
       song: song
