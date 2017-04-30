@@ -135,7 +135,7 @@ class Add extends Component {
       url: this.state.track.url,
       year: this.state.track.year
     })
-    Playlist.getByUrl('Library').addSong(song);
+    Playlist.getByTitle('Library').addSong(song);
   }
 
   @autobind

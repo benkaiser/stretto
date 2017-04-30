@@ -1,10 +1,17 @@
 import { h, Component } from 'preact';
 import { Link } from 'react-router';
+import Bootbox from '../services/Bootbox';
 import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
 import Playlist from '../models/playlist';
+import autobind from 'autobind-decorator';
 
 class Sidebar extends Component {
+  constructor() {
+    super();
+    Playlist.addOnChangeListener(this.onPlaylistChange);
+  }
+
   render() {
     return (
       <div class='sidebar'>
@@ -20,11 +27,12 @@ class Sidebar extends Component {
             <li class="dropdown-header">Your Music</li>
             { Playlist.fetchAll().map((playlist) =>
               <li>
-                <Link to={'/playlist/' + playlist.url()}>
+                <Link to={'/playlist/' + playlist.title}>
                   { playlist.title }
                 </Link>
               </li>
             ) }
+            <li onClick={this.addNewPlaylist}><a href='#'>Add new playlist</a></li>
           </ul>
         </div>
         <div class='sidebar-bottom'>
@@ -33,6 +41,19 @@ class Sidebar extends Component {
         </div>
       </div>
     );
+  }
+
+  addNewPlaylist() {
+    Bootbox.prompt('What do you want the new playlist title to be?').then((name) => {
+      Playlist.create({
+        title: name
+      });
+    });
+  }
+
+  @autobind
+  onPlaylistChange() {
+    this.setState({});
   }
 }
 

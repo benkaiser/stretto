@@ -39,10 +39,6 @@ class Playlist {
     return this._songData;
   }
 
-  url() {
-    return encodeURIComponent(this.title);
-  }
-
   static addOnChangeListener(listener) {
     listeners.push(listener);
   }
@@ -54,6 +50,8 @@ class Playlist {
   }
 
   static create(attrs) {
+    attrs.songs = attrs.songs || [];
+    attrs.createdAt = +(new Date());
     let newPlaylist = new Playlist(attrs);
     playlists.push(newPlaylist);
     Playlist.change();
@@ -64,8 +62,8 @@ class Playlist {
     return playlists;
   }
 
-  static getByUrl(url) {
-    return playlists.filter((playlist) => playlist.url() === url)[0];
+  static getByTitle(title) {
+    return playlists.filter((playlist) => playlist.title === title)[0];
   }
 
   static initialise(initialData) {

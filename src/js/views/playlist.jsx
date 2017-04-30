@@ -1,17 +1,21 @@
 import { h, Component } from 'preact';
 import Player from '../services/player.js';
 import Playlist from '../models/playlist';
+import autobind from 'autobind-decorator';
 
 class PlaylistView extends Component {
   constructor(props) {
     super(props);
-    this.playlist = Playlist.getByUrl(props.params.playlist);
-    this.songChangeListener = this.songChange.bind(this);
-    Player.addOnSongChangeListener(this.songChangeListener);
+    this.state = this.getStateFromprops(props);
+    Player.addOnSongChangeListener(this.songChange);
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState(this.getStateFromprops(props));
   }
 
   componentWillUnmount() {
-    Player.removeOnSongChangeListener(this.songChangeListener);
+    Player.removeOnSongChangeListener(this.songChange);
   }
 
   render() {
@@ -19,8 +23,8 @@ class PlaylistView extends Component {
     let currentSongId = (currentSong) ? currentSong.id : '';
     return (
       <div class='intro'>
-        <h1>{this.playlist.title}</h1>
-        <p>{this.playlist.songs.length} Songs</p>
+        <h1>{this.state.playlist.title}</h1>
+        <p>{this.state.playlist.songs.length} Songs</p>
         <table class='song-table table table-hover'>
           <thead>
             <tr>
@@ -30,7 +34,7 @@ class PlaylistView extends Component {
             </tr>
           </thead>
           <tbody>
-            { this.playlist.songData.map((song) =>
+            { this.state.playlist.songData.map((song) =>
               <tr class={ (currentSongId == song.id) ? 'active' : '' }
                   onClick={this.clickSong.bind(this, song)}>
                 <td>
@@ -48,10 +52,17 @@ class PlaylistView extends Component {
   }
 
   clickSong(song) {
-    Player.play(song, this.playlist);
+    Player.play(song, this.state.playlist);
     this.setState();
   }
 
+  getStateFromprops(props) {
+    return {
+      playlist: Playlist.getByTitle(props.params.playlist)
+    };
+  }
+
+  @autobind
   songChange() {
     this.setState();
   }
