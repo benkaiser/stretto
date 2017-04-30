@@ -58,6 +58,11 @@ body, html {
   margin-left: 14px;
 }
 
+.offscreen {
+  margin-left: -9999px;
+  position: absolute;
+}
+
 .playerinfo {
   margin-bottom: -20px;
   overflow: hidden;

@@ -17,6 +17,7 @@ class Player {
 
   currentTime() {
     return new Promise((resolve) => {
+      if (!this.currentSong) return 0;
       if (this.currentSong.isYoutube) {
         resolve(this.ytplayer.getCurrentTime() / this.ytplayer.getDuration());
       } else {
@@ -64,8 +65,12 @@ class Player {
       this.ytplayer.loadVideoById(song.originalId, 0, 'default');
     } else if (this.currentSong.isSoundcloud) {
       this.ytplayer.stopVideo();
-      this.scplayer.load(this.currentSong.url, { auto_play: true });
-      this.scplayer.play();
+      this.scplayer.load(this.currentSong.url, {
+        auto_play: true,
+        callback: () => {
+          this.scplayer.play();
+        }
+      });
     }
   }
 

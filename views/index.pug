@@ -1,10 +1,9 @@
 extends layout.pug
 
 block content
+  div.offscreen#ytplayer
+  iframe.offscreen#scplayer(src='https://w.soundcloud.com/player/?url=http://api.soundcloud.com/users/12574060')
   div#preact
-  .hidden
-    div#ytplayer
-    iframe#scplayer(src='https://w.soundcloud.com/player/?url=http://api.soundcloud.com/users/12574060')
 
 block scripts
   script(src='https://w.soundcloud.com/player/api.js', type='text/javascript')
