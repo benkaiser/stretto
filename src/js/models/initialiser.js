@@ -58,7 +58,7 @@ class ModelInitialiser {
       trackNumber: 4
     }));
     Playlist.create({
-      title: "Library",
+      title: Playlist.LIBRARY,
       songs: songs.map((song) => song.id)
     });
   }

@@ -4,10 +4,15 @@ let listeners = [];
 let playlists = [];
 
 class Playlist {
+  static get LIBRARY() {
+    return 'Library';
+  }
+
   constructor(attrs) {
     this.createdAt = attrs.createdAt || +new Date();
-    this.title = attrs.title || '';
     this.songs = attrs.songs || [];
+    this.title = attrs.title || '';
+    this.removable = attrs.title != Playlist.LIBRARY;
     this.updatedAt = attrs.updatedAt || +new Date();
   }
 
@@ -25,6 +30,7 @@ class Playlist {
     return {
       createdAt: this.createdAt,
       title: this.title,
+      removable: this.removable,
       songs: this.songs,
       updatedAt: this.updatedAt
     };
@@ -74,6 +80,13 @@ class Playlist {
 
   static isEmpty() {
     return playlists.length === 0;
+  }
+
+  static remove(playlist) {
+    const index = playlists.indexOf(playlist);
+    if (index < 0 || !playlists[index].removable) return;
+    playlists.splice(index, 1);
+    Playlist.change();
   }
 }
 

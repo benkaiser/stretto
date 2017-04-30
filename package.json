@@ -19,6 +19,7 @@
     "babel-preset-es2015": "^6.18.0",
     "body-parser": "^1.15.2",
     "bootstrap-slider": "^9.7.2",
+    "bootstrap.native": "^2.0.10",
     "connect-mongo": "^1.3.2",
     "express": "^4.14.0",
     "express-session": "^1.14.2",

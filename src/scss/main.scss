@@ -110,6 +110,15 @@ body, html {
   }
 }
 
+.playlist_header {
+  align-items: flex-start;
+  display: flex;
+
+  .btn-group {
+    margin: 0 15px;
+  }
+}
+
 .root {
   display: flex;
   flex-direction: row;

@@ -1,7 +1,9 @@
 import { h, Component } from 'preact';
-import Player from '../services/player.js';
+import Bootbox from '../services/Bootbox';
+import Player from '../services/player';
 import Playlist from '../models/playlist';
 import autobind from 'autobind-decorator';
+import bsn from 'bootstrap.native';
 
 class PlaylistView extends Component {
   constructor(props) {
@@ -23,7 +25,19 @@ class PlaylistView extends Component {
     let currentSongId = (currentSong) ? currentSong.id : '';
     return (
       <div class='intro'>
-        <h1>{this.state.playlist.title}</h1>
+        <div class='playlist_header'>
+          <h1>{this.state.playlist.title}</h1>
+          { this.state.playlist.removable &&
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" onclick={this.onOptions}>
+                Options <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a href="#" onClick={this.onDelete}>Delete playlist</a></li>
+              </ul>
+            </div>
+          }
+        </div>
         <p>{this.state.playlist.songs.length} Songs</p>
         <table class='song-table table table-hover'>
           <thead>
@@ -60,6 +74,19 @@ class PlaylistView extends Component {
     return {
       playlist: Playlist.getByTitle(props.params.playlist)
     };
+  }
+
+  @autobind
+  onDelete() {
+    Bootbox.confirm('Are you sure you want to delete this playlist?').then(() => {
+      Playlist.remove(this.state.playlist);
+      this.props.router.push('/playlist/' + Playlist.LIBRARY);
+    });
+  }
+
+  @autobind
+  onOptions(event) {
+    new bsn.Dropdown(event.target);
   }
 
   @autobind
