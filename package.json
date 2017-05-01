@@ -6,6 +6,7 @@
   "license": "MIT",
   "scripts": {
     "nodemon": "./node_modules/nodemon/bin/nodemon.js index.js",
+    "postinstall": "npm rebuild node-sass",
     "sass": "./node_modules/node-sass/bin/node-sass -r src/scss -o static/css",
     "start": "npm run webpack && npm run sass && node --harmony index.js",
     "webpack": "./node_modules/webpack/bin/webpack.js"
