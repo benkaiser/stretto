@@ -89,12 +89,13 @@ export default class Bootbox extends Component {
     })
   }
 
-  prompt(message) {
+  prompt(message, options = {}) {
     return new Promise((resolve) => {
       this.setState({
         type: TYPES.PROMPT,
         message: message,
-        successCallback: resolve
+        successCallback: resolve,
+        value: options.value || ''
       });
       this.bsModal.show();
     });
@@ -112,7 +113,7 @@ export default class Bootbox extends Component {
     return Bootbox._component.confirm(message);
   }
 
-  static prompt(message) {
+  static prompt(message, options) {
     return Bootbox._component.prompt(message);
   }
 }

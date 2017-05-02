@@ -12,8 +12,13 @@ class PlaylistView extends Component {
     Player.addOnSongChangeListener(this.songChange);
   }
 
+  componentDidMount() {
+    delete this.optionsButton['Dropdown'];
+  }
+
   componentWillReceiveProps(props) {
     this.setState(this.getStateFromprops(props));
+    this.optionsButton && delete this.optionsButton['Dropdown'];
   }
 
   componentWillUnmount() {
@@ -29,11 +34,12 @@ class PlaylistView extends Component {
           <h1>{this.state.playlist.title}</h1>
           { this.state.playlist.removable &&
             <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" onclick={this.onOptions}>
+              <button type="button" class="btn btn-default dropdown-toggle" onclick={this.onOptions} ref={(button) => this.optionsButton = button}>
                 Options <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
                 <li><a href="#" onClick={this.onDelete}>Delete playlist</a></li>
+                <li><a href="#" onClick={this.onRename}>Rename playlist</a></li>
               </ul>
             </div>
           }
@@ -87,6 +93,16 @@ class PlaylistView extends Component {
   @autobind
   onOptions(event) {
     new bsn.Dropdown(event.target);
+  }
+
+  @autobind
+  onRename() {
+    Bootbox.prompt('What would you like to rename your playlist to?', {
+      value: this.state.playlist.title
+    }).then((newTitle) => {
+      this.state.playlist.update('title', newTitle);
+      this.props.router.push('/playlist/' + newTitle);
+    });
   }
 
   @autobind

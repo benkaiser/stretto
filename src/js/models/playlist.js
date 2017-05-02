@@ -36,6 +36,11 @@ class Playlist {
     };
   }
 
+  update(attribute, value) {
+    this[attribute] = value;
+    Playlist.change();
+  }
+
   get songData() {
     if (!this._songData) {
       this._songData = this.songs
