@@ -97,7 +97,6 @@ class Player {
 
   saveState() {
     if (document.hidden) return;
-    console.log('saving...' + (+new Date()))
     this.currentTimeAbsolute().then((currentTime) => {
       DataLayer.setItem('playstate', {
         currentTime: currentTime,

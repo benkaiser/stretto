@@ -12,11 +12,12 @@ class Playlist {
     this.createdAt = attrs.createdAt || +new Date();
     this.songs = attrs.songs || [];
     this.title = attrs.title || '';
-    this.removable = attrs.title != Playlist.LIBRARY;
+    this.editable = attrs.title != Playlist.LIBRARY;
     this.updatedAt = attrs.updatedAt || +new Date();
   }
 
   addSong(song) {
+    if (this.songs.indexOf(song.id) > -1 || !this.editable) { return; }
     this.songs.push(song.id);
     delete this._songData;
     Playlist.change();
@@ -26,11 +27,19 @@ class Playlist {
     return this.songs.indexOf(song.id);
   }
 
+  removeSong(song) {
+    let index = this.songs.indexOf(song.id);
+    if (index === -1) { return; }
+    this.songs.splice(index, 1);
+    delete this._songData;
+    Playlist.change();
+  }
+
   serialize() {
     return {
       createdAt: this.createdAt,
       title: this.title,
-      removable: this.removable,
+      editable: this.editable,
       songs: this.songs,
       updatedAt: this.updatedAt
     };
@@ -89,9 +98,13 @@ class Playlist {
 
   static remove(playlist) {
     const index = playlists.indexOf(playlist);
-    if (index < 0 || !playlists[index].removable) return;
+    if (index < 0 || !playlists[index].editable) return;
     playlists.splice(index, 1);
     Playlist.change();
+  }
+
+  static removeOnChangeListener(listener) {
+    listeners.splice(listeners.indexOf(listener), 1);
   }
 }
 

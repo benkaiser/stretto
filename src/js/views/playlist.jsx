@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
-import Bootbox from '../services/Bootbox';
+import Bootbox from '../services/bootbox';
+import ContextMenu from './context_menu';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
 import autobind from 'autobind-decorator';
@@ -10,10 +11,11 @@ class PlaylistView extends Component {
     super(props);
     this.state = this.getStateFromprops(props);
     Player.addOnSongChangeListener(this.songChange);
+    Playlist.addOnChangeListener(this.songChange);
   }
 
   componentDidMount() {
-    delete this.optionsButton['Dropdown'];
+    this.optionsButton && delete this.optionsButton['Dropdown'];
   }
 
   componentWillReceiveProps(props) {
@@ -56,7 +58,8 @@ class PlaylistView extends Component {
           <tbody>
             { this.state.playlist.songData.map((song) =>
               <tr class={ (currentSongId == song.id) ? 'active' : '' }
-                  onClick={this.clickSong.bind(this, song)}>
+                  onClick={this.clickSong.bind(this, song)}
+                  onContextMenu={this.rightClickSong.bind(this, song)}>
                 <td>
                   <div class='cover' style={`background-image: url('${song.cover}')`}></div>
                   {song.title}
@@ -103,6 +106,11 @@ class PlaylistView extends Component {
       this.state.playlist.update('title', newTitle);
       this.props.router.push('/playlist/' + newTitle);
     });
+  }
+
+  rightClickSong(song, event) {
+    ContextMenu.open(song, event, this.state.playlist);
+    event.preventDefault();
   }
 
   @autobind

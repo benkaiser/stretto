@@ -1,7 +1,8 @@
 import { h, render } from 'preact';
 import { IndexRedirect, Redirect, Router, Route, browserHistory } from 'react-router';
 import Add from './add';
-import Bootbox from '../services/Bootbox';
+import Bootbox from '../services/bootbox';
+import ContextMenu from '../views/context_menu';
 import Intro from './intro';
 import Layout from './layout';
 import Playlist from './playlist';
@@ -22,6 +23,7 @@ class RootViewLoader {
           </Route>
         </Router>
         <Bootbox />
+        <ContextMenu />
       </div>
     ), document.getElementById('preact'));
   }

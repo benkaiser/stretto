@@ -36,6 +36,17 @@ body, html {
   width: 40px;
 }
 
+.dropdownContainer {
+  position: absolute;
+
+  .dropdown-menu.open {
+    position: static;
+    display: block;
+    margin-bottom: 5px;
+    clear: left;
+  }
+}
+
 .duration-slider {
   text-align: center;
   margin-bottom: 14px;

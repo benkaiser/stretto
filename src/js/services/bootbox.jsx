@@ -1,4 +1,4 @@
-import { Component, h, render, rerender } from 'preact';
+import { Component, h } from 'preact';
 import autobind from 'autobind-decorator';
 import bsn from 'bootstrap.native';
 
