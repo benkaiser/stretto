@@ -1,3 +1,5 @@
+const RESET_URL = 'http://api.soundcloud.com/users/12574060';
+
 export default class SoundcloudPlayer {
   constructor(song, options = {}) {
     if (options.autoPlay === undefined) options.autoPlay = true;
@@ -11,6 +13,9 @@ export default class SoundcloudPlayer {
 
   dispose() {
     SoundcloudPlayer.player.pause();
+    SoundcloudPlayer.player.load(RESET_URL, {
+      auto_play: false
+    });
   }
 
   getPosition() {
