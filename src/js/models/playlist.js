@@ -1,4 +1,5 @@
 import Song from './song';
+import autobind from 'autobind-decorator';
 
 let listeners = [];
 let playlists = [];
@@ -23,8 +24,47 @@ class Playlist {
     Playlist.change();
   }
 
-  indexOf(song) {
-    return this.songs.indexOf(song.id);
+  ensureShuffleReady() {
+    if (!this._shuffleData || this.songData.length != this._shuffleData.length) {
+      this._shuffleData = this.songData.slice();
+      for (let x = 0; x < this._shuffleData.length; x++) {
+        let temp = this._shuffleData[x];
+        let newIndex = Math.floor(Math.random() * this._shuffleData.length);
+        this._shuffleData[x] = this._shuffleData[newIndex];
+        this._shuffleData[newIndex] = temp;
+      }
+    }
+  }
+
+  findByOffset(song, offset, list, indexFunc) {
+    let newIndex = (indexFunc(song) + offset) % list.length;
+    return list[newIndex < 0 ? list.length + newIndex : newIndex];
+  }
+
+  findNextSong(song) {
+    return this.findByOffset(song, 1, this.songData, this.songIndex);
+  }
+
+  findNextSongInShuffle(song) {
+    this.ensureShuffleReady();
+    return this.findByOffset(song, 1, this._shuffleData, this.shuffleIndex);
+  }
+
+  findPreviousSong(song) {
+    return this.findByOffset(song, -1, this.songData, this.songIndex);
+  }
+
+  findPreviousSongInShuffle(song) {
+    this.ensureShuffleReady();
+    return this.findByOffset(song, -1, this._shuffleData, this.shuffleIndex);
+  }
+
+  nextSong(song, isShuffled) {
+    return isShuffled ? this.findNextSongInShuffle(song) : this.findNextSong(song);
+  }
+
+  previousSong(song, isShuffled) {
+    return isShuffled ? this.findPreviousSongInShuffle(song) : this.findPreviousSong(song);
   }
 
   removeSong(song) {
@@ -43,6 +83,16 @@ class Playlist {
       songs: this.songs,
       updatedAt: this.updatedAt
     };
+  }
+
+  @autobind
+  shuffleIndex(song) {
+    return this._shuffleData.indexOf(song);
+  }
+
+  @autobind
+  songIndex(song) {
+    return this.songs.indexOf(song.id);
   }
 
   update(attribute, value) {

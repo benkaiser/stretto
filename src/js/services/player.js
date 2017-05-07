@@ -9,8 +9,17 @@ class Player {
   constructor() {
     this.songListeners = [];
     this.stateListeners = [];
+    this.repeat_state = this.REPEAT.ALL;
+    this.shuffle_on = false;
     YoutubePlayer.injectHandlers(this.playstateChange, this.songEnded);
     SoundcloudPlayer.injectHandlers(this.playstateChange, this.songEnded);
+  }
+
+  get REPEAT() {
+    return {
+      ALL: 'all',
+      ONE: 'one'
+    }
   }
 
   addOnSongChangeListener(listener) {
@@ -46,9 +55,13 @@ class Player {
     return this.isPlaying;
   }
 
+  @autobind
   next() {
-    let nextIndex = (this.songIndex() + 1) % this.playlist.songs.length;
-    this.play(this.playlist.songData[nextIndex]);
+    if (this.repeat_state == this.REPEAT.ONE) {
+      this.setCurrentTime(0)
+      return;
+    }
+    this.play(this.playlist.nextSong(this.currentSong, this.shuffle_on));
   }
 
   play(song, playlist, options) {
@@ -71,11 +84,9 @@ class Player {
     oldisPlaying != isPlaying && this.stateChange();
   }
 
+  @autobind
   previous() {
-    let previousIndex = this.songIndex() === 0 ?
-                        this.playlist.songs.length - 1 :
-                        this.songIndex() - 1;
-    this.play(this.playlist.songData[previousIndex]);
+    this.play(this.playlist.previousSong(this.currentSong, this.shuffle_on));
   }
 
   removeOnSongChangeListener(listener) {
@@ -93,6 +104,8 @@ class Player {
           currentTime: playstate.currentTime,
         }
       );
+    playstate && playstate.repeat && (this.repeat_state = playstate.repeat);
+    playstate && playstate.shuffle_on && (this.shuffle_on = playstate.shuffle_on);
   }
 
   saveState() {
@@ -102,6 +115,8 @@ class Player {
         currentTime: currentTime,
         playlistTitle: this.playlist.title,
         playing: this.isPlaying,
+        repeat: this.repeat_state,
+        shuffle_on: this.shuffle_on,
         songId: this.currentSong.id
       });
     })
@@ -124,10 +139,6 @@ class Player {
     this.stateChange();
   }
 
-  songIndex() {
-    return this.playlist.indexOf(this.currentSong);
-  }
-
   stateChange() {
     this.stateListeners.forEach((listener) => {
       listener();
@@ -135,8 +146,23 @@ class Player {
     this.saveState();
   }
 
+  @autobind
   togglePlaying() {
     this.currentPlayer && this.currentPlayer.toggle();
+  }
+
+  @autobind
+  toggleRepeat() {
+    this.repeat_state = Object.values(this.REPEAT)[
+      (Object.values(this.REPEAT).indexOf(this.repeat_state) + 1) % Object.values(this.REPEAT).length
+    ];
+    this.stateChange();
+  }
+
+  @autobind
+  toggleShuffle() {
+    this.shuffle_on = !this.shuffle_on;
+    this.stateChange();
   }
 
   updateSong(song) {

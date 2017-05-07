@@ -22,9 +22,19 @@ body, html {
   }
 }
 
+.control-badge {
+  position: absolute;
+  right: -11px;
+  top: -6px;
+}
+
 .control-buttons {
   display: flex;
   justify-content: space-around;
+
+  > div {
+    position: relative;
+  }
 }
 
 .cover {
