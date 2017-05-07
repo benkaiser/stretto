@@ -65,6 +65,8 @@ class Song {
 
   static create(attrs) {
     let newSong = new Song(attrs);
+    let oldSong = Song.findById(newSong.id);
+    if (oldSong) { return oldSong; }
     songs.push(newSong);
     Song.change();
     return newSong;
@@ -82,6 +84,13 @@ class Song {
     initialData.forEach((item) => {
       songs.push(new Song(item));
     });
+  }
+
+  static remove(song) {
+    let index = songs.indexOf(song);
+    if (index === -1) { return; }
+    songs.splice(index, 1);
+    Song.change();
   }
 }
 

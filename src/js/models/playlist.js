@@ -18,7 +18,7 @@ class Playlist {
   }
 
   addSong(song) {
-    if (this.songs.indexOf(song.id) > -1 || !this.editable) { return; }
+    if (this.songs.indexOf(song.id) > -1) { return; }
     this.songs.push(song.id);
     delete this._songData;
     Playlist.change();

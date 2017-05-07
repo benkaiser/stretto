@@ -1,6 +1,7 @@
 import { Component, h } from 'preact';
 import { MenuItem } from 'react-bootstrap';
 import Playlist from '../models/playlist';
+import Song from '../models/song';
 import autobind from 'autobind-decorator';
 import bsn from 'bootstrap.native';
 
@@ -27,8 +28,9 @@ export default class ContextMenu extends Component {
     return (
       <div class='dropdownContainer' style={this.dropdownStyle()}>
         <ul className={`dropdown-menu ${this.openStyle()}`}>
+          <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>
           { this.state.playlist && this.state.playlist.editable &&
-            <MenuItem onClick={this.onRemoveClick}>Remove from playlist</MenuItem>
+            <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>
           }
           <MenuItem header>Add to playlist</MenuItem>
           { this.playlists().map((playlist) =>
@@ -56,7 +58,16 @@ export default class ContextMenu extends Component {
   }
 
   @autobind
-  onRemoveClick() {
+  onRemoveFromLibraryClick() {
+    Playlist.fetchAll().map((playlist) => {
+      playlist.removeSong(this.state.song);
+    });
+    Song.remove(this.state.song);
+    this.hide();
+  }
+
+  @autobind
+  onRemoveFromPlaylistClick() {
     this.state.playlist.removeSong(this.state.song);
     this.hide();
   }
