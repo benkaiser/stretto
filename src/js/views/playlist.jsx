@@ -34,7 +34,7 @@ class PlaylistView extends Component {
       <div class='intro'>
         <div class='playlist_header'>
           <h1>{this.state.playlist.title}</h1>
-          { this.state.playlist.removable &&
+          { this.state.playlist.editable &&
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" onclick={this.onOptions} ref={(button) => this.optionsButton = button}>
                 Options <span class="caret"></span>
