@@ -1,9 +1,8 @@
 import { Component, h } from 'preact';
-import { MenuItem } from 'react-bootstrap';
+import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import autobind from 'autobind-decorator';
-import bsn from 'bootstrap.native';
 
 export default class ContextMenu extends Component {
   constructor() {

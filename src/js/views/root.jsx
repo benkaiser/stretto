@@ -1,5 +1,9 @@
 import { h, render } from 'preact';
-import { IndexRedirect, Redirect, Router, Route, browserHistory } from 'react-router';
+import IndexRedirect from 'react-router/lib/IndexRedirect';
+import Redirect from 'react-router/lib/Redirect';
+import Router from 'react-router/lib/Router';
+import Route from 'react-router/lib/Route';
+import browserHistory from 'react-router/lib/browserHistory';
 import Add from './add';
 import Bootbox from '../services/bootbox';
 import ContextMenu from '../views/context_menu';

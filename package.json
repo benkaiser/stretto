@@ -27,10 +27,10 @@
     "fetch-jsonp": "^1.0.6",
     "node-sass": "^4.1.1",
     "nodemon": "^1.11.0",
-    "preact": "^7.1.0",
-    "preact-compat": "^3.9.4",
+    "preact": "^8.1.0",
+    "preact-compat": "^3.16.0",
     "pug": "^2.0.0-beta6",
-    "react-bootstrap": "0.29",
+    "react-bootstrap": "^0.31.0",
     "react-router": "^3.0.0",
     "webpack": "^1.14.0"
   },

@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Link } from 'react-router';
+import Link from 'react-router/lib/Link';
 import Bootbox from '../services/bootbox';
 import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
