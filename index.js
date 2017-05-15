@@ -1,7 +1,9 @@
+require('dotenv').config();
 const bodyParser = require('body-parser');
 const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+require('./services/google').initialise(process.env.GOOGLE_CLIENT_ID);
 
 var app = express();
 
