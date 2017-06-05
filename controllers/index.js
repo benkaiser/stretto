@@ -29,7 +29,8 @@ router.post('/login', (req, res) => {
 router.get('*', (req, res) => {
   res.render('index', {
     env: {
-      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || ''
+      GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || ''
     }
   });
 });

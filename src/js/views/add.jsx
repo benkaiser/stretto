@@ -15,8 +15,8 @@ class Add extends Component {
 
   render() {
     return (
-      <div class='intro'>
-        <h1>Add a Song from Youtube</h1>
+      <div class='add'>
+        <h1>Add a Song from Youtube or Soundcloud</h1>
         <form>
           <div class="form-group">
             <label for="songurl">Song URL</label>

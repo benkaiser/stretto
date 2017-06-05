@@ -6,8 +6,9 @@ import Route from 'react-router/lib/Route';
 import browserHistory from 'react-router/lib/browserHistory';
 import Add from './add';
 import Bootbox from '../services/bootbox';
-import ContextMenu from '../views/context_menu';
+import ContextMenu from './context_menu';
 import Intro from './intro';
+import Import from './import';
 import Layout from './layout';
 import Playlist from './playlist';
 import Settings from './settings';
@@ -20,6 +21,7 @@ class RootViewLoader {
           <Route path="/" component={Layout}>
             <IndexRedirect to="welcome" />
             <Route path="add" component={Add} />
+            <Route path="import" component={Import} />
             <Route path="welcome" component={Intro} />
             <Route path="settings" component={Settings} />
             <Route path="playlist/:playlist" component={Playlist} />

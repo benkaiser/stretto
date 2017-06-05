@@ -1,6 +1,7 @@
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const express = require('express');
+const proxy = require('express-http-proxy');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 require('./services/google').initialise(process.env.GOOGLE_CLIENT_ID);
@@ -22,6 +23,7 @@ app.use(session({
     url: process.env.MONGO_URL
   })
 }));
+app.use('/proxy', proxy('https://itunes.apple.com'));
 app.use(require('./controllers'));
 
 app.listen(process.env.PORT || 3000, function() {

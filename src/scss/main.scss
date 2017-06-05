@@ -5,12 +5,6 @@ body, html {
   width: 100%;
 }
 
-.add-button {
-  float: right;
-  font-size: 17px;
-  margin-right: 14px;
-}
-
 .content {
   height: 100%;
   overflow: auto;
@@ -148,12 +142,6 @@ body, html {
   width: 100%;
 }
 
-.settings-button {
-  float: right;
-  font-size: 17px;
-  margin-right: 14px;
-}
-
 .sidebar {
   box-shadow: 0 0 10px #ccc;
   display: flex;
@@ -162,6 +150,12 @@ body, html {
   overflow-x: hidden;
   min-width: 280px;
   max-width: 100%;
+}
+
+.sidebar-icon {
+  float: right;
+  font-size: 17px;
+  margin-right: 14px;
 }
 
 .sidebar-top {

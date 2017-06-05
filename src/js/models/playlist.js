@@ -136,6 +136,10 @@ class Playlist {
     return playlists.filter((playlist) => playlist.title === title)[0];
   }
 
+  static getOrCreateByTitle(title) {
+    return this.getByTitle(title) || this.create({ title: title });
+  }
+
   static initialise(initialData) {
     initialData.forEach((item) => {
       playlists.push(new Playlist(item));

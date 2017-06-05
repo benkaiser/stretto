@@ -1,3 +1,5 @@
+import autobind from 'autobind-decorator';
+
 export default class AccountManager {
   static initialise() {
     this.setupGoogleLibrary();
@@ -21,14 +23,14 @@ export default class AccountManager {
   }
 
   static setupGoogleLibrary() {
-    gapi.load('auth2', this.initSigninV2);
+    gapi.load('auth2:signin2', AccountManager.initSigninV2);
   }
 
-
   static initSigninV2() {
+    gapi.client.load('youtube', 'v3', AccountManager.initYoutubeV3);
     AccountManager.auth2 = gapi.auth2.init({
       client_id: `${env.GOOGLE_CLIENT_ID}.apps.googleusercontent.com`,
-      scope: 'profile'
+      scope: 'https://www.googleapis.com/auth/youtube.readonly'
     });
   }
 
