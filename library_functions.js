@@ -105,37 +105,101 @@ function findSong(relative_location, callback) {
     // only scan if we haven't scanned before, or we are scanning every document again
     if (doc === null || hard_rescan) {
       // insert the new song
-      var parser = new MM(fs.createReadStream(full_location), function(err, result) {
+      var stream = fs.createReadStream(full_location);
+      stream.on('error', function() {
+        app.db.songs.remove({location: relative_location}, {multi: false}, function(err, numRemoved) {
+          console.log(numRemoved + ' track deleted');
+        });
+        callback(null);
+      });
+      stream.on('open', function() {
+        var parser = new MM(stream, function(err, result) {
 
-        console.log(result);
+          console.log(result);
 
-        // mark the songs added time as the time it was exactly added
-        // so that it is seperate from other songs
-        var now = Date.now();
+          // mark the songs added time as the time it was exactly added
+          // so that it is seperate from other songs
+          var now = Date.now();
 
-        if (err) {
-          // get the file extension
-          var ext = '';
-          if (relative_location.lastIndexOf('.') > 0) {
-            ext = relative_location.substr(relative_location.lastIndexOf('.') + 1, relative_location.length);
-          }
+          if (err) {
+            // get the file extension
+            var ext = '';
+            if (relative_location.lastIndexOf('.') > 0) {
+              ext = relative_location.substr(relative_location.lastIndexOf('.') + 1, relative_location.length);
+            }
 
-          // if it was a metadata error and the file appears to be audio, add it
-          if (err.toString().indexOf('Could not find metadata header') > 0 &&
-              util.contains(song_extentions, ext)) {
-            console.log('Could not find metadata. Adding the song by filename.');
+            // if it was a metadata error and the file appears to be audio, add it
+            if (err.toString().indexOf('Could not find metadata header') > 0 &&
+                util.contains(song_extensions, ext)) {
+              console.log('Could not find metadata. Adding the song by filename.');
 
-            // create a song with the filename as the title
+              // create a song with the filename as the title
+              song = {
+                title: relative_location.substr(relative_location.lastIndexOf(path.sep) + 1, relative_location.length),
+                album: 'Unknown (no tags)',
+                artist: 'Unknown (no tags)',
+                albumartist: 'Unknown (no tags)',
+                display_artist: 'Unknown (no tags)',
+                genre: 'Unknown',
+                year: 'Unknown',
+                disc: 0,
+                track: 0,
+                duration: -1,
+                play_count: (doc === null) ? 0 : doc.play_count || 0,
+                location: relative_location,
+                date_added: now,
+                date_modified: now,
+              };
+
+              if (doc === null) {
+                app.db.songs.insert(song, function(err, newDoc) {
+                  duration_fetch(relative_location, newDoc._id);
+
+                  // update the browser the song has been added
+                  broadcast('scan_update', {
+                    type: 'add',
+                    count: song_list.length,
+                    completed: cnt,
+                    details: 'Added: ' + newDoc.title,
+                    doc: newDoc,
+                  });
+                  callback(null);
+                });
+              } else if (hard_rescan) {
+                // use the old date_added
+                if (doc.date_added) {
+                  song.date_added = doc.date_added;
+                }
+
+                // update the document
+                app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced) {
+                  duration_fetch(relative_location, doc._id);
+                  broadcast('scan_update', {
+                    type: 'update',
+                    count: song_list.length,
+                    completed: cnt,
+                    details: 'Updated: ' + song.title,
+                  });
+                  callback(null);
+                });
+              } else {
+                callback(null);
+              }
+            } else {
+              callback(err);
+            }
+          } else {
+            // add the location
             song = {
-              title: relative_location.substr(relative_location.lastIndexOf(path.sep) + 1, relative_location.length),
-              album: 'Unknown (no tags)',
-              artist: 'Unknown (no tags)',
-              albumartist: 'Unknown (no tags)',
-              display_artist: 'Unknown (no tags)',
-              genre: 'Unknown',
-              year: 'Unknown',
-              disc: 0,
-              track: 0,
+              title: result.title,
+              album: result.album,
+              artist: result.artist,
+              albumartist: result.albumartist,
+              display_artist: normaliseArtist(result.albumartist, result.artist),
+              genre: result.genre,
+              year: result.year,
+              disc: (result.disk || {no:0}).no || 0,
+              track: (result.track || {no:0}).no || 0,
               duration: -1,
               play_count: (doc === null) ? 0 : doc.play_count || 0,
               location: relative_location,
@@ -143,7 +207,24 @@ function findSong(relative_location, callback) {
               date_modified: now,
             };
 
+            // write the cover photo as an md5 string
+            if (result.picture.length > 0) {
+              pic = result.picture[0];
+              pic.format = pic.format.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+              song.cover_location = md5(pic.data) + '.' + pic.format;
+              filename = app.get('configDir') + '/dbs/covers/' + song.cover_location;
+              fs.exists(filename, function(exists) {
+                if (!exists) {
+                  fs.writeFile(filename, pic.data, function(err) {
+                    if (err) console.log(err);
+                    console.log('Wrote file!');
+                  });
+                }
+              });
+            }
+
             if (doc === null) {
+              // insert the song
               app.db.songs.insert(song, function(err, newDoc) {
                 duration_fetch(relative_location, newDoc._id);
 
@@ -152,7 +233,7 @@ function findSong(relative_location, callback) {
                   type: 'add',
                   count: song_list.length,
                   completed: cnt,
-                  details: 'Added: ' + newDoc.title,
+                  details: 'Added: ' + newDoc.title + ' - ' + newDoc.albumartist,
                   doc: newDoc,
                 });
                 callback(null);
@@ -170,88 +251,16 @@ function findSong(relative_location, callback) {
                   type: 'update',
                   count: song_list.length,
                   completed: cnt,
-                  details: 'Updated: ' + song.title,
+                  details: 'Updated: ' + song.title + ' - ' + song.artist,
+                  doc: doc,
                 });
                 callback(null);
               });
             } else {
               callback(null);
             }
-          } else {
-            callback(err);
           }
-        } else {
-          // add the location
-          song = {
-            title: result.title,
-            album: result.album,
-            artist: result.artist,
-            albumartist: result.albumartist,
-            display_artist: normaliseArtist(result.albumartist, result.artist),
-            genre: result.genre,
-            year: result.year,
-            disc: (result.disk || {no:0}).no || 0,
-            track: (result.track || {no:0}).no || 0,
-            duration: -1,
-            play_count: (doc === null) ? 0 : doc.play_count || 0,
-            location: relative_location,
-            date_added: now,
-            date_modified: now,
-          };
-
-          // write the cover photo as an md5 string
-          if (result.picture.length > 0) {
-            pic = result.picture[0];
-            pic.format = pic.format.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-            song.cover_location = md5(pic.data) + '.' + pic.format;
-            filename = app.get('configDir') + '/dbs/covers/' + song.cover_location;
-            fs.exists(filename, function(exists) {
-              if (!exists) {
-                fs.writeFile(filename, pic.data, function(err) {
-                  if (err) console.log(err);
-                  console.log('Wrote file!');
-                });
-              }
-            });
-          }
-
-          if (doc === null) {
-            // insert the song
-            app.db.songs.insert(song, function(err, newDoc) {
-              duration_fetch(relative_location, newDoc._id);
-
-              // update the browser the song has been added
-              broadcast('scan_update', {
-                type: 'add',
-                count: song_list.length,
-                completed: cnt,
-                details: 'Added: ' + newDoc.title + ' - ' + newDoc.albumartist,
-                doc: newDoc,
-              });
-              callback(null);
-            });
-          } else if (hard_rescan) {
-            // use the old date_added
-            if (doc.date_added) {
-              song.date_added = doc.date_added;
-            }
-
-            // update the document
-            app.db.songs.update({location: relative_location}, song, {}, function(err, numRplaced) {
-              duration_fetch(relative_location, doc._id);
-              broadcast('scan_update', {
-                type: 'update',
-                count: song_list.length,
-                completed: cnt,
-                details: 'Updated: ' + song.title + ' - ' + song.artist,
-                doc: doc,
-              });
-              callback(null);
-            });
-          } else {
-            callback(null);
-          }
-        }
+        });
       });
     }
   });
