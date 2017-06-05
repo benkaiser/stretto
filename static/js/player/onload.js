@@ -156,6 +156,10 @@
     MusicApp.contentRegion.show(MusicApp.router.syncview);
   });
 
+  $('#export_data').click(function() {
+    (new Exporter()).export();
+  });
+
   // setup messenger
   Messenger.options = {
     extraClasses: 'messenger-fixed messenger-on-top',
