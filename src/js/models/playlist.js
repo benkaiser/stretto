@@ -129,7 +129,7 @@ class Playlist {
   }
 
   static fetchAll() {
-    return playlists;
+    return playlists.sort(Playlist._sortFunction);
   }
 
   static getByTitle(title) {
@@ -159,6 +159,13 @@ class Playlist {
 
   static removeOnChangeListener(listener) {
     listeners.splice(listeners.indexOf(listener), 1);
+  }
+
+  static _sortFunction(playlist1, playlist2) {
+    return (
+      playlist1.editable > playlist2.editable ||
+      playlist1.editable === playlist2.editable && playlist1.title > playlist2.title
+    ) ? 1 : -1;
   }
 }
 
