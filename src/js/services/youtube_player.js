@@ -13,8 +13,16 @@ export default class YoutubePlayer {
     });
   }
 
+  get durationCacheSeconds() {
+    return this._lastDuration;
+  }
+
   dispose() {
     YoutubePlayer.player && YoutubePlayer.player.stopVideo();
+  }
+
+  getDuration() {
+    return this._lastDuration = YoutubePlayer.player.getDuration();
   }
 
   getPosition() {
@@ -25,7 +33,7 @@ export default class YoutubePlayer {
 
   getPositionFraction() {
     return YoutubePlayer.readyPromise().then(() => {
-      return Promise.resolve(YoutubePlayer.player.getCurrentTime() / YoutubePlayer.player.getDuration());
+      return Promise.resolve(YoutubePlayer.player.getCurrentTime() / this.getDuration());
     });
   }
 

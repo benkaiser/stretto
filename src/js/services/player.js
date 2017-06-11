@@ -43,6 +43,10 @@ class Player {
       Promise.resolve(0);
   }
 
+  duration() {
+    return this.currentPlayer.durationCacheSeconds || 0;
+  }
+
   getPlayerFor(song, options) {
     if (song.isYoutube) {
       return new YoutubePlayer(song, options);

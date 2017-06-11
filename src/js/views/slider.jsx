@@ -1,6 +1,8 @@
 import { h, Component } from 'preact';
-import Player from '../services/player';
 import BootstrapSlider from 'bootstrap-slider';
+import Player from '../services/player';
+import Utilities from '../utilities';
+import autobind from 'autobind-decorator';
 
 const SCRUB_DELAY = 1000;
 
@@ -12,10 +14,11 @@ class Slider extends Component {
 
   componentDidMount() {
     this.slider = new BootstrapSlider(this.sliderElement, {
+      formatter: this._getTime,
       max: 1,
       min: 0,
-      step: 0.001,
-      tooltip: 'hide',
+      step: 0.0001,
+      tooltip: 'show',
       value: 0
     }).on('slideStart', this.slideStart.bind(this))
       .on('slide', this.slide.bind(this))
@@ -60,6 +63,11 @@ class Slider extends Component {
     this.sliding = false;
     if (this.scrub_timeout) clearTimeout(this.scrub_timeout);
     this.seek();
+  }
+
+  @autobind
+  _getTime(value) {
+    return Utilities.timeFormat(~~(Player.duration() * value));
   }
 }
 

@@ -11,6 +11,10 @@ export default class SoundcloudPlayer {
     });
   }
 
+  get durationCacheSeconds() {
+    return this._lastDuration;
+  }
+
   dispose() {
     SoundcloudPlayer.player.pause();
     SoundcloudPlayer.player.load(RESET_URL, {
@@ -30,6 +34,7 @@ export default class SoundcloudPlayer {
     return new Promise((resolve) => {
       SoundcloudPlayer.player.getPosition((position) => {
         SoundcloudPlayer.player.getDuration((duration) => {
+          this._lastDuration = duration / 1000;
           resolve(position / duration);
         })
       });
