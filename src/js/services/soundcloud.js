@@ -1,3 +1,4 @@
+import Utilities from '../utilities';
 import fetchJsonp from 'fetch-jsonp';
 
 export default class Soundcloud {
@@ -11,9 +12,7 @@ export default class Soundcloud {
         return reject({ error: 'not a soundcloud track' });
       }
       fetch(`https://api.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
-        .then((response) => {
-          return response.json();
-        })
+        .then(Utilities.fetchToJson)
         .then((data) => {
           resolve({
             album: 'Unknown Album',

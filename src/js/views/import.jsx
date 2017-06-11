@@ -30,6 +30,23 @@ class Import extends Component {
         { this.state.error &&
           <p class='text-danger'>{this.state.error}</p>
         }
+        { this.state.progressFraction !== undefined &&
+          <div class="progress">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              aria-valuenow={this.state.progressFraction}
+              aria-valuemin="0"
+              aria-valuemax="1"
+              style={`width: ${this.state.progressFraction * 100}%;`}
+            >
+              <span class="sr-only">60% Complete</span>
+            </div>
+          </div>
+        }
+        { this.state.message &&
+          <p>{this.state.message}</p>
+        }
       </div>
     );
   }
@@ -46,12 +63,21 @@ class Import extends Component {
         progressCallback: this._onProgress
       });
       this.importer.start();
+      this.input.value = '';
     } catch (error) {
       console.log(error);
       this.setState({
         error: 'Input is not valid JSON.'
       });
     }
+  }
+
+  @autobind
+  _onProgress(progressFraction, message) {
+    this.setState({
+      message: message,
+      progressFraction: progressFraction
+    });
   }
 }
 

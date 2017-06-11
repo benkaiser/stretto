@@ -1,3 +1,4 @@
+import Utilities from '../utilities';
 import fetchJsonp from 'fetch-jsonp';
 
 let youtubeIdRegex = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -19,9 +20,7 @@ export default class Youtube {
         return reject({ error: 'not a youtube track' });
       }
       fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${this.API_KEY}&fields=items(snippet)&part=snippet`)
-        .then((response) => {
-          return response.json();
-        })
+        .then(Utilities.fetchToJson)
         .then((data) => {
           let snippet = data.items[0].snippet;
           resolve({
@@ -55,9 +54,8 @@ export default class Youtube {
   static _addDurations(items) {
     let videoIds = items.map((item) => item.id.videoId);
     return fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${this.API_KEY}`)
-    .then((response) => {
-      return response.json();
-    }).then((data) => {
+    .then(Utilities.fetchToJson)
+    .then((data) => {
       data.items.forEach((dataItem, index) => {
         items[index].duration = this._durationToSeconds(dataItem.contentDetails.duration);
       });

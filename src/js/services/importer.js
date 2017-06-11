@@ -1,9 +1,12 @@
 import Constants from '../constants';
-import CoverArt from './cover_art';
+import MusicBrainzCoverArt from './music_brainz_cover_art';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Soundcloud from './/soundcloud';
 import Youtube from './youtube';
+import async from 'async';
+
+const PAUSE = 1000;
 
 export default class Importer {
   constructor(options) {
@@ -13,7 +16,7 @@ export default class Importer {
   }
 
   start() {
-    this.data.songs && this.data.songs.map((song) => {
+    this.data.songs && async.eachLimit(this.data.songs, 1, (song, callback) => {
       Youtube.search(`${song.title} ${song.artist}`).then((youtubeItems) => {
         if (!youtubeItems.length) { throw new Error('Unable to find youtube matches'); }
         let match = this._pickBestMatch(song, youtubeItems);
@@ -23,7 +26,7 @@ export default class Importer {
         return song;
       }).then((song) => {
         return new Promise((resolve) => {
-          CoverArt.fetch(song).then((cover) => {
+          MusicBrainzCoverArt.fetch(song).then((cover) => {
             song.thumbnailUrl = cover;
             resolve(song);
           }).catch((error) => {
@@ -32,11 +35,15 @@ export default class Importer {
         });
       }).then((song) => {
         this._addSong(song);
-        this._updateProgress();
+        this._updateProgress(`Added: ${song.title} - ${song.artist}`);
+        setTimeout(callback, PAUSE);
       }).catch((error) => {
-        this._updateProgress();
-        console.log(error);
+        console.log(`FAILED TO RESOLVE TRACK: "${song.title} - ${song.artist}" because ${error}`);
+        this._updateProgress(`Failed to find "${song.title} ${song.artist}" item with ${error}`);
+        setTimeout(callback, PAUSE);
       });
+    }, () => {
+      this._updateProgress('Finished!');
     });
   }
 
@@ -77,8 +84,9 @@ export default class Importer {
     return closestMatch;
   }
 
-  _updateProgress() {
+  _updateProgress(message) {
     this.progress++;
-    this.progressCallback && this.progressCallback(this.progress / this.data.length);
+    this.progress > this.data.songs.length && (this.progress = this.data.songs.length);
+    this.progressCallback && this.progressCallback(this.progress / this.data.songs.length, message);
   }
 }
