@@ -69,7 +69,7 @@ var app = null;
 var cnt = 0;
 var song_list = [];
 
-var song_extentions = ['mp3', 'm4a', 'aac', 'ogg', 'wav', 'flac', 'raw'];
+var song_extensions = ['mp3', 'm4a', 'aac', 'ogg', 'wav', 'flac', 'raw'];
 
 function findNextSong() {
   if (cnt < song_list.length && running) {
