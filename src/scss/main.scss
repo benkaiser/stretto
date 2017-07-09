@@ -79,7 +79,6 @@ body, html {
 }
 
 .playerinfo {
-  margin-bottom: -20px;
   overflow: hidden;
   padding: 14px;
   text-align: center;
@@ -99,8 +98,14 @@ body, html {
     visibility: visible;
   }
 
+  .cover-wrapper {
+    position: relative;
+  }
+
   .hide-button {
-    margin-top: -67px;
+    left: calc(50% - 15px);
+    position: absolute;
+    top: 210px;
     visibility: hidden;
   }
 

@@ -33,7 +33,7 @@ class PlayerInfo extends Component {
             <p class='artist'>{this.state.song.artist} - {this.state.song.album}</p>
           </div>
           { (!this.state.hideCover) ?
-          <div>
+          <div class='cover-wrapper'>
             <div class='cover' style={`background-image: url('${this.state.song.cover}')`}></div>
             <div key='hide' class='btn btn-default btn-sm hide-button' onClick={this.hideCover.bind(this, true)}>
               <i class='fa fa-angle-down' aria-hidden='true'></i>
