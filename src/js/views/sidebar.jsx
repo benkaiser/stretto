@@ -21,6 +21,7 @@ class Sidebar extends Component {
             <Link class='sidebar-icon' to='/settings/'><span class='glyphicon glyphicon-cog'></span></Link>
             <Link class='sidebar-icon' to='/add/'><span class='glyphicon glyphicon-plus'></span></Link>
             <Link class='sidebar-icon' to='/import/'><span class='glyphicon glyphicon-cloud-upload'></span></Link>
+            <Link class='sidebar-icon' to='/sync/'><span class='glyphicon glyphicon-refresh'></span></Link>
           </h3>
           <ul class='nav nav-pills nav-stacked'>
             <li class="dropdown-header">Find Music</li>

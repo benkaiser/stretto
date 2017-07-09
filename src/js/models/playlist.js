@@ -141,6 +141,7 @@ class Playlist {
   }
 
   static initialise(initialData) {
+    playlists = [];
     initialData.forEach((item) => {
       playlists.push(new Playlist(item));
     });

@@ -12,6 +12,7 @@ import Import from './import';
 import Layout from './layout';
 import Playlist from './playlist';
 import Settings from './settings';
+import Sync from './sync';
 
 class RootViewLoader {
   static initialise() {
@@ -24,6 +25,7 @@ class RootViewLoader {
             <Route path="import" component={Import} />
             <Route path="welcome" component={Intro} />
             <Route path="settings" component={Settings} />
+            <Route path="sync" component={Sync} />
             <Route path="playlist/:playlist" component={Playlist} />
             <Redirect from='*' to='/' />
           </Route>

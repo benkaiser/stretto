@@ -44,7 +44,7 @@ class Player {
   }
 
   duration() {
-    return this.currentPlayer.durationCacheSeconds || 0;
+    return this.currentPlayer && this.currentPlayer.durationCacheSeconds || 0;
   }
 
   getPlayerFor(song, options) {
@@ -99,15 +99,22 @@ class Player {
 
   resumeOnLoad(listener) {
     let playstate = DataLayer.getItem('playstate');
-    playstate &&
-      this.play(
-        Song.findById(playstate.songId),
-        Playlist.getByTitle(playstate.playlistTitle),
-        {
-          autoPlay: playstate.playing,
-          currentTime: playstate.currentTime,
-        }
-      );
+    if (playstate) {
+      const song = Song.findById(playstate.songId);
+      const playlist = Playlist.getByTitle(playstate.playlistTitle);
+      if (song && playlist) {
+        this.play(
+          song,
+          playlist,
+          {
+            autoPlay: playstate.playing,
+            currentTime: playstate.currentTime,
+          }
+        );
+      } else {
+        this.playlist = Playlist.getByTitle(Playlist.LIBRARY);
+      }
+    }
     playstate && playstate.repeat && (this.repeat_state = playstate.repeat);
     playstate && playstate.shuffle_on && (this.shuffle_on = playstate.shuffle_on);
   }
@@ -121,7 +128,7 @@ class Player {
         playing: this.isPlaying,
         repeat: this.repeat_state,
         shuffle_on: this.shuffle_on,
-        songId: this.currentSong.id
+        songId: this.currentSong && this.currentSong.id || undefined
       });
     })
   }

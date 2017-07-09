@@ -81,6 +81,7 @@ class Song {
   }
 
   static initialise(initialData) {
+    songs = [];
     initialData.forEach((item) => {
       songs.push(new Song(item));
     });
