@@ -5,6 +5,16 @@ import Player from '../services/player';
 import Playlist from '../models/playlist';
 import autobind from 'autobind-decorator';
 import bsn from 'bootstrap.native';
+import moment from 'moment';
+
+const COLUMNS = ['title', 'artist', 'album', 'createdAt'];
+
+const COLUMN_TITLE_MAPPING = {
+  'title': 'Title',
+  'artist': 'Artist',
+  'album': 'Album',
+  'createdAt': 'Date Added'
+};
 
 class PlaylistView extends Component {
   constructor(props) {
@@ -50,9 +60,7 @@ class PlaylistView extends Component {
         <table class='song-table table table-hover'>
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Artist</th>
-              <th>Album</th>
+              { COLUMNS.map((column) => this.headerForColumn(column)) }
             </tr>
           </thead>
           <tbody>
@@ -60,12 +68,7 @@ class PlaylistView extends Component {
               <tr class={ (currentSongId == song.id) ? 'active' : '' }
                   onClick={this.clickSong.bind(this, song)}
                   onContextMenu={this.rightClickSong.bind(this, song)}>
-                <td>
-                  <div class='cover' style={`background-image: url('${song.cover}')`}></div>
-                  {song.title}
-                </td>
-                <td>{song.artist}</td>
-                <td>{song.album}</td>
+                { COLUMNS.map((column) => this.itemForColumn(column, song)) }
               </tr>
             )}
           </tbody>
@@ -83,6 +86,29 @@ class PlaylistView extends Component {
     return {
       playlist: Playlist.getByTitle(props.params.playlist)
     };
+  }
+
+  headerForColumn(column) {
+    return <th class={`${column}Column`}>{COLUMN_TITLE_MAPPING[column]}</th>;
+  }
+
+  itemForColumn(column, song) {
+    switch (column) {
+      case 'title':
+        return (
+          <td class={`${column}Column`}>
+            <div class='cover' style={`background-image: url('${song.cover}')`}></div>
+            {song.title}
+          </td>
+        );
+        break;
+      case 'createdAt':
+      case 'updatedAt':
+        return <td class={`${column}Column`}>{moment(song[column]).fromNow()}</td>;
+        break;
+      default:
+        return <td class={`${column}Column`}>{song[column]}</td>;
+    }
   }
 
   @autobind

@@ -30,6 +30,7 @@
     "express-session": "^1.14.2",
     "fetch-jsonp": "^1.0.6",
     "google-auth-library": "^0.10.0",
+    "moment": "^2.18.1",
     "mongoose": "^4.11.1",
     "node-sass": "^4.1.1",
     "nodemon": "^1.11.0",

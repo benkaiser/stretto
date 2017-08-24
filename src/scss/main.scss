@@ -184,9 +184,22 @@ body, html {
     line-height: 40px;
     overflow: hidden;
     padding: 0;
+    padding-right: 15px;
     text-overflow: ellipsis;
     vertical-align: middle;
     white-space: nowrap;
+  }
+
+  .titleColumn {
+    max-width: 400px;
+  }
+
+  .artistColumn {
+    max-width: 200px;
+  }
+
+  .albumColumn {
+    max-width: 200px;
   }
 }
 
