@@ -5,6 +5,7 @@ import Router from 'react-router/lib/Router';
 import Route from 'react-router/lib/Route';
 import browserHistory from 'react-router/lib/browserHistory';
 import Add from './add';
+import Alerter from '../services/alerter';
 import Bootbox from '../services/bootbox';
 import ContextMenu from './context_menu';
 import Intro from './intro';
@@ -31,6 +32,7 @@ class RootViewLoader {
           </Route>
         </Router>
         <Bootbox />
+        <Alerter />
         <ContextMenu />
       </div>
     ), document.getElementById('preact'));

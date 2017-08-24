@@ -1,4 +1,5 @@
 import autobind from 'autobind-decorator';
+import Alerter from './alerter';
 
 let readyPromise;
 let readyResolve;
@@ -79,7 +80,9 @@ export default class YoutubePlayer {
 
 
   static onYoutubePlayerError(error) {
-    console.log(error);
+    Alerter.error('Error occured in youtube playback. See console for more information.');
+    console.error(`Youtube playback error: ${error.data}`);
+    console.error(error);
     YoutubePlayer.endHandler();
   }
 
