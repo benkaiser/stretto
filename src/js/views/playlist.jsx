@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import Bootbox from '../services/bootbox';
 import ContextMenu from './context_menu';
 import Player from '../services/player';
-import Playlist from '../models/playlist';
+import Playlist, { SortDirection } from '../models/playlist';
 import autobind from 'autobind-decorator';
 import bsn from 'bootstrap.native';
 import moment from 'moment';
@@ -83,13 +83,39 @@ class PlaylistView extends Component {
   }
 
   getStateFromprops(props) {
+    const playlist = Playlist.getByTitle(props.params.playlist);
     return {
-      playlist: Playlist.getByTitle(props.params.playlist)
+      sortColumn: playlist.sortColumn || undefined,
+      sortDirection: playlist.sortDirection || SortDirection.NONE,
+      playlist: playlist
     };
   }
 
+  @autobind
+  sortBy(column) {
+    let nextSortDirection = this.state.sortDirection;
+    if (column != this.state.sortColumn) {
+      nextSortDirection = SortDirection.ASCENDING;
+    } else {
+      nextSortDirection = (nextSortDirection + 1) % Object.keys(SortDirection).length;
+    }
+    this.state.playlist.sortBy(column, nextSortDirection);
+    this.setState({
+      sortColumn: column,
+      sortDirection: nextSortDirection
+    });
+  }
+
   headerForColumn(column) {
-    return <th class={`${column}Column`}>{COLUMN_TITLE_MAPPING[column]}</th>;
+    return (
+      <th
+        class={`${column}Column`}
+        onClick={() => this.sortBy(column)}>
+        {COLUMN_TITLE_MAPPING[column]}
+        { ' ' }
+        { this.sortIconFor(column) }
+      </th>
+    );
   }
 
   itemForColumn(column, song) {
@@ -142,6 +168,14 @@ class PlaylistView extends Component {
   @autobind
   songChange() {
     this.setState();
+  }
+
+  sortIconFor(column) {
+    if (this.state.sortColumn === column && this.state.sortDirection !== SortDirection.NONE) {
+      return this.state.sortDirection === SortDirection.ASCENDING ?
+        <i class="fa fa-chevron-up" aria-label="Sorting Ascending"></i> :
+        <i class="fa fa-chevron-down" aria-label="Sorting Descending"></i>;
+    }
   }
 }
 

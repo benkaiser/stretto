@@ -4,7 +4,15 @@ import autobind from 'autobind-decorator';
 let listeners = [];
 let playlists = [];
 
-class Playlist {
+const SortDirection = {
+  NONE: 0,
+  ASCENDING: 1,
+  DESCENDING: 2
+}
+
+export { SortDirection };
+
+export default class Playlist {
   static get LIBRARY() {
     return 'Library';
   }
@@ -92,7 +100,27 @@ class Playlist {
 
   @autobind
   songIndex(song) {
-    return this.songs.indexOf(song.id);
+    return this.songData.indexOf(song);
+  }
+
+  sortBy(column, direction) {
+    this._sortColumn = column;
+    this._sortDirection = direction;
+    delete this._songData;
+  }
+
+  @autobind
+  sortSongs(firstSong, secondSong) {
+    if (firstSong[this._sortColumn] === secondSong[this._sortColumn]) return 0;
+    switch (this._sortDirection) {
+      case SortDirection.ASCENDING:
+        return (firstSong[this._sortColumn] < secondSong[this._sortColumn]) ? -1 : 1;
+      case SortDirection.DESCENDING:
+        return (firstSong[this._sortColumn] > secondSong[this._sortColumn]) ? -1 : 1;
+      case SortDirection.NONE:
+      default:
+        return 0;
+    }
   }
 
   update(attribute, value) {
@@ -105,8 +133,19 @@ class Playlist {
       this._songData = this.songs
                            .map((songId) => Song.findById(songId))
                            .filter((song) => song !== undefined);
+      if (this._sortColumn && this._sortDirection !== SortDirection.NONE) {
+        this._songData = this._songData.sort(this.sortSongs);
+      }
     }
     return this._songData;
+  }
+
+  get sortColumn() {
+    return this._sortColumn;
+  }
+
+  get sortDirection() {
+    return this._sortDirection;
   }
 
   static addOnChangeListener(listener) {
@@ -169,5 +208,3 @@ class Playlist {
     ) ? 1 : -1;
   }
 }
-
-module.exports = Playlist;

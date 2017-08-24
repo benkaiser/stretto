@@ -180,6 +180,15 @@ body, html {
 .song-table {
   margin-bottom: 0;
 
+  thead > tr > th {
+    padding-left: 0;
+    cursor: pointer;
+
+    > i {
+      margin-left: 5px;
+    }
+  }
+
   tbody > tr > td {
     line-height: 40px;
     overflow: hidden;
