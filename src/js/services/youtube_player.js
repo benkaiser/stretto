@@ -78,8 +78,9 @@ export default class YoutubePlayer {
   }
 
 
-  static onYoutubePlayerError(event) {
-    // TODO: handle
+  static onYoutubePlayerError(error) {
+    console.log(error);
+    YoutubePlayer.endHandler();
   }
 
   static onYoutubePlayerReady(event) {
@@ -87,7 +88,7 @@ export default class YoutubePlayer {
   }
 
   static onYoutubePlayerStateChange(event) {
-    YoutubePlayer.playstateChangeHandler(YoutubePlayer.isPlaying())
+    YoutubePlayer.playstateChangeHandler(YoutubePlayer.isPlaying());
     YoutubePlayer.player.getPlayerState() === YT.PlayerState.ENDED && YoutubePlayer.endHandler();
   }
 }
