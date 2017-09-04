@@ -44,10 +44,12 @@ body, html {
   position: absolute;
 
   .dropdown-menu.open {
-    position: static;
+    clear: left;
     display: block;
     margin-bottom: 5px;
-    clear: left;
+    max-height: 400px;
+    overflow-y: scroll;
+    position: static;
   }
 }
 

@@ -4,6 +4,8 @@ import Playlist from '../models/playlist';
 import Song from '../models/song';
 import autobind from 'autobind-decorator';
 
+const DROPDOWN_HEIGHT = 400;
+
 export default class ContextMenu extends Component {
   constructor() {
     super();
@@ -25,7 +27,7 @@ export default class ContextMenu extends Component {
 
   render() {
     return (
-      <div class='dropdownContainer' style={this.dropdownStyle()}>
+      <div className={`dropdownContainer`} style={this.dropdownStyle()}>
         <ul className={`dropdown-menu ${this.openStyle()}`}>
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>
           { this.state.playlist && this.state.playlist.editable &&
@@ -41,7 +43,12 @@ export default class ContextMenu extends Component {
   }
 
   dropdownStyle() {
-    return `left: ${this.state.xPosition}px; top: ${this.state.yPosition}px;`;
+    const yPosition = this.dropup() ? this.state.yPosition - DROPDOWN_HEIGHT : this.state.yPosition;
+    return `left: ${this.state.xPosition}px; top: ${yPosition}px;`;
+  }
+
+  dropup() {
+    return this.state.yPosition > window.innerHeight - DROPDOWN_HEIGHT;
   }
 
   @autobind
