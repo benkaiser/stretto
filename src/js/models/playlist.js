@@ -83,6 +83,13 @@ export default class Playlist {
     Playlist.change();
   }
 
+  reorder(oldIndex, newIndex) {
+    let [item] = this.songs.splice(oldIndex, 1);
+    this.songs.splice(newIndex, 0, item);
+    delete this._songData;
+    Playlist.change();
+  }
+
   serialize() {
     return {
       createdAt: this.createdAt,

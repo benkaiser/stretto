@@ -44,12 +44,10 @@ body, html {
   position: absolute;
 
   .dropdown-menu.open {
-    clear: left;
+    position: static;
     display: block;
     margin-bottom: 5px;
-    max-height: 400px;
-    overflow-y: scroll;
-    position: static;
+    clear: left;
   }
 }
 
@@ -63,6 +61,10 @@ body, html {
   background-size: cover;
   height: 250px;
   width: 250px;
+}
+
+.intro {
+  height: 100%;
 }
 
 .hidden {
@@ -159,6 +161,10 @@ body, html {
   max-width: 100%;
 }
 
+.sidebar-bottom {
+  padding-top: 5px;
+}
+
 .sidebar-icon {
   float: right;
   font-size: 17px;
@@ -181,6 +187,7 @@ body, html {
 
 .song-table {
   margin-bottom: 0;
+  user-select: none;
 
   thead > tr > th {
     padding-left: 0;
@@ -200,17 +207,18 @@ body, html {
     vertical-align: middle;
     white-space: nowrap;
   }
+}
 
-  .titleColumn {
-    max-width: 400px;
-  }
-
-  .artistColumn {
-    max-width: 200px;
-  }
-
-  .albumColumn {
-    max-width: 200px;
+.sortableElement {
+  background-color: #eee;
+  td {
+    line-height: 40px;
+    overflow: hidden;
+    padding: 0;
+    padding-right: 15px;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
   }
 }
 

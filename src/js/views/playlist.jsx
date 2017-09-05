@@ -1,8 +1,11 @@
+import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { h, Component } from 'preact';
 import Bootbox from '../services/bootbox';
+import ContainerDimensions from 'react-container-dimensions';
 import ContextMenu from './context_menu';
 import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
+import ReactDOM from 'preact-compat';
 import autobind from 'autobind-decorator';
 import bsn from 'bootstrap.native';
 import moment from 'moment';
@@ -15,11 +18,19 @@ const COLUMN_TITLE_MAPPING = {
   'album': 'Album',
   'createdAt': 'Date Added'
 };
+const COLUMN_WIDTH_MAPPING = {
+  'title': 0.3,
+  'artist': 0.25,
+  'album': 0.25,
+  'createdAt': 0.2
+}
 
-class PlaylistView extends Component {
+class PlaylistView extends ReactDOM.Component {
   constructor(props) {
     super(props);
     this.state = this.getStateFromprops(props);
+    this.SortableContainer = SortableContainer(this.sortableList, { withRef: true });
+    this.SortableElement = SortableElement(this.sortableItem)
     Player.addOnSongChangeListener(this.songChange);
     Playlist.addOnChangeListener(this.songChange);
   }
@@ -57,24 +68,35 @@ class PlaylistView extends Component {
           }
         </div>
         <p>{this.state.playlist.songs.length} Songs</p>
-        <table class='song-table table table-hover'>
-          <thead>
-            <tr>
-              { COLUMNS.map((column) => this.headerForColumn(column)) }
-            </tr>
-          </thead>
-          <tbody>
-            { this.state.playlist.songData.map((song) =>
-              <tr class={ (currentSongId == song.id) ? 'active' : '' }
-                  onClick={this.clickSong.bind(this, song)}
-                  onContextMenu={this.rightClickSong.bind(this, song)}>
-                { COLUMNS.map((column) => this.itemForColumn(column, song)) }
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <ContainerDimensions>
+          {({width}) => {
+            this._width = width;
+            return (
+              <table class='song-table table table-hover'>
+                <thead>
+                  <tr>
+                    { COLUMNS.map((column) => this.headerForColumn(column)) }
+                  </tr>
+                </thead>
+                <this.SortableContainer
+                  getContainer={wrappedInstance => ReactDOM.findDOMNode(this).parentElement}
+                  distance={20}
+                  helperClass='sortableElement'
+                  items={this.state.playlist.songData}
+                  onSortEnd={this.onSortEnd}
+                  shouldCancelStart={this.shouldCancelSortStart}
+                  useWindowAsScrollContainer={true}
+                />
+              </table>
+            );
+          }}
+        </ContainerDimensions>
       </div>
     );
+  }
+
+  cellWidthForColumn(column) {
+    return COLUMN_WIDTH_MAPPING[column] * this._width;
   }
 
   clickSong(song) {
@@ -91,21 +113,6 @@ class PlaylistView extends Component {
     };
   }
 
-  @autobind
-  sortBy(column) {
-    let nextSortDirection = this.state.sortDirection;
-    if (column != this.state.sortColumn) {
-      nextSortDirection = SortDirection.ASCENDING;
-    } else {
-      nextSortDirection = (nextSortDirection + 1) % Object.keys(SortDirection).length;
-    }
-    this.state.playlist.sortBy(column, nextSortDirection);
-    this.setState({
-      sortColumn: column,
-      sortDirection: nextSortDirection
-    });
-  }
-
   headerForColumn(column) {
     return (
       <th
@@ -118,11 +125,21 @@ class PlaylistView extends Component {
     );
   }
 
+  isCurrentSongPlaying(songId) {
+    let currentSongId = Player.currentSong ? Player.currentSong.id : '';
+    return songId === currentSongId;
+  }
+
   itemForColumn(column, song) {
+    const props = {
+      style: {
+        width: `${this.cellWidthForColumn(column)}px`
+      }
+    };
     switch (column) {
       case 'title':
         return (
-          <td class={`${column}Column`}>
+          <td {...props}>
             <div class='cover' style={`background-image: url('${song.cover}')`}></div>
             {song.title}
           </td>
@@ -130,10 +147,10 @@ class PlaylistView extends Component {
         break;
       case 'createdAt':
       case 'updatedAt':
-        return <td class={`${column}Column`}>{moment(song[column]).fromNow()}</td>;
+        return <td {...props}>{moment(song[column]).fromNow()}</td>;
         break;
       default:
-        return <td class={`${column}Column`}>{song[column]}</td>;
+        return <td {...props}>{song[column]}</td>;
     }
   }
 
@@ -160,14 +177,42 @@ class PlaylistView extends Component {
     });
   }
 
+  @autobind
+  onSortEnd({oldIndex, newIndex}) {
+    this.state.playlist.reorder(oldIndex, newIndex);
+    this.forceUpdate();
+  }
+
   rightClickSong(song, event) {
     ContextMenu.open(song, event, this.state.playlist);
     event.preventDefault();
   }
 
   @autobind
+  shouldCancelSortStart() {
+    if (!this.state.playlist.editable || this.state.sortDirection !== SortDirection.NONE) {
+      return true;
+    }
+  }
+
+  @autobind
   songChange() {
     this.setState();
+  }
+
+  @autobind
+  sortBy(column) {
+    let nextSortDirection = this.state.sortDirection;
+    if (column != this.state.sortColumn) {
+      nextSortDirection = SortDirection.ASCENDING;
+    } else {
+      nextSortDirection = (nextSortDirection + 1) % Object.keys(SortDirection).length;
+    }
+    this.state.playlist.sortBy(column, nextSortDirection);
+    this.setState({
+      sortColumn: column,
+      sortDirection: nextSortDirection
+    });
   }
 
   sortIconFor(column) {
@@ -176,6 +221,28 @@ class PlaylistView extends Component {
         <i class="fa fa-chevron-up" aria-label="Sorting Ascending"></i> :
         <i class="fa fa-chevron-down" aria-label="Sorting Descending"></i>;
     }
+  }
+
+  @autobind
+  sortableItem({value}) {
+    return (
+      <tr class={ this.isCurrentSongPlaying(value.id) ? 'active' : '' }
+          onClick={this.clickSong.bind(this, value)}
+          onContextMenu={this.rightClickSong.bind(this, value)}>
+        { COLUMNS.map((column) => this.itemForColumn(column, value)) }
+      </tr>
+    );
+  }
+
+  @autobind
+  sortableList({items}) {
+    return (
+      <tbody>
+        {items.map((value, index) =>
+          <this.SortableElement key={`item-${index}`} index={index} value={value} />
+        )}
+      </tbody>
+    );
   }
 }
 
