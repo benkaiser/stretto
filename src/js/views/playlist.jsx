@@ -79,13 +79,12 @@ class PlaylistView extends ReactDOM.Component {
                   </tr>
                 </thead>
                 <this.SortableContainer
-                  getContainer={wrappedInstance => ReactDOM.findDOMNode(this).parentElement}
+                  getContainer={wrappedInstance => document.getElementsByClassName('content')[0]}
                   distance={20}
                   helperClass='sortableElement'
                   items={this.state.playlist.songData}
                   onSortEnd={this.onSortEnd}
                   shouldCancelStart={this.shouldCancelSortStart}
-                  useWindowAsScrollContainer={true}
                 />
               </table>
             );
