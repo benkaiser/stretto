@@ -3,6 +3,7 @@ import { h, Component } from 'preact';
 import Bootbox from '../services/bootbox';
 import ContainerDimensions from 'react-container-dimensions';
 import ContextMenu from './context_menu';
+import Infinite from 'react-infinite';
 import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
 import ReactDOM from 'preact-compat';
@@ -24,6 +25,8 @@ const COLUMN_WIDTH_MAPPING = {
   'album': 0.25,
   'createdAt': 0.2
 }
+const ELEMENT_HEIGHT = 41;
+const HEADER_HEIGHT = 50;
 
 class PlaylistView extends ReactDOM.Component {
   constructor(props) {
@@ -37,6 +40,9 @@ class PlaylistView extends ReactDOM.Component {
 
   componentDidMount() {
     this.optionsButton && delete this.optionsButton['Dropdown'];
+    this.contentContainer().addEventListener('scroll', (event) => {
+      this.setState(this.determineStateForElementsToShow(event.target.scrollTop, event.target.clientHeight, this.state.playlist));
+    });
   }
 
   componentWillReceiveProps(props) {
@@ -49,8 +55,6 @@ class PlaylistView extends ReactDOM.Component {
   }
 
   render() {
-    let currentSong = Player.currentSong;
-    let currentSongId = (currentSong) ? currentSong.id : '';
     return (
       <div class='intro'>
         <div class='playlist_header'>
@@ -79,12 +83,13 @@ class PlaylistView extends ReactDOM.Component {
                   </tr>
                 </thead>
                 <this.SortableContainer
-                  getContainer={wrappedInstance => document.getElementsByClassName('content')[0]}
+                  getContainer={wrappedInstance => this.contentContainer()}
                   distance={20}
                   helperClass='sortableElement'
-                  items={this.state.playlist.songData}
+                  items={this.state.songsToRender}
                   onSortEnd={this.onSortEnd}
                   shouldCancelStart={this.shouldCancelSortStart}
+                  transitionDuration={0}
                 />
               </table>
             );
@@ -103,13 +108,32 @@ class PlaylistView extends ReactDOM.Component {
     this.setState();
   }
 
+  contentContainer() {
+    return document.getElementsByClassName('content')[0];
+  }
+
+  determineStateForElementsToShow(scrollTop, containerHeight, playlist) {
+    scrollTop = scrollTop - HEADER_HEIGHT;
+    const numSongs = playlist.songData.length;
+    const numElements = Math.floor(containerHeight / ELEMENT_HEIGHT) + 20;
+    const firstIndex = Math.max(Math.floor(scrollTop / ELEMENT_HEIGHT) - 10, 0);
+    const lastIndex = Math.min(firstIndex + numElements, numSongs);
+    const songs = playlist.songData.slice(firstIndex, lastIndex);
+    return {
+      firstIndex: firstIndex,
+      songsToRender: songs,
+      topSpacerHeight: firstIndex * ELEMENT_HEIGHT,
+      bottomSpacerHeight: (playlist.songData.length - lastIndex) * ELEMENT_HEIGHT
+    };
+  }
+
   getStateFromprops(props) {
     const playlist = Playlist.getByTitle(props.params.playlist);
-    return {
-      sortColumn: playlist.sortColumn || undefined,
-      sortDirection: playlist.sortDirection || SortDirection.NONE,
-      playlist: playlist
-    };
+    const state = this.determineStateForElementsToShow(0, window.innerHeight, playlist);
+    state.sortColumn = playlist.sortColumn || undefined;
+    state.sortDirection = playlist.sortDirection || SortDirection.NONE;
+    state.playlist = playlist;
+    return state;
   }
 
   headerForColumn(column) {
@@ -179,7 +203,8 @@ class PlaylistView extends ReactDOM.Component {
   @autobind
   onSortEnd({oldIndex, newIndex}) {
     this.state.playlist.reorder(oldIndex, newIndex);
-    this.forceUpdate();
+    const scrollContainer = this.contentContainer();
+    this.setState(this.determineStateForElementsToShow(scrollContainer.scrollTop, scrollContainer.clientHeight, this.state.playlist));
   }
 
   rightClickSong(song, event) {
@@ -237,9 +262,11 @@ class PlaylistView extends ReactDOM.Component {
   sortableList({items}) {
     return (
       <tbody>
+        <tr height={this.state.topSpacerHeight}></tr>
         {items.map((value, index) =>
-          <this.SortableElement key={`item-${index}`} index={index} value={value} />
+          <this.SortableElement key={`item-${value.id}`} index={this.state.firstIndex + index} value={value} />
         )}
+        <tr height={this.state.bottomSpacerHeight}></tr>
       </tbody>
     );
   }
