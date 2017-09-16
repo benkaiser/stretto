@@ -3,7 +3,6 @@ import { h, Component } from 'preact';
 import Bootbox from '../services/bootbox';
 import ContainerDimensions from 'react-container-dimensions';
 import ContextMenu from './context_menu';
-import Infinite from 'react-infinite';
 import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
 import ReactDOM from 'preact-compat';
