@@ -1,13 +1,8 @@
 import { h, render } from 'preact';
 import IndexRedirect from 'react-router/lib/IndexRedirect';
-import Redirect from 'react-router/lib/Redirect';
-import Router from 'react-router/lib/Router';
-import Route from 'react-router/lib/Route';
-import browserHistory from 'react-router/lib/browserHistory';
+import { browserHistory, Policy, Redirect, Route, Router } from 'react-router';
 import Add from './add';
-import Alerter from '../services/alerter';
-import Bootbox from '../services/bootbox';
-import ContextMenu from './context_menu';
+import Edit from './edit';
 import Intro from './intro';
 import Import from './import';
 import Layout from './layout';
@@ -23,6 +18,7 @@ class RootViewLoader {
           <Route path="/" component={Layout}>
             <IndexRedirect to="welcome" />
             <Route path="add" component={Add} />
+            <Route path="edit/:id" component={Edit} />
             <Route path="import" component={Import} />
             <Route path="welcome" component={Intro} />
             <Route path="settings" component={Settings} />
@@ -31,9 +27,6 @@ class RootViewLoader {
             <Redirect from='*' to='/' />
           </Route>
         </Router>
-        <Bootbox />
-        <Alerter />
-        <ContextMenu />
       </div>
     ), document.getElementById('preact'));
   }

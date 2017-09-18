@@ -208,6 +208,20 @@ export default class Playlist {
     listeners.splice(listeners.indexOf(listener), 1);
   }
 
+  /**
+   * TODO: use GUID for ids so this ugly hack isn't needed
+   */
+  static updateIds(oldId, newId) {
+    playlists.forEach((playlist) => {
+      const index = playlist.songs.indexOf(oldId);
+      if (index > -1) {
+        playlist.songs[index] = newId;
+        delete playlist._songData;
+      }
+    });
+    Playlist.change();
+  }
+
   static _sortFunction(playlist1, playlist2) {
     return (
       playlist1.editable > playlist2.editable ||

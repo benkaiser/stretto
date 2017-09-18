@@ -232,10 +232,10 @@ class PlaylistView extends ReactDOM.Component {
       nextSortDirection = (nextSortDirection + 1) % Object.keys(SortDirection).length;
     }
     this.state.playlist.sortBy(column, nextSortDirection);
-    this.setState({
-      sortColumn: column,
-      sortDirection: nextSortDirection
-    });
+    const newScrollState = this.determineStateForElementsToShow(0, window.innerHeight, this.state.playlist);
+    newScrollState.sortColumn = column;
+    newScrollState.sortDirection = nextSortDirection;
+    this.setState(newScrollState);
   }
 
   sortIconFor(column) {

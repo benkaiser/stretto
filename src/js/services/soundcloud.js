@@ -6,35 +6,53 @@ export default class Soundcloud {
     return '310e867035eacd04d104cedd5705b31e';
   }
 
+  static extractId(url) {
+    return Soundcloud.getInfo(url)
+    .then((info) => info.id);
+  }
+
   static getInfo(url) {
-    return new Promise((resolve, reject) => {
-      if (!Soundcloud.isSoundcloudURL(url)) {
-        return reject({ error: 'not a soundcloud track' });
-      }
-      fetch(`https://api.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
-        .then(Utilities.fetchToJson)
-        .then((data) => {
-          resolve({
-            album: 'Unknown Album',
-            channel: data.user.username,
-            duration: data.duration / 1000,
-            genre: data.genre,
-            id: `${data.id}`,
-            isSoundcloud: true,
-            isYoutube: false,
-            thumbnail: data.artwork_url.replace('large.jpg', 't500x500.jpg'),
-            title: data.title,
-            url: data.permalink_url,
-            year: data.release_year
-          });
-        })
-        .catch((error) => {
-          reject({ error: error });
-        });
+    if (!Soundcloud.isSoundcloudURL(url)) {
+      return Promise.reject({ error: 'not a soundcloud track' });
+    }
+    return fetch(`https://api.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
+    .then(Utilities.fetchToJson)
+    .then((track) => Soundcloud._convertToStandardTrack(track))
+    .catch((error) => {
+      return Promise.reject({ error: error });
     });
   }
 
   static isSoundcloudURL(url) {
     return url.indexOf('https://soundcloud.com/') === 0;
+  }
+
+  static search(query) {
+    return fetch(`https://api.soundcloud.com/tracks?q=${encodeURIComponent(query)}&client_id=${Soundcloud.client_id}`)
+    .then(Utilities.fetchToJson)
+    .then((tracks) => tracks.map(Soundcloud._convertToStandardTrack));
+  }
+
+  static _convertToStandardTrack(soundcloudTrack) {
+    return {
+      album: 'Unknown Album',
+      channel: soundcloudTrack.user.username,
+      duration: soundcloudTrack.duration / 1000,
+      genre: soundcloudTrack.genre,
+      id: `${soundcloudTrack.id}`,
+      isSoundcloud: true,
+      isYoutube: false,
+      thumbnail: Soundcloud._getThumbnail(soundcloudTrack),
+      title: soundcloudTrack.title,
+      url: soundcloudTrack.permalink_url,
+      year: soundcloudTrack.release_year
+    };
+  }
+
+  static _getThumbnail(soundcloudTrack) {
+    const thumbnail = soundcloudTrack.artwork_url ?
+      soundcloudTrack.artwork_url :
+      soundcloudTrack.user.avatar_url;
+    return thumbnail && thumbnail.replace('large.jpg', 't500x500.jpg');
   }
 }

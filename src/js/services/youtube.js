@@ -14,41 +14,39 @@ export default class Youtube {
   }
 
   static getInfo(url) {
-    return new Promise((resolve, reject) => {
-      let id = Youtube.extractId(url);
-      if (!id) {
-        return reject({ error: 'not a youtube track' });
-      }
-      fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${this.API_KEY}&fields=items(snippet)&part=snippet`)
-        .then(Utilities.fetchToJson)
-        .then((data) => {
-          let snippet = data.items[0].snippet;
-          resolve({
-            channel: snippet.channelTitle,
-            id: id,
-            isSoundcloud: false,
-            isYoutube: true,
-            title: snippet.title,
-            thumbnail: this._maximumResolution(snippet.thumbnails),
-            url: `https://www.youtube.com/watch?v=${id}`,
-            year: (new Date(snippet.publishedAt)).getFullYear()
-          });
-        })
-        .catch((error) => {
-          reject({ error: error });
-        });
+    let id = Youtube.extractId(url);
+    if (!id) {
+      return Promise.reject({ error: 'not a youtube track' });
+    }
+    return fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${this.API_KEY}&fields=items(snippet)&part=snippet`)
+    .then(Utilities.fetchToJson)
+    .then((data) => this._convertToStandardTrack(data.items[0]))
+    .catch((error) => {
+      reject({ error: error });
     });
   }
 
+  static isYoutubeURL(url) {
+    try {
+      url = new URL(url);
+      return url.hostname.indexOf('youtu') > -1;
+    } catch (error) {
+      return false;
+    }
+  }
+
   static search(query) {
-    return new Promise((resolve, reject) => {
-      let request = gapi.client.youtube.search.list({
+    return new Promise((resolve) => gapi.load('client', resolve))
+    .then(() => gapi.client.load('youtube', 'v3'))
+    .then(() =>
+      gapi.client.youtube.search.list({
         q: query,
         part: 'snippet'
-      });
-      request.execute(resolve);
-    }).then((response) => this._addDurations(response.items))
-    .then(this._addThumbnails.bind(this));
+      })
+    )
+    .then((response) => this._addDurations(response.result.items))
+    .then(this._addThumbnails.bind(this))
+    .then(items => items.map(this._convertToStandardTrack));
   }
 
   static _addDurations(items) {
@@ -68,6 +66,19 @@ export default class Youtube {
       item.thumbnail = this._maximumResolution(item.snippet.thumbnails);
       return item;
     });
+  }
+
+  static _convertToStandardTrack(track) {
+    return {
+      channel: track.snippet.channelTitle,
+      id: track.id.videoId,
+      isSoundcloud: false,
+      isYoutube: true,
+      title: track.snippet.title,
+      thumbnail: Youtube._maximumResolution(track.snippet.thumbnails),
+      url: `https://www.youtube.com/watch?v=${track.id.videoId}`,
+      year: (new Date(track.snippet.publishedAt)).getFullYear()
+    };
   }
 
   // utility function from: https://stackoverflow.com/a/30134889/485048
