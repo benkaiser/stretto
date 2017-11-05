@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import SoundcloudConnector from './soundcloud_connector';
 import ThemeSwitcher from './themeswitcher';
 
 class Intro extends Component {
@@ -8,6 +9,7 @@ class Intro extends Component {
         <h1>Settings</h1>
         <div class='form-horizontal'>
           <ThemeSwitcher />
+          <SoundcloudConnector />
         </div>
       </div>
     );

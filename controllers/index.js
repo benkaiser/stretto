@@ -60,6 +60,10 @@ router.post('/uploaddata', loggedIn, (req, res) => {
   });
 });
 
+router.get('/callback', (req, res) => {
+    res.render('callback');
+});
+
 router.get('*', (req, res) => {
   res.render('index', {
     env: {
