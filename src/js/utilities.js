@@ -19,4 +19,18 @@ export default class Utilities {
     ret += `${mins}:${(secs < 10 ? "0" : "")}${secs}`;
     return ret;
   }
+
+  static generateRandomString(length) {
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return Array.from(Array(length)).map(() => possible.charAt(Math.floor(Math.random() * possible.length))).join('');
+  }
+
+  static getHashParams(hash) {
+    let hashParams = {};
+    let e, r = /([^&;=]+)=?([^&;]*)/g, q = hash;
+    while (e = r.exec(q)) {
+      hashParams[e[1]] = decodeURIComponent(e[2]);
+    }
+    return hashParams;
+  }
 }

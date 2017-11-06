@@ -3373,6 +3373,10 @@ split@0.3:
   dependencies:
     through "2"
 
+spotify-web-api-js@^0.22.1:
+  version "0.22.1"
+  resolved "https://registry.yarnpkg.com/spotify-web-api-js/-/spotify-web-api-js-0.22.1.tgz#879a169cfb84eec538d72bf7f630d691cf1a2c5a"
+
 sshpk@^1.7.0:
   version "1.10.1"
   resolved "https://registry.yarnpkg.com/sshpk/-/sshpk-1.10.1.tgz#30e1a5d329244974a1af61511339d595af6638b0"

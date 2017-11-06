@@ -36,6 +36,10 @@ router.post('/login', (req, res) => {
   }).catch(errorHandler.bind(res));
 });
 
+router.get('/spotify_callback', (req, res) => {
+  res.render('spotify_callback');
+});
+
 router.get('/latestversion', loggedIn, (req, res) => {
   DataMapper.getVersionForUser(req.session.user).then((version) => {
     res.send({ version: version });
@@ -64,7 +68,8 @@ router.get('*', (req, res) => {
   res.render('index', {
     env: {
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
-      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || ''
+      GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
+      SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || ''
     }
   });
 });

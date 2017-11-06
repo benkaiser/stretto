@@ -1,0 +1,10 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    title Connect with Spotify
+  body
+  script.
+    setTimeout(function() {
+      window.opener.SpotifyCallback(window.location.hash.substring(1));
+    }, 1);

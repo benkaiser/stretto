@@ -26,6 +26,7 @@ class Sidebar extends Component {
           <ul class='nav nav-pills nav-stacked'>
             <li class="dropdown-header">Find Music</li>
             <li><a href="#">Explore</a></li>
+            <li><Link to='/spotify/'>Import from Spotify</Link></li>
             <li class="dropdown-header">Your Music</li>
             { Playlist.fetchAll().map((playlist) =>
               <li>
