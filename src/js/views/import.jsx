@@ -10,10 +10,10 @@ class Import extends Component {
   render() {
     return (
       <div class='import'>
-        <h1>Import Library</h1>
+        <h1>Import Library from Stretto 1.x</h1>
         <form>
           <div class="form-group">
-            <label for="importdata">Import JSON</label>
+            <label for="importdata">Paste the import JSON here</label>
             <textarea
               class='form-control'
               ref={(input) => { this.input = input; }}

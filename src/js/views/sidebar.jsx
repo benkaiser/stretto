@@ -20,13 +20,12 @@ class Sidebar extends Component {
             <Link to='/' style={{ textDecoration: 'none' }}>Stretto</Link>
             <Link class='sidebar-icon' to='/settings/'><span class='glyphicon glyphicon-cog'></span></Link>
             <Link class='sidebar-icon' to='/add/'><span class='glyphicon glyphicon-plus'></span></Link>
-            <Link class='sidebar-icon' to='/import/'><span class='glyphicon glyphicon-cloud-upload'></span></Link>
             <Link class='sidebar-icon' to='/sync/'><span class='glyphicon glyphicon-refresh'></span></Link>
           </h3>
           <ul class='nav nav-pills nav-stacked'>
-            <li class="dropdown-header">Find Music</li>
-            <li><a href="#">Explore</a></li>
+            <li class="dropdown-header">Add to Library</li>
             <li><Link to='/spotify/'>Import from Spotify</Link></li>
+            <li><Link to='/import/'>Import from Stretto 1.x (JSON)</Link></li>
             <li class="dropdown-header">Your Music</li>
             { Playlist.fetchAll().map((playlist) =>
               <li>

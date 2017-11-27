@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import Link from 'react-router/lib/Link';
 
 class Intro extends Component {
   render() {
@@ -10,8 +11,7 @@ class Intro extends Component {
         <p>Your library becomes all of youtube and soundcloud. Millions of songs at the end of your fingertips.</p>
         <h3><i class="fa fa-headphones" aria-hidden="true"></i> Unlimited Ad-Free Listening</h3>
         <p>
-          Listen to the music you love, uninterupted (Ad Blocker required
-          {' - ' }
+          Listen to the music you love, uninterupted thanks to ad blockers (
           <a target='_blank' href='https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=en'>uBlock Origin Chrome</a>
           {' - '}
           <a target='_blank' href='https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/'>uBlock Origin Firefox</a>
@@ -19,8 +19,8 @@ class Intro extends Component {
         </p>
         <h3><i class="fa fa-github" aria-hidden="true"></i> Open Source</h3>
         <p>Built by members of the community in the open on <a href='https://github.com/benkaiser/stretto'>Github</a>.</p>
-        <h3><i class="fa fa-arrow-right" aria-hidden="true"></i> How do I start?</h3>
-        <p>You already have! This webpage is Stretto, click the Explore button on the left to start adding music to your library.</p>
+        <h3><i class="fa fa-arrow-right" aria-hidden="true"></i> How do I add my music?</h3>
+        <p>There are a bunch of options, you can <Link to='/add/'>add them individually</Link> from youtube or soundcloud links.<br/>You can <Link to='/spotify/'>add them in bulk from Spotify</Link> or from <Link to='/import/'>Stretto 1.x</Link>.</p>
       </div>
     );
   }
