@@ -59,7 +59,7 @@ class Song {
 
   static change() {
     listeners.forEach((listener) => {
-      listener(songs);
+      listener instanceof Function && listener(songs);
     });
   }
 

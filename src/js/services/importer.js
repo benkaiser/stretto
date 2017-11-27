@@ -6,41 +6,26 @@ import Soundcloud from './/soundcloud';
 import Youtube from './youtube';
 import async from 'async';
 
-const PAUSE = 1000;
-
 export default class Importer {
   constructor(options) {
     this.data = options.data;
     this.progressCallback = options.progressCallback;
     this.progress = 0;
+    this.PAUSE_INTERVAL = 1000;
   }
 
   start() {
     this.data.songs && async.eachLimit(this.data.songs, 1, (song, callback) => {
-      Youtube.search(`${song.title} ${song.artist}`).then((youtubeItems) => {
-        if (!youtubeItems.length) { throw new Error('Unable to find youtube matches'); }
-        let match = this._pickBestMatch(song, youtubeItems);
-        song.duration = match.duration;
-        song.thumbnailUrl = match.thumbnail;
-        song.youtubeId = match.id.videoId;
-        return song;
-      }).then((song) => {
-        return new Promise((resolve) => {
-          MusicBrainzCoverArt.fetch(song).then((cover) => {
-            song.thumbnailUrl = cover;
-            resolve(song);
-          }).catch((error) => {
-            resolve(song);
-          });
-        });
-      }).then((song) => {
+      this._findYoutubeVideo(song)
+      .then(this._findMusicBrainzCover)
+      .then((song) => {
         this._addSong(song);
         this._updateProgress(`Added: ${song.title} - ${song.artist}`);
-        setTimeout(callback, PAUSE);
+        setTimeout(callback, this.PAUSE_INTERVAL);
       }).catch((error) => {
         console.log(`FAILED TO RESOLVE TRACK: "${song.title} - ${song.artist}" because ${error}`);
         this._updateProgress(`Failed to find "${song.title} ${song.artist}" item with ${error}`);
-        setTimeout(callback, PAUSE);
+        setTimeout(callback, this.PAUSE_INTERVAL);
       });
     }, () => {
       this._updateProgress('Finished!');
@@ -68,6 +53,29 @@ export default class Importer {
     song.playlists && song.playlists.forEach((playlist) => {
       Playlist.getOrCreateByTitle(playlist).addSong(songModel);
     });
+    return songModel;
+  }
+
+  _findMusicBrainzCover(song) {
+    return new Promise((resolve) => {
+      MusicBrainzCoverArt.fetch(song).then((cover) => {
+        song.thumbnailUrl = cover;
+        resolve(song);
+      }).catch((error) => {
+        resolve(song);
+      });
+    });
+  }
+
+  _findYoutubeVideo(song) {
+    return Youtube.search(`${song.title} ${song.artist}`).then((youtubeItems) => {
+      if (!youtubeItems.length) { throw new Error('Unable to find youtube matches'); }
+      let match = this._pickBestMatch(song, youtubeItems);
+      song.duration = match.duration;
+      song.thumbnailUrl = match.thumbnail;
+      song.youtubeId = match.id;
+      return song;
+    });
   }
 
   _pickBestMatch(song, youtubeItems) {
@@ -88,5 +96,6 @@ export default class Importer {
     this.progress++;
     this.progress > this.data.songs.length && (this.progress = this.data.songs.length);
     this.progressCallback && this.progressCallback(this.progress / this.data.songs.length, message);
+    console.log(message);
   }
 }

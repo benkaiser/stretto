@@ -161,7 +161,7 @@ export default class Playlist {
 
   static change() {
     listeners.forEach((listener) => {
-      listener(playlists);
+      listener instanceof Function && listener(playlists);
     });
   }
 

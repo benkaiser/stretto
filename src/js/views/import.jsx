@@ -40,7 +40,7 @@ class Import extends Component {
               aria-valuemax="1"
               style={`width: ${this.state.progressFraction * 100}%;`}
             >
-              <span class="sr-only">60% Complete</span>
+              <span class="sr-only">{this.state.progressFraction}% Complete</span>
             </div>
           </div>
         }

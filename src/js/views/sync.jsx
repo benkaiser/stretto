@@ -1,6 +1,5 @@
 import { h, Component } from 'preact';
 import AccountManager from '../services/account_manager';
-import Importer from '../services/importer';
 import autobind from 'autobind-decorator';
 
 class Import extends Component {

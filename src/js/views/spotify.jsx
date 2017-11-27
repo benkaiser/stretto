@@ -1,17 +1,36 @@
 import { h, Component } from 'preact';
-import { Button } from 'react-bootstrap';
-import SpotifyWebAPI from 'spotify-web-api-js';
+import { Button, ButtonGroup, FormGroup, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import autobind from 'autobind-decorator';
-import Utilities from '../utilities';
-
-const SpotifyAPI = new SpotifyWebAPI();
+import SpotifyAPI from '../services/spotify_api';
 
 export default class Spotify extends Component {
+  constructor(props) {
+    super(props);
+
+    if (SpotifyAPI.instance.connected) {
+      this.state = {
+        fetching: true
+      };
+      this._fetchData();
+    }
+  }
+
   render() {
+    let currentView;
+    if (this.state.fetching) {
+      currentView = this.showFetching();
+    } else if (!this.state.playlists) {
+      currentView = this.showConnect();
+    } else if (this.state.syncing) {
+      currentView = this.showSyncing();
+    } else {
+      currentView = this.showSync();
+    }
+
     return (
       <div>
         <h1>Spotify</h1>
-        { this._access_token ? this.showList() : this.showConnect() }
+        { currentView }
       </div>
     );
   }
@@ -22,46 +41,95 @@ export default class Spotify extends Component {
     );
   }
 
-  showList() {
+  showFetching() {
     return (
-      <p>What would you like to sync?</p>
+      <div>
+        <p>Fetching your spotify library...</p>
+        <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+      </div>
     );
   }
 
-  _authUrl() {
-    const state = this._generateAndStoreState();
-    const scopes_needed = 'playlist-read-private playlist-read-collaborative user-follow-read user-library-read user-top-read';
-    return 'https://accounts.spotify.com/authorize' +
-      `?response_type=token` +
-      `&client_id=${encodeURIComponent(env.SPOTIFY_CLIENT_ID)}` +
-      `&redirect_uri=${encodeURIComponent(window.location.origin + '/spotify_callback')}` +
-      `&state=${encodeURIComponent(state)}` +
-      `&scope=${encodeURIComponent(scopes_needed)}`;
+  showSync() {
+    return (
+      <div>
+        <p>
+          Select which playlists you would like to sync<br/>
+          <Button bsStyle="link" onClick={this._selectAll}>Check All</Button>
+          <Button bsStyle="link" onClick={this._deselectAll}>Uncheck All</Button>
+        </p>
+        <FormGroup>
+          <ToggleButtonGroup
+            onChange={this._onChangePlaylist}
+            type="checkbox"
+            value={this.state.selectedPlaylists}
+            vertical
+          >
+          { this.state.playlists.map((playlist) => {
+            return <ToggleButton value={playlist.id}>{playlist.name} ({playlist.tracks.total} tracks)</ToggleButton>
+          }) }
+          </ToggleButtonGroup>
+        </FormGroup>
+        <Button bsStyle='primary' onClick={this._sync}>Sync</Button>
+      </div>
+    );
   }
 
-  _setupAPI() {
-    SpotifyAPI.setAccessToken(this._access_token);
+  showSyncing() {
+    return (
+      <p>
+        Your playlists are now syncing and will start to show up on the sidebar and the songs in your library. Closing the browser window will interrupt the sync.
+      </p>
+    );
   }
 
-  _generateAndStoreState() {
-    this._state = Utilities.generateRandomString(16);
-    return this._state;
+  @autobind
+  _fetchData() {
+    SpotifyAPI.instance.fetchData().then((data) => {
+      this.setState({
+        fetching: false,
+        selectedPlaylists: [],
+        playlists: data.playlists,
+        albums: data.albums,
+        artists: data.artists
+      });
+    });
   }
 
   @autobind
   _login() {
-    window.SpotifyCallback = this._spotifyCallback;
-    this._window = window.open(this._authUrl(), 'Spotify Auth', 'height=650,width=500')
+    SpotifyAPI.instance.login().then(() => {
+      this.setState({
+        fetching: true
+      });
+      this._fetchData();
+    });
   }
 
   @autobind
-  _spotifyCallback(hash) {
-    this._window && this._window.close();
-    const hashParams = Utilities.getHashParams(hash);
-    console.log(hashParams);
-    if (hashParams.access_token && this._state === hashParams.state) {
-      this._access_token = hashParams.access_token;
-    }
-    this._setupAPI();
+  _onChangePlaylist(selectedPlaylists) {
+    this.setState({ selectedPlaylists });
+  }
+
+  @autobind
+  _selectAll() {
+    this.setState({
+      selectedPlaylists: this.state.playlists.map((playlist) => playlist.id)
+    });
+  }
+
+  @autobind
+  _sync() {
+    SpotifyAPI.instance.startSync(this.state.playlists.filter((playlist) => this.state.selectedPlaylists.indexOf(playlist.id) >= 0));
+    this.setState({
+      syncing: true
+    });
+  }
+
+  @autobind
+  _deselectAll() {
+    this.setState({
+      selectedPlaylists: []
+    });
   }
 }

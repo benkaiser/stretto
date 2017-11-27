@@ -220,7 +220,8 @@ class PlaylistView extends ReactDOM.Component {
 
   @autobind
   songChange() {
-    this.setState();
+    const scrollContainer = this.contentContainer();
+    this.setState(this.determineStateForElementsToShow(scrollContainer.scrollTop, scrollContainer.clientHeight, this.state.playlist));
   }
 
   @autobind
