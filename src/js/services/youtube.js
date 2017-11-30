@@ -18,11 +18,11 @@ export default class Youtube {
     if (!id) {
       return Promise.reject({ error: 'not a youtube track' });
     }
-    return fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${this.API_KEY}&fields=items(snippet)&part=snippet`)
+    return fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${this.API_KEY}&fields=items(id,snippet)&part=snippet`)
     .then(Utilities.fetchToJson)
     .then((data) => this._convertToStandardTrack(data.items[0]))
     .catch((error) => {
-      reject({ error: error });
+      return Promise.reject({ error: error });
     });
   }
 
@@ -71,12 +71,12 @@ export default class Youtube {
   static _convertToStandardTrack(track) {
     return {
       channel: track.snippet.channelTitle,
-      id: track.id.videoId,
+      id: track.id,
       isSoundcloud: false,
       isYoutube: true,
       title: track.snippet.title,
       thumbnail: Youtube._maximumResolution(track.snippet.thumbnails),
-      url: `https://www.youtube.com/watch?v=${track.id.videoId}`,
+      url: `https://www.youtube.com/watch?v=${track.id}`,
       year: (new Date(track.snippet.publishedAt)).getFullYear()
     };
   }
