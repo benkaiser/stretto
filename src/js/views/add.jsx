@@ -1,4 +1,7 @@
 import { h, Component } from 'preact';
+import { Alert } from 'react-bootstrap';
+import Spinner from 'react-spinkit';
+import Alerter from '../services/alerter';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Soundcloud from '../services/soundcloud';
@@ -11,6 +14,17 @@ class Add extends Component {
     this.state = {
       titleBeforeDash: true
     };
+  }
+
+  componentDidMount() {
+    this.input && this.input.focus && this.input.focus();
+  }
+
+  shouldComponentUpdate(newProps, newState) {
+    return this.state.titleBeforeDash != newState.titleBeforeDash ||
+      this.state.track != newState.track ||
+      this.state.loading != newState.loading ||
+      this.state.error != newState.error;
   }
 
   render() {
@@ -29,6 +43,16 @@ class Add extends Component {
             />
           </div>
         </form>
+        <div class='addLoading'>
+        { this.state.loading &&
+          <div><Spinner name="line-scale" /></div>
+        }
+        { this.state.error &&
+          <Alert bsStyle="danger">
+            <strong>Oh no!</strong> Looks like we are {this.state.error}
+          </Alert>
+        }
+        </div>
         { this.state.track &&
         <div class='row'>
           <div class='col-lg-6'>
@@ -93,28 +117,28 @@ class Add extends Component {
   }
 
   containsDash() {
-    return this.state.track.title.indexOf('-') !== -1;
+    return this.state.track && this.state.track.title.indexOf('-') !== -1;
   }
 
-  getAlbum() {
-    if (this.state.album) return this.state.album;
+  getAlbum(state = this.state) {
+    if (state.album) return state.album;
     return 'Unknown Album';
   }
 
-  getArtist() {
-    if (this.state.artist) return this.state.artist;
-    if (!this.containsDash()) return this.state.track.channel || this.state.track.title;
-    return this.state.track.title.split('-')[
-      this.state.titleBeforeDash ? 1 : 0
-    ].trim();
+  getArtist(state = this.state) {
+    if (state.artist) return state.artist;
+    if (!this.containsDash()) return state.track && (state.track.channel || state.track.title) || '';
+    return state.track && state.track.title.split('-')[
+      state.titleBeforeDash ? 1 : 0
+    ].trim() || '';
   }
 
-  getTitle() {
-    if (this.state.title) return this.state.title;
-    if (!this.containsDash()) return this.state.track.title;
-    return this.state.track.title.split('-')[
-      this.state.titleBeforeDash ? 0 : 1
-    ].trim();
+  getTitle(state = this.state) {
+    if (state.title) return state.title;
+    if (!this.containsDash()) return state.track && state.track.title || '';
+    return state.track && state.track.title.split('-')[
+      state.titleBeforeDash ? 0 : 1
+    ].trim() || '';
   }
 
   @autobind
@@ -136,10 +160,25 @@ class Add extends Component {
       year: this.state.track.year
     })
     Playlist.getByTitle(Playlist.LIBRARY).addSong(song);
+    Alerter.success('Track added to Library');
+    this.setState({
+      titleBeforeDash: true,
+      track: null,
+      artist: undefined,
+      album: undefined,
+      title: undefined,
+      loading: false
+    });
+    this.input.value = '';
+    this.input.focus();
   }
 
   @autobind
   onChange() {
+    this.setState({
+      loading: !!this.input.value,
+      error: ''
+    });
     this.timeout && clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
       (Soundcloud.isSoundcloudURL(this.input.value) ?
@@ -150,10 +189,15 @@ class Add extends Component {
           artist: undefined,
           album: undefined,
           title: undefined,
-          track: track
+          track: track,
+          loading: false
         });
       }).catch((error) => {
         console.log(error);
+        this.setState({
+          loading: false,
+          error: 'unable to find that track'
+        });
       });
     }, 1000);
   }

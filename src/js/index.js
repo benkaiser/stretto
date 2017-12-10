@@ -3,6 +3,7 @@ import Keyboard from './initialisers/keyboard';
 import ModelInitialiser from './models/initialiser';
 import Player from './services/player';
 import RootView from './views/root';
+import SCSS from '../scss/main.scss';
 import Theme from './theme';
 
 class Loader {
