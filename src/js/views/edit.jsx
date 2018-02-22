@@ -210,7 +210,7 @@ export default class Edit extends Component {
     const song = new Song({
       artist: track.channel,
       cover: track.thumbnail,
-      id: track.id,
+      id: track.id.videoId,
       isSoundcloud: track.isSoundcloud,
       isYoutube: track.isYoutube,
       title: track.title,
