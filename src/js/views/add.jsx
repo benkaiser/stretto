@@ -11,20 +11,11 @@ import autobind from 'autobind-decorator';
 class Add extends Component {
   constructor() {
     super();
-    this.state = {
-      titleBeforeDash: true
-    };
+    this.state = {};
   }
 
   componentDidMount() {
     this.input && this.input.focus && this.input.focus();
-  }
-
-  shouldComponentUpdate(newProps, newState) {
-    return this.state.titleBeforeDash != newState.titleBeforeDash ||
-      this.state.track != newState.track ||
-      this.state.loading != newState.loading ||
-      this.state.error != newState.error;
   }
 
   render() {
@@ -65,7 +56,7 @@ class Add extends Component {
                        onkeyup={this.attributeModified}
                        ref={(input) => { this.title = input; }}
                        type='text'
-                       value={this.getTitle()}
+                       defaultValue={this.getTitle()}
                 />
               </div>
               <div class="form-group">
@@ -75,7 +66,7 @@ class Add extends Component {
                        onkeyup={this.attributeModified}
                        ref={(input) => { this.artist = input; }}
                        type='text'
-                       value={this.getArtist()}
+                       defaultValue={this.getArtist()}
                 />
               </div>
               <div class="form-group">
@@ -85,7 +76,7 @@ class Add extends Component {
                        onkeyup={this.attributeModified}
                        ref={(input) => { this.album = input; }}
                        type='text'
-                       value={this.getAlbum()}
+                       defaultValue={this.getAlbum()}
                 />
               </div>
             </form>
@@ -107,45 +98,29 @@ class Add extends Component {
     );
   }
 
-  @autobind
-  attributeModified() {
-    this.setState({
-      artist: this.artist.value,
-      album: this.album.value,
-      title: this.title.value
-    });
-  }
-
   containsDash() {
     return this.state.track && this.state.track.title.indexOf('-') !== -1;
   }
 
   getAlbum(state = this.state) {
-    if (state.album) return state.album;
     return 'Unknown Album';
   }
 
   getArtist(state = this.state) {
-    if (state.artist) return state.artist;
     if (!this.containsDash()) return state.track && (state.track.channel || state.track.title) || '';
-    return state.track && state.track.title.split('-')[
-      state.titleBeforeDash ? 1 : 0
-    ].trim() || '';
+    return state.track && state.track.title.split('-')[0].trim() || '';
   }
 
   getTitle(state = this.state) {
-    if (state.title) return state.title;
     if (!this.containsDash()) return state.track && state.track.title || '';
-    return state.track && state.track.title.split('-')[
-      state.titleBeforeDash ? 0 : 1
-    ].trim() || '';
+    return state.track && state.track.title.split('-')[1].trim() || '';
   }
 
   @autobind
   importTrack() {
     let song = Song.create({
-      album: this.getAlbum(),
-      artist: this.getArtist(),
+      album: this.album.value,
+      artist: this.artist.value,
       cover: this.state.track.thumbnail,
       discNumber: 0,
       duration: this.state.track.duration,
@@ -154,7 +129,7 @@ class Add extends Component {
       id: this.state.track.id,
       isSoundcloud: this.state.track.isSoundcloud,
       isYoutube: this.state.track.isYoutube,
-      title: this.getTitle(),
+      title: this.title.value,
       trackNumber: 0,
       url: this.state.track.url,
       year: this.state.track.year
@@ -162,13 +137,12 @@ class Add extends Component {
     Playlist.getByTitle(Playlist.LIBRARY).addSong(song);
     Alerter.success('Track added to Library');
     this.setState({
-      titleBeforeDash: true,
       track: null,
-      artist: undefined,
-      album: undefined,
-      title: undefined,
       loading: false
     });
+    this.album.value = '';
+    this.artist.value = '';
+    this.title.value = '';
     this.input.value = '';
     this.input.focus();
   }
@@ -185,10 +159,11 @@ class Add extends Component {
         Soundcloud.getInfo(this.input.value) :
         Youtube.getInfo(this.input.value)
       ).then((track) => {
+        this.title && (this.title.value = this.getTitle());
+        this.artist && (this.artist.value = this.getArtist());
+        this.album && (this.album.value = this.getAlbum());
+
         this.setState({
-          artist: undefined,
-          album: undefined,
-          title: undefined,
           track: track,
           loading: false
         });
@@ -204,11 +179,9 @@ class Add extends Component {
 
   @autobind
   setTitleBeforeDash(titleBeforeDash) {
-    delete this.state.artist;
-    delete this.state.title;
-    this.setState({
-      titleBeforeDash: titleBeforeDash
-    });
+    const oldTitle = this.title.value;
+    this.title && (this.title.value = this.artist.value);
+    this.artist && (this.artist.value = oldTitle);
   }
 }
 

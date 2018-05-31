@@ -5,6 +5,10 @@ body, html {
   width: 100%;
 }
 
+.cancelButton {
+  margin-right: 10px;
+}
+
 .content {
   height: 100%;
   overflow: auto;
@@ -76,11 +80,6 @@ body, html {
 
 .logo {
   margin-left: 14px;
-}
-
-.offscreen {
-  margin-left: -9999px;
-  position: absolute;
 }
 
 .media, .media-body {

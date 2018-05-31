@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import ContextMenu from './context_menu';
 import Player from '../services/player.js';
 import autobind from 'autobind-decorator';
 
@@ -27,7 +28,7 @@ class PlayerInfo extends Component {
   render() {
     if (this.state.song) {
       return (
-        <div class='playerinfo'>
+        <div class='playerinfo' onContextMenu={this.rightSongClick}>
           <div class='info'>
             <p class='title' title={this.state.song.title}>{this.state.song.title}</p>
             <p class='artist'>{this.state.song.artist} - {this.state.song.album}</p>
@@ -48,6 +49,12 @@ class PlayerInfo extends Component {
     } else {
       return <div class='playerinfo' />;
     }
+  }
+
+  @autobind
+  rightSongClick(event) {
+    ContextMenu.open(this.state.song, event, Player.playlist);
+    event.preventDefault();
   }
 }
 

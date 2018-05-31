@@ -39,9 +39,8 @@ class PlaylistView extends ReactDOM.Component {
 
   componentDidMount() {
     this.optionsButton && delete this.optionsButton['Dropdown'];
-    this.contentContainer().addEventListener('scroll', (event) => {
-      this.setState(this.determineStateForElementsToShow(event.target.scrollTop, event.target.clientHeight, this.state.playlist));
-    });
+    this.contentContainer().addEventListener('scroll', this.onScroll);
+    PlaylistView.lastScrollTop && this.scrollAndReset();
   }
 
   componentWillReceiveProps(props) {
@@ -50,6 +49,8 @@ class PlaylistView extends ReactDOM.Component {
   }
 
   componentWillUnmount() {
+    PlaylistView.lastScrollTop = this.state.scrollTop;
+    this.contentContainer().removeEventListener('scroll', this.onScroll);
     Player.removeOnSongChangeListener(this.songChange);
   }
 
@@ -112,13 +113,14 @@ class PlaylistView extends ReactDOM.Component {
   }
 
   determineStateForElementsToShow(scrollTop, containerHeight, playlist) {
-    scrollTop = scrollTop - HEADER_HEIGHT;
+    const scrollTopMinusHeader = scrollTop - HEADER_HEIGHT;
     const numSongs = playlist.songData.length;
     const numElements = Math.floor(containerHeight / ELEMENT_HEIGHT) + 20;
-    const firstIndex = Math.max(Math.floor(scrollTop / ELEMENT_HEIGHT) - 10, 0);
+    const firstIndex = Math.max(Math.floor(scrollTopMinusHeader / ELEMENT_HEIGHT) - 10, 0);
     const lastIndex = Math.min(firstIndex + numElements, numSongs);
     const songs = playlist.songData.slice(firstIndex, lastIndex);
     return {
+      scrollTop,
       firstIndex: firstIndex,
       songsToRender: songs,
       topSpacerHeight: firstIndex * ELEMENT_HEIGHT,
@@ -200,6 +202,11 @@ class PlaylistView extends ReactDOM.Component {
   }
 
   @autobind
+  onScroll(event) {
+    this.setState(this.determineStateForElementsToShow(event.target.scrollTop, event.target.clientHeight, this.state.playlist));
+  }
+
+  @autobind
   onSortEnd({oldIndex, newIndex}) {
     this.state.playlist.reorder(oldIndex, newIndex);
     const scrollContainer = this.contentContainer();
@@ -209,6 +216,13 @@ class PlaylistView extends ReactDOM.Component {
   rightClickSong(song, event) {
     ContextMenu.open(song, event, this.state.playlist);
     event.preventDefault();
+  }
+
+  scrollAndReset() {
+    setTimeout(() => {
+      this.contentContainer().scrollTop = PlaylistView.lastScrollTop;
+      delete PlaylistView.lastScrollTop;
+    }, 0);
   }
 
   @autobind

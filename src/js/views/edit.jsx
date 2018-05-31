@@ -30,6 +30,7 @@ export default class Edit extends Component {
             <h3>
               Edit Track
               <Button className='pull-right' bsStyle='primary' onClick={this.save}>Save</Button>
+              <Button className='pull-right cancelButton' bsStyle='default' onClick={this.cancel}>Cancel</Button>
             </h3>
             <Tabs defaultActiveKey={1} id="editingtabs">
               <Tab eventKey={1} title="Information">{this.informationTab()}</Tab>
@@ -146,7 +147,7 @@ export default class Edit extends Component {
                      onkeyup={this.attributeModified}
                      ref={(input) => { this.title = input; }}
                      type='text'
-                     value={this.state.title}
+                     defaultValue={this.state.title}
               />
             </div>
             <div class="form-group">
@@ -156,7 +157,7 @@ export default class Edit extends Component {
                      onkeyup={this.attributeModified}
                      ref={(input) => { this.artist = input; }}
                      type='text'
-                     value={this.artist && this.artist.value || this.state.artist}
+                     defaultValue={this.state.artist}
               />
             </div>
             <div class="form-group">
@@ -166,7 +167,7 @@ export default class Edit extends Component {
                      onkeyup={this.attributeModified}
                      ref={(input) => { this.album = input; }}
                      type='text'
-                     value={this.album && this.album.value || this.state.album}
+                     defaultValue={this.state.album}
               />
             </div>
             <div class="form-group">
@@ -176,7 +177,7 @@ export default class Edit extends Component {
                      onkeyup={this.attributeModified}
                      ref={(input) => { this.cover = input; }}
                      type='text'
-                     value={this.cover && this.cover.value || this.state.cover}
+                     defaultValue={this.state.cover}
               />
             </div>
             <div class="form-group">
@@ -186,7 +187,7 @@ export default class Edit extends Component {
                      onkeyup={this.attributeModified}
                      ref={(input) => { this.url = input; }}
                      type='text'
-                     value={this.url && this.url.value || this.state.url}
+                     defaultValue={this.state.url}
               />
             </div>
           </form>
@@ -201,6 +202,13 @@ export default class Edit extends Component {
     );
   }
 
+  @autobind
+  cancel() {
+    window.lastRoute ?
+      this.props.router.goBack() :
+      this.props.router.push(`/playlist/${Playlist.LIBRARY}`);
+  }
+
   isYoutube() {
     return this.state.url.indexOf('youtu') > -1;
   }
@@ -210,7 +218,7 @@ export default class Edit extends Component {
     const song = new Song({
       artist: track.channel,
       cover: track.thumbnail,
-      id: track.isYoutube ? track.id.videoId : track.id,
+      id: track.id,
       isSoundcloud: track.isSoundcloud,
       isYoutube: track.isYoutube,
       title: track.title,
@@ -235,7 +243,7 @@ export default class Edit extends Component {
         Playlist.updateIds(oldId, track.id);
       }
       window.lastRoute ?
-        this.props.router.push(window.lastRoute) :
+        this.props.router.goBack() :
         this.props.router.push(`/playlist/${Playlist.LIBRARY}`);
       Song.change();
     });
