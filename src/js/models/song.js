@@ -53,6 +53,10 @@ class Song {
     return this.id.slice(2);
   }
 
+  get allinfo() {
+    return (this.title + ' ' + this.artist + ' ' + this.album).toLowerCase();
+  }
+
   static addOnChangeListener(listener) {
     listeners.push(listener);
   }

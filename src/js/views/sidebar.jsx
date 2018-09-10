@@ -4,6 +4,7 @@ import Bootbox from '../services/bootbox';
 import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
 import Playlist from '../models/playlist';
+import SearchBox from './search_box';
 import autobind from 'autobind-decorator';
 
 class Sidebar extends Component {
@@ -22,6 +23,7 @@ class Sidebar extends Component {
             <Link class='sidebar-icon' to='/add/'><span class='glyphicon glyphicon-plus'></span></Link>
             <Link class='sidebar-icon' to='/sync/'><span class='glyphicon glyphicon-refresh'></span></Link>
           </h3>
+          <SearchBox />
           <ul class='nav nav-pills nav-stacked'>
             <li class="dropdown-header">Add to Library</li>
             <li><Link to='/spotify/'>Import from Spotify</Link></li>

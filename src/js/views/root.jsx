@@ -7,6 +7,7 @@ import Intro from './intro';
 import Import from './import';
 import Layout from './layout';
 import Playlist from './playlist';
+import Search from './search';
 import Settings from './settings';
 import Spotify from './spotify';
 import Sync from './sync';
@@ -26,6 +27,7 @@ class RootViewLoader {
             <Route path="spotify" component={Spotify} />
             <Route path="sync" component={Sync} />
             <Route path="playlist/:playlist" component={Playlist} />
+            <Route path="search/:search" component={Search} />
             <Redirect from='*' to='/' />
           </Route>
         </Router>
