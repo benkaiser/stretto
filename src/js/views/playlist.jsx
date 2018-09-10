@@ -1,7 +1,6 @@
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { h, Component } from 'preact';
 import Bootbox from '../services/bootbox';
-import ContainerDimensions from 'react-container-dimensions';
 import ContextMenu from './context_menu';
 import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
@@ -32,7 +31,7 @@ class PlaylistView extends ReactDOM.Component {
     super(props);
     this.state = this.getStateFromprops(props);
     this.SortableContainer = SortableContainer(this.sortableList, { withRef: true });
-    this.SortableElement = SortableElement(this.sortableItem)
+    this.SortableElement = SortableElement(this.sortableItem);
     Player.addOnSongChangeListener(this.songChange);
     Playlist.addOnChangeListener(this.songChange);
   }
@@ -41,6 +40,9 @@ class PlaylistView extends ReactDOM.Component {
     this.optionsButton && delete this.optionsButton['Dropdown'];
     this.contentContainer().addEventListener('scroll', this.onScroll);
     PlaylistView.lastScrollTop && this.scrollAndReset();
+    this.setState({
+      width: this.contentContainer().width
+    });
   }
 
   componentWillReceiveProps(props) {
@@ -72,35 +74,28 @@ class PlaylistView extends ReactDOM.Component {
           }
         </div>
         <p>{this.state.playlist.songs.length} Songs</p>
-        <ContainerDimensions>
-          {({width}) => {
-            this._width = width;
-            return (
-              <table class='song-table table table-hover'>
-                <thead>
-                  <tr>
-                    { COLUMNS.map((column) => this.headerForColumn(column)) }
-                  </tr>
-                </thead>
-                <this.SortableContainer
-                  getContainer={wrappedInstance => this.contentContainer()}
-                  distance={20}
-                  helperClass='sortableElement'
-                  items={this.state.songsToRender}
-                  onSortEnd={this.onSortEnd}
-                  shouldCancelStart={this.shouldCancelSortStart}
-                  transitionDuration={0}
-                />
-              </table>
-            );
-          }}
-        </ContainerDimensions>
+        <table class='song-table table table-hover'>
+          <thead>
+            <tr>
+              { COLUMNS.map((column) => this.headerForColumn(column)) }
+            </tr>
+          </thead>
+          <this.SortableContainer
+            getContainer={wrappedInstance => this.contentContainer()}
+            distance={20}
+            helperClass='sortableElement'
+            items={this.state.songsToRender}
+            onSortEnd={this.onSortEnd}
+            shouldCancelStart={this.shouldCancelSortStart}
+            transitionDuration={0}
+          />
+        </table>
       </div>
     );
   }
 
   cellWidthForColumn(column) {
-    return COLUMN_WIDTH_MAPPING[column] * this._width;
+    return COLUMN_WIDTH_MAPPING[column] * this.state.width;
   }
 
   clickSong(song) {
@@ -134,6 +129,7 @@ class PlaylistView extends ReactDOM.Component {
     state.sortColumn = playlist.sortColumn || undefined;
     state.sortDirection = playlist.sortDirection || SortDirection.NONE;
     state.playlist = playlist;
+    state.width = this.state ? this.state.width : 1000;
     return state;
   }
 

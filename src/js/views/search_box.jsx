@@ -46,7 +46,10 @@ class SearchBox extends Component {
     if (this.state.value.length < 3) {
       return false;
     }
-    this.props.router.push(`/search/${this.state.value}`);
+    const newUrl = `/search/${this.state.value}`;
+    this.props.router.location.pathname.indexOf('/search/') == 0 ?
+      this.props.router.replace(newUrl) :
+      this.props.router.push(newUrl);
   }
 }
 
