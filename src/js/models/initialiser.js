@@ -36,7 +36,7 @@ class ModelInitialiser {
       trackNumber: 16
     }));
     songs.push(Song.create({
-      album: "Writer's Block",
+      album: 'Writer\'s Block',
       artist: 'Peter Bjorn and John',
       cover: 'http://is4.mzstatic.com/image/thumb/Music/v4/a7/94/78/a7947819-82e0-7458-8e3e-8587acc2cc0a/source/1000x1000bb.jpg',
       discNumber: 1,

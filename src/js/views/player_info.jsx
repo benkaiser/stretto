@@ -1,9 +1,9 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import ContextMenu from './context_menu';
 import Player from '../services/player.js';
 import autobind from 'autobind-decorator';
 
-class PlayerInfo extends Component {
+class PlayerInfo extends React.Component {
   constructor(props) {
     super(props);
     Player.addOnSongChangeListener(this.newSong);
@@ -28,26 +28,26 @@ class PlayerInfo extends Component {
   render() {
     if (this.state.song) {
       return (
-        <div class='playerinfo' onContextMenu={this.rightSongClick}>
-          <div class='info'>
-            <p class='title' title={this.state.song.title}>{this.state.song.title}</p>
-            <p class='artist'>{this.state.song.artist} - {this.state.song.album}</p>
+        <div className='playerinfo' onContextMenu={this.rightSongClick}>
+          <div className='info'>
+            <p className='title' title={this.state.song.title}>{this.state.song.title}</p>
+            <p className='artist'>{this.state.song.artist} - {this.state.song.album}</p>
           </div>
           { (!this.state.hideCover) ?
-          <div class='cover-wrapper'>
-            <div class='cover' style={`background-image: url('${this.state.song.cover}')`}></div>
-            <div key='hide' class='btn btn-default btn-sm hide-button' onClick={this.hideCover.bind(this, true)}>
-              <i class='fa fa-angle-down' aria-hidden='true'></i>
+          <div className='cover-wrapper'>
+            <div className='cover' style={{'backgroundImage': `url('${this.state.song.cover}')`}}></div>
+            <div key='hide' className='btn btn-default btn-sm hide-button' onClick={this.hideCover.bind(this, true)}>
+              <i className='fa fa-angle-down' aria-hidden='true'></i>
             </div>
           </div>
-          : <div key='show' class='btn btn-default btn-xs show-button' onClick={this.hideCover.bind(this, false)}>
-              <i class='fa fa-angle-up' aria-hidden='true'></i>
+          : <div key='show' className='btn btn-default btn-xs show-button' onClick={this.hideCover.bind(this, false)}>
+              <i className='fa fa-angle-up' aria-hidden='true'></i>
             </div>
           }
         </div>
       );
     } else {
-      return <div class='playerinfo' />;
+      return <div className='playerinfo' />;
     }
   }
 

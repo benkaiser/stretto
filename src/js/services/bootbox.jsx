@@ -1,4 +1,4 @@
-import { Component, h } from 'preact';
+import * as React from 'react';
 import autobind from 'autobind-decorator';
 import bsn from 'bootstrap.native';
 
@@ -7,7 +7,7 @@ const TYPES = {
   PROMPT: 2
 }
 
-export default class Bootbox extends Component {
+export default class Bootbox extends React.Component {
   constructor() {
     super();
     Bootbox._component = this;
@@ -20,33 +20,33 @@ export default class Bootbox extends Component {
     const closeBtn = (
       <button
         aria-label='Close'
-        class='close'
-        onclick={this.onCancel}
+        className='close'
+        onClick={this.onCancel}
         type='button'>
         <span aria-hidden='true'>&times;</span>
       </button>
     );
 
     return (
-      <div class='modal fade' ref={(modal) => this.modal = modal} tabindex='-1' role='dialog' aria-hidden='true'>
-        <div class='modal-dialog'>
-          <div class='modal-content'>
+      <div className='modal fade' ref={(modal) => this.modal = modal} tabIndex='-1' role='dialog' aria-hidden='true'>
+        <div className='modal-dialog'>
+          <div className='modal-content'>
             { this.state.type === TYPES.PROMPT &&
-              <div class='modal-header'>
+              <div className='modal-header'>
                 { closeBtn }
-                <h4 class='modal-title'>{this.state.message}</h4>
+                <h4 className='modal-title'>{this.state.message}</h4>
               </div>
             }
-            <div class='modal-body'>
+            <div className='modal-body'>
               { this.state.type === TYPES.CONFIRM  && closeBtn }
               { this.state.type === TYPES.PROMPT &&
-                <input class='form-control' autocomplete='off' type='text' value={this.state.value} onChange={this.handleChange}  /> }
+                <input className='form-control' autoComplete='off' type='text' value={this.state.value} onChange={this.handleChange}  /> }
               { this.state.type === TYPES.CONFIRM &&
                 <p>{this.state.message}</p> }
             </div>
-            <div class='modal-footer'>
-              <button type='button' class='btn btn-default' onclick={this.onCancel}>Cancel</button>
-              <button type='button' class='btn btn-primary' onclick={this.onSuccess}>OK</button>
+            <div className='modal-footer'>
+              <button type='button' className='btn btn-default' onClick={this.onCancel}>Cancel</button>
+              <button type='button' className='btn btn-primary' onClick={this.onSuccess}>OK</button>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import BootstrapSlider from 'bootstrap-slider';
 import Player from '../services/player';
 import Utilities from '../utilities';
@@ -6,7 +6,7 @@ import autobind from 'autobind-decorator';
 
 const SCRUB_DELAY = 1000;
 
-class Slider extends Component {
+class Slider extends React.Component {
   constructor(props) {
     super(props);
     this.sliding = false;
@@ -33,7 +33,7 @@ class Slider extends Component {
 
   render() {
     return (
-      <div class='duration-slider'>
+      <div className='duration-slider'>
         <div ref={ (slider) => this.sliderElement = slider } />
       </div>
     );

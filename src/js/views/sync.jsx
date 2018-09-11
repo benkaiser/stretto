@@ -1,20 +1,20 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import AccountManager from '../services/account_manager';
 import autobind from 'autobind-decorator';
 
-class Import extends Component {
+class Import extends React.Component {
   constructor() {
     super();
   }
 
   render() {
     return (
-      <div class='sync'>
+      <div className='sync'>
         <h1>Sync Status</h1>
-        <div class='form-horizontal'>
-          <div class='form-group'>
-            <label class='col-sm-2 control-label'>Connect to Sync</label>
-            <div class='col-sm-10'>
+        <div className='form-horizontal'>
+          <div className='form-group'>
+            <label className='col-sm-2 control-label'>Connect to Sync</label>
+            <div className='col-sm-10'>
               <div id='google-signin-button'></div>
             </div>
           </div>

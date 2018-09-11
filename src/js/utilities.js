@@ -12,11 +12,11 @@ export default class Utilities {
     let hrs = ~~(seconds / 3600);
     let mins = ~~((seconds % 3600) / 60);
     let secs = seconds % 60;
-    let ret = "";
+    let ret = '';
     if (hrs > 0) {
-        ret += `${hrs}:${(mins < 10 ? "0" : "")}`;
+        ret += `${hrs}:${(mins < 10 ? '0' : '')}`;
     }
-    ret += `${mins}:${(secs < 10 ? "0" : "")}${secs}`;
+    ret += `${mins}:${(secs < 10 ? '0' : '')}${secs}`;
     return ret;
   }
 

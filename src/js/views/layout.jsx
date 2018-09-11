@@ -1,19 +1,19 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import Sidebar from './sidebar';
 import Alerter from '../services/alerter';
 import Bootbox from '../services/bootbox';
 import ContextMenu from './context_menu';
 
-class Layout extends Component {
+class Layout extends React.Component {
   constructor(props) {
     super(props);
   }
 
   render() {
     return (
-      <div class='root'>
+      <div className='root'>
         <Sidebar />
-        <div class="content">
+        <div className='content'>
           {this.props.children}
         </div>
         <Bootbox />

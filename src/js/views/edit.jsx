@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import { Button, ButtonToolbar, DropdownButton, Media, MenuItem, Tabs, Tab } from 'react-bootstrap';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
@@ -7,10 +7,10 @@ import Soundcloud from '../services/soundcloud';
 import Youtube from '../services/youtube';
 import autobind from 'autobind-decorator';
 
-export default class Edit extends Component {
+export default class Edit extends React.Component {
   constructor(props) {
     super(props);
-    const track = Song.findById(this.props.params.id);
+    const track = Song.findById(this.props.match.params.id);
     this.state = {
       album: track.album,
       artist: track.artist,
@@ -24,18 +24,18 @@ export default class Edit extends Component {
 
   render() {
     return (
-      <div class='edit'>
-        <div class='row'>
-          <div class='col-sm-12'>
+      <div className='edit'>
+        <div className='row'>
+          <div className='col-sm-12'>
             <h3>
               Edit Track
               <Button className='pull-right' bsStyle='primary' onClick={this.save}>Save</Button>
               <Button className='pull-right cancelButton' bsStyle='default' onClick={this.cancel}>Cancel</Button>
             </h3>
-            <Tabs defaultActiveKey={1} id="editingtabs">
-              <Tab eventKey={1} title="Information">{this.informationTab()}</Tab>
+            <Tabs defaultActiveKey={1} id='editingtabs'>
+              <Tab eventKey={1} title='Information'>{this.informationTab()}</Tab>
               { (this.state.soundcloudSuggestions || this.state.youtubeSuggestions) &&
-                <Tab eventKey={2} title="Find Backing Track">
+                <Tab eventKey={2} title='Find Backing Track'>
                   { this.suggestions() }
                 </Tab>
               }
@@ -88,20 +88,20 @@ export default class Edit extends Component {
     if (Youtube.isYoutubeURL(this.state.url)) {
       return (
         <iframe
-          width="560"
-          height="315"
+          width='560'
+          height='315'
           src={`https://www.youtube.com/embed/${Youtube.extractId(this.state.url)}`}
-          frameborder="0"
+          frameborder='0'
           allowfullscreen>
         </iframe>
       );
     } else if (Soundcloud.isSoundcloudURL(this.state.url)) {
       return (
         <iframe
-          width="560"
-          height="315"
-          scrolling="no"
-          frameborder="no"
+          width='560'
+          height='315'
+          scrolling='no'
+          frameborder='no'
           src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(this.state.url)}&amp;color=%23ff5500&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=true`}
         >
         </iframe>
@@ -137,54 +137,54 @@ export default class Edit extends Component {
 
   informationTab() {
     return (
-      <div class='tab-padding row'>
-        <div class='col-sm-6'>
+      <div className='tab-padding row'>
+        <div className='col-sm-6'>
           <form>
-            <div class="form-group">
-              <label for="title">Title</label>
-              <input class='form-control'
+            <div className='form-group'>
+              <label htmlFor='title'>Title</label>
+              <input className='form-control'
                      name='title'
-                     onkeyup={this.attributeModified}
+                     onKeyUp={this.attributeModified}
                      ref={(input) => { this.title = input; }}
                      type='text'
                      defaultValue={this.state.title}
               />
             </div>
-            <div class="form-group">
-              <label for="artist">Artist</label>
-              <input class='form-control'
+            <div className='form-group'>
+              <label htmlFor='artist'>Artist</label>
+              <input className='form-control'
                      name='artist'
-                     onkeyup={this.attributeModified}
+                     onKeyUp={this.attributeModified}
                      ref={(input) => { this.artist = input; }}
                      type='text'
                      defaultValue={this.state.artist}
               />
             </div>
-            <div class="form-group">
-              <label for="album">Album</label>
-              <input class='form-control'
+            <div className='form-group'>
+              <label htmlFor='album'>Album</label>
+              <input className='form-control'
                      name='album'
-                     onkeyup={this.attributeModified}
+                     onKeyUp={this.attributeModified}
                      ref={(input) => { this.album = input; }}
                      type='text'
                      defaultValue={this.state.album}
               />
             </div>
-            <div class="form-group">
-              <label for="cover">Cover</label>
-              <input class='form-control'
+            <div className='form-group'>
+              <label htmlFor='cover'>Cover</label>
+              <input className='form-control'
                      name='cover'
-                     onkeyup={this.attributeModified}
+                     onKeyUp={this.attributeModified}
                      ref={(input) => { this.cover = input; }}
                      type='text'
                      defaultValue={this.state.cover}
               />
             </div>
-            <div class="form-group">
-              <label for="url">Backing URL</label>
-              <input class='form-control'
+            <div className='form-group'>
+              <label htmlFor='url'>Backing URL</label>
+              <input className='form-control'
                      name='url'
-                     onkeyup={this.attributeModified}
+                     onKeyUp={this.attributeModified}
                      ref={(input) => { this.url = input; }}
                      type='text'
                      defaultValue={this.state.url}
@@ -192,9 +192,9 @@ export default class Edit extends Component {
             </div>
           </form>
         </div>
-        <div class='col-sm-6'>
+        <div className='col-sm-6'>
           <h4>Image Preview</h4>
-          <div class='image-preview' style={`background-image: url('${this.state.cover}')`} />
+          <div className='image-preview' style={{'backgroundImage': `url('${this.state.cover}')`}} />
           <h4>Backing Track</h4>
           { this.embedPlayer() }
         </div>
@@ -205,8 +205,8 @@ export default class Edit extends Component {
   @autobind
   cancel() {
     window.lastRoute ?
-      this.props.router.goBack() :
-      this.props.router.push(`/playlist/${Playlist.LIBRARY}`);
+      this.props.history.goBack() :
+      this.props.history.push(`/playlist/${Playlist.LIBRARY}`);
   }
 
   isYoutube() {
@@ -243,8 +243,8 @@ export default class Edit extends Component {
         Playlist.updateIds(oldId, track.id);
       }
       window.lastRoute ?
-        this.props.router.goBack() :
-        this.props.router.push(`/playlist/${Playlist.LIBRARY}`);
+        this.props.history.goBack() :
+        this.props.history.push(`/playlist/${Playlist.LIBRARY}`);
       Song.change();
     });
   }
@@ -252,18 +252,18 @@ export default class Edit extends Component {
   @autobind
   suggestionItem(item) {
     return (
-      <Media>
+      <Media key={'editItem' + item.id}>
         <Media.Left>
-          <img class="media-object preview-thumbnail" src={item.thumbnail}/>
+          <img className='media-object preview-thumbnail' src={item.thumbnail}/>
         </Media.Left>
         <Media.Body>
-          <Media.Heading class="media-heading">{item.title}</Media.Heading>
+          <Media.Heading className='media-heading'>{item.title}</Media.Heading>
           <p>
             Artist: {item.channel}
           </p>
           <ButtonToolbar>
-            <Button bsSize="small" bsStyle="primary" onClick={this.playTrack.bind(this, item)}>Play Track</Button>
-            <DropdownButton bsSize="small" title="Use Metadata" rootCloseEvent='mousedown'>
+            <Button bsSize='small' bsStyle='primary' onClick={this.playTrack.bind(this, item)}>Play Track</Button>
+            <DropdownButton id='useItemDropdown' bsSize='small' title='Use Metadata'>
               <MenuItem onClick={this.changeAllInfo.bind(this, item)}>All</MenuItem>
               <MenuItem onClick={this.changeInfo.bind(this, 'url', item.url)}>Only backing track</MenuItem>
               <MenuItem onClick={this.changeInfo.bind(this, 'cover', item.thumbnail)}>Only cover</MenuItem>
@@ -278,12 +278,12 @@ export default class Edit extends Component {
 
   suggestions() {
     return (
-      <div class='tab-padding row'>
-        <div class='col-sm-6'>
+      <div className='tab-padding row'>
+        <div className='col-sm-6'>
           <h4>From Youtube</h4>
           {this.state.youtubeSuggestions && this.state.youtubeSuggestions.map(this.suggestionItem)}
         </div>
-        <div class='col-sm-6'>
+        <div className='col-sm-6'>
           <h4> From SoundCloud</h4>
           {this.state.youtubeSuggestions && this.state.soundcloudSuggestions.map(this.suggestionItem)}
         </div>

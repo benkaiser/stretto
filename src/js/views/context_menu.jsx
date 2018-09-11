@@ -1,5 +1,5 @@
-import { Component, h } from 'preact';
-import { withRouter } from 'react-router'
+import * as React from 'react';
+import { withRouter } from 'react-router-dom'
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
@@ -7,7 +7,7 @@ import autobind from 'autobind-decorator';
 
 const DROPDOWN_HEIGHT = 400;
 
-class ContextMenu extends Component {
+class ContextMenu extends React.Component {
   constructor(props) {
     super(props);
     ContextMenu._component = this;
@@ -37,7 +37,7 @@ class ContextMenu extends Component {
           }
           <MenuItem header>Add to playlist</MenuItem>
           { this.playlists().map((playlist) =>
-            <MenuItem onClick={this.onItemClick.bind(this, playlist)}>{ playlist.title }</MenuItem>
+            <MenuItem key={'menuItem_' + playlist.title} onClick={this.onItemClick.bind(this, playlist)}>{ playlist.title }</MenuItem>
           ) }
         </ul>
       </div>
@@ -46,7 +46,10 @@ class ContextMenu extends Component {
 
   dropdownStyle() {
     const yPosition = this.dropup() ? this.state.yPosition - DROPDOWN_HEIGHT : this.state.yPosition;
-    return `left: ${this.state.xPosition}px; top: ${yPosition}px;`;
+    return {
+      left: `${this.state.xPosition}px`,
+      top: `${yPosition}px`
+    };
   }
 
   dropup() {
@@ -55,16 +58,18 @@ class ContextMenu extends Component {
 
   @autobind
   editDetails() {
-    window.lastRoute = this.props.router.location.pathname;
-    this.props.router.push('/edit/' + this.state.song.id);
+    window.lastRoute = this.props.history.location.pathname;
+    this.props.history.push('/edit/' + this.state.song.id);
   }
 
   @autobind
   hide() {
-    this.setState({
-      open: false
-    });
-    return false;
+    if (this.state.open) {
+      this.setState({
+        open: false
+      });
+      return false;
+    }
   }
 
   onItemClick(playlist) {

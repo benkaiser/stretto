@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import { Alert } from 'react-bootstrap';
 import Spinner from 'react-spinkit';
 import Alerter from '../services/alerter';
@@ -8,7 +8,7 @@ import Soundcloud from '../services/soundcloud';
 import Youtube from '../services/youtube';
 import autobind from 'autobind-decorator';
 
-class Add extends Component {
+class Add extends React.Component {
   constructor() {
     super();
     this.state = {};
@@ -20,13 +20,13 @@ class Add extends Component {
 
   render() {
     return (
-      <div class='add'>
+      <div className='add'>
         <h1>Add a Song from Youtube or Soundcloud</h1>
         <form>
-          <div class="form-group">
-            <label for="songurl">Song URL</label>
-            <input class='form-control'
-                   onkeyup={this.onChange}
+          <div className='form-group'>
+            <label htmlFor='songurl'>Song URL</label>
+            <input className='form-control'
+                   onKeyUp={this.onChange}
                    placeholder='https://youtube.com/... or https://soundcloud.com/...'
                    ref={(input) => { this.input = input; }}
                    type='text'
@@ -34,60 +34,60 @@ class Add extends Component {
             />
           </div>
         </form>
-        <div class='addLoading'>
+        <div className='addLoading'>
         { this.state.loading &&
-          <div><Spinner name="line-scale" /></div>
+          <div><Spinner name='line-scale' /></div>
         }
         { this.state.error &&
-          <Alert bsStyle="danger">
+          <Alert bsStyle='danger'>
             <strong>Oh no!</strong> Looks like we are {this.state.error}
           </Alert>
         }
         </div>
         { this.state.track &&
-        <div class='row'>
-          <div class='col-lg-6'>
+        <div className='row'>
+          <div className='col-lg-6'>
             <h3>Track Information</h3>
             <form>
-              <div class="form-group">
-                <label for="title">Title</label>
-                <input class='form-control'
+              <div className='form-group'>
+                <label htmlFor='title'>Title</label>
+                <input className='form-control'
                        name='title'
-                       onkeyup={this.attributeModified}
+                       onKeyUp={this.attributeModified}
                        ref={(input) => { this.title = input; }}
                        type='text'
                        defaultValue={this.getTitle()}
                 />
               </div>
-              <div class="form-group">
-                <label for="artist">Artist</label>
-                <input class='form-control'
+              <div className='form-group'>
+                <label htmlFor='artist'>Artist</label>
+                <input className='form-control'
                        name='artist'
-                       onkeyup={this.attributeModified}
+                       onKeyUp={this.attributeModified}
                        ref={(input) => { this.artist = input; }}
                        type='text'
                        defaultValue={this.getArtist()}
                 />
               </div>
-              <div class="form-group">
-                <label for="album">Album</label>
-                <input class='form-control'
+              <div className='form-group'>
+                <label htmlFor='album'>Album</label>
+                <input className='form-control'
                        name='album'
-                       onkeyup={this.attributeModified}
+                       onKeyUp={this.attributeModified}
                        ref={(input) => { this.album = input; }}
                        type='text'
                        defaultValue={this.getAlbum()}
                 />
               </div>
             </form>
-            <div class='image-preview' style={`background-image: url('${this.state.track.thumbnail}')`} />
+            <div className='image-preview' style={{'backgroundImage': `url('${this.state.track.thumbnail}')`}} />
           </div>
-          <div class='col-lg-6'>
+          <div className='col-lg-6'>
             <h3>Actions</h3>
-            <div class='btn btn-primary' onClick={this.importTrack}>Import this Track</div>
+            <div className='btn btn-primary' onClick={this.importTrack}>Import this Track</div>
             { this.containsDash() && <div>
               <h4>Format Options</h4>
-              <div class='btn btn-default' onClick={() => this.setTitleBeforeDash(!this.state.titleBeforeDash)}>
+              <div className='btn btn-default' onClick={() => this.setTitleBeforeDash(!this.state.titleBeforeDash)}>
                 Switch title and artist
               </div>
             </div>}

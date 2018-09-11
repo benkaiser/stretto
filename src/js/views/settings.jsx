@@ -1,12 +1,12 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import ThemeSwitcher from './themeswitcher';
 
-class Intro extends Component {
+class Intro extends React.Component {
   render() {
     return (
       <div>
         <h1>Settings</h1>
-        <div class='form-horizontal'>
+        <div className='form-horizontal'>
           <ThemeSwitcher />
         </div>
       </div>

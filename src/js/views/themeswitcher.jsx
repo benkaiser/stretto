@@ -1,15 +1,15 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import Theme from '../theme.js';
 
-class ThemeSwitcher extends Component {
+class ThemeSwitcher extends React.Component {
   render() {
     return (
-      <div class='form-group'>
-        <label class='col-sm-2 control-label'>Theme</label>
-        <div class='col-sm-10'>
-          <select class='form-control input-sm' onChange={this.loadTheme.bind(this)}>
+      <div className='form-group'>
+        <label className='col-sm-2 control-label'>Theme</label>
+        <div className='col-sm-10'>
+          <select className='form-control input-sm' onChange={this.loadTheme.bind(this)}>
           {Theme.themes().map((theme) =>
-            <option value={theme}>{theme}</option>
+            <option key={theme} value={theme}>{theme}</option>
           )}
           </select>
         </div>

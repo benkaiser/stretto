@@ -1,46 +1,47 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import Importer from '../services/importer';
 import autobind from 'autobind-decorator';
 
-class Import extends Component {
+class Import extends React.Component {
   constructor() {
     super();
+    this.state = {};
   }
 
   render() {
     return (
-      <div class='import'>
+      <div className='import'>
         <h1>Import Library from Stretto 1.x</h1>
         <form>
-          <div class="form-group">
-            <label for="importdata">Paste the import JSON here</label>
+          <div className='form-group'>
+            <label htmlFor='importdata'>Paste the import JSON here</label>
             <textarea
-              class='form-control'
+              className='form-control'
               ref={(input) => { this.input = input; }}
               type='text'
               name='importdata'
             />
           </div>
-          <div class="form-group">
-            <div class='btn btn-default' onClick={this._import}>
+          <div className='form-group'>
+            <div className='btn btn-default' onClick={this._import}>
               Import
             </div>
           </div>
         </form>
         { this.state.error &&
-          <p class='text-danger'>{this.state.error}</p>
+          <p className='text-danger'>{this.state.error}</p>
         }
         { this.state.progressFraction !== undefined &&
-          <div class="progress">
+          <div className='progress'>
             <div
-              class="progress-bar"
-              role="progressbar"
+              className='progress-bar'
+              role='progressbar'
               aria-valuenow={this.state.progressFraction}
-              aria-valuemin="0"
-              aria-valuemax="1"
-              style={`width: ${this.state.progressFraction * 100}%;`}
+              aria-valuemin='0'
+              aria-valuemax='1'
+              style={{'width': `${this.state.progressFraction * 100}%`}}
             >
-              <span class="sr-only">{this.state.progressFraction}% Complete</span>
+              <span className='sr-only'>{this.state.progressFraction}% Complete</span>
             </div>
           </div>
         }

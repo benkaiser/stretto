@@ -1,11 +1,14 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import { Button, ButtonGroup, FormGroup, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import autobind from 'autobind-decorator';
 import SpotifyAPI from '../services/spotify_api';
 
-export default class Spotify extends Component {
+export default class Spotify extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      fetching: false
+    };
 
     if (SpotifyAPI.instance.connected) {
       this.state = {
@@ -45,7 +48,7 @@ export default class Spotify extends Component {
     return (
       <div>
         <p>Fetching your spotify library...</p>
-        <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+        <i className='fa fa-circle-o-notch fa-spin fa-3x fa-fw'></i>
       </div>
     );
   }
@@ -55,18 +58,18 @@ export default class Spotify extends Component {
       <div>
         <p>
           Select which playlists you would like to sync<br/>
-          <Button bsStyle="link" onClick={this._selectAll}>Check All</Button>
-          <Button bsStyle="link" onClick={this._deselectAll}>Uncheck All</Button>
+          <Button bsStyle='link' onClick={this._selectAll}>Check All</Button>
+          <Button bsStyle='link' onClick={this._deselectAll}>Uncheck All</Button>
         </p>
         <FormGroup>
           <ToggleButtonGroup
             onChange={this._onChangePlaylist}
-            type="checkbox"
+            type='checkbox'
             value={this.state.selectedPlaylists}
             vertical
           >
           { this.state.playlists.map((playlist) => {
-            return <ToggleButton value={playlist.id}>{playlist.name} ({playlist.tracks.total} tracks)</ToggleButton>
+            return <ToggleButton key={playlist.id} value={playlist.id}>{playlist.name} ({playlist.tracks.total} tracks)</ToggleButton>
           }) }
           </ToggleButtonGroup>
         </FormGroup>

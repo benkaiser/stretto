@@ -1,8 +1,8 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import Player from '../services/player';
 import Slider from './slider';
 
-class PlayerControls extends Component {
+class PlayerControls extends React.Component {
   constructor(props) {
     super(props);
     Player.addOnStateChangeListener(this.stateChange.bind(this));
@@ -17,19 +17,19 @@ class PlayerControls extends Component {
     return (
       <div>
         <Slider />
-        <div class='control-buttons'>
+        <div className='control-buttons'>
           <div>
-            <i class={'fa fa-2x fa-retweet' + (this.state.repeat ? ' text-primary' : '')} aria-hidden='true' onClick={Player.toggleRepeat}></i>
-            { this.state.repeat && <span class='badge control-badge'>1</span> }
+            <i className={'fa fa-2x fa-retweet' + (this.state.repeat ? ' text-primary' : '')} aria-hidden='true' onClick={Player.toggleRepeat}></i>
+            { this.state.repeat && <span className='badge control-badge'>1</span> }
           </div>
-          <div><i class='fa fa-2x fa-fast-backward' aria-hidden='true' onClick={Player.previous}></i></div>
+          <div><i className='fa fa-2x fa-fast-backward' aria-hidden='true' onClick={Player.previous}></i></div>
           { (this.state.playing) ?
-            <div><i class='fa fa-2x fa-pause' aria-hidden='true' onClick={this.togglePlaying}></i></div>
+            <div><i className='fa fa-2x fa-pause' aria-hidden='true' onClick={this.togglePlaying}></i></div>
             :
-            <div><i class='fa fa-2x fa-play' aria-hidden='true' onClick={this.togglePlaying}></i></div>
+            <div><i className='fa fa-2x fa-play' aria-hidden='true' onClick={this.togglePlaying}></i></div>
           }
-          <div><i class='fa fa-2x fa-fast-forward' aria-hidden='true' onClick={Player.next}></i></div>
-          <div><i class={'fa fa-2x fa-random' + (this.state.shuffle ? ' text-primary' : '')} aria-hidden='true' onClick={Player.toggleShuffle}></i></div>
+          <div><i className='fa fa-2x fa-fast-forward' aria-hidden='true' onClick={Player.next}></i></div>
+          <div><i className={'fa fa-2x fa-random' + (this.state.shuffle ? ' text-primary' : '')} aria-hidden='true' onClick={Player.toggleShuffle}></i></div>
         </div>
       </div>
     );

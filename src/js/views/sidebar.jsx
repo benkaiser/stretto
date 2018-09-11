@@ -1,5 +1,5 @@
-import { h, Component } from 'preact';
-import Link from 'react-router/lib/Link';
+import * as React from 'react';
+import { Link } from 'react-router-dom';
 import Bootbox from '../services/bootbox';
 import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
@@ -7,7 +7,7 @@ import Playlist from '../models/playlist';
 import SearchBox from './search_box';
 import autobind from 'autobind-decorator';
 
-class Sidebar extends Component {
+class Sidebar extends React.Component {
   constructor() {
     super();
     Playlist.addOnChangeListener(this.onPlaylistChange);
@@ -15,22 +15,22 @@ class Sidebar extends Component {
 
   render() {
     return (
-      <div class='sidebar'>
-        <div class='sidebar-top'>
-          <h3 class='logo'>
+      <div className='sidebar'>
+        <div className='sidebar-top'>
+          <h3 className='logo'>
             <Link to='/' style={{ textDecoration: 'none' }}>Stretto</Link>
-            <Link class='sidebar-icon' to='/settings/'><span class='glyphicon glyphicon-cog'></span></Link>
-            <Link class='sidebar-icon' to='/add/'><span class='glyphicon glyphicon-plus'></span></Link>
-            <Link class='sidebar-icon' to='/sync/'><span class='glyphicon glyphicon-refresh'></span></Link>
+            <Link className='sidebar-icon' to='/settings/'><span className='glyphicon glyphicon-cog'></span></Link>
+            <Link className='sidebar-icon' to='/add/'><span className='glyphicon glyphicon-plus'></span></Link>
+            <Link className='sidebar-icon' to='/sync/'><span className='glyphicon glyphicon-refresh'></span></Link>
           </h3>
           <SearchBox />
-          <ul class='nav nav-pills nav-stacked'>
-            <li class="dropdown-header">Add to Library</li>
+          <ul className='nav nav-pills nav-stacked'>
+            <li className='dropdown-header'>Add to Library</li>
             <li><Link to='/spotify/'>Import from Spotify</Link></li>
             <li><Link to='/import/'>Import from Stretto 1.x (JSON)</Link></li>
-            <li class="dropdown-header">Your Music</li>
+            <li className='dropdown-header'>Your Music</li>
             { Playlist.fetchAll().map((playlist) =>
-              <li>
+              <li key={'playlist_' + playlist.title}>
                 <Link to={'/playlist/' + playlist.title}>
                   { playlist.title }
                 </Link>
@@ -39,7 +39,7 @@ class Sidebar extends Component {
             <li onClick={this.addNewPlaylist}><a href='#'>Add new playlist</a></li>
           </ul>
         </div>
-        <div class='sidebar-bottom'>
+        <div className='sidebar-bottom'>
           <PlayerControls />
           <PlayerInfo />
         </div>

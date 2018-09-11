@@ -1,5 +1,5 @@
 import AlertContainer from 'react-alert';
-import { Component, h } from 'preact';
+import * as React from 'react';
 
 const ALERT_OPTIONS = {
   offset: 30,
@@ -9,7 +9,7 @@ const ALERT_OPTIONS = {
   transition: 'fade'
 }
 
-export default class Alerter extends Component {
+export default class Alerter extends React.Component {
   static error(message) {
     return Alerter._component.alert(message, 'error');
   }

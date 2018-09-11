@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import * as React from 'react';
 import {
   Form,
   FormControl,
@@ -6,12 +6,12 @@ import {
   Glyphicon,
   InputGroup
 } from 'react-bootstrap';
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import autobind from 'autobind-decorator';
 
 const SEARCH_DELAY = 300;
 
-class SearchBox extends Component {
+class SearchBox extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -21,13 +21,13 @@ class SearchBox extends Component {
 
   render() {
     return (
-      <div class="searchContainer">
-        <InputGroup class="searchBox" bsSize="sm">
-          <InputGroup.Addon><Glyphicon glyph="search" /></InputGroup.Addon>
+      <div className='searchContainer'>
+        <InputGroup className='searchBox' bsSize='sm'>
+          <InputGroup.Addon><Glyphicon glyph='search' /></InputGroup.Addon>
           <FormControl
-            type="text"
+            type='text'
             value={this.state.value}
-            placeholder="Search"
+            placeholder='Search'
             onChange={this._handleChange} />
         </InputGroup>
       </div>
@@ -47,9 +47,9 @@ class SearchBox extends Component {
       return false;
     }
     const newUrl = `/search/${this.state.value}`;
-    this.props.router.location.pathname.indexOf('/search/') == 0 ?
-      this.props.router.replace(newUrl) :
-      this.props.router.push(newUrl);
+    this.props.history.location.pathname.indexOf('/search/') == 0 ?
+      this.props.history.replace(newUrl) :
+      this.props.history.push(newUrl);
   }
 }
 

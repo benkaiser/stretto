@@ -17,8 +17,7 @@ module.exports = {
           plugins: [
             'transform-decorators-legacy',
             [
-              'transform-react-jsx',
-              {'pragma': 'h'}
+              'transform-react-jsx'
             ]
           ]
         }
@@ -36,9 +35,7 @@ module.exports = {
   resolve: {
     extensions: ['', '.js', '.jsx'],
     alias: {
-      'jquery': path.join(__dirname, 'stubs/jquery.js'),
-      'react': 'preact-compat',
-      'react-dom': 'preact-compat'
+      'jquery': path.join(__dirname, 'stubs/jquery.js')
     }
   }
 };

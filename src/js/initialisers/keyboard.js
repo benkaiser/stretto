@@ -15,7 +15,7 @@ export default class Keyboard {
     document.body.onkeydown = (event) => {
       if (event.target.localName == 'input') return;
       let keymap = {
-        " ": (event) => Player.togglePlaying() && event.preventDefault(),
+        ' ': (event) => Player.togglePlaying() && event.preventDefault(),
         ArrowRight: Player.next.bind(Player),
         ArrowLeft: Player.previous.bind(Player)
       };
