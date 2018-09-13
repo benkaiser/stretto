@@ -23,6 +23,7 @@ export default class Playlist {
     this.title = attrs.title || '';
     this.editable = attrs.title != Playlist.LIBRARY;
     this.updatedAt = attrs.updatedAt || +new Date();
+    this._rawsongs = attrs.rawSongs;
   }
 
   addSong(song) {
@@ -135,11 +136,17 @@ export default class Playlist {
     Playlist.change();
   }
 
+  _getSongs() {
+    return this._rawSongs ||
+      (this.songs
+        .map((songId) => Song.findById(songId))
+        .filter((song) => song !== undefined)
+     );
+  }
+
   get songData() {
     if (!this._songData) {
-      this._songData = this.songs
-                           .map((songId) => Song.findById(songId))
-                           .filter((song) => song !== undefined);
+      this._songData = this._getSongs();
       if (this._sortColumn && this._sortDirection !== SortDirection.NONE) {
         this._songData = this._songData.sort(this.sortSongs);
       }
@@ -153,6 +160,11 @@ export default class Playlist {
 
   get sortDirection() {
     return this._sortDirection;
+  }
+
+  set rawSongs(songs) {
+    this._rawSongs = songs;
+    delete this._songData;
   }
 
   static addOnChangeListener(listener) {

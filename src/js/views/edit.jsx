@@ -91,8 +91,8 @@ export default class Edit extends React.Component {
           width='560'
           height='315'
           src={`https://www.youtube.com/embed/${Youtube.extractId(this.state.url)}`}
-          frameborder='0'
-          allowfullscreen>
+          frameBorder='0'
+          allowFullscreen>
         </iframe>
       );
     } else if (Soundcloud.isSoundcloudURL(this.state.url)) {
@@ -101,7 +101,7 @@ export default class Edit extends React.Component {
           width='560'
           height='315'
           scrolling='no'
-          frameborder='no'
+          frameBorder='no'
           src={`https://w.soundcloud.com/player/?url=${encodeURIComponent(this.state.url)}&amp;color=%23ff5500&amp;auto_play=false&amp;hide_related=true&amp;show_comments=false&amp;show_user=true&amp;show_reposts=false&amp;visual=true`}
         >
         </iframe>

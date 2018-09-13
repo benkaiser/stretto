@@ -145,6 +145,14 @@ body, html {
   .btn-group {
     margin: 0 15px;
   }
+
+  .buttons {
+    margin: 0 15px;
+
+    .btn:not(:last-child) {
+      margin-right: 5px;
+    }
+  }
 }
 
 .preview-thumbnail {

@@ -2,6 +2,7 @@ import Utilities from '../utilities';
 import fetchJsonp from 'fetch-jsonp';
 
 let youtubeIdRegex = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+const resolveIdentity = (i) => Promise.resolve(i);
 
 export default class Youtube {
   static get API_KEY() {
@@ -41,18 +42,23 @@ export default class Youtube {
     }
   }
 
-  static search(query) {
+  static search(query, options = {}) {
+    const requestDurations = options.requestDurations === undefined ? true : options.requestDurations;
+    const addThumbnail = options.addThumbnail === undefined ? true : options.addThumbnail;
+    const maxResults = options.maxResults === undefined ? 5 : options.maxResults;
     return new Promise((resolve) => gapi.load('client', resolve))
     .then(() => gapi.client.load('youtube', 'v3'))
     .then(() =>
       gapi.client.youtube.search.list({
+        maxResults: maxResults,
         q: query,
         part: 'snippet'
       })
     )
-    .then((response) => this._addDurations(response.result.items))
-    .then(this._addThumbnails.bind(this))
-    .then(items => items.map(this._convertToStandardTrack));
+    .then(response => response.result.items)
+    .then(requestDurations ? ((items) => this._addDurations(items)) : resolveIdentity)
+    .then(addThumbnail ? this._addThumbnails.bind(this) : resolveIdentity)
+    .then(items => items.map(this._convertToStandardTrack).filter(item => item));
   }
 
   static _addDurations(items) {
@@ -75,6 +81,7 @@ export default class Youtube {
   }
 
   static _convertToStandardTrack(track) {
+    if (!track.id.videoId) { return undefined; }
     return {
       channel: track.snippet.channelTitle,
       id: track.id.videoId,

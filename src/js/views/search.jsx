@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
+import Itunes from '../services/itunes';
 import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
 import PlaylistView from './playlist';
@@ -17,10 +18,11 @@ class Search extends PlaylistView {
 
   headerButtons() {
     return (
-      <div>
-        <Button onClick={this._onCreatePlaylist}>Create Playlist from Selection</Button>
-        <Button onClick={this._youtubeSearch}>Youtube Search</Button>
-        <Button onClick={this._soundcloudSearch}>Soundcloud Search</Button>
+      <div className='buttons'>
+        { /* <Button onClick={this._onCreatePlaylist} title="Create a playlist from these songs">Create Playlist</Button> */ }
+        <Button onClick={this._itunesSearch} title="search iTunes, back with youtube tracks">Search iTunes</Button>
+        { /* <Button onClick={this._youtubeSearch} title="search youtube directly"><i className='fa fa-youtube' aria-hidden='true'></i> Search Youtube</Button> */ }
+        { /* <Button onClick={this._soundcloudSearch} title="search soundcloud directly"><i className='fa fa-soundcloud' aria-hidden='true'></i> Search SoundCloud</Button> */ }
       </div>
     );
   }
@@ -35,14 +37,28 @@ class Search extends PlaylistView {
     });
   }
 
+  @autobind
+  _itunesSearch() {
+    Itunes.search(this.props.match.params.search).then(songs => {
+      const newPlaylist = this.state.playlist;
+      newPlaylist.rawSongs = songs;
+      const state = this.determineStateForElementsToShow(0, window.innerHeight, newPlaylist);
+      state.playlist = newPlaylist;
+      this.setState(state);
+    });
+  }
+
+  @autobind
   _onCreatePlaylist() {
     /* no-op */
   }
 
+  @autobind
   _soundcloudSearch() {
     /* no-op */
   }
 
+  @autobind
   _youtubeSearch() {
     /* no-op */
   }

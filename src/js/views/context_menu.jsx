@@ -27,6 +27,13 @@ class ContextMenu extends React.Component {
   }
 
   render() {
+    if (!this.state.song) {
+      return null;
+    }
+    return this.state.song.inLibrary ? this._inLibraryMenu() : this._importMenu();
+  }
+
+  _inLibraryMenu() {
     return (
       <div className={`dropdownContainer`} style={this.dropdownStyle()}>
         <ul className={`dropdown-menu ${this.openStyle()}`}>
@@ -44,6 +51,16 @@ class ContextMenu extends React.Component {
     );
   }
 
+  _importMenu() {
+    return (
+      <div className={`dropdownContainer`} style={this.dropdownStyle()}>
+        <ul className={`dropdown-menu ${this.openStyle()}`}>
+          <MenuItem onClick={this.addToLibrary}>Add to library</MenuItem>
+        </ul>
+      </div>
+    );
+  }
+
   dropdownStyle() {
     const yPosition = this.dropup() ? this.state.yPosition - DROPDOWN_HEIGHT : this.state.yPosition;
     return {
@@ -54,6 +71,12 @@ class ContextMenu extends React.Component {
 
   dropup() {
     return this.state.yPosition > window.innerHeight - DROPDOWN_HEIGHT;
+  }
+
+  @autobind
+  addToLibrary() {
+    const newSong = Song.create(this.state.song);
+    Playlist.getByTitle(Playlist.LIBRARY).addSong(newSong);
   }
 
   @autobind
@@ -121,6 +144,8 @@ class ContextMenu extends React.Component {
       return document.body;
     }
   }
+
+
 
   static open(song, event, playlist) {
     return ContextMenu._component.open(song, event, playlist);

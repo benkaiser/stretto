@@ -53,6 +53,10 @@ class Song {
     return this.id.slice(2);
   }
 
+  get inLibrary() {
+    return !!Song.findById(this.id);
+  }
+
   get allinfo() {
     return (this.title + ' ' + this.artist + ' ' + this.album).toLowerCase();
   }
