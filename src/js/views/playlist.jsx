@@ -52,6 +52,7 @@ class PlaylistView extends React.Component {
     PlaylistView.lastScrollTop = this.state.scrollTop;
     this.contentContainer().removeEventListener('scroll', this.onScroll);
     Player.removeOnSongChangeListener(this.songChange);
+    Playlist.removeOnChangeListener(this.songChange);
     this._mounted = false;
   }
 
@@ -177,6 +178,9 @@ class PlaylistView extends React.Component {
       case 'updatedAt':
         return <td key={key} {...props}>{moment(song[column]).fromNow()}</td>;
         break;
+      case 'artist':
+      case 'album':
+        return <td key={key} {...props} onClick={this._searchFor.bind(this, song[column])} role='link' className='searchable'>{song[column]}</td>;
       default:
         return <td key={key} {...props}>{song[column]}</td>;
     }
@@ -282,6 +286,13 @@ class PlaylistView extends React.Component {
         <tr height={this.state.bottomSpacerHeight}></tr>
       </tbody>
     );
+  }
+
+  _searchFor(searchText, event) {
+    this.props.history.push(`/search/${searchText}`);
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
   }
 }
 

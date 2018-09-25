@@ -101,7 +101,7 @@ class Player {
     let playstate = DataLayer.getItem('playstate');
     if (playstate) {
       const song = Song.findById(playstate.songId);
-      const playlist = Playlist.getByTitle(playstate.playlistTitle);
+      const playlist = Playlist.getByTitle(playstate.playlistTitle) || Playlist.getByTitle(Playlist.LIBRARY);
       if (song && playlist) {
         this.play(
           song,
@@ -112,7 +112,7 @@ class Player {
           }
         );
       } else {
-        this.playlist = Playlist.getByTitle(Playlist.LIBRARY);
+        this.playlist = playlist;
       }
     }
     playstate && playstate.repeat && (this.repeat_state = playstate.repeat);

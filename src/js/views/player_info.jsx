@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { withRouter } from 'react-router-dom'
 import ContextMenu from './context_menu';
 import Player from '../services/player.js';
 import autobind from 'autobind-decorator';
@@ -31,7 +32,11 @@ class PlayerInfo extends React.Component {
         <div className='playerinfo' onContextMenu={this.rightSongClick}>
           <div className='info'>
             <p className='title' title={this.state.song.title}>{this.state.song.title}</p>
-            <p className='artist'>{this.state.song.artist} - {this.state.song.album}</p>
+            <p className='artist'>
+              <span className='searchable' onClick={this._search.bind(this, this.state.song.artist)}>{this.state.song.artist}</span>
+              { " - " }
+              <span className='searchable' onClick={this._search.bind(this, this.state.song.album)}>{this.state.song.album}</span>
+            </p>
           </div>
           { (!this.state.hideCover) ?
           <div className='cover-wrapper'>
@@ -56,6 +61,13 @@ class PlayerInfo extends React.Component {
     ContextMenu.open(this.state.song, event, Player.playlist);
     event.preventDefault();
   }
+
+  _search(searchText, event) {
+    this.props.history.push(`/search/${searchText}`);
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  }
 }
 
-module.exports = PlayerInfo;
+module.exports = withRouter(PlayerInfo);

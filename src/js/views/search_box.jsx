@@ -19,6 +19,14 @@ class SearchBox extends React.Component {
     };
   }
 
+  componentWillReceiveProps(props) {
+    this._updateSearch(props);
+  }
+
+  componentDidMount() {
+    this._updateSearch(this.props);
+  }
+
   render() {
     return (
       <div className='searchContainer'>
@@ -28,7 +36,8 @@ class SearchBox extends React.Component {
             type='text'
             value={this.state.value}
             placeholder='Search'
-            onChange={this._handleChange} />
+            onChange={this._handleChange}
+            inputRef={(ref) => this._inputRef = ref } />
         </InputGroup>
       </div>
     );
@@ -50,6 +59,19 @@ class SearchBox extends React.Component {
     this.props.history.location.pathname.indexOf('/search/') == 0 ?
       this.props.history.replace(newUrl) :
       this.props.history.push(newUrl);
+  }
+
+  _getSearchTerm(props) {
+    return props.location.pathname.indexOf('/search/') === 0 && decodeURIComponent(props.location.pathname.replace('/search/',''));
+  }
+
+  _updateSearch(props) {
+    const searchTerm = this._getSearchTerm(props);
+    if (this._inputRef && this._inputRef !== document.activeElement && searchTerm) {
+      this.setState({
+        value: searchTerm || ''
+      });
+    }
   }
 }
 
