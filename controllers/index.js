@@ -3,8 +3,8 @@ const router = express.Router();
 const Google = require('../services/google');
 const DataMapper = require('../models/data_mapper');
 
-const WebGoogle = require('./services/google')(process.env.GOOGLE_CLIENT_ID);
-const AndroidGoogle = require('./services/google')(process.env.GOOGLE_CLIENT_ID_ANDROID);
+const WebGoogle = new Google(process.env.GOOGLE_CLIENT_ID);
+const AndroidGoogle = new Google(process.env.GOOGLE_CLIENT_ID_ANDROID);
 
 function loggedIn(req, res, next) {
   if (req.session.loggedIn) {
@@ -23,7 +23,7 @@ function errorHandler(error) {
 }
 
 function googleLogin(req, res, googleModule) {
-  googleModule.verifyToken(req.body.token).then((user) => {
+  req.params.googleModule.verifyToken(req.body.token).then((user) => {
     if (user.email === req.body.email) {
       req.session.user = user;
       req.session.loggedIn = true;
@@ -39,8 +39,14 @@ function googleLogin(req, res, googleModule) {
   }).catch(errorHandler.bind(res));
 }
 
-router.post('/login', (req, res, next) => next(req, res, WebGoogle), googleLogin);
-router.post('/androidlogin', (req, res, next) => next(req, res, AndroidGoogle), googleLogin);
+router.post('/login', (req, res, next) => {
+  req.params.googleModule = WebGoogle;
+  next();
+}, googleLogin);
+router.post('/androidlogin', (req, res, next) => {
+  req.params.googleModule = AndroidGoogle;
+  next();
+}, googleLogin);
 
 router.get('/spotify_callback', (req, res) => {
   res.render('spotify_callback');
