@@ -2,12 +2,12 @@ const GoogleAuth = require('google-auth-library');
 const auth = new GoogleAuth;
 
 module.exports = class Google {
-  static initialise(client_id) {
+  constructor(client_id) {
     Google.client = new auth.OAuth2(client_id, '', '');
     Google.client_id = client_id;
   }
 
-  static verifyToken(token) {
+  verifyToken(token) {
     return new Promise((resolve, reject) => {
       Google.client.verifyIdToken(
         token,

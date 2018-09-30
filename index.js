@@ -6,7 +6,6 @@ const proxy = require('express-http-proxy');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const DataMapper = require('./models/data_mapper');
-require('./services/google').initialise(process.env.GOOGLE_CLIENT_ID);
 
 var sessionStore = new MongoDBStore({
   uri: process.env.MONGO_URL,

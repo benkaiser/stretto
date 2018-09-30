@@ -3,6 +3,9 @@ const router = express.Router();
 const Google = require('../services/google');
 const DataMapper = require('../models/data_mapper');
 
+const WebGoogle = require('./services/google')(process.env.GOOGLE_CLIENT_ID);
+const AndroidGoogle = require('./services/google')(process.env.GOOGLE_CLIENT_ID_ANDROID);
+
 function loggedIn(req, res, next) {
   if (req.session.loggedIn) {
     next();
@@ -19,8 +22,8 @@ function errorHandler(error) {
   });
 }
 
-router.post('/login', (req, res) => {
-  Google.verifyToken(req.body.token).then((user) => {
+function googleLogin(req, res, googleModule) {
+  googleModule.verifyToken(req.body.token).then((user) => {
     if (user.email === req.body.email) {
       req.session.user = user;
       req.session.loggedIn = true;
@@ -34,7 +37,10 @@ router.post('/login', (req, res) => {
       });
     }
   }).catch(errorHandler.bind(res));
-});
+}
+
+router.post('/login', (req, res, next) => next(req, res, WebGoogle), googleLogin);
+router.post('/androidlogin', (req, res, next) => next(req, res, AndroidGoogle), googleLogin);
 
 router.get('/spotify_callback', (req, res) => {
   res.render('spotify_callback');
