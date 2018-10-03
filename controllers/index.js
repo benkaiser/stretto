@@ -15,6 +15,7 @@ function loggedIn(req, res, next) {
 }
 
 function errorHandler(error) {
+  console.log('Error:');
   console.log(error);
   this.send({
     success: false,
@@ -22,7 +23,7 @@ function errorHandler(error) {
   });
 }
 
-function googleLogin(req, res, googleModule) {
+function googleLogin(req, res) {
   req.params.googleModule.verifyToken(req.body.token).then((user) => {
     if (user.email === req.body.email) {
       req.session.user = user;
