@@ -124,7 +124,7 @@ class Player {
     this.currentTimeAbsolute().then((currentTime) => {
       DataLayer.setItem('playstate', {
         currentTime: currentTime,
-        playlistTitle: this.playlist.title,
+        playlistTitle: this.playlist ? this.playlist.title : '',
         playing: this.isPlaying,
         repeat: this.repeat_state,
         shuffle_on: this.shuffle_on,
