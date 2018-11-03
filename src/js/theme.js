@@ -4,6 +4,10 @@ class Theme {
     theme.load();
   }
 
+  static currentTheme() {
+    return localStorage.getItem('theme') || 'cerulean';
+  }
+
   static themes() {
     return [
       'cerulean',

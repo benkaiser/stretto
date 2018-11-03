@@ -19,15 +19,13 @@ class Sidebar extends React.Component {
         <div className='sidebar-top'>
           <h3 className='logo'>
             <Link to='/' style={{ textDecoration: 'none' }}>Stretto</Link>
-            <Link className='sidebar-icon' to='/settings/'><span className='glyphicon glyphicon-cog'></span></Link>
-            <Link className='sidebar-icon' to='/add/'><span className='glyphicon glyphicon-plus'></span></Link>
-            <Link className='sidebar-icon' to='/sync/'><span className='glyphicon glyphicon-refresh'></span></Link>
+            <Link className='sidebar-icon' to='/settings/'><i class="fa fa-cog"></i></Link>
+            <Link className='sidebar-icon' to='/add/'><i class="fa fa-plus"></i></Link>
+            <Link className='sidebar-icon' to='/sync/'><i class="fa fa-refresh"></i></Link>
+            <Link className='sidebar-icon' to='/spotify/' title='Import from Spotify'><i class="fa fa-spotify"></i></Link>
           </h3>
           <SearchBox />
           <ul className='nav nav-pills nav-stacked'>
-            <li className='dropdown-header'>Add to Library</li>
-            <li><Link to='/spotify/'>Import from Spotify</Link></li>
-            <li><Link to='/import/'>Import from Stretto 1.x (JSON)</Link></li>
             <li className='dropdown-header'>Your Music</li>
             { Playlist.fetchAll().map((playlist) =>
               <li key={'playlist_' + playlist.title}>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, ButtonGroup, FormGroup, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { Button, FormGroup, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import autobind from 'autobind-decorator';
 import SpotifyAPI from '../services/spotify_api';
 
@@ -32,7 +32,7 @@ export default class Spotify extends React.Component {
 
     return (
       <div>
-        <h1>Spotify</h1>
+        <h1>Import from Spotify</h1>
         { currentView }
       </div>
     );
