@@ -235,6 +235,15 @@ body, html {
     text-overflow: ellipsis;
     vertical-align: middle;
     white-space: nowrap;
+    border-top: none;
+  }
+}
+
+tbody > tr {
+  transition: all 200ms linear;
+
+  &:hover {
+    box-shadow: 0 0 30px -5px #aaa;
   }
 }
 

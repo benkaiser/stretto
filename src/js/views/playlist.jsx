@@ -61,7 +61,7 @@ class PlaylistView extends React.Component {
       <div className='intro'>
         { this.header() }
         <p>{this.state.playlist.songs.length} Songs</p>
-        <table className='song-table table table-hover'>
+        <table className='song-table table'>
           <thead>
             <tr>
               { COLUMNS.map((column) => this.headerForColumn(column)) }
@@ -267,7 +267,7 @@ class PlaylistView extends React.Component {
   @autobind
   sortableItem({value}) {
     return (
-      <tr className={ this.isCurrentSongPlaying(value.id) ? 'active' : '' }
+      <tr className={ this.isCurrentSongPlaying(value.id) ? 'bg-primary' : '' }
           onClick={this.clickSong.bind(this, value)}
           onContextMenu={this.rightClickSong.bind(this, value)}>
         { COLUMNS.map((column) => this.itemForColumn(column, value)) }
