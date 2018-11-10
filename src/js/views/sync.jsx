@@ -24,9 +24,11 @@ class Import extends React.Component {
   }
 
   componentDidMount() {
-    window.gapi.signin2 && window.gapi.signin2.render('google-signin-button', {
-      onSuccess: this.loginSuccess,
-      onFailure: this.loginFailure
+    AccountManager.initialise().then(() => {
+      window.gapi.signin2.render('google-signin-button', {
+        onSuccess: this.loginSuccess,
+        onFailure: this.loginFailure
+      });
     });
   }
 

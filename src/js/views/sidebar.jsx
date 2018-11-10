@@ -19,10 +19,10 @@ class Sidebar extends React.Component {
         <div className='sidebar-top'>
           <h3 className='logo'>
             <Link to='/' style={{ textDecoration: 'none' }}>Stretto</Link>
-            <Link className='sidebar-icon' to='/settings/'><i class="fa fa-cog"></i></Link>
-            <Link className='sidebar-icon' to='/add/'><i class="fa fa-plus"></i></Link>
-            <Link className='sidebar-icon' to='/sync/'><i class="fa fa-refresh"></i></Link>
-            <Link className='sidebar-icon' to='/spotify/' title='Import from Spotify'><i class="fa fa-spotify"></i></Link>
+            <Link className='sidebar-icon' to='/settings/'><i className="fa fa-cog"></i></Link>
+            <Link className='sidebar-icon' to='/add/'><i className="fa fa-plus"></i></Link>
+            <Link className='sidebar-icon' to='/sync/'><i className="fa fa-refresh"></i></Link>
+            <Link className='sidebar-icon' to='/spotify/' title='Import from Spotify'><i className="fa fa-spotify"></i></Link>
           </h3>
           <SearchBox />
           <ul className='nav nav-pills nav-stacked'>

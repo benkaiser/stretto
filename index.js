@@ -2,6 +2,8 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
+const socketio = require('socket.io');
+const http = require('http');
 const proxy = require('express-http-proxy');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
@@ -18,6 +20,8 @@ sessionStore.on('error', function(error) {
 });
 
 var app = express();
+var server = http.createServer(app);
+var io = socketio.listen(server);
 
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
@@ -38,8 +42,9 @@ app.use(session({
 }));
 app.use('/proxy', proxy('https://itunes.apple.com'));
 app.use(require('./controllers'));
+require('./controllers/socketio')(io);
 
-app.listen(process.env.PORT || 3000, function() {
+server.listen(process.env.PORT || 3000, function() {
   console.log("Let's get this party started!");
 });
 

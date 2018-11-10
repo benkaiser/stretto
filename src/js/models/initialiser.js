@@ -18,7 +18,7 @@ class ModelInitialiser {
     if (Playlist.isEmpty()) {
       ModelInitialiser.seed();
     }
-    Player.resumeOnLoad();
+    window.location.href.indexOf('/remote') == -1 && Player.resumeOnLoad();
   }
 
   static seed() {

@@ -9,7 +9,7 @@ export default class SyncManager {
   }
 
   static startSync() {
-    this._instance._startSync();
+    return this._instance._startSync();
   }
 
   constructor() {
@@ -54,7 +54,7 @@ export default class SyncManager {
   }
 
   _startSync() {
-    this._getLatestVersionFromServer()
+    return this._getLatestVersionFromServer()
     .then(this._addListeners);
   }
 

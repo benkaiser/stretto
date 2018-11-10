@@ -13,7 +13,7 @@ module.exports = class Playlist {
   static getPlaylists(email) {
     return new Promise((resolve, reject) => {
       PlaylistModel.findOne({ email: email }, (err, doc) => {
-        if (err) { return reject(err); }
+        if (err || !doc) { return reject(err); }
         resolve(doc.playlistBlob);
       });
     });
