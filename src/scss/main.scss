@@ -160,6 +160,17 @@ body, html {
   max-height: 100px;
 }
 
+.remote-control-buttons {
+  display: flex;
+  justify-content: space-around;
+  max-width: 180px;
+  margin: 60px auto;
+
+  > div {
+    position: relative;
+  }
+}
+
 .root {
   display: flex;
   flex-direction: row;

@@ -12,6 +12,14 @@ module.exports = (io) => {
 
     socket.on('playpause', () => {
       socket.to(socket._room).emit('playpause');
-    })
+    });
+
+    socket.on('previous', () => {
+      socket.to(socket._room).emit('previous');
+    });
+
+    socket.on('next', () => {
+      socket.to(socket._room).emit('next');
+    });
   });
 }
