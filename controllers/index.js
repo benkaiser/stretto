@@ -1,4 +1,7 @@
 const express = require('express');
+const fetch = require('node-fetch');
+var youtubeSearch = require('youtube-search');
+
 const router = express.Router();
 const Google = require('../services/google');
 const DataMapper = require('../models/data_mapper');
@@ -75,6 +78,66 @@ router.post('/uploaddata', loggedIn, (req, res) => {
   .catch((error) => {
     res.send({ success: false, error: error });
   });
+});
+
+const searchOptions = {
+  maxResults: 1,
+  key: process.env.GOOGLE_API_KEY
+};
+
+function standardItem(itunesItem, youtubeResult) {
+  return {
+    title: itunesItem.trackName,
+    artist: itunesItem.artistName,
+    album: itunesItem.collectionName,
+    cover: itunesItem.artworkUrl100.replace('100x100', '600x600'),
+    id: 'y_' + youtubeResult.id
+  };
+}
+
+function removeDuplicates(items) {
+  const ids = [];
+  return items.filter(item => {
+    if (ids.indexOf(item.id) != -1) {
+      return false;
+    }
+    ids.push(item.id);
+    return true;
+  });
+}
+
+function findYoutubeVideo(item) {
+  return new Promise((resolve, reject) => {
+    youtubeSearch(item.trackName + ' ' + item.artistName, searchOptions, (error, results) => {
+      if (error) {
+        console.log(error);
+        return reject(error);
+      }
+      if (!results || !results.length) {
+        console.log(results);
+        console.log('no results from youtube search');
+        return resolve(undefined);
+      }
+      resolve(standardItem(item, results[0]));
+    });
+  })
+}
+
+router.post('/search', loggedIn, (req, res) => {
+  if (!req.body || !req.body.query) {
+    return res.send('Missing parameter \'query\' in payload.');
+  }
+  fetch(`https://itunes.apple.com/search?term=${req.body.query}&entity=song&limit=50&country=us`)
+  .then(response => response.json())
+  .then(responseJson => {
+    Promise.all(responseJson.results.map(findYoutubeVideo))
+    .then(results => {
+      results = removeDuplicates(results.filter((result) => !!result));
+      res.send(results);
+    });
+  }).catch(() => {
+    res.send('[]');
+  })
 });
 
 router.get('*', (req, res) => {
