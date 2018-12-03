@@ -22,7 +22,7 @@ const COLUMN_WIDTH_MAPPING = {
   'album': 0.25,
   'createdAt': 0.2
 }
-const ELEMENT_HEIGHT = 41;
+const ELEMENT_HEIGHT = 40;
 const HEADER_HEIGHT = 50;
 
 class PlaylistView extends React.Component {
@@ -31,6 +31,7 @@ class PlaylistView extends React.Component {
     this.state = this.getStateFromprops(props);
     this.SortableContainer = SortableContainer(createSortableList(this), { withRef: true });
     this.SortableElement = SortableElement(this.sortableItem);
+    this._lastRenderScrollTop = 0;
     Player.addOnSongChangeListener(this.songChange);
     Playlist.addOnChangeListener(this.songChange);
   }
@@ -206,7 +207,10 @@ class PlaylistView extends React.Component {
 
   @autobind
   onScroll(event) {
-    this._mounted && this.setState(this.determineStateForElementsToShow(event.target.scrollTop, event.target.clientHeight, this.state.playlist));
+    if (Math.abs(this._lastRenderScrollTop - event.currentTarget.scrollTop) > ELEMENT_HEIGHT) {
+      this._lastRenderScrollTop = event.currentTarget.scrollTop;
+      this._mounted && this.setState(this.determineStateForElementsToShow(event.currentTarget.scrollTop, event.currentTarget.clientHeight, this.state.playlist));
+    }
   }
 
   @autobind
@@ -275,19 +279,6 @@ class PlaylistView extends React.Component {
     );
   }
 
-  @autobind
-  sortableList({items}) {
-    return (
-      <tbody>
-        <tr height={this.state.topSpacerHeight}></tr>
-        {items.map((value, index) =>
-          <this.SortableElement key={`item-${value.id}`} index={this.state.firstIndex + index} value={value} />
-        )}
-        <tr height={this.state.bottomSpacerHeight}></tr>
-      </tbody>
-    );
-  }
-
   _searchFor(searchText, event) {
     this.props.history.push(`/search/${searchText}`);
     event.preventDefault();
@@ -301,11 +292,11 @@ function createSortableList(parentRef) {
     render() {
       return (
         <tbody>
-          <tr height={parentRef.state.topSpacerHeight}></tr>
+          <tr className="spacer" height={parentRef.state.topSpacerHeight}></tr>
           {this.props.items.map((value, index) =>
             <parentRef.SortableElement key={`item-${value.id}`} index={parentRef.state.firstIndex + index} value={value} />
           )}
-          <tr height={parentRef.state.bottomSpacerHeight}></tr>
+          <tr className="spacer" height={parentRef.state.bottomSpacerHeight}></tr>
         </tbody>
       );
     }

@@ -227,27 +227,44 @@ body, html {
 
 .song-table {
   margin-bottom: 0;
+  table-layout: fixed;
   user-select: none;
 
-  thead > tr > th {
-    padding-left: 0;
-    cursor: pointer;
+  thead > tr {
+    :first-child {
+      width: 35%;
+    }
 
-    > i {
-      margin-left: 5px;
+    :last-child {
+      width: 15%;
+    }
+
+    > th {
+      padding-left: 0;
+      cursor: pointer;
+
+      > i {
+        margin-left: 5px;
+      }
     }
   }
 
-  tbody > tr > td {
-    line-height: 40px;
-    overflow: hidden;
-    padding: 0;
-    padding-right: 15px;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-    white-space: nowrap;
-    border-top: none;
-    width: 25%;
+  tbody > tr {
+    &:not(.spacer) {
+      height: 40px;
+    }
+
+    > td {
+      line-height: 40px;
+      overflow: hidden;
+      padding: 0;
+      padding-right: 15px;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+      white-space: nowrap;
+      border-top: none;
+      width: 25%;
+    }
   }
 }
 
