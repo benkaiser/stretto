@@ -27,17 +27,21 @@ class ContextMenu extends React.Component {
   }
 
   render() {
-    if (!this.state.song) {
+    if (!this.state.items || !this.state.items[0]) {
       return null;
     }
-    return this.state.song.inLibrary ? this._inLibraryMenu() : this._importMenu();
+    return this._allInLibrary() ? this._inLibraryMenu() : this._importMenu();
+  }
+
+  _allInLibrary() {
+    return this.state.items.every(item => item.inLibrary);
   }
 
   _inLibraryMenu() {
     return (
       <div className={`dropdownContainer`} style={this.dropdownStyle()}>
         <ul className={`dropdown-menu ${this.openStyle()}`}>
-          <MenuItem onClick={this.editDetails}>Edit track</MenuItem>
+          { this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem> }
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>
           { this.state.playlist && this.state.playlist.editable &&
             <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>
@@ -75,14 +79,16 @@ class ContextMenu extends React.Component {
 
   @autobind
   addToLibrary() {
-    const newSong = Song.create(this.state.song);
-    Playlist.getByTitle(Playlist.LIBRARY).addSong(newSong);
+    this.state.items.map(song => {
+      const newSong = Song.create(song);
+      Playlist.getByTitle(Playlist.LIBRARY).addSong(newSong);
+    });
   }
 
   @autobind
   editDetails() {
     window.lastRoute = this.props.history.location.pathname;
-    this.props.history.push('/edit/' + this.state.song.id);
+    this.props.history.push('/edit/' + this.state.items[0].id);
   }
 
   @autobind
@@ -96,30 +102,36 @@ class ContextMenu extends React.Component {
   }
 
   onItemClick(playlist) {
-    playlist.addSong(this.state.song);
+    this.state.items.map(song => {
+      playlist.addSong(song);
+    });
     this.hide();
   }
 
   @autobind
   onRemoveFromLibraryClick() {
-    Playlist.fetchAll().map((playlist) => {
-      playlist.removeSong(this.state.song);
+    this.state.items.map(song => {
+      Playlist.fetchAll().map((playlist) => {
+        playlist.removeSong(song);
+      });
+      Song.remove(song);
     });
-    Song.remove(this.state.song);
     this.hide();
   }
 
   @autobind
   onRemoveFromPlaylistClick() {
-    this.state.playlist.removeSong(this.state.song);
+    this.state.items.map(song => {
+      this.state.playlist.removeSong(song);
+    });
     this.hide();
   }
 
-  open(song, event, playlist) {
+  open(items, event, playlist) {
     this.setState({
       open: true,
       playlist: playlist,
-      song: song,
+      items: items,
       xPosition: event.clientX,
       yPosition: event.clientY
     });
@@ -145,10 +157,8 @@ class ContextMenu extends React.Component {
     }
   }
 
-
-
-  static open(song, event, playlist) {
-    return ContextMenu._component.open(song, event, playlist);
+  static open(items, event, playlist) {
+    return ContextMenu._component.open(items, event, playlist);
   }
 }
 

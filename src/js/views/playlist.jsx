@@ -86,9 +86,37 @@ class PlaylistView extends React.Component {
     return COLUMN_WIDTH_MAPPING[column] * this.state.width;
   }
 
-  clickSong(song) {
-    Player.play(song, this.state.playlist);
-    this.setState();
+  clickSong(song, event) {
+    if (event.ctrlKey) {
+      if (this.state.selected.includes(song.id)) {
+        this.setState({
+          selected: this.state.selected.filter(id => song.id !== id)
+        });
+      } else {
+        this.setState({
+          selected: [...this.state.selected, song.id],
+          lastSelected: song.id
+        });
+      }
+      return;
+    } else if (event.shiftKey) {
+      this.setState({
+        selected: [
+          ...this.state.selected,
+          ...this._songsIdsBetween(
+            song.id, this.state.lastSelected || (Player.currentSong ? Player.currentSong.id : '')
+          ).filter(id => !this.state.selected.includes(id))
+        ],
+        lastSelected: song.id
+      });
+      return;
+    } else {
+      this.setState({
+        selected: [song.id],
+        lastSelected: song.id
+      })
+      Player.play(song, this.state.playlist);
+    }
   }
 
   contentContainer() {
@@ -111,13 +139,19 @@ class PlaylistView extends React.Component {
     };
   }
 
+  getPlaylistFromProps(props) {
+    return Playlist.getByTitle(props.match.params.playlist);
+  }
+
   getStateFromprops(props) {
-    const playlist = Playlist.getByTitle(props.match.params.playlist);
+    const playlist = this.getPlaylistFromProps(props);
     const state = this.determineStateForElementsToShow(0, window.innerHeight, playlist);
     state.sortColumn = playlist.sortColumn || undefined;
     state.sortDirection = playlist.sortDirection || SortDirection.NONE;
     state.playlist = playlist;
     state.width = this.state ? this.state.width : 1000;
+    state.selected = [];
+    state.lastSelected = undefined;
     return state;
   }
 
@@ -154,9 +188,12 @@ class PlaylistView extends React.Component {
     );
   }
 
-  isCurrentSongPlaying(songId) {
-    let currentSongId = Player.currentSong ? Player.currentSong.id : '';
-    return songId === currentSongId;
+  isCurrentlyPlaying(songId) {
+    return songId === (Player.currentSong ? Player.currentSong.id : '');
+  }
+
+  isSelected(songId) {
+    return this.state.selected.includes(songId);
   }
 
   itemForColumn(column, song) {
@@ -174,11 +211,9 @@ class PlaylistView extends React.Component {
             {song.title}
           </td>
         );
-        break;
       case 'createdAt':
       case 'updatedAt':
         return <td key={key} {...props}>{moment(song[column]).fromNow()}</td>;
-        break;
       case 'artist':
       case 'album':
         return <td key={key} {...props} onClick={this._searchFor.bind(this, song[column])} role='link' className='searchable'>{song[column]}</td>;
@@ -221,7 +256,7 @@ class PlaylistView extends React.Component {
   }
 
   rightClickSong(song, event) {
-    ContextMenu.open(song, event, this.state.playlist);
+    ContextMenu.open(this._contextMenuItems(song), event, this.state.playlist);
     event.preventDefault();
   }
 
@@ -242,7 +277,10 @@ class PlaylistView extends React.Component {
   @autobind
   songChange() {
     const scrollContainer = this.contentContainer();
-    this.setState(this.determineStateForElementsToShow(scrollContainer.scrollTop, scrollContainer.clientHeight, this.state.playlist));
+    this.setState({
+      ...this.determineStateForElementsToShow(scrollContainer.scrollTop, scrollContainer.clientHeight, this.state.playlist),
+      ...this._newSelectedState(Player.currentSong && Player.currentSong ? Player.currentSong.id : '')
+    });
   }
 
   @autobind
@@ -271,7 +309,7 @@ class PlaylistView extends React.Component {
   @autobind
   sortableItem({value}) {
     return (
-      <tr className={ this.isCurrentSongPlaying(value.id) ? 'bg-primary' : '' }
+      <tr className={ this._classForId(value.id) }
           onClick={this.clickSong.bind(this, value)}
           onContextMenu={this.rightClickSong.bind(this, value)}>
         { COLUMNS.map((column) => this.itemForColumn(column, value)) }
@@ -284,6 +322,43 @@ class PlaylistView extends React.Component {
     event.preventDefault();
     event.stopPropagation();
     return false;
+  }
+
+  _songsIdsBetween(firstId, secondId) {
+    const firstIndex = this.state.playlist.songData.findIndex(song => song.id === firstId);
+    const secondIndex = this.state.playlist.songData.findIndex(song => song.id === secondId);
+    if (firstIndex >= 0 && secondIndex >= 0) {
+      return this.state.playlist.songData.slice(Math.min(firstIndex, secondIndex), Math.max(firstIndex, secondIndex) + 1).map(song => song.id);
+    } else {
+      return [firstId, secondId];
+    }
+  }
+
+  _newSelectedState(newSongId) {
+    if (this.state.selected.length > 1) {
+      return {};
+    } else {
+      return {
+        selected: [newSongId],
+        lastSelected: newSongId
+      };
+    }
+  }
+
+  _classForId(id) {
+    if (this.state.selected.length > 1 || this.state.selected[0] && !this.isCurrentlyPlaying(this.state.selected[0])) {
+      return this.isSelected(id) ? 'bg-info' : '';
+    } else {
+      return this.isCurrentlyPlaying(id) ? 'bg-primary' : '';
+    }
+  }
+
+  _contextMenuItems(song) {
+    if (this.state.selected.length > 1) {
+      return this.state.selected.map(id => this.state.playlist.songData.find(song => song.id === id));
+    } else {
+      return [song];
+    }
   }
 }
 

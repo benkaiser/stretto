@@ -7,13 +7,8 @@ import PlaylistView from './playlist';
 import autobind from 'autobind-decorator';
 
 class Search extends PlaylistView {
-  getStateFromprops(props) {
-    const playlist = this._createPlaylistForSearch(props.match.params.search);
-    const state = this.determineStateForElementsToShow(0, window.innerHeight, playlist);
-    state.sortColumn = playlist.sortColumn || undefined;
-    state.sortDirection = playlist.sortDirection || SortDirection.NONE;
-    state.playlist = playlist;
-    return state;
+  getPlaylistFromProps(props) {
+    return this._createPlaylistForSearch(props.match.params.search);
   }
 
   headerButtons() {

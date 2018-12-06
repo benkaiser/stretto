@@ -164,6 +164,7 @@ export default class Playlist {
 
   set rawSongs(songs) {
     this._rawSongs = songs;
+    this.songs = songs.map(song => song.id);
     delete this._songData;
   }
 

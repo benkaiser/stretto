@@ -18,7 +18,8 @@ module.exports = {
             'transform-decorators-legacy',
             [
               'transform-react-jsx'
-            ]
+            ],
+            'transform-object-rest-spread'
           ]
         }
       },
