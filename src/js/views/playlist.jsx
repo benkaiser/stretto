@@ -1,8 +1,9 @@
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { Label, DropdownButton, MenuItem } from 'react-bootstrap';
 import Bootbox from '../services/bootbox';
 import ContextMenu from './context_menu';
 import * as React from 'react';
+import Lyrics from '../services/lyrics';
 import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
 import autobind from 'autobind-decorator';
@@ -39,6 +40,7 @@ class PlaylistView extends React.Component {
   componentDidMount() {
     this.contentContainer().addEventListener('scroll', this.onScroll);
     PlaylistView.lastScrollTop && this.scrollAndReset();
+    Lyrics.addListener(this._onLyricsFound);
     this.setState({
       width: this.contentContainer().width
     });
@@ -54,6 +56,7 @@ class PlaylistView extends React.Component {
     this.contentContainer().removeEventListener('scroll', this.onScroll);
     Player.removeOnSongChangeListener(this.songChange);
     Playlist.removeOnChangeListener(this.songChange);
+    Lyrics.removeListener(this._onLyricsFound);
     this._mounted = false;
   }
 
@@ -197,28 +200,24 @@ class PlaylistView extends React.Component {
   }
 
   itemForColumn(column, song) {
-    const props = {
-      style: {
-        width: `${this.cellWidthForColumn(column)}px`
-      }
-    };
     const key = column;
     switch (column) {
       case 'title':
         return (
-          <td key={key} {...props}>
+          <td className='titleItemColumn' key={key}>
             <div className='cover' style={{'backgroundImage': `url('${song.cover}')`}}></div>
-            {song.title}
+            <div className='titleItemText'>{song.title}</div>
+            { this.isCurrentlyPlaying(song.id) && Lyrics.lyrics && this._lyricsButton() }
           </td>
         );
       case 'createdAt':
       case 'updatedAt':
-        return <td key={key} {...props}>{moment(song[column]).fromNow()}</td>;
+        return <td key={key}>{moment(song[column]).fromNow()}</td>;
       case 'artist':
       case 'album':
-        return <td key={key} {...props} onClick={this._searchFor.bind(this, song[column])} role='link' className='searchable'>{song[column]}</td>;
+        return <td key={key} onClick={this._searchFor.bind(this, song[column])} role='link' className='searchable'>{song[column]}</td>;
       default:
-        return <td key={key} {...props}>{song[column]}</td>;
+        return <td key={key}>{song[column]}</td>;
     }
   }
 
@@ -315,6 +314,26 @@ class PlaylistView extends React.Component {
         { COLUMNS.map((column) => this.itemForColumn(column, value)) }
       </tr>
     );
+  }
+
+  _lyricsButton() {
+    return (
+      <div className='lyric-label'>
+        <Label bsStyle="info" onClick={this._onLyricsClick}>Lyrics</Label>
+      </div>
+    );
+  }
+
+  @autobind
+  _onLyricsClick(event) {
+    Lyrics.show();
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  @autobind
+  _onLyricsFound() {
+    this.forceUpdate();
   }
 
   _searchFor(searchText, event) {

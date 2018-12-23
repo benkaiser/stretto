@@ -40,7 +40,9 @@ app.use(session({
   secret: 'stretto-secret',
   store: sessionStore
 }));
-app.use('/proxy', proxy('https://itunes.apple.com'));
+app.use('/itunes', proxy('https://itunes.apple.com'));
+app.use('/azlyrics', proxy('https://www.azlyrics.com/'));
+app.use('/azlyricssearch', proxy('https://search.azlyrics.com'));
 app.use(require('./controllers'));
 require('./controllers/socketio')(io);
 

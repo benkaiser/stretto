@@ -2006,6 +2006,11 @@ hawk@~3.1.3:
     hoek "2.x.x"
     sntp "1.x.x"
 
+he@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/he/-/he-1.1.1.tgz#93410fd21b009735151f8868c2f271f3427e23fd"
+  integrity sha1-k0EP0hsAlzUVH4howvJx80J+I/0=
+
 history@^4.7.2:
   version "4.7.2"
   resolved "https://registry.yarnpkg.com/history/-/history-4.7.2.tgz#22b5c7f31633c5b8021c7f4a8a954ac139ee8d5b"
@@ -2359,6 +2364,13 @@ jodid25519@^1.0.0:
   resolved "https://registry.yarnpkg.com/jodid25519/-/jodid25519-1.0.2.tgz#06d4912255093419477d425633606e0e90782967"
   dependencies:
     jsbn "~0.1.0"
+
+js-azlyrics@^0.2.0:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/js-azlyrics/-/js-azlyrics-0.2.2.tgz#e22353dfeda48213a08ff47ef1b7304d4084964f"
+  integrity sha512-0bQgLMf32D8EcINx+y2D4OPtSKT5m65I6+LNfa9dYNwkGKmG/V3NYwJ7yHnC3CeLcKuwIe64d7NIgMulTPwrcw==
+  dependencies:
+    node-html-parser "^1.1.11"
 
 js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.4.0"
@@ -2908,6 +2920,13 @@ node-gyp@^3.3.1:
     semver "~5.3.0"
     tar "^2.0.0"
     which "1"
+
+node-html-parser@^1.1.11:
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/node-html-parser/-/node-html-parser-1.1.11.tgz#aa42738efb0899ab1ec50651e07dae9344a427c7"
+  integrity sha512-KOjvmbk0yWuy/cN8uqk6bVYS0Lue+jVWcLO/zmnCtz8FPXhj00apBN376FoM6QmFMMbJwXQdKf5ko6G1S6bnrw==
+  dependencies:
+    he "1.1.1"
 
 node-libs-browser@^0.7.0:
   version "0.7.0"

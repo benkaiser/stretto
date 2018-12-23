@@ -1,5 +1,6 @@
 import AccountManager from './services/account_manager';
 import Keyboard from './initialisers/keyboard';
+import Lyrics from './services/lyrics';
 import ModelInitialiser from './models/initialiser';
 import Player from './services/player';
 import RootView from './views/root';
@@ -13,6 +14,7 @@ class Loader {
     Theme.initialise();
     ModelInitialiser.initialise();
     RootView.initialise();
+    Lyrics.initialise();
   }
 }
 

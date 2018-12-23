@@ -4,7 +4,8 @@ import bsn from 'bootstrap.native';
 
 const TYPES = {
   CONFIRM: 1,
-  PROMPT: 2
+  PROMPT: 2,
+  SHOW: 3
 }
 
 export default class Bootbox extends React.Component {
@@ -31,7 +32,7 @@ export default class Bootbox extends React.Component {
       <div className='modal fade' ref={(modal) => this.modal = modal} tabIndex='-1' role='dialog' aria-hidden='true'>
         <div className='modal-dialog'>
           <div className='modal-content'>
-            { this.state.type === TYPES.PROMPT &&
+            { (this.state.type === TYPES.PROMPT || this.state.type === TYPES.SHOW) &&
               <div className='modal-header'>
                 { closeBtn }
                 <h4 className='modal-title'>{this.state.message}</h4>
@@ -43,11 +44,14 @@ export default class Bootbox extends React.Component {
                 <input className='form-control' autoComplete='off' type='text' value={this.state.value} onChange={this.handleChange}  /> }
               { this.state.type === TYPES.CONFIRM &&
                 <p>{this.state.message}</p> }
+              { this.state.type === TYPES.SHOW && this.state.contents }
             </div>
-            <div className='modal-footer'>
-              <button type='button' className='btn btn-default' onClick={this.onCancel}>Cancel</button>
-              <button type='button' className='btn btn-primary' onClick={this.onSuccess}>OK</button>
-            </div>
+            { this.state.type !== TYPES.SHOW && 
+              <div className='modal-footer'>
+                <button type='button' className='btn btn-default' onClick={this.onCancel}>Cancel</button>
+                <button type='button' className='btn btn-primary' onClick={this.onSuccess}>OK</button>
+              </div>
+            }
           </div>
         </div>
       </div>
@@ -101,6 +105,15 @@ export default class Bootbox extends React.Component {
     });
   }
 
+  show(header, contents) {
+    this.setState({
+      type: TYPES.SHOW,
+      contents: contents,
+      message: header
+    });
+    this.bsModal.show();
+  }
+
   reset() {
     this.setState({
       message: undefined,
@@ -115,5 +128,9 @@ export default class Bootbox extends React.Component {
 
   static prompt(message, options) {
     return Bootbox._component.prompt(message);
+  }
+
+  static show(header, contents) {
+    Bootbox._component.show(header, contents);
   }
 }

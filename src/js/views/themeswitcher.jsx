@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Theme from '../theme.js';
+import Theme from '../theme';
 
 class ThemeSwitcher extends React.Component {
   render() {

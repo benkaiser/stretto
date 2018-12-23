@@ -1,4 +1,4 @@
-import Player from '../services/player.js';
+import Player from '../services/player';
 
 const KEYS = {
   SPACE: 32,

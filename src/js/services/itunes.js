@@ -6,7 +6,7 @@ import Youtube from './youtube';
 export default class Itunes {
   static search(searchTerm) {
     searchTerm = encodeURI(searchTerm);
-    let url = `/proxy/search?term=${searchTerm}&entity=song&limit=50&country=us`;
+    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=50&country=us`;
     return fetch(url)
     .then(Utilities.fetchToJson)
     .then((data) => {
@@ -19,7 +19,7 @@ export default class Itunes {
 
   static fetchCover(song) {
     let searchTerm = encodeURI(`${song.title} ${song.artist}`);
-    let url = `/proxy/search?term=${searchTerm}&entity=song&limit=10&country=us`;
+    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=10&country=us`;
     return fetch(url)
     .then(Utilities.fetchToJson)
     .then((data) => {

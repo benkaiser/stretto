@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { withRouter } from 'react-router-dom'
 import ContextMenu from './context_menu';
-import Player from '../services/player.js';
+import Player from '../services/player';
 import autobind from 'autobind-decorator';
 
 class PlayerInfo extends React.Component {
@@ -58,7 +58,7 @@ class PlayerInfo extends React.Component {
 
   @autobind
   rightSongClick(event) {
-    ContextMenu.open(this.state.song, event, Player.playlist);
+    ContextMenu.open([this.state.song], event, Player.playlist);
     event.preventDefault();
   }
 

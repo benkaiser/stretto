@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { withRouter } from 'react-router-dom'
+import Bootbox from '../services/bootbox';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
+import Lyrics from '../services/lyrics';
+import Player from '../services/player';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import autobind from 'autobind-decorator';
@@ -37,11 +40,16 @@ class ContextMenu extends React.Component {
     return this.state.items.every(item => item.inLibrary);
   }
 
+  _hasLyrics() {
+    return !!Lyrics.lyrics && Player.currentSong.id === this.state.items[0].id;
+  }
+
   _inLibraryMenu() {
     return (
       <div className={`dropdownContainer`} style={this.dropdownStyle()}>
         <ul className={`dropdown-menu ${this.openStyle()}`}>
           { this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem> }
+          { this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>}
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>
           { this.state.playlist && this.state.playlist.editable &&
             <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>
@@ -155,6 +163,12 @@ class ContextMenu extends React.Component {
       console.log('errored!');
       return document.body;
     }
+  }
+
+  @autobind
+  _showLyrics() {
+    Lyrics.show();
+    this.hide();
   }
 
   static open(items, event, playlist) {

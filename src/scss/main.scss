@@ -42,6 +42,7 @@ body, html {
   height: 40px;
   margin-right: 10px;
   width: 40px;
+  flex-shrink: 0;
 }
 
 .dropdownContainer {
@@ -80,6 +81,16 @@ body, html {
 
 .logo {
   margin-left: 14px;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.lyric-label {
+  margin-top: -1px;
+  animation: fadein 1s;
 }
 
 .media, .media-body {
@@ -263,7 +274,6 @@ body, html {
       vertical-align: middle;
       white-space: nowrap;
       border-top: none;
-      width: 25%;
     }
   }
 }
@@ -291,6 +301,17 @@ tbody > tr {
 
 .tab-padding {
   padding: 10px;
+}
+
+.titleItemColumn {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.titleItemText {
+  flex-grow: 1;
+  text-overflow: ellipsis;
 }
 
 .visibleModal {
