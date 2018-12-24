@@ -1,4 +1,6 @@
-import autobind from 'autobind-decorator';
+import * as React from 'react';
+import { Button } from 'react-bootstrap';
+import getHistory from 'react-router-global-history'; 
 import Alerter from './alerter';
 
 let readyPromise;
@@ -9,6 +11,7 @@ export default class YoutubePlayer {
     if (options.autoPlay === undefined) options.autoPlay = true;
     options.currentTime = options.currentTime || 0;
     YoutubePlayer.readyPromise().then(() => {
+      YoutubePlayer.song = song;
       YoutubePlayer.player.cueVideoById(song.originalId, options.currentTime, 'default');
        options.autoPlay && YoutubePlayer.player.playVideo();
     });
@@ -80,7 +83,14 @@ export default class YoutubePlayer {
 
 
   static onYoutubePlayerError(error) {
-    Alerter.error('Error occured in youtube playback. See console for more information.');
+    const errorSong = YoutubePlayer.song;
+    errorSong && Alerter.error(<p>
+      Unable to play youtube backing track.
+      <Button onClick={() => {
+        window.lastRoute = getHistory().location.pathname;
+        getHistory().push('/edit/' + errorSong.id);
+      }}>Edit Track</Button>
+    </p>);
     console.error(`Youtube playback error: ${error.data}`);
     console.error(error);
     YoutubePlayer.endHandler();

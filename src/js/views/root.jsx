@@ -1,6 +1,7 @@
 import { render } from 'react-dom';
 import * as React from 'react';
 import { browserHistory, Switch, Route, BrowserRouter } from 'react-router-dom';
+import { ReactRouterGlobalHistory } from 'react-router-global-history';
 import Add from './add';
 import Edit from './edit';
 import Intro from './intro';
@@ -17,6 +18,7 @@ class RegularRoutes extends React.Component {
   render() {
     return (
       <Layout>
+        <ReactRouterGlobalHistory />
         <Switch>
           <Route path='/add' component={Add} />
           <Route path='/edit/:id' component={Edit} />
