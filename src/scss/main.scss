@@ -312,6 +312,7 @@ tbody > tr {
 .titleItemText {
   flex-grow: 1;
   text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .visibleModal {
