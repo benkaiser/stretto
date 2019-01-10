@@ -3,6 +3,7 @@ import * as React from 'react';
 import { browserHistory, Switch, Route, BrowserRouter } from 'react-router-dom';
 import { ReactRouterGlobalHistory } from 'react-router-global-history';
 import Add from './add';
+import Discover from './discover';
 import Edit from './edit';
 import Intro from './intro';
 import Import from './import';
@@ -29,6 +30,7 @@ class RegularRoutes extends React.Component {
           <Route path='/sync' component={Sync} />
           <Route path='/playlist/:playlist' component={Playlist} />
           <Route path='/search/:search' component={Search} />
+          <Route path='/discover' component={Discover} />
           <Route exact component={Intro} />
         </Switch>
       </Layout>
@@ -36,7 +38,7 @@ class RegularRoutes extends React.Component {
   }
 }
 
-class RootViewLoader {
+export default class RootViewLoader {
   static initialise() {
     render((
       <div>
@@ -50,5 +52,3 @@ class RootViewLoader {
     ), document.getElementById('react'));
   }
 }
-
-module.exports = RootViewLoader;
