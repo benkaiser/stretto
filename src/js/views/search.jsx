@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button } from 'react-bootstrap';
 import Itunes from '../services/itunes';
 import Player from '../services/player';
-import Playlist, { SortDirection } from '../models/playlist';
+import Playlist from '../models/playlist';
 import PlaylistView from './playlist';
 import autobind from 'autobind-decorator';
 

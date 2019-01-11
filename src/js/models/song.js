@@ -1,3 +1,5 @@
+import Youtube from '../services/youtube';
+
 let listeners = [];
 let songs = [];
 
@@ -7,6 +9,7 @@ class Song {
     this.artist = attrs.artist || '';
     this.cover = attrs.cover || 'https://unsplash.it/g/512?random&' + attrs.id;
     this.createdAt = attrs.createdAt || +new Date();
+    this.deferred = attrs.deferred || false;
     this.discNumber = attrs.discNumber || 0;
     this.duration = attrs.duration || 0;
     this.explicit = attrs.explicit || false;
@@ -47,6 +50,17 @@ class Song {
     } else if (this.isSoundcloud && id.indexOf('s_') !== 0) {
       this.id = 's_' + this.id;
     }
+  }
+
+  getTrack() {
+    return Youtube.search(`${this.title} ${this.artist} lyrics`, { maxResults: 1 }).then(([youtubeItem]) => {
+      if (!youtubeItem) { throw new Error('Unable to find youtube matches'); }
+      this.deferred = undefined;
+      this.duration = youtubeItem.duration;
+      this.id = 'y_' + youtubeItem.id;
+      this.isYoutube = true;
+      return this;
+    });
   }
 
   get originalId() {

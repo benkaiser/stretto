@@ -26,6 +26,7 @@ class Sidebar extends React.Component {
           </h3>
           <SearchBox />
           <ul className='nav nav-pills nav-stacked'>
+            <li key='discover'><Link to='/discover'>Discover</Link></li>
             <li className='dropdown-header'>Your Music</li>
             { Playlist.fetchAll().map((playlist) =>
               <li key={'playlist_' + playlist.title}>

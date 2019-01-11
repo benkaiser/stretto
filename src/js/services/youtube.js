@@ -52,6 +52,8 @@ export default class Youtube {
       gapi.client.youtube.search.list({
         maxResults: maxResults,
         q: query,
+        type: 'video',
+        videoEmbeddable: true,
         part: 'snippet'
       })
     )

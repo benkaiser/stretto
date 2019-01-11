@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { withRouter } from 'react-router-dom'
+import Alerter from '../services/alerter';
 import Bootbox from '../services/bootbox';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Lyrics from '../services/lyrics';
@@ -74,10 +75,12 @@ class ContextMenu extends React.Component {
   }
 
   dropdownStyle() {
-    const yPosition = this.dropup() ? this.state.yPosition - DROPDOWN_HEIGHT : this.state.yPosition;
+    const topDistance = this.dropup() ? '' : this.state.yPosition + 'px';
+    const bottomDistance = this.dropup() ? (window.innerHeight - this.state.yPosition) + 'px' : '';
     return {
       left: `${this.state.xPosition}px`,
-      top: `${yPosition}px`
+      top: `${topDistance}`,
+      bottom: `${bottomDistance}`
     };
   }
 
@@ -88,8 +91,11 @@ class ContextMenu extends React.Component {
   @autobind
   addToLibrary() {
     this.state.items.map(song => {
-      const newSong = Song.create(song);
-      Playlist.getByTitle(Playlist.LIBRARY).addSong(newSong);
+      (song.deferred ? song.getTrack() : Promise.resolve()).then(() => {
+        const newSong = Song.create(song);
+        Playlist.getByTitle(Playlist.LIBRARY).addSong(newSong);
+        Alerter.success('Added "' + song.title + '" to Library');
+      });
     });
   }
 

@@ -23,7 +23,9 @@ export default class Playlist {
     this.title = attrs.title || '';
     this.editable = attrs.title != Playlist.LIBRARY;
     this.updatedAt = attrs.updatedAt || +new Date();
-    this._rawsongs = attrs.rawSongs;
+    if (attrs.rawSongs) {
+      this.rawSongs = attrs.rawSongs;
+    }
   }
 
   addSong(song) {
