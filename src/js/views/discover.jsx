@@ -9,12 +9,12 @@ export default class Discover extends React.Component {
         <h1>Top Charts</h1>
         <Row>
           <Col md={3} xs={12}>
-            <p>Top Songs</p>
-            <ItunesChart chartType='top' />
+            <h2>Top Songs</h2>
+            <ItunesChart />
           </Col>
           <Col md={3} xs={12}>
-            <p>Top Electronic</p>
-            
+            <h2>Top Pop</h2>
+            <ItunesChart chartOptions={ { genreCode: 14 } } />            
           </Col>
         </Row>
       </div>

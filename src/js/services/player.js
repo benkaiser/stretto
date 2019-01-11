@@ -78,7 +78,10 @@ class Player {
     }
 
     this.currentPlayer && this.currentPlayer.dispose();
-    this.currentPlayer = this.getPlayerFor(this.currentSong, options);
+    (this.currentSong.deferred ? this.currentSong.getTrack() : Promise.resolve())
+    .then(() => {
+      this.currentPlayer = this.getPlayerFor(this.currentSong, options);
+    });
   }
 
   @autobind
