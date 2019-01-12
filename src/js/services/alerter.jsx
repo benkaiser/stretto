@@ -71,7 +71,3 @@ export class AlerterContainer extends React.Component {
     )
   }
 }
-
-setTimeout(() => {
-  window.temp1 = Alerter;
-}, 3000);
