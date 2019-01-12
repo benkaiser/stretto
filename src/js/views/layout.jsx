@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Sidebar from './sidebar';
-import Alerter from '../services/alerter';
+import { AlerterContainer } from '../services/alerter';
 import Bootbox from '../services/bootbox';
 import ContextMenu from './context_menu';
 
@@ -17,7 +17,7 @@ class Layout extends React.Component {
           {this.props.children}
         </div>
         <Bootbox />
-        <Alerter />
+        <AlerterContainer />
         <ContextMenu />
       </div>
     );

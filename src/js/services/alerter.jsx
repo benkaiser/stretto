@@ -1,12 +1,11 @@
-import AlertContainer from 'react-alert';
+import { Provider, withAlert } from 'react-alert';
 import * as React from 'react';
 
 const ALERT_OPTIONS = {
-  offset: 30,
+  offset: '10px',
   position: 'top right',
-  theme: 'dark',
-  time: 5000,
-  transition: 'fade'
+  timeout: 5000,
+  transition: 'scale'
 }
 
 export default class Alerter extends React.Component {
@@ -31,14 +30,48 @@ export default class Alerter extends React.Component {
   }
 
   render() {
-    return (
-      <AlertContainer ref={alert => this._alertRef = alert} {...ALERT_OPTIONS} />
-    );
+    return null;
   }
 
   alert(message, type) {
-    this._alertRef.show(message, {
+    this.props.alert.show(message, {
       type: type
     });
   }
 }
+
+class AlertTemplate extends React.Component {
+  render() {
+    let { style, options, message, close } = this.props;
+    if (style) {
+      style = {
+        ...style,
+        marginRight: '25px'
+      };
+    }
+    let type = options.type;
+    type == 'error' && (type = 'danger');
+    return (
+      <div style={style} className={'alert alerter-alert alert-dismissable alert-' + type}>
+        <button type="button" className="close" data-dismiss="alert" onClick={close}>×</button>
+        {message}
+      </div>
+    );
+  }
+}
+
+const AlerterWithAlert = withAlert(Alerter);
+
+export class AlerterContainer extends React.Component {
+  render() {
+    return (
+      <Provider template={AlertTemplate} {...ALERT_OPTIONS}>
+        <AlerterWithAlert />
+      </Provider>
+    )
+  }
+}
+
+setTimeout(() => {
+  window.temp1 = Alerter;
+}, 3000);

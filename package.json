@@ -38,7 +38,7 @@
     "nodemon": "^1.11.0",
     "pug": "^2.0.0-beta6",
     "react": "^16.5.0",
-    "react-alert": "^2.2.0",
+    "react-alert": "^4.0.4",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.5.0",
     "react-router": "^4.3.1",
