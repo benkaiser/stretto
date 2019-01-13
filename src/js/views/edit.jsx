@@ -11,6 +11,10 @@ export default class Edit extends React.Component {
   constructor(props) {
     super(props);
     const track = Song.findById(this.props.match.params.id);
+    if (!track) {
+      this.cancel();
+      return;
+    }
     this.state = {
       album: track.album,
       artist: track.artist,
@@ -23,6 +27,9 @@ export default class Edit extends React.Component {
   }
 
   render() {
+    if (!this.state || !this.state.track) {
+      return null;
+    }
     return (
       <div className='edit'>
         <div className='row'>
