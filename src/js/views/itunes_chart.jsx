@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 import Spinner from 'react-spinkit';
 import autobind from 'autobind-decorator';
 
@@ -12,9 +12,10 @@ export default class ItunesChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loaded: false
+      loaded: false,
+      loadedAll: false
     };
-    this._fetchChart();
+    this._fetchChart(props);
     this.isDisposed = false;
   }
 
@@ -22,13 +23,17 @@ export default class ItunesChart extends React.Component {
     this.isDisposed = true;
   }
 
+  componentWillReceiveProps(props) {
+    this._fetchChart(props);
+  }
+
   render() {
     if (this.state.loaded) {
       return (
         <div>
           <ListGroup>
-          { this.state.playlist.songData.map(item => 
-            <ListGroupItem key={item.title} onClick={this._playSong.bind(this, item)} onContextMenu={this._rightSongClick.bind(this, item)}>
+          { this.state.playlist.songData.map((item, index) => 
+            <ListGroupItem key={index} onClick={this._playSong.bind(this, item)} onContextMenu={this._rightSongClick.bind(this, item)}>
               <div className='chartInnerContainer'>
                 <img className='chartImage' src={item.cover.replace(/600x600/, '50x50')} alt='cover art' />
                 <div className='chartInformation'>
@@ -38,7 +43,12 @@ export default class ItunesChart extends React.Component {
               </div>
             </ListGroupItem>
             )}
-          </ListGroup>;
+          </ListGroup>
+          { !this.state.loadedAll && 
+            <Button bsStyle="primary" block onClick={this._loadMore}>
+              Load All
+            </Button>
+          }
         </div>
       )
     } else {
@@ -47,13 +57,21 @@ export default class ItunesChart extends React.Component {
   }
 
   @autobind
+  _loadMore() {
+    this._fetchChart(this.props, true);
+  }
+
+  @autobind
   _rightSongClick(song, event) {
     ContextMenu.open([song], event, Player.playlist);
     event.preventDefault();
   }
 
-  _fetchChart() {
-    Itunes.fetchChart(this.props.chartOptions)
+  _fetchChart(props, loadAll) {
+    Itunes.fetchChart({
+      ...props.chartOptions,
+      limit: loadAll ? 200 : 20
+    })
     .then(results => {
       if (this.isDisposed) {
         return;
@@ -64,7 +82,8 @@ export default class ItunesChart extends React.Component {
       });
       this.setState({
         playlist: playlist,
-        loaded: true
+        loaded: true,
+        loadedAll: loadAll
       });
     });
   }

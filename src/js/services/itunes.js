@@ -10,7 +10,7 @@ export default class Itunes {
     options.limit = options.limit || 20;
     const countryCode = ItunesCountry.current();
     const genreSection = options.genreCode ? `/genre=${options.genreCode}` : '';
-    return `/itunes/${countryCode}/rss/topsongs/limit=20${genreSection}/json`;
+    return `/itunes/${countryCode}/rss/topsongs/limit=${options.limit}${genreSection}/json`;
   }
 
   static search(searchTerm) {

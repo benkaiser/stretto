@@ -1,3 +1,8 @@
+.addPlaylist {
+  float: right;
+  padding: 4px;
+}
+
 .alerter-alert {
   max-width: 300px;
   width: 300px;
@@ -85,6 +90,10 @@ body, html {
 .duration-slider {
   text-align: center;
   margin-bottom: 14px;
+}
+
+.genreDropdown {
+  float: right;
 }
 
 .image-preview {
