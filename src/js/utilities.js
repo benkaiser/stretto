@@ -7,6 +7,19 @@ export default class Utilities {
     return response.json();
   }
 
+  static fetchToCSV(response) {
+    return response.text().then(text => {
+      return text.split('\n').map(line => {
+        if (line === '') {
+          return undefined;
+        }
+        return (line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || []).map(cell => {
+          return cell.replace(/(^"|"$)/g, '');
+        });
+      }).filter(item => item !== undefined);
+    });
+  }
+
   // modified from: https://stackoverflow.com/a/11486026/485048
   static timeFormat(seconds) {
     let hrs = ~~(seconds / 3600);

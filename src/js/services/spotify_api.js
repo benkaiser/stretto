@@ -1,14 +1,58 @@
 import SpotifyWebAPI from 'spotify-web-api-js';
 import async from 'async';
 import autobind from 'autobind-decorator';
+import fetchJsonp from 'fetch-jsonp';
+
+import Country from '../country';
+import Song from '../models/song';
 import SpotifyImporter from './spotify_importer';
 import Utilities from '../utilities';
 
+
 const SpotifyExternalAPI = new SpotifyWebAPI();
+
+const chartMap = {
+  'top': 'regional',
+  'viral': 'viral'
+};
 
 export default class SpotifyAPI {
   static get instance() {
     return SpotifyAPI.__instance || (SpotifyAPI.__instance = new SpotifyAPI());
+  }
+
+  static fetchChart(type) {
+    type = chartMap[type];
+    return fetch(`/spotifycharts/${type}/${Country.current()}/daily/latest/download`)
+    .then(Utilities.fetchToCSV)
+    .then(data => {
+      data = data.slice(type === 'regional' ? 2 : 1);
+      return Promise.all(data.map(entry => {
+        return SpotifyAPI.fetchCover(entry[entry.length-1].replace('https://open.spotify.com/track/', ''))
+        .then(coverUrl => {
+          return new Song({
+            title: entry[1],
+            artist: entry[2],
+            album: 'Unknown Album',
+            cover: coverUrl,
+            deferred: true
+          });
+        }).catch(error => {
+          console.error(error);
+          return undefined;
+        })
+      })).then(results => results.filter(result => !!result));
+    });
+  }
+
+  static fetchCover(trackId) {
+    return fetchJsonp(`https://embed.spotify.com/oembed?url=spotify:track:${trackId}`, {
+      jsonpCallbackFunction: `jsonp${Date.now()}${Math.ceil(Math.random() * 100000)}`
+    })
+    .then(Utilities.fetchToJson)
+    .then(result => {
+      return result.thumbnail_url;
+    }); 
   }
 
   get connected() {

@@ -1,21 +1,21 @@
 import Constants from '../constants';
+import Country from '../country';
 import Song from '../models/song';
 import Utilities from '../utilities';
 import Youtube from './youtube';
-import ItunesCountry from '../itunes_country';
 
 export default class Itunes {
   static chartUrl(options) {
     options = options || {};
     options.limit = options.limit || 20;
-    const countryCode = ItunesCountry.current();
+    const countryCode = Country.current();
     const genreSection = options.genreCode ? `/genre=${options.genreCode}` : '';
     return `/itunes/${countryCode}/rss/topsongs/limit=${options.limit}${genreSection}/json`;
   }
 
   static search(searchTerm) {
     searchTerm = encodeURI(searchTerm);
-    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=50&country=` + ItunesCountry.current();
+    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=50&country=` + Country.current();
     return fetch(url)
     .then(Utilities.fetchToJson)
     .then((data) => {
@@ -28,7 +28,7 @@ export default class Itunes {
 
   static fetchCover(song) {
     let searchTerm = encodeURI(`${song.title} ${song.artist}`);
-    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=10&country=` + ItunesCountry.current();
+    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=10&country=` + Country.current();
     return fetch(url)
     .then(Utilities.fetchToJson)
     .then(data => {

@@ -7,9 +7,9 @@ class ThemeSwitcher extends React.Component {
       <div className='form-group'>
         <label className='col-sm-2 control-label'>Theme</label>
         <div className='col-sm-10'>
-          <select className='form-control input-sm' onChange={this.loadTheme.bind(this)}>
+          <select className='form-control input-sm' onChange={this.loadTheme.bind(this)} defaultValue={Theme.currentTheme()}>
           {Theme.themes().map((theme) =>
-            <option key={theme} value={theme} selected={theme === Theme.currentTheme()}>{theme}</option>
+            <option key={theme} value={theme}>{theme}</option>
           )}
           </select>
         </div>

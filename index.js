@@ -43,6 +43,7 @@ app.use(session({
 app.use('/itunes', proxy('https://itunes.apple.com'));
 app.use('/azlyrics', proxy('https://www.azlyrics.com/'));
 app.use('/azlyricssearch', proxy('https://search.azlyrics.com'));
+app.use('/spotifycharts', proxy('https://spotifycharts.com'));
 app.use(require('./controllers'));
 require('./controllers/socketio')(io);
 

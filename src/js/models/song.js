@@ -7,7 +7,7 @@ class Song {
   constructor(attrs) {
     this.album = attrs.album || '';
     this.artist = attrs.artist || '';
-    this.cover = attrs.cover || 'https://unsplash.it/g/512?random&' + attrs.id;
+    this.cover = attrs.cover || 'https://unsplash.it/g/512?random&' + (attrs.id || 'title=' + attrs.title);
     this.createdAt = attrs.createdAt || +new Date();
     this.deferred = attrs.deferred || false;
     this.discNumber = attrs.discNumber || 0;
