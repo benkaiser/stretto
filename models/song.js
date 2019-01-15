@@ -14,6 +14,7 @@ module.exports = class Song {
     return new Promise((resolve, reject) => {
       SongModel.findOne({ email: email }, (err, doc) => {
         if (err) { return reject(err); }
+        if (!doc) { return reject('Doc isn\'t defined'); }
         resolve(doc.songBlob);
       });
     });
