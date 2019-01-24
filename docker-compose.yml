@@ -2,7 +2,7 @@ mongo:
   image: mongo
 web:
   build: .
-  command: npm run nodemon
+  command: npm run dev
   dockerfile: Dockerfile.local
   environment:
     PORT: 3000

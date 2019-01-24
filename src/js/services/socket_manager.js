@@ -29,6 +29,16 @@ class SocketManager {
     this._socket.on('previous', () => {
       Player.previous();
     });
+
+    if (env.ENV == 'development') {
+      this._socket.on('reconnect', () => {
+        fetch('/static/js/bundle.js').then(response => {
+          if (new Date() - new Date(response.headers.get('last-modified')) < 1000 * 5) {
+            window.location.href = window.location.href;
+          }
+        });
+      });
+    }
   }
 
   join(room) {

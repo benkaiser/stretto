@@ -5,7 +5,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "nodemon": "./node_modules/nodemon/bin/nodemon.js index.js",
+    "dev": "./node_modules/nodemon/bin/nodemon.js index.js & npm run webpack -- --watch",
     "start": "npm run webpack && node --harmony index.js",
     "webpack": "./node_modules/webpack/bin/webpack.js"
   },

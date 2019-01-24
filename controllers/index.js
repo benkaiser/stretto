@@ -143,6 +143,7 @@ router.post('/search', loggedIn, (req, res) => {
 router.get('*', (req, res) => {
   res.render('index', {
     env: {
+      ENV: process.env.ENV || 'production',
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
       SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || ''

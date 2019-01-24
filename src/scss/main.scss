@@ -3,6 +3,11 @@
 .addPlaylist {
   float: right;
   padding: 4px;
+  opacity: 0;
+  transition: opacity 300ms ease 100ms;
+}
+.nav:hover .addPlaylist {
+  opacity: 1;
 }
 
 .alerter-alert {
@@ -372,4 +377,17 @@ tbody > tr {
 
 .visibleModal {
   display: block;
+}
+
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+ 
+::-webkit-scrollbar-track {
+  background: #eee;
+}
+ 
+::-webkit-scrollbar-thumb {
+  background: #999; 
 }

@@ -1,6 +1,6 @@
 {
   "execMap": {
-    "js": "npm run webpack && node --harmony"
+    "js": "node --harmony"
   },
   "ext": "js jsx scss",
   "ignore": ["static/js/bundle.js"]
