@@ -1,3 +1,4 @@
 node_modules/*
-static/*
+/static/*
+!/static/assets/
 .env

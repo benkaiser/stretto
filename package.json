@@ -19,7 +19,7 @@
     "babel-plugin-transform-react-jsx": "^6.8.0",
     "babel-preset-es2015": "^6.18.0",
     "body-parser": "^1.15.2",
-    "bootstrap-slider": "^9.7.2",
+    "bootstrap-slider": "benkaiser/bootstrap-slider",
     "bootstrap.native": "^2.0.10",
     "connect-mongodb-session": "^1.3.0",
     "cookie-parser": "^1.4.3",

@@ -1,3 +1,5 @@
+@import '../../node_modules/bootstrap-slider/dist/css/bootstrap-slider.min.css';
+
 .addPlaylist {
   float: right;
   padding: 4px;
@@ -115,6 +117,24 @@ body, html {
 
 .logo {
   margin-left: 14px;
+  font-size: 28px;
+}
+
+@font-face {
+  font-family: WisdomScript;
+  src: url('/static/assets/wisdom.otf') format("opentype");
+}
+
+.logoText {
+  font-family: WisdomScript;
+  text-decoration: none;
+  font-weight: 300;
+  font-size: 29px;
+  line-height: 1.1;
+
+  &:hover, &:active, &:focus {
+    text-decoration: none;
+  }
 }
 
 @keyframes fadein {
@@ -254,6 +274,7 @@ body, html {
   float: right;
   font-size: 17px;
   margin-right: 14px;
+  margin-top: 5px;
 }
 
 .sidebar-top {

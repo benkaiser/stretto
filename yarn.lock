@@ -788,9 +788,9 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-bootstrap-slider@^9.7.2:
-  version "9.7.2"
-  resolved "https://registry.yarnpkg.com/bootstrap-slider/-/bootstrap-slider-9.7.2.tgz#26e6fc8862189a95615dd0318ee6ca09787751f3"
+bootstrap-slider@benkaiser/bootstrap-slider:
+  version "10.6.0"
+  resolved "https://codeload.github.com/benkaiser/bootstrap-slider/tar.gz/28e27d4db73978faa2420e47dce1c6169a0b8d3d"
 
 bootstrap.native@^2.0.10:
   version "2.0.10"

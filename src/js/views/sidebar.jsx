@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Label } from 'react-bootstrap';
+import { Label, Image } from 'react-bootstrap';
 import Bootbox from '../services/bootbox';
 import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
@@ -19,7 +19,7 @@ class Sidebar extends React.Component {
       <div className='sidebar'>
         <div className='sidebar-top'>
           <h3 className='logo'>
-            <Link to='/' style={{ textDecoration: 'none' }}>Stretto</Link>
+            <Link to='/' className='logoText'>Stretto</Link>
             <Link className='sidebar-icon' to='/settings/' title='Settings'><i className="fa fa-cog"></i></Link>
             <Link className='sidebar-icon' to='/add/' title='Add song'><i className="fa fa-plus"></i></Link>
             <Link className='sidebar-icon' to='/sync/' title='Sync to Cloud'><i className="fa fa-refresh"></i></Link>
