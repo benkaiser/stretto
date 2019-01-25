@@ -6,6 +6,7 @@ import Player from './services/player';
 import RootView from './views/root';
 import SCSS from '../scss/main.scss';
 import Theme from './theme';
+import TitleUpdater from './services/title_updater';
 
 class Loader {
   static loadAll() {
@@ -15,6 +16,7 @@ class Loader {
     ModelInitialiser.initialise();
     RootView.initialise();
     Lyrics.initialise();
+    TitleUpdater.initialise();
   }
 }
 
