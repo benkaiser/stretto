@@ -69,13 +69,13 @@ class Player {
   }
 
   play(song, playlist, options) {
+    if (playlist) {
+      this.playlist = playlist;
+    }
     if (this.currentSong && this.currentSong.id == song.id) {
       return;
     }
     this.updateSong(song);
-    if (playlist) {
-      this.playlist = playlist;
-    }
 
     this.currentPlayer && this.currentPlayer.dispose();
     (this.currentSong.deferred ? this.currentSong.getTrack() : Promise.resolve(this.currentSong))

@@ -10,13 +10,13 @@ import TitleUpdater from './services/title_updater';
 
 class Loader {
   static loadAll() {
+    TitleUpdater.initialise();
     AccountManager.initialise();
     Keyboard.initialise();
     Theme.initialise();
     ModelInitialiser.initialise();
     RootView.initialise();
     Lyrics.initialise();
-    TitleUpdater.initialise();
   }
 }
 
