@@ -82,6 +82,10 @@ body, html {
   flex-shrink: 0;
 }
 
+.displayFlex {
+  display: flex;
+}
+
 .dropdownContainer {
   position: absolute;
 
@@ -114,10 +118,6 @@ body, html {
   height: 100%;
 }
 
-.introPanel {
-  height: 200px;
-}
-
 .introPanelTitle {
   .fa {
     font-size: 40px
@@ -126,6 +126,7 @@ body, html {
   .titleSpan {
     font-size: 30px;
     margin-left: 10px;
+    vertical-align: text-bottom;
   }
 }
 
