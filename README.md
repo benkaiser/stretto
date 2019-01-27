@@ -1,3 +1,7 @@
+## Unmaintained Branch
+
+**Note that this version of Stretto is unmaintained and we recommend upgrading to the new Stretto, available on Github [here](https://github.com/benkaiser/stretto) and hosted [here](https://next.kaiserapps.com/).**
+
 Stretto (previously Node Music Player)
 =================
 #### An open source web-based music player
