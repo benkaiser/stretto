@@ -38,6 +38,17 @@ export default class Intro extends React.Component {
             <Panel bsStyle="primary">
               <Panel.Heading>
                 <Panel.Title componentClass="h3" className='introPanelTitle'>
+                  <i className='fa fa-music' aria-hidden='true'></i>
+                  <span className='titleSpan'>Discover New Music</span>
+                </Panel.Title>
+              </Panel.Heading>
+              <Panel.Body>With access to the top hits from iTunes and Spotify, you can always find new music</Panel.Body>
+            </Panel>
+          </Col>
+          <Col className='displayFlex' lg={4} md={6} sm={12}>
+            <Panel bsStyle="primary">
+              <Panel.Heading>
+                <Panel.Title componentClass="h3" className='introPanelTitle'>
                   <i className='fa fa-headphones' aria-hidden='true'></i>
                   <span className='titleSpan'>Listen Ad Free</span>
                 </Panel.Title>
@@ -49,17 +60,6 @@ export default class Intro extends React.Component {
                 <a target='_blank' href='https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/'>Firefox</a>
                 ).
               </Panel.Body>
-            </Panel>
-          </Col>
-          <Col className='displayFlex' lg={4} md={6} sm={12}>
-            <Panel bsStyle="primary">
-              <Panel.Heading>
-                <Panel.Title componentClass="h3" className='introPanelTitle'>
-                  <i className='fa fa-music' aria-hidden='true'></i>
-                  <span className='titleSpan'>Discover New Music</span>
-                </Panel.Title>
-              </Panel.Heading>
-              <Panel.Body>With access to the top hits from iTunes and Spotify, you can always find new music</Panel.Body>
             </Panel>
           </Col>
         </Row>
