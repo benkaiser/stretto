@@ -96,19 +96,26 @@ textarea {
    ========================================================================== */
 
 html, body {
-  background: #4bf;
-  background: linear-gradient(to bottom, #4bf, #6cf);
-  color: white;
-  font-family: 'Open Sans', sans-serif;
-}
-
-h1, h2, h3, h4 {
-  color: rgba(255, 255, 255, 0.9);
   font-family: 'Open Sans', sans-serif;
 }
 
 body {
+  background: #54b4eb;
+  background: linear-gradient(to bottom, #54b4eb, #1d9ce5);
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+.flex {
+  display: flex;
+}
+
+.headerText {
+  color: white;
 }
 
 .logo {
@@ -123,11 +130,7 @@ body {
 }
 
 .download {
-  padding-top: 50px;
-}
-
-.download-other, .download-other:hover {
-  color: #fff;
+  padding-top: 30px;
 }
 
 .developer {
