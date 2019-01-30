@@ -5,7 +5,7 @@ export default class Intro extends React.Component {
   render() {
     return (
       <div className='intro'>
-        <div class="jumbotron">
+        <div className="jumbotron">
           <h1>Welcome to Stretto</h1>
           <p>Stretto is an <a href='https://github.com/benkaiser/stretto'>open-source</a> web-based music player</p>
           <DropdownButton

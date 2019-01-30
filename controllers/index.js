@@ -146,7 +146,8 @@ router.get('*', (req, res) => {
       ENV: process.env.ENV || 'production',
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
-      SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || ''
+      SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || '',
+      GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID || ''
     }
   });
 });

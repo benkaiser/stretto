@@ -10,6 +10,15 @@ html(lang='en')
     title Streto - Web Music Player
     block meta
     block stylesheets
+
+    if env.GOOGLE_ANALYTICS_ID
+      script(async, src="https://www.googletagmanager.com/gtag/js?id=UA-40538046-4")
+      script.
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', '!{env.GOOGLE_ANALYTICS_ID}');
   body
     block content
     block scripts
