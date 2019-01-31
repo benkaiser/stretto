@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Label, Image } from 'react-bootstrap';
+import { Dropdown, Label, MenuItem } from 'react-bootstrap';
+import getHistory from 'react-router-global-history'; 
 import Bootbox from '../services/bootbox';
 import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
@@ -21,9 +22,19 @@ class Sidebar extends React.Component {
           <h3 className='logo'>
             <Link to='/' className='logoText'>Stretto</Link>
             <Link className='sidebar-icon' to='/settings/' title='Settings'><i className="fa fa-cog"></i></Link>
-            <Link className='sidebar-icon' to='/add/' title='Add song'><i className="fa fa-plus"></i></Link>
+            <Dropdown title='Add music' className='pull-right' id={`dropdown-import-sidebar`} onSelect={this._onSelect}>
+              <Dropdown.Toggle bsStyle='link'>
+                <i className="fa fa-plus"></i>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <MenuItem eventKey="/spotify">From Spotify</MenuItem>
+                <MenuItem eventKey="/add">From Youtube/Soundcloud</MenuItem>
+                <MenuItem eventKey="/discover">From Top Charts</MenuItem>
+                <MenuItem divider />
+                <MenuItem eventKey="/import">From last Stretto version</MenuItem>
+              </Dropdown.Menu>
+          </Dropdown>
             <Link className='sidebar-icon' to='/sync/' title='Sync to Cloud'><i className="fa fa-refresh"></i></Link>
-            <Link className='sidebar-icon' to='/spotify/' title='Import from Spotify'><i className="fa fa-spotify"></i></Link>
           </h3>
           <SearchBox />
           <ul className='nav nav-pills nav-stacked'>
@@ -57,6 +68,11 @@ class Sidebar extends React.Component {
   @autobind
   onPlaylistChange() {
     this.setState({});
+  }
+
+  @autobind
+  _onSelect(url) {
+    getHistory().push(url);
   }
 }
 
