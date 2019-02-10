@@ -35,6 +35,12 @@ export default class YoutubePlaylist extends PlaylistView {
       return super.render();
     }
   }
+
+  componentWillReceiveProps(props) {
+    this._youtubePlaylist = undefined;
+    this.setState(this.getStateFromprops(props));
+    this._getYoutubePlaylist();
+  }
     
 
   getPlaylistFromProps() {
