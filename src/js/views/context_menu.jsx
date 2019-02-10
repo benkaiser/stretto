@@ -71,6 +71,7 @@ class ContextMenu extends React.Component {
       <div className={`dropdownContainer`} style={this.dropdownStyle()}>
         <ul className={`dropdown-menu ${this.openStyle()}`}>
           <MenuItem onClick={this.addToLibrary}>Add to library</MenuItem>
+          { this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>}
         </ul>
       </div>
     );
