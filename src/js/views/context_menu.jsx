@@ -126,11 +126,14 @@ class ContextMenu extends React.Component {
 
   @autobind
   onRemoveFromLibraryClick() {
-    this.state.items.map(song => {
-      Playlist.fetchAll().map((playlist) => {
-        playlist.removeSong(song);
+    Bootbox.confirm('Are you sure you want to remove the selected songs?')
+    .then(() => {
+      this.state.items.map(song => {
+        Playlist.fetchAll().map((playlist) => {
+          playlist.removeSong(song);
+        });
+        Song.remove(song);
       });
-      Song.remove(song);
     });
     this.hide();
   }
