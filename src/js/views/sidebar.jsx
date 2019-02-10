@@ -42,7 +42,7 @@ class Sidebar extends React.Component {
             <li className='dropdown-header'>Your Music <Label className='addPlaylist' bsStyle="default" onClick={this.addNewPlaylist}>Add Playlist</Label></li>
             { Playlist.fetchAll().map((playlist) =>
               <li key={'playlist_' + playlist.title}>
-                <Link to={'/playlist/' + playlist.title}>
+                <Link to={'/playlist/' + encodeURIComponent(playlist.title)}>
                   { playlist.title }
                 </Link>
               </li>

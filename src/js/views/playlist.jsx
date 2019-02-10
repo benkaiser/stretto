@@ -143,7 +143,7 @@ class PlaylistView extends React.Component {
   }
 
   getPlaylistFromProps(props) {
-    return Playlist.getByTitle(props.match.params.playlist);
+    return Playlist.getByTitle(decodeURIComponent(props.match.params.playlist));
   }
 
   getStateFromprops(props) {
