@@ -1,5 +1,6 @@
 import Utilities from '../utilities';
 import fetchJsonp from 'fetch-jsonp';
+import AccountManager from './account_manager';
 
 let youtubeIdRegex = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
 const resolveIdentity = (i) => Promise.resolve(i);
@@ -63,8 +64,43 @@ export default class Youtube {
     .then(items => items.map(this._convertToStandardTrack).filter(item => item));
   }
 
+  /**
+   * Find the youtube automix for a song
+   * @param youtubeId
+   * @returns Promise with the playlistid of the mix 
+   */
+  static findMix(youtubeId) {
+    return fetch(`/youtube/watch?v=${youtubeId}`)
+    .then((response) => response.text())
+    .then(responseText => {
+      const results = /0026list=([^"\\]+)/.exec(responseText);
+      if (results && results[1]) {
+        return results[1];
+      } else {
+        return Promise.reject('Unable to find mix id');
+      }
+    });
+  }
+
+  static getPlaylist(playlistId, options = {}) {
+    const requestDurations = options.requestDurations === undefined ? true : options.requestDurations;
+    const addThumbnail = options.addThumbnail === undefined ? true : options.addThumbnail;
+    return AccountManager.whenYoutubeLoaded
+    .then(() => AccountManager.whenLoggedIn)
+    .then(() => gapi.client.youtube.playlistItems.list({
+      part: 'snippet',
+      playlistId: playlistId,
+      maxResults: 50
+    }))
+    .then(response => response.result.items.map(item => item.snippet))
+    .then(requestDurations ? ((items) => this._addDurations(items)) : resolveIdentity)
+    .then(addThumbnail ? this._addThumbnails.bind(this) : resolveIdentity)
+    .then(items => items.map(this._convertToStandardTrack).filter(item => item))
+    .then(this._guessSplitTitle.bind(this));
+  }
+
   static _addDurations(items) {
-    let videoIds = items.map((item) => item.id.videoId);
+    let videoIds = items.map((item) => (item.id || item.resourceId).videoId);
     return fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${this.API_KEY}`)
     .then(Utilities.fetchToJson)
     .then((data) => {
@@ -77,22 +113,26 @@ export default class Youtube {
 
   static _addThumbnails(items) {
     return items.map((item) => {
-      item.thumbnail = this._maximumResolution(item.snippet.thumbnails);
+      item.thumbnail = this._maximumResolution((item.snippet || item).thumbnails);
       return item;
     });
   }
 
   static _convertToStandardTrack(track) {
-    if (!track.id.videoId) { return undefined; }
+    const id = (track.id || track.resourceId || {}).videoId;
+    if (!id) { return undefined; }
+    const snippet = track.snippet || track;
+    const thumbnail = Youtube._maximumResolution(snippet.thumbnails);
     return {
-      channel: track.snippet.channelTitle,
-      id: track.id.videoId,
+      channel: snippet.channelTitle,
+      cover: thumbnail,
+      id: id,
       isSoundcloud: false,
       isYoutube: true,
-      title: track.snippet.title,
-      thumbnail: Youtube._maximumResolution(track.snippet.thumbnails),
-      url: `https://www.youtube.com/watch?v=${track.id.videoId}`,
-      year: (new Date(track.snippet.publishedAt)).getFullYear()
+      title: snippet.title,
+      thumbnail: thumbnail,
+      url: `https://www.youtube.com/watch?v=${id}`,
+      year: (new Date(snippet.publishedAt)).getFullYear()
     };
   }
 
@@ -103,6 +143,20 @@ export default class Youtube {
     let minutes = (parseInt(match[2]) || 0);
     let seconds = (parseInt(match[3]) || 0);
     return hours * 3600 + minutes * 60 + seconds;
+  }
+
+  static _guessSplitTitle(items) {
+    return items.map((item) => {
+      const youtubeTitle = item.title; 
+      const dashIndex = youtubeTitle.indexOf('-');
+      if (dashIndex > -1) {
+        item.title = youtubeTitle.substr(dashIndex + 1).trim();
+        item.artist = youtubeTitle.substr(0, dashIndex).trim();
+      } else {
+        item.artist = item.channel;
+      }
+      return item;
+    });
   }
 
   static _maximumResolution(thumbnails) {

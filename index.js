@@ -23,6 +23,11 @@ var app = express();
 var server = http.createServer(app);
 var io = socketio.listen(server);
 
+app.use('/itunes', proxy('https://itunes.apple.com'));
+app.use('/azlyrics', proxy('https://www.azlyrics.com/'));
+app.use('/azlyricssearch', proxy('https://search.azlyrics.com'));
+app.use('/spotifycharts', proxy('https://spotifycharts.com'));
+app.use('/youtube', proxy('https://www.youtube.com'));
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
 app.use('/static', express.static('static'));
@@ -40,10 +45,6 @@ app.use(session({
   secret: 'stretto-secret',
   store: sessionStore
 }));
-app.use('/itunes', proxy('https://itunes.apple.com'));
-app.use('/azlyrics', proxy('https://www.azlyrics.com/'));
-app.use('/azlyricssearch', proxy('https://search.azlyrics.com'));
-app.use('/spotifycharts', proxy('https://spotifycharts.com'));
 app.use(require('./controllers'));
 require('./controllers/socketio')(io);
 

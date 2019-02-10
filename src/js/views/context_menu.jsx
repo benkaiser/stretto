@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { withRouter } from 'react-router-dom'
+import autobind from 'autobind-decorator';
 import Alerter from '../services/alerter';
 import Bootbox from '../services/bootbox';
 import MenuItem from 'react-bootstrap/lib/MenuItem';
@@ -7,7 +8,7 @@ import Lyrics from '../services/lyrics';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
-import autobind from 'autobind-decorator';
+import Youtube from '../services/youtube';
 
 const DROPDOWN_HEIGHT = 400;
 
@@ -51,6 +52,7 @@ class ContextMenu extends React.Component {
         <ul className={`dropdown-menu ${this.openStyle()}`}>
           { this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem> }
           { this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>}
+          { this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>}
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>
           { this.state.playlist && this.state.playlist.editable &&
             <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>
@@ -174,6 +176,19 @@ class ContextMenu extends React.Component {
   @autobind
   _showLyrics() {
     Lyrics.show();
+    this.hide();
+  }
+
+  @autobind
+  _getMix() {
+    Alerter.info('Attempting to find mix');
+    Youtube.findMix(this.state.items[0].originalId).then((playlistId) => {
+      Alerter.success('Found mix, loading');
+      this.props.history.push('/mix/' + playlistId);
+    }).catch(error => {
+      console.log(error);
+      Alerter.error('Unable to find mix, see console for more info');
+    });
     this.hide();
   }
 

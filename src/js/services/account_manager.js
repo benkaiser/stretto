@@ -5,6 +5,12 @@ import autobind from 'autobind-decorator';
 class AccountManager {
   constructor() {
     this._listeners = [];
+    this.whenYoutubeLoaded = new Promise((resolve) => {
+      this._resolveYoutubeLoaded = resolve;
+    });
+    this.whenLoggedIn = new Promise((resolve) => {
+      this._resolveLoggedIn = resolve;
+    });
   }
 
   addListener(listener) {
@@ -73,7 +79,9 @@ class AccountManager {
   @autobind
   initSigninV2() {
     this._onResolveLoad && this._onResolveLoad();
-    gapi.client.load('youtube', 'v3', this.initYoutubeV3);
+    gapi.client.load('youtube', 'v3', () => {
+      this._resolveYoutubeLoaded();
+    });
     this.auth2 = gapi.auth2.init({
       client_id: `${env.GOOGLE_CLIENT_ID}.apps.googleusercontent.com`,
       scope: 'https://www.googleapis.com/auth/youtube.readonly'
@@ -84,6 +92,7 @@ class AccountManager {
   @autobind
   setUser(googleUser) {
     this.user = googleUser;
+    this._resolveLoggedIn();
     this._notifyListeners();
     this.authServer();
     return this.email;
