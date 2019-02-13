@@ -14,7 +14,7 @@ import Settings from './settings';
 import Spotify from './spotify';
 import Sync from './sync';
 import Remote from './remote';
-import YoutubePlaylist from './youtube_playlist';
+import YoutubeMix from './youtube_mix';
 
 class RegularRoutes extends React.Component {
   render() {
@@ -31,7 +31,7 @@ class RegularRoutes extends React.Component {
           <Route path='/sync' component={Sync} />
           <Route path='/playlist/:playlist' component={Playlist} />
           <Route path='/search/:search' component={Search} />
-          <Route path='/mix/:playlist' component={YoutubePlaylist} />
+          <Route path='/mix/:playlist' component={YoutubeMix} />
           <Route path='/discover' component={Discover} />
           <Route exact component={Intro} />
         </Switch>

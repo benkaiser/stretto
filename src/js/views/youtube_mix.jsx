@@ -7,7 +7,7 @@ import Song from '../models/song';
 import PlaylistView from './playlist';
 import autobind from 'autobind-decorator';
 
-export default class YoutubePlaylist extends PlaylistView {
+export default class YoutubeMix extends PlaylistView {
   constructor(props) {
     super(props);
     this._getYoutubePlaylist();
@@ -59,10 +59,15 @@ export default class YoutubePlaylist extends PlaylistView {
 
   @autobind
   _getYoutubePlaylist() {
-    Youtube.getPlaylist(this.props.match.params.playlist).then(youtubeItems => {
-      const songs = youtubeItems.map(item => new Song(item));
+    Youtube.getPlaylistAnonymous(this.props.match.params.playlist)
+    .catch(error => {
+      console.log('Unable to use anonymous playlist: ' + error.message);
+      return Youtube.getPlaylist(this.props.match.params.playlist);
+    })
+    .then(mixPlaylist => {
+      const songs = mixPlaylist.items.map(item => new Song(item));
       this._youtubePlaylist = new Playlist({
-        title: 'Youtube Mix',
+        title: 'Youtube Mix for: ' + mixPlaylist.title,
         rawSongs: songs
       });
       const state = this.determineStateForElementsToShow(0, window.innerHeight, this._youtubePlaylist);

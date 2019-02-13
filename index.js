@@ -27,7 +27,11 @@ app.use('/itunes', proxy('https://itunes.apple.com'));
 app.use('/azlyrics', proxy('https://www.azlyrics.com/'));
 app.use('/azlyricssearch', proxy('https://search.azlyrics.com'));
 app.use('/spotifycharts', proxy('https://spotifycharts.com'));
-app.use('/youtube', proxy('https://www.youtube.com'));
+app.use('/youtube', proxy('https://www.youtube.com', {
+  userResHeaderDecorator() {
+    return {};
+  }
+}));
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
 app.use('/static', express.static('static'));

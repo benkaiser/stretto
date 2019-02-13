@@ -85,18 +85,45 @@ export default class Youtube {
   static getPlaylist(playlistId, options = {}) {
     const requestDurations = options.requestDurations === undefined ? true : options.requestDurations;
     const addThumbnail = options.addThumbnail === undefined ? true : options.addThumbnail;
+    const maxResults = options.maxResults === undefined ? 50 : options.maxResults;
     return AccountManager.whenYoutubeLoaded
     .then(() => AccountManager.whenLoggedIn)
     .then(() => gapi.client.youtube.playlistItems.list({
       part: 'snippet',
       playlistId: playlistId,
-      maxResults: 50
+      maxResults: maxResults
     }))
     .then(response => response.result.items.map(item => item.snippet))
     .then(requestDurations ? ((items) => this._addDurations(items)) : resolveIdentity)
     .then(addThumbnail ? this._addThumbnails.bind(this) : resolveIdentity)
     .then(items => items.map(this._convertToStandardTrack).filter(item => item))
-    .then(this._guessSplitTitle.bind(this));
+    .then(this._guessSplitTitle.bind(this))
+    .then(items => {
+      return {
+        title: 'Youtube Playlist',
+        items
+      };
+    })
+  }
+
+  static getPlaylistAnonymous(playlistId) {
+    return this._getRadioFromPlaylistId(playlistId)
+    .then(radioUrl => fetch(radioUrl.replace('https://www.youtube.com', '/youtube')))
+    .then((response) => response.text())
+    .then(responseText => {
+      const windowIndex = responseText.indexOf('window["ytInitialData"]');
+      const nextWindow = responseText.indexOf('window["ytInitialPlayerResponse"]', windowIndex);
+      const substring = responseText.substr(windowIndex + 26, nextWindow - windowIndex - 26);
+      const json = substring.substr(0, substring.lastIndexOf('}') + 1);
+      return JSON.parse(json);
+    }).then(parsedJson => {
+      const playlist = parsedJson.contents.twoColumnWatchNextResults.playlist.playlist;
+      const items = playlist.contents.map(item => item.playlistPanelVideoRenderer);
+      return {
+        title: playlist.title,
+        items: this._guessSplitTitle(items.map(this._convertScrapedToStandardTrack))
+      };
+    });
   }
 
   static _addDurations(items) {
@@ -116,6 +143,19 @@ export default class Youtube {
       item.thumbnail = this._maximumResolution((item.snippet || item).thumbnails);
       return item;
     });
+  }
+
+  static _convertScrapedToStandardTrack(track) {
+    return {
+      channel: track.shortBylineText.runs[0].text,
+      cover: track.thumbnail.thumbnails[track.thumbnail.thumbnails.length-1].url,
+      id: track.videoId,
+      isSoundcloud: false,
+      isYoutube: true,
+      title: track.title.simpleText,
+      url: `https://www.youtube.com/watch?v=${track.videoId}`,
+      duration: track.lengthText.simpleText.split(':').reduce((acc,time) => (60 * acc) + +time)
+    };
   }
 
   static _convertToStandardTrack(track) {
@@ -143,6 +183,22 @@ export default class Youtube {
     let minutes = (parseInt(match[2]) || 0);
     let seconds = (parseInt(match[3]) || 0);
     return hours * 3600 + minutes * 60 + seconds;
+  }
+  
+  static _getRadioFromPlaylistId(playlistId) {
+    return AccountManager.whenYoutubeLoaded
+    .then(() => AccountManager.whenLoggedIn)
+    .then(() => gapi.client.youtube.playlistItems.list({
+      part: 'snippet',
+      playlistId: playlistId,
+      maxResults: 1
+    })).then(response => {
+      if (!response.result.items || !response.result.items[0]) {
+        throw new Error('Unable to fetch items');
+      }
+      const videoId = response.result.items[0].snippet.resourceId.videoId;
+      return `https://www.youtube.com/watch?v=${videoId}&list=${playlistId}&start_radio=1`;
+    });
   }
 
   static _guessSplitTitle(items) {
