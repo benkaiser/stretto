@@ -19,7 +19,7 @@ Here is a list of some of the features Stretto has:
 - Automatic lyric fetching for the currently playing song
 - [Music discovery through iTunes/Spotify top charts](https://next.kaiserapps.com/discover)
 - Search iTunes and add tracks to library seamlessly
-- Multiple themes available.
+- Multiple themes available
 - Completely free!
 - [Android App](https://github.com/benkaiser/stretto-mobile-next/)
 
