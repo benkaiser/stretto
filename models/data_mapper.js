@@ -2,6 +2,7 @@ var versionMap = {};
 var playlistsMap = {};
 var songsMap = {};
 const Playlist = require('./playlist');
+const SharedPlaylists = require('./shared_playlist');
 const Song = require('./song');
 const User = require('./user');
 const mongoose = require('mongoose');
@@ -12,6 +13,7 @@ module.exports = class DataMapper {
       Song.initialize();
       Playlist.initialize();
       User.initialize();
+      SharedPlaylists.initialize();
     });
   }
 
@@ -46,5 +48,13 @@ module.exports = class DataMapper {
       }
       return Promise.reject('version mismatch');
     });
+  }
+
+  static sharePlaylist(playlistData, user) {
+    return SharedPlaylists.uploadPlaylist(user.email, playlistData);
+  }
+
+  static getPlaylist(guid) {
+    return SharedPlaylists.getPlaylist(guid);
   }
 }

@@ -140,16 +140,41 @@ router.post('/search', loggedIn, (req, res) => {
   })
 });
 
-router.get('*', (req, res) => {
+router.post('/share', loggedIn, (req, res) => {
+  if (!req.body || !req.body.playlist) {
+    return res.send('Missing parameter \'playlist\' in payload.');
+  }
+  DataMapper.sharePlaylist(req.body.playlist, req.session.user).then(guid => {
+    res.send({ guid: guid });
+  });
+});
+
+function render(res, extraEnv) {
   res.render('index', {
     env: {
       ENV: process.env.ENV || 'production',
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
       GOOGLE_API_KEY: process.env.GOOGLE_API_KEY || '',
       SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || '',
-      GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID || ''
+      GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID || '',
+      ...extraEnv
     }
   });
+}
+
+router.get('/shared/:guid', (req, res) => {
+  if (!req.params || !req.params.guid) {
+    return res.send('Missing parameter \'guid\' in url.');
+  }
+  DataMapper.getPlaylist(req.params.guid).then(playlistBlob => {
+    render(res, {
+      playlist: playlistBlob
+    });
+  });
+});
+
+router.get('*', (req, res) => {
+  render(res);
 });
 
 module.exports = router;

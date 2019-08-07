@@ -149,6 +149,13 @@ export default class Playlist {
      );
   }
 
+  exportShare() {
+    return {
+      title: this.title,
+      rawSongs: this._getSongs().map(song => song.serialize())
+    }
+  }
+
   get songData() {
     if (!this._songData) {
       this._songData = this._getSongs();

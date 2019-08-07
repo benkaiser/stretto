@@ -11,6 +11,7 @@ import Layout from './layout';
 import Playlist from './playlist';
 import Search from './search';
 import Settings from './settings';
+import SharedPlaylist from './shared_playlist';
 import Spotify from './spotify';
 import Sync from './sync';
 import Remote from './remote';
@@ -33,6 +34,7 @@ class RegularRoutes extends React.Component {
           <Route path='/search/:search' component={Search} />
           <Route path='/mix/:playlist' component={YoutubeMix} />
           <Route path='/discover' component={Discover} />
+          <Route path='/shared/:guid' component={SharedPlaylist} />
           <Route exact component={Intro} />
         </Switch>
       </Layout>

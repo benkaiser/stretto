@@ -1,13 +1,15 @@
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { Label, DropdownButton, MenuItem } from 'react-bootstrap';
+import autobind from 'autobind-decorator';
+import moment from 'moment';
 import Bootbox from '../services/bootbox';
 import ContextMenu from './context_menu';
 import * as React from 'react';
 import Lyrics from '../services/lyrics';
 import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
-import autobind from 'autobind-decorator';
-import moment from 'moment';
+import Alerter from '../services/alerter';
+import Utilities from '../utilities';
 
 const COLUMNS = ['title', 'artist', 'album', 'createdAt'];
 
@@ -173,6 +175,7 @@ class PlaylistView extends React.Component {
         <DropdownButton id='playlist-dropdown' title='Options'>
           <MenuItem onClick={this.onDelete}>Delete playlist</MenuItem>
           <MenuItem onClick={this.onRename}>Rename playlist</MenuItem>
+          <MenuItem onClick={this.sharePlaylist}>Share Playlist</MenuItem>
         </DropdownButton>
       </div>
     );
@@ -236,6 +239,25 @@ class PlaylistView extends React.Component {
     }).then((newTitle) => {
       this.state.playlist.update('title', newTitle);
       this.props.history.push('/playlist/' + newTitle);
+    });
+  }
+
+  @autobind
+  sharePlaylist() {
+    Alerter.info('Uploading...');
+    return fetch('/share', {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        playlist:  this.state.playlist.exportShare()
+      })
+    })
+    .then(Utilities.fetchToJson)
+    .then((data) => {
+      Bootbox.show('Playlist Link', <p>Here is the link to your <a href={'/shared/' + data.guid}>Shared Playlist</a></p>);
     });
   }
 
