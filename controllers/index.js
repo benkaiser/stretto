@@ -1,5 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const path = require('path');
 var youtubeSearch = require('youtube-search');
 
 const router = express.Router();
@@ -171,6 +172,10 @@ router.get('/shared/:guid', (req, res) => {
       playlist: playlistBlob
     });
   });
+});
+
+router.get('/privacy', (req, res) => {
+  res.sendFile('./privacy_policy.html', { root: path.resolve(__dirname, '../') });
 });
 
 router.get('*', (req, res) => {
