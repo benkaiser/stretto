@@ -6,10 +6,6 @@ let youtubeIdRegex = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\
 const resolveIdentity = (i) => Promise.resolve(i);
 
 export default class Youtube {
-  static get API_KEY() {
-    return env.GOOGLE_API_KEY;
-  }
-
   static extractId(url) {
     let match = url.match(youtubeIdRegex);
     return (match && match[2].length == 11) ? match[2] : false;
@@ -20,7 +16,11 @@ export default class Youtube {
     if (!id) {
       return Promise.reject({ error: 'not a youtube track' });
     }
-    return fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?id=${id}&key=${this.API_KEY}&fields=items(id,snippet)&part=snippet`)
+    return gapi.client.youtube.videos.list({
+      part: 'snippet',
+      id: id,
+      fields: '(id,snippet)'
+    })
     .then(Utilities.fetchToJson)
     .then(({ items }) => {
       if (items[0]) {
@@ -128,7 +128,10 @@ export default class Youtube {
 
   static _addDurations(items) {
     let videoIds = items.map((item) => (item.id || item.resourceId).videoId);
-    return fetchJsonp(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${this.API_KEY}`)
+    return gapi.client.youtube.videos.list({
+      part: 'contentDetails',
+      id: videoIds
+    })
     .then(Utilities.fetchToJson)
     .then((data) => {
       data.items.forEach((dataItem, index) => {
