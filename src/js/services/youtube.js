@@ -19,10 +19,10 @@ export default class Youtube {
     return gapi.client.youtube.videos.list({
       part: 'snippet',
       id: id,
-      fields: '(id,snippet)'
+      fields: 'items(id,snippet)'
     })
-    .then(Utilities.fetchToJson)
-    .then(({ items }) => {
+    .then(({ result }) => {
+      const items = result.items;
       if (items[0]) {
         items[0].id = { videoId: id };
       }
