@@ -50,11 +50,15 @@ export default class Youtube {
     return new Promise((resolve) => gapi.load('client', resolve))
     .then(() => gapi.client.load('youtube', 'v3'))
     .then(() =>
-      fetchJsonp(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&maxResults=${maxResults}&key=${this.API_KEY}`)
-    ).then(Utilities.fetchToJson)
-    .then(response => {
-      return response.items;
-    })
+      gapi.client.youtube.search.list({
+        maxResults: maxResults,
+        q: query,
+        type: 'video',
+        videoEmbeddable: true,
+        part: 'snippet'
+      })
+    )
+    .then(response => response.result.items)
     .then(requestDurations ? ((items) => this._addDurations(items)) : resolveIdentity)
     .then(addThumbnail ? this._addThumbnails.bind(this) : resolveIdentity)
     .then(items => items.map(this._convertToStandardTrack).filter(item => item));
