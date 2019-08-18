@@ -132,9 +132,8 @@ export default class Youtube {
       part: 'contentDetails',
       id: videoIds
     })
-    .then(Utilities.fetchToJson)
-    .then((data) => {
-      data.items.forEach((dataItem, index) => {
+    .then(({ result }) => {
+      result.items.forEach((dataItem, index) => {
         items[index].duration = this._durationToSeconds(dataItem.contentDetails.duration);
       });
       return items;
