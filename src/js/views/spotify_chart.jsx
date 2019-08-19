@@ -53,7 +53,7 @@ export default class SpotifyChart extends React.Component {
   }
 
   _fetchChart(props) {
-    SpotifyAPI.fetchChart(props.type)
+    return SpotifyAPI.fetchChart(props.type)
     .then(results => {
       if (this.isDisposed) {
         return;
@@ -66,7 +66,24 @@ export default class SpotifyChart extends React.Component {
         playlist: playlist,
         loaded: true
       });
+      this._requestRealCovers(playlist);
     });
+  }
+
+  _requestRealCovers(playlist) {
+    playlist._rawSongs.reduce((lastPromise, song) => {
+      if (this.isDisposed) {
+        return Promise.resolve();
+      }
+      return lastPromise.then(() => {
+        return SpotifyAPI.fetchCover(song.spotifyId, true).then(cover => {
+          song.cover = cover;
+          if (!this.isDisposed) {
+            this.forceUpdate();
+          }
+        });
+      });
+    }, Promise.resolve());
   }
 
   _playSong(item) {

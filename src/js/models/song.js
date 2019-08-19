@@ -18,6 +18,7 @@ class Song {
     this.title = attrs.title || '';
     this.trackNumber = attrs.trackNumber || 0;
     this.url = attrs.url || '';
+    this.spotifyId = attrs.spotifyId;
     this.year = attrs.year || new Date().getFullYear();
     this.updatedAt = attrs.updatedAt || +new Date();
     this.setId(attrs.id);

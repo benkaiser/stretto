@@ -15,26 +15,30 @@ const chartMap = {
   'top': 'regional',
   'viral': 'viral'
 };
+const SPOTIFY_DEFAULT_COVER = 'https://developer.spotify.com/assets/branding-guidelines/icon1@2x.png';
 
 export default class SpotifyAPI {
   static get instance() {
     return SpotifyAPI.__instance || (SpotifyAPI.__instance = new SpotifyAPI());
   }
 
-  static fetchChart(type) {
+  static fetchChart(type, options) {
     type = chartMap[type];
+    const requestRealCover = options && options.requestRealCover || false;
     return fetch(`/spotifycharts/${type}/${Country.current()}/daily/latest/download`)
     .then(Utilities.fetchToCSV)
     .then(data => {
       data = data.slice(type === 'regional' ? 2 : 1);
       return Promise.all(data.map(entry => {
-        return SpotifyAPI.fetchCover(entry[entry.length-1].replace('https://open.spotify.com/track/', ''))
+        const id = entry[entry.length-1].replace('https://open.spotify.com/track/', '');
+        return SpotifyAPI.fetchCover(id, requestRealCover)
         .then(coverUrl => {
           return new Song({
             title: entry[1],
             artist: entry[2],
             album: 'Unknown Album',
             cover: coverUrl,
+            spotifyId: id,
             deferred: true
           });
         }).catch(error => {
@@ -45,14 +49,20 @@ export default class SpotifyAPI {
     });
   }
 
-  static fetchCover(trackId) {
-    return fetchJsonp(`https://embed.spotify.com/oembed?url=spotify:track:${trackId}`, {
-      jsonpCallbackFunction: `jsonp${Date.now()}${Math.ceil(Math.random() * 100000)}`
-    })
-    .then(Utilities.fetchToJson)
-    .then(result => {
-      return result.thumbnail_url;
-    }); 
+  static fetchCover(trackId, requestRealCover) {
+    if (requestRealCover) {
+      return fetchJsonp(`https://embed.spotify.com/oembed?url=spotify:track:${trackId}`, {
+        jsonpCallbackFunction: `jsonp${Date.now()}${Math.ceil(Math.random() * 100000)}`
+      })
+      .then(Utilities.fetchToJson)
+      .then(result => {
+        return result.thumbnail_url;
+      }).catch((error) => {
+        return 'https://developer.spotify.com/assets/branding-guidelines/icon2@2x.png';
+      });
+    } else {
+      return Promise.resolve(SPOTIFY_DEFAULT_COVER);
+    }
   }
 
   get connected() {
