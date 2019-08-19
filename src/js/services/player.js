@@ -78,7 +78,7 @@ class Player {
     this.updateSong(song);
 
     this.currentPlayer && this.currentPlayer.dispose();
-    (this.currentSong.deferred ? this.currentSong.getTrack() : Promise.resolve(this.currentSong))
+    return (this.currentSong.deferred ? this.currentSong.getTrack() : Promise.resolve(this.currentSong))
     .then((song) => {
       if (song != this.currentSong) {
         return;

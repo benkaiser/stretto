@@ -19,11 +19,8 @@ export default class Itunes {
     return fetch(url)
     .then(Utilities.fetchToJson)
     .then((data) => {
-      console.log(data);
-      return Promise.all(
-        data.results.map(this._getYoutubeTrackForSong)
-      ).then((items) => items.filter(item => item));
-    }).then(this._removeDuplicates);
+      return data.results.map(this._deferredTrack);
+    });
   }
 
   static fetchCover(song) {
@@ -57,6 +54,20 @@ export default class Itunes {
           });
         });
       }
+    });
+  }
+
+  static _deferredTrack(song) {
+    return new Song({
+      // this id is temporary until a proper one is fetched from youtube
+      id: song.trackId + '-' + song.collectionId + '-' + song.artistId,
+      title: song.trackName,
+      artist: song.artistName,
+      cover: song.artworkUrl100.replace('100x100', '600x600'),
+      album: song.collectionName,
+      discNumber: song.discNumber,
+      trackNumber: song.trackNumber,
+      deferred: true
     });
   }
 

@@ -120,7 +120,15 @@ class PlaylistView extends React.Component {
         selected: [song.id],
         lastSelected: song.id
       })
-      Player.play(song, this.state.playlist);
+      const promise = Player.play(song, this.state.playlist)
+      if (song.deferred) {
+        promise.then(() => {
+          this.setState({
+            selected: [ song.id ],
+            lastSelected: song.id
+          });
+        });
+      }
     }
   }
 
