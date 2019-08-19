@@ -58,7 +58,7 @@ export default class SpotifyAPI {
       .then(result => {
         return result.thumbnail_url;
       }).catch((error) => {
-        return 'https://developer.spotify.com/assets/branding-guidelines/icon2@2x.png';
+        return SPOTIFY_DEFAULT_COVER;
       });
     } else {
       return Promise.resolve(SPOTIFY_DEFAULT_COVER);
