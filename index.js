@@ -27,6 +27,7 @@ app.use('/itunes', proxy('https://itunes.apple.com'));
 app.use('/azlyrics', proxy('https://www.azlyrics.com/'));
 app.use('/azlyricssearch', proxy('https://search.azlyrics.com'));
 app.use('/spotifycharts', proxy('https://spotifycharts.com'));
+app.use('/spotifyoembed', proxy('https://embed.spotify.com'));
 app.use('/youtube', proxy('https://www.youtube.com', {
   userResHeaderDecorator() {
     return {};

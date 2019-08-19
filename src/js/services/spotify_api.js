@@ -51,7 +51,7 @@ export default class SpotifyAPI {
 
   static fetchCover(trackId, requestRealCover) {
     if (requestRealCover) {
-      return fetchJsonp(`https://embed.spotify.com/oembed?url=spotify:track:${trackId}`, {
+      return fetch(`/spotifyoembed/oembed?url=spotify:track:${trackId}`, {
         jsonpCallbackFunction: `jsonp${Date.now()}${Math.ceil(Math.random() * 100000)}`
       })
       .then(Utilities.fetchToJson)
