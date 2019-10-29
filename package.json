@@ -32,7 +32,7 @@
     "google-auth-library": "^0.10.0",
     "js-azlyrics": "^0.2.0",
     "moment": "^2.18.1",
-    "mongoose": "^4.11.1",
+    "mongoose": "^5.7.5",
     "node-fetch": "^2.2.1",
     "node-sass": "^4.7.2",
     "nodemon": "^1.11.0",
