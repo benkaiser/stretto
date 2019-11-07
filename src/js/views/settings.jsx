@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import CountrySwitcher from './countryswitcher';
 import ThemeSwitcher from './themeswitcher';
 
-class Intro extends React.Component {
+export default class Intro extends React.Component {
   render() {
     return (
       <div>
@@ -22,5 +22,3 @@ class Intro extends React.Component {
     );
   }
 }
-
-module.exports = Intro;

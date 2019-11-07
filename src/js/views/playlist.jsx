@@ -28,7 +28,7 @@ const COLUMN_WIDTH_MAPPING = {
 const ELEMENT_HEIGHT = 40;
 const HEADER_HEIGHT = 50;
 
-class PlaylistView extends React.Component {
+export default class PlaylistView extends React.Component {
   constructor(props) {
     super(props);
     this.state = this.getStateFromprops(props);
@@ -426,6 +426,3 @@ function createSortableList(parentRef) {
     }
   }
 }
-
-
-module.exports = PlaylistView;

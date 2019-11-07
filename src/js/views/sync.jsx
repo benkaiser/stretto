@@ -2,7 +2,7 @@ import * as React from 'react';
 import AccountManager from '../services/account_manager';
 import autobind from 'autobind-decorator';
 
-class Import extends React.Component {
+export default class Import extends React.Component {
   constructor() {
     super();
   }
@@ -42,5 +42,3 @@ class Import extends React.Component {
     console.log('Failed to log in');
   }
 }
-
-module.exports = Import;

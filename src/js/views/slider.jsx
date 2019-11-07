@@ -6,7 +6,7 @@ import autobind from 'autobind-decorator';
 
 const SCRUB_DELAY = 1000;
 
-class Slider extends React.Component {
+export default class Slider extends React.Component {
   constructor(props) {
     super(props);
     this.sliding = false;
@@ -70,5 +70,3 @@ class Slider extends React.Component {
     return Utilities.timeFormat(~~(Player.duration() * value));
   }
 }
-
-module.exports = Slider;

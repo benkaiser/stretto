@@ -2,7 +2,7 @@ import * as React from 'react';
 import Player from '../services/player';
 import Slider from './slider';
 
-class PlayerControls extends React.Component {
+export default class PlayerControls extends React.Component {
   constructor(props) {
     super(props);
     Player.addOnStateChangeListener(this.stateChange.bind(this));
@@ -47,5 +47,3 @@ class PlayerControls extends React.Component {
     Player.togglePlaying();
   }
 }
-
-module.exports = PlayerControls;

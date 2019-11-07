@@ -6,7 +6,7 @@ import Playlist from '../models/playlist';
 import PlaylistView from './playlist';
 import autobind from 'autobind-decorator';
 
-class Search extends PlaylistView {
+export default class Search extends PlaylistView {
   getPlaylistFromProps(props) {
     return this._createPlaylistForSearch(props.match.params.search);
   }
@@ -58,5 +58,3 @@ class Search extends PlaylistView {
     /* no-op */
   }
 }
-
-module.exports = Search;

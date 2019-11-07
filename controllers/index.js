@@ -173,6 +173,10 @@ router.get('/shared/:guid', (req, res) => {
   });
 });
 
+router.get('/redirect', (req, res) => {
+  res.render('redirect');
+});
+
 router.get('/privacy', (req, res) => {
   res.sendFile('./privacy_policy.html', { root: path.resolve(__dirname, '../') });
 });

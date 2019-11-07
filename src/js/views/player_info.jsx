@@ -70,4 +70,4 @@ class PlayerInfo extends React.Component {
   }
 }
 
-module.exports = withRouter(PlayerInfo);
+export default withRouter(PlayerInfo);

@@ -8,7 +8,7 @@ import Soundcloud from '../services/soundcloud';
 import Youtube from '../services/youtube';
 import autobind from 'autobind-decorator';
 
-class Add extends React.Component {
+export default class Add extends React.Component {
   constructor() {
     super();
     this.state = {};
@@ -184,5 +184,3 @@ class Add extends React.Component {
     this.artist && (this.artist.value = oldTitle);
   }
 }
-
-module.exports = Add;

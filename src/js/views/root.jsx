@@ -1,6 +1,6 @@
 import { render } from 'react-dom';
 import * as React from 'react';
-import { browserHistory, Switch, Route, BrowserRouter } from 'react-router-dom';
+import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { ReactRouterGlobalHistory } from 'react-router-global-history';
 import Add from './add';
 import Discover from './discover';
@@ -12,6 +12,7 @@ import Playlist from './playlist';
 import Search from './search';
 import Settings from './settings';
 import SharedPlaylist from './shared_playlist';
+import Soundcloud from './soundcloud';
 import Spotify from './spotify';
 import Sync from './sync';
 import Remote from './remote';
@@ -34,6 +35,7 @@ class RegularRoutes extends React.Component {
           <Route path='/search/:search' component={Search} />
           <Route path='/mix/:playlist' component={YoutubeMix} />
           <Route path='/discover' component={Discover} />
+          <Route path='/soundcloud' component={Soundcloud} />
           <Route path='/shared/:guid' component={SharedPlaylist} />
           <Route exact component={Intro} />
         </Switch>
@@ -46,7 +48,7 @@ export default class RootViewLoader {
   static initialise() {
     render((
       <div>
-        <BrowserRouter history={browserHistory}>
+        <BrowserRouter>
           <Switch>
             <Route path='/remote' component={Remote} />
             <Route path='/' component={RegularRoutes} />

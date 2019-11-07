@@ -1,54 +1,49 @@
 const RESET_URL = 'http://api.soundcloud.com/users/12574060';
+import Soundcloud from './soundcloud';
+import * as SC from 'soundcloud';
+
+SC.initialize({
+  client_id: Soundcloud.client_id,
+  redirect_uri: '/'
+});
 
 export default class SoundcloudPlayer {
   constructor(song, options = {}) {
     if (options.autoPlay === undefined) options.autoPlay = true;
-    SoundcloudPlayer.player.load(song.url, {
-      auto_play: options.autoPlay,
-      callback: () => {
-        SoundcloudPlayer.timeToSeek = options.currentTime || 0;
+    SoundcloudPlayer.setupSoundcloud(song).then(() => {
+      SoundcloudPlayer.timeToSeek = options.currentTime || 0;
+      if (options.autoPlay) {
+        SoundcloudPlayer.player.play();
       }
     });
   }
 
   get durationCacheSeconds() {
-    return this._lastDuration;
+    return SoundcloudPlayer.player.getDuration() / 1000;
   }
 
   dispose() {
-    SoundcloudPlayer.player.pause();
-    SoundcloudPlayer.player.load(RESET_URL, {
-      auto_play: false
-    });
+    SoundcloudPlayer.player.kill();
   }
 
   getPosition() {
-    return new Promise((resolve) => {
-      SoundcloudPlayer.player.getPosition((position) => {
-        resolve(position);
-      });
-    });
+    return Promise.resolve(SoundcloudPlayer.player ? SoundcloudPlayer.player.currentTime() : 0);
   }
 
   getPositionFraction() {
-    return new Promise((resolve) => {
-      SoundcloudPlayer.player.getPosition((position) => {
-        SoundcloudPlayer.player.getDuration((duration) => {
-          this._lastDuration = duration / 1000;
-          resolve(position / duration);
-        })
-      });
-    });
+    return Promise.resolve(SoundcloudPlayer.player ?
+      SoundcloudPlayer.player.currentTime() / SoundcloudPlayer.player.getDuration()
+      : 0
+    );
   }
 
   setCurrentTime(timeFraction) {
-    SoundcloudPlayer.player.getDuration((duration) => {
-      SoundcloudPlayer.player.seekTo(timeFraction * duration);
-    })
+    const duration = SoundcloudPlayer.player.getDuration();
+    SoundcloudPlayer.player.seek(timeFraction * duration);
   }
 
   toggle() {
-    SoundcloudPlayer.player.toggle();
+    SoundcloudPlayer.player.isPlaying() ? SoundcloudPlayer.player.pause() : SoundcloudPlayer.player.play();
   }
 
   static injectHandlers(playstateChange, onEnded) {
@@ -56,22 +51,27 @@ export default class SoundcloudPlayer {
     SoundcloudPlayer.endHandler = onEnded;
   }
 
-  static setupSoundcloud() {
-    SoundcloudPlayer.player = SC.Widget('scplayer');
-    SoundcloudPlayer.player.bind(SC.Widget.Events.PLAY, () => {
-      SoundcloudPlayer.playstateChangeHandler(true);
-      if (SoundcloudPlayer.timeToSeek) {
-        SoundcloudPlayer.player.seekTo(SoundcloudPlayer.timeToSeek);
-        SoundcloudPlayer.timeToSeek = 0;
-      }
-    });
-    SoundcloudPlayer.player.bind(SC.Widget.Events.PAUSE, () => {
-      SoundcloudPlayer.playstateChangeHandler(false);
-    });
-    SoundcloudPlayer.player.bind(SC.Widget.Events.FINISH, () => {
-      SoundcloudPlayer.endHandler();
+  static setupSoundcloud(song) {
+    return SC.stream('/tracks/' + song.originalId).then(player => {
+      SoundcloudPlayer.player = player;
+      player.on('play', () => {
+        SoundcloudPlayer.playstateChangeHandler(true);
+        if (SoundcloudPlayer.timeToSeek) {
+          SoundcloudPlayer.player.seek(SoundcloudPlayer.timeToSeek);
+          SoundcloudPlayer.timeToSeek = 0;
+          SoundcloudPlayer.player.play();
+        }
+      });
+      player.on('pause', () => {
+        SoundcloudPlayer.playstateChangeHandler(false);
+      });
+      player.on('finish', () => {
+        SoundcloudPlayer.endHandler();
+      });
+
+      return player;
+    }).catch(error => {
+      console.error(error);
     });
   }
 }
-
-SoundcloudPlayer.setupSoundcloud();

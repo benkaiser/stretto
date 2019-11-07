@@ -9,7 +9,7 @@ import Playlist from '../models/playlist';
 import SearchBox from './search_box';
 import autobind from 'autobind-decorator';
 
-class Sidebar extends React.Component {
+export default class Sidebar extends React.Component {
   constructor() {
     super();
     Playlist.addOnChangeListener(this.onPlaylistChange);
@@ -38,6 +38,7 @@ class Sidebar extends React.Component {
           </h3>
           <SearchBox />
           <ul className='nav nav-pills nav-stacked'>
+            <li key='soundcloud'><Link to='/soundcloud'>Soundcloud</Link></li>
             <li key='discover'><Link to='/discover'>Discover</Link></li>
             <li className='dropdown-header'>Your Music <Label className='addPlaylist' bsStyle="default" onClick={this.addNewPlaylist}>Add Playlist</Label></li>
             { Playlist.fetchAll().map((playlist) =>
@@ -75,5 +76,3 @@ class Sidebar extends React.Component {
     getHistory().push(url);
   }
 }
-
-module.exports = Sidebar;

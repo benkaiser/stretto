@@ -1,4 +1,4 @@
-class Theme {
+export default class Theme {
   static initialise() {
     const theme = new Theme(localStorage.getItem('theme') || 'cerulean');
     theme.load();
@@ -38,5 +38,3 @@ class Theme {
     document.getElementById('theme').href = `//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/${this.name}/bootstrap.min.css`;
   }
 }
-
-module.exports = Theme;

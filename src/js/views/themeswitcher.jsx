@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Theme from '../theme';
 
-class ThemeSwitcher extends React.Component {
+export default class ThemeSwitcher extends React.Component {
   render() {
     return (
       <div className='form-group'>
@@ -22,5 +22,3 @@ class ThemeSwitcher extends React.Component {
     newTheme.load();
   }
 }
-
-module.exports = ThemeSwitcher;

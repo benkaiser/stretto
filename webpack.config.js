@@ -2,24 +2,23 @@ const path = require('path');
 
 module.exports = {
   entry: './src/js/index.js',
+  mode: 'development',
   output: {
     path: path.join(__dirname, 'static', 'js'),
     filename: 'bundle.js'
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
         query: {
-          presets: ['es2015'],
+          presets: ['@babel/env'],
           plugins: [
-            'transform-decorators-legacy',
-            [
-              'transform-react-jsx'
-            ],
-            'transform-object-rest-spread'
+            ['@babel/plugin-proposal-decorators', { 'legacy': true }],
+            ['@babel/plugin-transform-react-jsx'],
+            '@babel/plugin-proposal-object-rest-spread'
           ]
         }
       },
@@ -34,7 +33,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['.js', '.jsx'],
     alias: {
       'jquery': path.join(__dirname, 'stubs/jquery.js')
     }

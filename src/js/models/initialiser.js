@@ -3,7 +3,7 @@ import Player from '../services/player';
 import Playlist from './playlist';
 import Song from './song';
 
-class ModelInitialiser {
+export default class ModelInitialiser {
   static createChangeListener(key) {
     return (data) => {
       DataLayer.setItem(key, data.map((item) => item.serialize()));
@@ -65,5 +65,3 @@ class ModelInitialiser {
     });
   }
 }
-
-module.exports = ModelInitialiser;

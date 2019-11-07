@@ -4,7 +4,7 @@ import { AlerterContainer } from '../services/alerter';
 import Bootbox from '../services/bootbox';
 import ContextMenu from './context_menu';
 
-class Layout extends React.Component {
+export default class Layout extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -23,5 +23,3 @@ class Layout extends React.Component {
     );
   }
 }
-
-module.exports = Layout;

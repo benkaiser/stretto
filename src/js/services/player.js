@@ -191,4 +191,4 @@ class Player {
 let instance = new Player();
 
 window.Player = Player;
-module.exports = instance;
+export default instance;

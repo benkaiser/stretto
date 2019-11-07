@@ -3,7 +3,7 @@ import Youtube from '../services/youtube';
 let listeners = [];
 let songs = [];
 
-class Song {
+export default class Song {
   constructor(attrs) {
     this.album = attrs.album || '';
     this.artist = attrs.artist || '';
@@ -117,5 +117,3 @@ class Song {
     Song.change();
   }
 }
-
-module.exports = Song;

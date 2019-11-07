@@ -2,7 +2,7 @@ import * as React from 'react';
 import Importer from '../services/importer';
 import autobind from 'autobind-decorator';
 
-class Import extends React.Component {
+export default class Import extends React.Component {
   constructor() {
     super();
     this.state = {};
@@ -81,5 +81,3 @@ class Import extends React.Component {
     });
   }
 }
-
-module.exports = Import;

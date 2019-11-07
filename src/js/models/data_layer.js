@@ -1,4 +1,4 @@
-class DataLayer {
+export default class DataLayer {
   static getItem(key) {
     return JSON.parse(localStorage.getItem(key));
   }
@@ -7,5 +7,3 @@ class DataLayer {
     localStorage.setItem(key, JSON.stringify(value));
   }
 }
-
-module.exports = DataLayer;
