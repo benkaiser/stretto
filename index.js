@@ -33,6 +33,7 @@ app.use('/youtube', proxy('https://www.youtube.com', {
     return {};
   }
 }));
+app.use('/scapi', proxy('https://api-v2.soundcloud.com'));
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
 app.use('/static', express.static('static'));

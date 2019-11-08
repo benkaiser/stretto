@@ -22,6 +22,9 @@ export default class Playlist {
     this.songs = attrs.songs || [];
     this.title = attrs.title || '';
     this.editable = attrs.title != Playlist.LIBRARY;
+    if (attrs.editable !== undefined) {
+      this.editable = attrs.editable;
+    }
     this.updatedAt = attrs.updatedAt || +new Date();
     if (attrs.title === Playlist.LIBRARY) {
       this.sortBy('createdAt', SortDirection.DESCENDING);

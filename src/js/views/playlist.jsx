@@ -1,5 +1,5 @@
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { Label, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
 import autobind from 'autobind-decorator';
 import moment from 'moment';
 import Bootbox from '../services/bootbox';
@@ -11,20 +11,6 @@ import Playlist, { SortDirection } from '../models/playlist';
 import Alerter from '../services/alerter';
 import Utilities from '../utilities';
 
-const COLUMNS = ['title', 'artist', 'album', 'createdAt'];
-
-const COLUMN_TITLE_MAPPING = {
-  'title': 'Title',
-  'artist': 'Artist',
-  'album': 'Album',
-  'createdAt': 'Date Added'
-};
-const COLUMN_WIDTH_MAPPING = {
-  'title': 0.3,
-  'artist': 0.25,
-  'album': 0.25,
-  'createdAt': 0.2
-}
 const ELEMENT_HEIGHT = 40;
 const HEADER_HEIGHT = 50;
 
@@ -70,7 +56,7 @@ export default class PlaylistView extends React.Component {
         <table className='song-table table'>
           <thead>
             <tr>
-              { COLUMNS.map((column) => this.headerForColumn(column)) }
+              { this.getColumns().map((column) => this.headerForColumn(column)) }
             </tr>
           </thead>
           <this.SortableContainer
@@ -83,12 +69,21 @@ export default class PlaylistView extends React.Component {
             transitionDuration={0}
           />
         </table>
+        { this.allowPagination &&
+          this.allowPagination() &&
+          <Button
+            bsStyle='primary'
+            className={'paginate ' + (this.state.atBottom ? 'slideInUp' : 'slideOutDown')}
+            onClick={this.paginationCallback.bind(this)}
+          >
+            Load More
+          </Button> }
       </div>
     );
   }
 
   cellWidthForColumn(column) {
-    return COLUMN_WIDTH_MAPPING[column] * this.state.width;
+    return this.columnWidthMappings()[column] * this.state.width;
   }
 
   clickSong(song, event) {
@@ -133,7 +128,7 @@ export default class PlaylistView extends React.Component {
   }
 
   contentContainer() {
-    return document.getElementsByClassName('content')[0];
+    return this._contentContainer || (this._contentContainer = document.getElementsByClassName('content')[0]);
   }
 
   determineStateForElementsToShow(scrollTop, containerHeight, playlist) {
@@ -143,12 +138,14 @@ export default class PlaylistView extends React.Component {
     const firstIndex = Math.max(Math.floor(scrollTopMinusHeader / ELEMENT_HEIGHT) - 10, 0);
     const lastIndex = Math.min(firstIndex + numElements, numSongs);
     const songs = playlist.songData.slice(firstIndex, lastIndex);
+    const container = this.contentContainer();
     return {
       scrollTop,
       firstIndex: firstIndex,
       songsToRender: songs,
       topSpacerHeight: firstIndex * ELEMENT_HEIGHT,
-      bottomSpacerHeight: (playlist.songData.length - lastIndex) * ELEMENT_HEIGHT
+      bottomSpacerHeight: (playlist.songData.length - lastIndex) * ELEMENT_HEIGHT,
+      atBottom: container ? scrollTop > container.scrollHeight - container.offsetHeight - 100 : false 
     };
   }
 
@@ -195,7 +192,7 @@ export default class PlaylistView extends React.Component {
         key={'header_' + column}
         className={`${column}Column`}
         onClick={() => this.sortBy(column)}>
-        {COLUMN_TITLE_MAPPING[column]}
+        {this.columnTitleMappings()[column]}
         { ' ' }
         { this.sortIconFor(column) }
       </th>
@@ -227,6 +224,8 @@ export default class PlaylistView extends React.Component {
       case 'artist':
       case 'album':
         return <td key={key} onClick={this._searchFor.bind(this, song[column])} role='link' className='searchable'>{song[column]}</td>;
+      case 'duration':
+        return <td key={key}>{Utilities.timeFormat(~~song[column])}</td>;
       default:
         return <td key={key}>{song[column]}</td>;
     }
@@ -341,7 +340,7 @@ export default class PlaylistView extends React.Component {
       <tr className={ this._classForId(value.id) }
           onClick={this.clickSong.bind(this, value)}
           onContextMenu={this.rightClickSong.bind(this, value)}>
-        { COLUMNS.map((column) => this.itemForColumn(column, value)) }
+        { this.getColumns().map((column) => this.itemForColumn(column, value)) }
       </tr>
     );
   }
@@ -408,6 +407,28 @@ export default class PlaylistView extends React.Component {
     } else {
       return [song];
     }
+  }
+
+  getColumns() {
+    return ['title', 'artist', 'album', 'createdAt'];
+  }
+
+  columnTitleMappings() {
+    return {
+      'title': 'Title',
+      'artist': 'Artist',
+      'album': 'Album',
+      'createdAt': 'Date Added'
+    };
+  }
+
+  columnWidthMappings() {
+    return {
+      'title': 0.3,
+      'artist': 0.25,
+      'album': 0.25,
+      'createdAt': 0.2
+    };
   }
 }
 
