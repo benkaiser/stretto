@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
+const assert = require('assert');
 var youtubeSearch = require('youtube-search');
 
 const router = express.Router();
@@ -67,6 +68,50 @@ router.get('/latestversion', loggedIn, (req, res) => {
 router.get('/latestdata', loggedIn, (req, res) => {
   DataMapper.getDataForUser(req.session.user).then((data) => {
     res.send(data);
+  }).catch(errorHandler.bind(res));
+});
+
+function validateSong(song) {
+  assert.strictEqual(typeof song, 'object', 'Song is not an object');
+  assert.strictEqual(typeof song.id, 'string', 'id is not a string');
+  assert.strictEqual(typeof song.cover, 'string', 'cover is not a string');
+  assert.strictEqual(typeof song.url, 'string', 'url is not a string');
+  assert.strictEqual(typeof song.album, 'string', 'album is not a string');
+  assert.strictEqual(typeof song.artist, 'string', 'artist is not a string');
+  assert.strictEqual(typeof song.createdAt, 'number', 'createdAt is not a number');
+  assert.strictEqual(typeof song.updatedAt, 'number', 'updatedAt is not a number');
+  assert.strictEqual(typeof song.isYoutube, 'boolean', 'isYoutube is not a boolean');
+  assert.strictEqual(typeof song.isSoundcloud, 'boolean', 'isSoundcloud is not a boolean');
+  assert.strictEqual(typeof song.explicit, 'boolean', 'explicit is not a boolean');
+}
+
+function songPresent(song, data) {
+  return data.songs.some(existingSong => existingSong.id === song.id);
+}
+
+function validatePlaylist(playlist, data) {
+  assert.strictEqual(typeof playlist, 'string');
+  assert.ok(data.playlists.some(existingPlaylist => existingPlaylist.title === playlist));
+}
+
+router.post('/addsong', loggedIn, (req, res) => {
+  DataMapper.getDataForUser(req.session.user).then((data) => {
+    validateSong(req.body.song);
+    validatePlaylist(req.body.playlist, data)
+    if (!songPresent(req.body.song, data)) {
+      data.songs.push(req.body.song);
+    }
+    data.playlists = data.playlists.map(playlist => {
+      if (playlist.title === req.body.playlist) {
+        playlist.songs.push(req.body.song.id);
+      }
+      return playlist;
+    });
+    return DataMapper.setDataForUser(data, req.session.user)
+    .then((newVersion) => {
+      console.log(newVersion);
+      res.send({ success: true, version: newVersion })
+    })
   }).catch(errorHandler.bind(res));
 });
 
