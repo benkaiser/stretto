@@ -95,6 +95,7 @@ export default class Edit extends React.Component {
     if (Youtube.isYoutubeURL(this.state.url)) {
       return (
         <iframe
+          key={this.state.url}
           width='560'
           height='315'
           src={`https://www.youtube.com/embed/${Youtube.extractId(this.state.url)}`}
@@ -105,6 +106,7 @@ export default class Edit extends React.Component {
     } else if (Soundcloud.isSoundcloudURL(this.state.url)) {
       return (
         <iframe
+          key={this.state.url}
           width='560'
           height='315'
           scrolling='no'
@@ -292,7 +294,7 @@ export default class Edit extends React.Component {
         </div>
         <div className='col-sm-6'>
           <h4> From SoundCloud</h4>
-          {this.state.youtubeSuggestions && this.state.soundcloudSuggestions.map(this.suggestionItem)}
+          {this.state.soundcloudSuggestions && this.state.soundcloudSuggestions.map(this.suggestionItem)}
         </div>
       </div>
     );
