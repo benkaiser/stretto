@@ -14,7 +14,12 @@ export default class Intro extends React.Component {
           <CountrySwitcher />
           <div className='form-group'>
             <div className='col-sm-10 col-sm-offset-2'>
-            <Link to='/import/'><Button bsStyle='primary'>Import from Stretto 1.x</Button></Link>
+            <Link to='/import/'><Button bsStyle='primary'>Import from Stretto Desktop (old Stretto)</Button></Link>
+            </div>
+          </div>
+          <div className='form-group'>
+            <div className='col-sm-10 col-sm-offset-2'>
+              <Link to='/backup/'><Button bsStyle='primary'>Backup and Restore data</Button></Link>
             </div>
           </div>
         </div>

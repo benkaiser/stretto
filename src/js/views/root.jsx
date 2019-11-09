@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { ReactRouterGlobalHistory } from 'react-router-global-history';
 import Add from './add';
+import BackupRestore from './backup_restore';
 import Discover from './discover';
 import Edit from './edit';
 import Intro from './intro';
@@ -27,6 +28,7 @@ class RegularRoutes extends React.Component {
           <Route path='/add' component={Add} />
           <Route path='/edit/:id' component={Edit} />
           <Route path='/import' component={Import} />
+          <Route path='/backup' component={BackupRestore} />
           <Route path='/welcome' component={Intro} />
           <Route path='/settings' component={Settings} />
           <Route path='/spotify' component={Spotify} />

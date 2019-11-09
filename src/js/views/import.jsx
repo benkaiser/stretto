@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Importer from '../services/importer';
+import ImporterOld from '../services/importer_old';
 import autobind from 'autobind-decorator';
 
 export default class Import extends React.Component {
@@ -59,7 +59,7 @@ export default class Import extends React.Component {
     });
     try {
       let importData = JSON.parse(this.input.value);
-      this.importer = new Importer({
+      this.importer = new ImporterOld({
         data: importData,
         progressCallback: this._onProgress
       });
