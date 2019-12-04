@@ -3,7 +3,7 @@ import fetchJsonp from 'fetch-jsonp';
 
 export default class Soundcloud {
   static get client_id() {
-    return 'BeGVhOrGmfboy1LtiHTQF6Ejpt9ULJCI';
+    return 'UW9ajvMgVdMMW3cdeBi8lPfN6dvOVGji';
   }
 
   static extractId(url) {
