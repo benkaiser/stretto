@@ -241,6 +241,7 @@ export default class Edit extends React.Component {
     const track = this.state.track;
     track.title = this.state.title;
     track.artist = this.state.artist;
+    track.album = this.state.album;
     track.cover = this.state.cover;
     track.url = this.state.url;
     track.isSoundcloud = Soundcloud.isSoundcloudURL(this.state.url);
