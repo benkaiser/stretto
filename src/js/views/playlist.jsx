@@ -145,7 +145,7 @@ export default class PlaylistView extends React.Component {
       songsToRender: songs,
       topSpacerHeight: firstIndex * ELEMENT_HEIGHT,
       bottomSpacerHeight: (playlist.songData.length - lastIndex) * ELEMENT_HEIGHT,
-      atBottom: container ? scrollTop > container.scrollHeight - container.offsetHeight - 100 : false 
+      atBottom: container ? scrollTop > container.scrollHeight - container.offsetHeight - 100 : false
     };
   }
 
@@ -297,9 +297,13 @@ export default class PlaylistView extends React.Component {
 
   @autobind
   shouldCancelSortStart() {
-    if (!this.state.playlist.editable || this.state.sortDirection !== SortDirection.NONE) {
+    if (!this.state.playlist.editable || this.state.sortDirection !== SortDirection.NONE || this._isAndroid()) {
       return true;
     }
+  }
+
+  _isAndroid() {
+    return navigator.userAgent.toLowerCase().indexOf("android") > -1;
   }
 
   @autobind
