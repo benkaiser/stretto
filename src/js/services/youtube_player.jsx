@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
-import getHistory from 'react-router-global-history'; 
+import getHistory from 'react-router-global-history';
 import Alerter from './alerter';
 
 let readyPromise;

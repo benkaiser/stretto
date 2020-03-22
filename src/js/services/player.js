@@ -13,6 +13,7 @@ class Player {
     this.shuffle_on = false;
     YoutubePlayer.injectHandlers(this.playstateChange, this.songEnded);
     SoundcloudPlayer.injectHandlers(this.playstateChange, this.songEnded);
+    this.setupMediaHandler();
   }
 
   get REPEAT() {
@@ -75,6 +76,7 @@ class Player {
     if (this.currentSong && this.currentSong.id == song.id) {
       return;
     }
+    this.tryPlayAudioTag();
     this.updateSong(song);
 
     this.currentPlayer && this.currentPlayer.dispose();
@@ -165,6 +167,7 @@ class Player {
 
   @autobind
   togglePlaying() {
+    this.tryPlayAudioTag();
     this.currentPlayer && this.currentPlayer.toggle();
   }
 
@@ -184,7 +187,64 @@ class Player {
 
   updateSong(song) {
     this.currentSong = song;
+    this.updateMediaSession(this.currentSong);
     this.songChange(this.currentSong);
+  }
+
+  /**
+   * This is a hack to get the media session controls to use the
+   * methods and information from Stretto rather than the embedded iframe.
+   */
+  tryPlayAudioTag() {
+    try {
+      this.audioTag && this.audioTag.play();
+    } catch (error) {
+      /* no-op */
+    }
+  }
+
+  setupMediaHandler() {
+    if ('mediaSession' in navigator) {
+      if (!this.audioTag) {
+        this.audioTag = document.getElementById('audioplayer');
+      }
+      navigator.mediaSession.setActionHandler('play', () => {
+        setTimeout(() => {
+          this.togglePlaying();
+        }, 0);
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        setTimeout(() => {
+          this.togglePlaying();
+        }, 0);
+      });
+      navigator.mediaSession.setActionHandler('seekbackward', () => {
+        this.currentTime()
+        .then((currentTime) => {
+          this.setCurrentTime(Math.min(currentTime - .05, 1));
+        });
+      });
+      navigator.mediaSession.setActionHandler('seekforward', () => {
+        this.currentTime()
+        .then((currentTime) => {
+          this.setCurrentTime(Math.min(currentTime + .05, 1));
+        });
+      });
+      navigator.mediaSession.setActionHandler('previoustrack', () => this.previous());
+      navigator.mediaSession.setActionHandler('nexttrack', () => this.next());
+    }
+  }
+
+  updateMediaSession(song) {
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: song.title,
+        artist: song.artist,
+        album: song.album,
+        artwork: [{src: song.cover, sizes: '512x512', type: 'image/jpeg'}]
+      });
+      this.setupMediaHandler();
+    }
   }
 }
 
