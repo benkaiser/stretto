@@ -62,3 +62,7 @@ Add your MONGO_URL settings to your environment variables, then execute
 yarn
 npm run dev
 ```
+
+#### License
+
+MIT
