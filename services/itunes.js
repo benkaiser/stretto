@@ -50,6 +50,7 @@ module.exports = class Itunes {
     .then(results => results.filter(result => result.wrapperType === 'track' && result.kind === 'song'))
     .then(results => results.map(result => Itunes.standardItem(result)))
     .then(results => results.sort((a, b) => a.releaseDate < b.releaseDate ? 1 : -1))
+    .then(results => results.filter((item, index) => results.findIndex(findItem => findItem.id === item.id) === index))
     .then(results => results.filter(result => new Date(result.releaseDate) > oneYearAgo).slice(0, MAX_FOLLOWED_SONG));
   }
 
