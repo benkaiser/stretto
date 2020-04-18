@@ -53,7 +53,7 @@ That's it! Go to http://localhost:3000
 #### Without Docker
 
 You'll need:
-- Node.js 6
+- Node.js 10
 - Mongodb running
 
 Add your MONGO_URL settings to your environment variables, then execute
