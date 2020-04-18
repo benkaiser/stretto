@@ -7,6 +7,7 @@ var youtubeSearch = require('youtube-search');
 const router = express.Router();
 const Google = require('../services/google');
 const DataMapper = require('../models/data_mapper');
+const Itunes = require('../services/itunes');
 
 const WebGoogle = new Google(process.env.GOOGLE_CLIENT_ID);
 const AndroidGoogle = new Google(process.env.GOOGLE_CLIENT_ID_ANDROID);
@@ -68,6 +69,44 @@ router.get('/latestversion', loggedIn, (req, res) => {
 router.get('/latestdata', loggedIn, (req, res) => {
   DataMapper.getDataForUser(req.session.user).then((data) => {
     res.send(data);
+  }).catch(errorHandler.bind(res));
+});
+
+router.get('/suggest/artists', loggedIn, (req, res) => {
+  DataMapper.getTopArtists(req.session.user, 5)
+  .then(artists => {
+    return Promise.all(
+      artists.map(artist => Itunes.getArtistResults(artist.artist))
+    );
+  })
+  .then(itunesResponses => {
+    const convertedItems = itunesResponses.map(response => {
+      if (response && response.results && response.results.length > 0) {
+        return response.results[0];
+      } else {
+        return undefined;
+      }
+    }).filter(item => !!item);
+    return convertedItems.filter((item, index) => convertedItems.findIndex(filterMatch => item.artistId === filterMatch.artistId) === index);
+  })
+  .then(artistItems => {
+    return Promise.all(
+      artistItems.map(artist => {
+        return Itunes.getPhotoOfArtist(artist.artistLinkUrl).then(coverUrl => Object.assign(artist, { artistCover: coverUrl}))
+      })
+    );
+  })
+  .then(data => {
+    res.send(data);
+  }).catch(errorHandler.bind(res));
+});
+
+router.post('/artists/follow', loggedIn, (req, res) => {
+  DataMapper.followArtist(req.body.artist, req.session.user)
+  .then(document => {
+    if (document) {
+      res.send('Added');
+    }
   }).catch(errorHandler.bind(res));
 });
 

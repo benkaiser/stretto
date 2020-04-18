@@ -4,12 +4,14 @@ var songsMap = {};
 const Playlist = require('./playlist');
 const SharedPlaylists = require('./shared_playlist');
 const Song = require('./song');
+const Artist = require('./artist');
 const User = require('./user');
 const mongoose = require('mongoose');
 
 module.exports = class DataMapper {
   static initialize(dbUrl) {
     mongoose.connect(dbUrl, function() {
+      Artist.initialize();
       Song.initialize();
       Playlist.initialize();
       User.initialize();
@@ -35,6 +37,31 @@ module.exports = class DataMapper {
     return User.getVersionForUser(user);
   }
 
+  static getTopArtists(user, howMany) {
+    return Song.getSongs(user.email)
+    .then(songs => {
+      const artistLookup = {};
+      songs.forEach(song => {
+        if (song && song.artist) {
+          if (artistLookup[song.artist]) {
+            artistLookup[song.artist]++;
+          } else {
+            artistLookup[song.artist] = 1;
+          }
+        }
+      });
+      delete artistLookup['Unknown'];
+      const artistArray = Object.keys(artistLookup).map(key => {
+        return {
+          artist: key,
+          count: artistLookup[key]
+        };
+      });
+      artistArray.sort((a, b) => a.count > b.count ? -1 : 1);
+      return artistArray.slice(0, howMany);
+    });
+  }
+
   static setDataForUser(data, user) {
     return User.getVersionForUser(user)
     .then((version) => {
@@ -48,6 +75,10 @@ module.exports = class DataMapper {
       }
       return Promise.reject('version mismatch');
     });
+  }
+
+  static followArtist(artist, user) {
+    return Artist.followArtist(user.email, artist);
   }
 
   static sharePlaylist(playlistData, user) {
