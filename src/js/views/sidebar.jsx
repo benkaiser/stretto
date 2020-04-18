@@ -40,7 +40,7 @@ export default class Sidebar extends React.Component {
           <ul className='nav nav-pills nav-stacked'>
             <li key='soundcloud'><Link to='/soundcloud'>Soundcloud</Link></li>
             <li key='discover'><Link to='/discover'>Discover</Link></li>
-            <li key='artists'><Link to='/artists'>Artists</Link></li>
+            <li key='artists'><Link to='/artists/feed'>Artists Feed</Link></li>
             <li className='dropdown-header'>Your Music <Label className='addPlaylist' bsStyle="default" onClick={this.addNewPlaylist}>Add Playlist</Label></li>
             { Playlist.fetchAll().map((playlist) =>
               <li key={'playlist_' + playlist.title}>

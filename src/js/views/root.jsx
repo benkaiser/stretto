@@ -3,8 +3,9 @@ import * as React from 'react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { ReactRouterGlobalHistory } from 'react-router-global-history';
 import Add from './add';
-import Artists from './artists';
+import ArtistSuggestions from './artist_suggestions';
 import ArtistsFeed from './artists_feed';
+import ArtistsManage from './artists_manage';
 import BackupRestore from './backup_restore';
 import Discover from './discover';
 import Edit from './edit';
@@ -40,7 +41,8 @@ class RegularRoutes extends React.Component {
           <Route path='/mix/:playlist' component={YoutubeMix} />
           <Route path='/discover' component={Discover} />
           <Route path='/artists/feed' component={ArtistsFeed} />
-          <Route path='/artists' component={Artists} />
+          <Route path='/artists/add' component={ArtistSuggestions} />
+          <Route path='/artists/manage' component={ArtistsManage} />
           <Route path='/soundcloud' component={Soundcloud} />
           <Route path='/shared/:guid' component={SharedPlaylist} />
           <Route exact component={Intro} />

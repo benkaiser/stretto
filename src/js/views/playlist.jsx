@@ -218,6 +218,7 @@ export default class PlaylistView extends React.Component {
             { this.isCurrentlyPlaying(song.id) && Lyrics.lyrics && this._lyricsButton() }
           </td>
         );
+      case 'releaseDate':
       case 'createdAt':
       case 'updatedAt':
         return <td key={key}>{moment(song[column]).fromNow()}</td>;

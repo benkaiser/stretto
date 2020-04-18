@@ -37,7 +37,13 @@ module.exports = class DataMapper {
     return User.getVersionForUser(user);
   }
 
-  static getTopArtists(user, howMany) {
+  static getFollowedArtists(user) {
+    return Artist.getFollowedArtists(user.email);
+  }
+
+  static getTopArtists(user, artistsToFilterOut, howMany, atLeastXSongs) {
+    atLeastXSongs = atLeastXSongs || 0;
+    const filterLookup = artistsToFilterOut.map(artist => artist.artistName.toLowerCase());
     return Song.getSongs(user.email)
     .then(songs => {
       const artistLookup = {};
@@ -51,14 +57,16 @@ module.exports = class DataMapper {
         }
       });
       delete artistLookup['Unknown'];
-      const artistArray = Object.keys(artistLookup).map(key => {
+      let artistArray = Object.keys(artistLookup).map(key => {
         return {
           artist: key,
+          lowerCase: key.toLowerCase(),
           count: artistLookup[key]
         };
       });
       artistArray.sort((a, b) => a.count > b.count ? -1 : 1);
-      return artistArray.slice(0, howMany);
+      artistArray = artistArray.filter(artist => filterLookup.indexOf(artist.lowerCase) === -1);
+      return artistArray.slice(0, howMany).filter(artist => artist.count > atLeastXSongs);
     });
   }
 
@@ -79,6 +87,11 @@ module.exports = class DataMapper {
 
   static followArtist(artist, user) {
     return Artist.followArtist(user.email, artist);
+  }
+
+  static unfollowArtist(artist, user) {
+    return Artist.unfollowArtist(user.email, artist);
+
   }
 
   static sharePlaylist(playlistData, user) {

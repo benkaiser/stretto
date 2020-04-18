@@ -14,7 +14,7 @@ module.exports = class Artist {
     return new Promise((resolve, reject) => {
       ArtistModel.findOne({ email: email }, (err, doc) => {
         if (err) { return reject(err); }
-        if (!doc) { return reject('Doc isn\'t defined'); }
+        if (!doc) { return resolve([]); }
         resolve(doc.artists);
       });
     });
@@ -24,12 +24,31 @@ module.exports = class Artist {
     return new Promise((resolve, reject) => {
       ArtistModel.findOne({ email: email }, (err, doc) => {
         let artists = [];
-        if (doc.artists) {
+        if (doc && doc.artists) {
           if (doc.artists.findIndex((item) => item.artistId == artist.artistId) === -1) {
             artists = doc.artists.concat(artist);
           }
         } else {
           artists = [artist];
+        }
+        ArtistModel.findOneAndUpdate(
+          { email: email },
+          { email: email, artists: artists },
+          { upsert: true },
+        (err, result) => {
+          if (err) { return reject(err); }
+          resolve(result);
+        });
+      });
+    });
+  }
+
+  static unfollowArtist(email, artist) {
+    return new Promise((resolve, reject) => {
+      ArtistModel.findOne({ email: email }, (err, doc) => {
+        let artists = [];
+        if (doc && doc.artists) {
+          artists = doc.artists.filter((item) => item.artistId !== artist.artistId);
         }
         ArtistModel.findOneAndUpdate(
           { email: email },

@@ -21,6 +21,7 @@ export default class Song {
     this.spotifyId = attrs.spotifyId;
     this.year = attrs.year || new Date().getFullYear();
     this.updatedAt = attrs.updatedAt || +new Date();
+    this.releaseDate = attrs.releaseDate;
     this.setId(attrs.id);
   }
 
@@ -40,7 +41,8 @@ export default class Song {
       trackNumber: this.trackNumber,
       updatedAt: this.updatedAt,
       url: this.url,
-      year: this.year
+      year: this.year,
+      releaseDate: this.releaseDate
     };
   }
 

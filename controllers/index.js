@@ -73,7 +73,10 @@ router.get('/latestdata', loggedIn, (req, res) => {
 });
 
 router.get('/suggest/artists', loggedIn, (req, res) => {
-  DataMapper.getTopArtists(req.session.user, 5)
+  DataMapper.getFollowedArtists(req.session.user)
+  .then(followedArtists => {
+    return DataMapper.getTopArtists(req.session.user, followedArtists, 20, 2)
+  })
   .then(artists => {
     return Promise.all(
       artists.map(artist => Itunes.getArtistResults(artist.artist))
@@ -101,11 +104,39 @@ router.get('/suggest/artists', loggedIn, (req, res) => {
   }).catch(errorHandler.bind(res));
 });
 
+router.get('/artists/followed/raw', loggedIn, (req, res) => {
+  DataMapper.getFollowedArtists(req.session.user)
+  .then(results => {
+    res.send(results);
+  }).catch(errorHandler.bind(res));
+});
+
+router.get('/artists/followed', loggedIn, (req, res) => {
+  DataMapper.getFollowedArtists(req.session.user)
+  .then(artists => Itunes.getSongsForArtists(artists))
+  .then(results => {
+    res.send(results);
+  }).catch(errorHandler.bind(res));
+});
+
 router.post('/artists/follow', loggedIn, (req, res) => {
   DataMapper.followArtist(req.body.artist, req.session.user)
   .then(document => {
     if (document) {
-      res.send('Added');
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
+    }
+  }).catch(errorHandler.bind(res));
+});
+
+router.post('/artists/unfollow', loggedIn, (req, res) => {
+  DataMapper.unfollowArtist(req.body.artist, req.session.user)
+  .then(document => {
+    if (document) {
+      res.send({ success: true });
+    } else {
+      res.send({ success: false });
     }
   }).catch(errorHandler.bind(res));
 });

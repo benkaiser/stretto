@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Button, Col, Row, Image } from 'react-bootstrap';
 import Utilities from '../utilities';
+import Alerter from '../services/alerter';
 
-export default class Artists extends React.Component {
+export default class ArtistsManage extends React.Component {
   constructor(props) {
     super(props);
 
@@ -19,55 +20,41 @@ export default class Artists extends React.Component {
   render() {
     return (
       <div className='intro'>
-        <h1>Select Your Favorite Artists</h1>
+        <h1>Manage Your Followed Artists</h1>
+        <p>Click to unfollow an artist</p>
         { this.state.artists &&
           <Row>
             { this.state.artists.map(artist => (
               <Col key={artist.artistId} md={3}>
+                <Image onClick={this._unfollow.bind(this, artist)} className='artistImage' src={artist.artistCover} />
                 <h4 className='artistText'>{artist.artistName}</h4>
-                <Image onClick={this._follow.bind(this, artist)} className={`artistImage ${artist.following ? 'followingArtist' : ''}`} src={artist.artistCover} />
               </Col>
             )) }
           </Row>
         }
-        { this.state.following.length > 0 && (
-          <Button bsStyle='primary' onClick={this._goToFeed.bind(this)}>Go To Feed</Button>
-        )}
       </div>
     );
   }
 
-  _goToFeed() {
-    this.props.history.push('/artists/feed');
-  }
-
-  _follow(artistToFollow) {
+  _unfollow(artistToUnfollow) {
     this.setState({
-      following: this.state.following.concat(artistToFollow),
-      artists: this.state.artists.map(artist => {
-        if (artistToFollow === artist) {
-          return {
-            ...artist,
-            following: true
-          };
-        }
-        return artist;
-      })
+      artists: this.state.artists.filter(artist => artist !== artistToUnfollow)
     });
-    return fetch('/artists/follow', {
+    Alerter.success(`Unfollowed ${ artistToUnfollow.artistName }`);
+    return fetch('/artists/unfollow', {
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
       },
       method: 'POST',
       body: JSON.stringify({
-        artist: artistToFollow
+        artist: artistToUnfollow
       })
     });
   }
 
   _loadArtists() {
-    fetch('/suggest/artists')
+    fetch('/artists/followed/raw')
     .then(Utilities.fetchToJson)
     .then(responseJson => {
       this.setState({
