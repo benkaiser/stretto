@@ -42,7 +42,7 @@ export default class ModelInitialiser {
       discNumber: 1,
       explicit: false,
       genre: 'Alternative',
-      id: 'OIRE6iw-ws4',
+      id: 'iArXv64tCJA',
       isYoutube: true,
       title: 'Young Folks',
       trackNumber: 3

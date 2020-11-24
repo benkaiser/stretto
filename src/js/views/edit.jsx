@@ -100,7 +100,7 @@ export default class Edit extends React.Component {
           height='315'
           src={`https://www.youtube.com/embed/${Youtube.extractId(this.state.url)}`}
           frameBorder='0'
-          allowFullscreen>
+          allowFullScreen>
         </iframe>
       );
     } else if (Soundcloud.isSoundcloudURL(this.state.url)) {

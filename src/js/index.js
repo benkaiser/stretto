@@ -7,6 +7,7 @@ import RootView from './views/root';
 import SCSS from '../scss/main.scss';
 import Theme from './theme';
 import TitleUpdater from './services/title_updater';
+import ServiceWorkerClient from './services/service_worker_client';
 
 class Loader {
   static loadAll() {
@@ -17,6 +18,7 @@ class Loader {
     ModelInitialiser.initialise();
     RootView.initialise();
     Lyrics.initialise();
+    ServiceWorkerClient.initialise();
   }
 }
 

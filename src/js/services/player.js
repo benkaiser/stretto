@@ -3,7 +3,9 @@ import Playlist from '../models/playlist';
 import Song from '../models/song';
 import SoundcloudPlayer from './soundcloud_player';
 import YoutubePlayer from './youtube_player';
+import HTML5AudioPlayer from './html5_audio_player';
 import autobind from 'autobind-decorator';
+import ServiceWorkerClient from './service_worker_client';
 
 class Player {
   constructor() {
@@ -13,6 +15,7 @@ class Player {
     this.shuffle_on = false;
     YoutubePlayer.injectHandlers(this.playstateChange, this.songEnded);
     SoundcloudPlayer.injectHandlers(this.playstateChange, this.songEnded);
+    HTML5AudioPlayer.injectHandlers(this.playstateChange, this.songEnded);
     this.setupMediaHandler();
   }
 
@@ -49,6 +52,9 @@ class Player {
   }
 
   getPlayerFor(song, options) {
+    if (song.offline) {
+      return new HTML5AudioPlayer(song, options);
+    }
     if (song.isYoutube) {
       return new YoutubePlayer(song, options);
     } else if (song.isSoundcloud) {
@@ -76,7 +82,11 @@ class Player {
     if (this.currentSong && this.currentSong.id == song.id) {
       return;
     }
-    this.tryPlayAudioTag();
+    try {
+      this.tryPlayAudioTag();
+    } catch (_) {
+      // no-op
+    }
     this.updateSong(song);
 
     this.currentPlayer && this.currentPlayer.dispose();
@@ -111,14 +121,23 @@ class Player {
       const song = Song.findById(playstate.songId);
       const playlist = Playlist.getByTitle(playstate.playlistTitle) || Playlist.getByTitle(Playlist.LIBRARY);
       if (song && playlist) {
-        this.play(
-          song,
-          playlist,
-          {
-            autoPlay: playstate.playing,
-            currentTime: playstate.currentTime,
-          }
-        );
+        const play = () => {
+          this.play(
+            song,
+            playlist,
+            {
+              autoPlay: playstate.playing,
+              currentTime: playstate.currentTime,
+            }
+          );
+        };
+        if (ServiceWorkerClient.available()) {
+          Song.waitForOffline().then(() => {
+            play();
+          });
+        } else {
+          play();
+        }
       } else {
         this.playlist = playlist;
       }

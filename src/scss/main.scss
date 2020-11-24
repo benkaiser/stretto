@@ -205,6 +205,12 @@ body, html {
   to   { opacity: 1; }
 }
 
+.airplane-label {
+  margin-right: 8px;
+  margin-left: 8px;
+  animation: fadein 0.3s;
+}
+
 .lyric-label {
   margin-top: -1px;
   animation: fadein 1s;

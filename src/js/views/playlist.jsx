@@ -10,6 +10,7 @@ import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
 import Alerter from '../services/alerter';
 import Utilities from '../utilities';
+import Song from '../models/song';
 
 const ELEMENT_HEIGHT = 40;
 const HEADER_HEIGHT = 50;
@@ -23,6 +24,7 @@ export default class PlaylistView extends React.Component {
     this._lastRenderScrollTop = 0;
     Player.addOnSongChangeListener(this.songChange);
     Playlist.addOnChangeListener(this.songChange);
+    Song.addOnChangeListener(this.songChange);
   }
 
   componentDidMount() {
@@ -44,6 +46,7 @@ export default class PlaylistView extends React.Component {
     this.contentContainer().removeEventListener('scroll', this.onScroll);
     Player.removeOnSongChangeListener(this.songChange);
     Playlist.removeOnChangeListener(this.songChange);
+    Song.removeOnChangeListener(this.songChange);
     Lyrics.removeListener(this._onLyricsFound);
     this._mounted = false;
   }
@@ -215,6 +218,7 @@ export default class PlaylistView extends React.Component {
           <td className='titleItemColumn' key={key}>
             <div className='cover' style={{'backgroundImage': `url('${song.cover}')`}}></div>
             <div className='titleItemText'>{song.title}</div>
+            { song.offline && this._offlineAirplane() }
             { this.isCurrentlyPlaying(song.id) && Lyrics.lyrics && this._lyricsButton() }
           </td>
         );
@@ -347,6 +351,14 @@ export default class PlaylistView extends React.Component {
           onContextMenu={this.rightClickSong.bind(this, value)}>
         { this.getColumns().map((column) => this.itemForColumn(column, value)) }
       </tr>
+    );
+  }
+
+  _offlineAirplane() {
+    return (
+      <div className='airplane-label'>
+        <i className="fa fa-plane" aria-hidden="true"></i>
+      </div>
     );
   }
 

@@ -1,7 +1,11 @@
+import ServiceWorkerClient from '../services/service_worker_client';
 import Youtube from '../services/youtube';
 
 let listeners = [];
 let songs = [];
+let offlineSongs = [];
+let offlineReady;
+const offlineReadyPromise = new Promise(resolve => offlineReady = resolve);
 
 export default class Song {
   constructor(attrs) {
@@ -78,6 +82,10 @@ export default class Song {
     return (this.title + ' ' + this.artist + ' ' + this.album).toLowerCase();
   }
 
+  get offline() {
+    return offlineSongs.includes(this.originalId);
+  }
+
   static addOnChangeListener(listener) {
     listeners.push(listener);
   }
@@ -110,6 +118,29 @@ export default class Song {
     initialData.forEach((item) => {
       songs.push(new Song(item));
     });
+    ServiceWorkerClient.getOffline()
+    .then(offlinedSongs => {
+      offlineSongs = offlinedSongs;
+      Song.change();
+      offlineReady();
+    })
+    .catch(() => {
+      offlineReady();
+    })
+  }
+
+  static offline(songId) {
+    ServiceWorkerClient.offline(songId)
+    .then(() => {
+      if (!offlineSongs.includes(songId)) {
+        offlineSongs.push(songId);
+        Song.change();
+      }
+    });
+  }
+
+  static waitForOffline() {
+    return offlineReadyPromise;
   }
 
   static remove(song) {
