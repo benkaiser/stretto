@@ -200,7 +200,7 @@ class ContextMenu extends React.Component {
 
   @autobind
   _offline() {
-    Song.offline(this.state.items[0].originalId);
+    this.state.items[0].cacheOffline();
   }
 
   static open(items, event, playlist) {

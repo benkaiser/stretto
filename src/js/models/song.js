@@ -70,6 +70,26 @@ export default class Song {
     });
   }
 
+  cacheOffline(rawBytes) {
+    if (this.isYoutube) {
+      ServiceWorkerClient.offlineYoutube(this.originalId)
+      .then(() => {
+        if (!offlineSongs.includes(this.originalId)) {
+          offlineSongs.push(this.originalId);
+          Song.change();
+        }
+      });
+    } else if (this.isSoundcloud) {
+      ServiceWorkerClient.offlineSoundcloud(this.originalId, rawBytes)
+      .then(() => {
+        if (!offlineSongs.includes(this.originalId)) {
+          offlineSongs.push(this.originalId);
+          Song.change();
+        }
+      });
+    }
+  }
+
   get originalId() {
     return this.id.slice(2);
   }
@@ -88,6 +108,10 @@ export default class Song {
 
   static addOnChangeListener(listener) {
     listeners.push(listener);
+  }
+
+  static removeOnChangeListener(listener) {
+    listeners.splice(listeners.indexOf(listener), 1);
   }
 
   static change() {
@@ -127,16 +151,6 @@ export default class Song {
     .catch(() => {
       offlineReady();
     })
-  }
-
-  static offline(songId) {
-    ServiceWorkerClient.offline(songId)
-    .then(() => {
-      if (!offlineSongs.includes(songId)) {
-        offlineSongs.push(songId);
-        Song.change();
-      }
-    });
   }
 
   static waitForOffline() {

@@ -46,6 +46,7 @@ function isOfflineUrl(path) {
 function isCacheableThirdParty(request) {
   return request.url.includes('//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/')
   || request.url.includes('ytimg.com')
+  || request.url.includes('sndcdn.com')
   || request.url.includes('mzstatic.com')
   || request.url.includes('cdnjs.cloudflare.com');
 }
@@ -107,6 +108,23 @@ function cacheYoutubeFile(payload) {
   });
 }
 
+function cacheRawFile(payload) {
+  const blob = new Blob([payload.rawFile], {
+    type: 'audio/mpeg',
+  });
+  const headers = new Headers();
+  headers.set('content-length', payload.rawFile.length);
+  headers.set('accept-ranges', 'bytes');
+  var songResponse = new Response(blob, {
+    status : 200,
+    headers: headers,
+  });
+  return caches.open(MUSIC_CACHE)
+  .then(cache => {
+    cache.put('/offlineaudio/' + payload.songId, songResponse);
+  });
+}
+
 const broadcast = new BroadcastChannel('stretto-sw');
 broadcast.onmessage = (event) => {
   if (!event.data || !event.data.type) {
@@ -116,13 +134,20 @@ broadcast.onmessage = (event) => {
     caches.open(MUSIC_CACHE)
     .then((cache) => cache.keys())
     .then(requests => {
-      console.log('Offlined: ', requests);
       const offlineItems = requests.map(request => request.url.substring(request.url.lastIndexOf('/') + 1));
       broadcast.postMessage({ type: 'OFFLINED', payload: offlineItems });
     });
   }
   if (event.data.type === 'DOWNLOAD') {
-    cacheYoutubeFile(event.data.payload);
-    broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: event.data.payload.youtubeId });
+    cacheYoutubeFile(event.data.payload)
+    .then(() => {
+      broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: event.data.payload.youtubeId });
+    });
+  }
+  if (event.data.type === 'OFFLINE_RAW_FILE') {
+    cacheRawFile(event.data.payload)
+    .then(() => {
+      broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: event.data.payload.songId });
+    });
   }
 };

@@ -22,8 +22,8 @@ export default class HTML5AudioPlayer {
       }
     }
     player.onended = HTML5AudioPlayer.endHandler;
-    player.onpause = HTML5AudioPlayer.playstateChangeHandler;
-    player.onplay = HTML5AudioPlayer.playstateChangeHandler;
+    player.onpause = () => HTML5AudioPlayer.playstateChangeHandler(false);
+    player.onplaying = () => HTML5AudioPlayer.playstateChangeHandler(true);
   }
 
   get durationCacheSeconds() {

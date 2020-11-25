@@ -1,4 +1,3 @@
-const RESET_URL = 'http://api.soundcloud.com/users/12574060';
 import Soundcloud from './soundcloud';
 import * as SC from 'soundcloud';
 

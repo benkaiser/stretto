@@ -1,9 +1,8 @@
 import Utilities from '../utilities';
-import fetchJsonp from 'fetch-jsonp';
 
 export default class Soundcloud {
   static get client_id() {
-    return '3c2fb8cfc81c40dcfb99bb9f786f561c';
+    return 'dNhNOtdLfZ4zaPqT9a9wzk8nf57qNQDh';
   }
 
   static extractId(url) {
@@ -15,7 +14,7 @@ export default class Soundcloud {
     if (!Soundcloud.isSoundcloudURL(url)) {
       return Promise.reject({ error: 'not a soundcloud track' });
     }
-    return fetch(`https://api.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
+    return fetch(`https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
     .then(Utilities.fetchToJson)
     .then((track) => Soundcloud._convertToStandardTrack(track))
     .catch((error) => {

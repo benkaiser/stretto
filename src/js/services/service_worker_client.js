@@ -16,7 +16,7 @@ export default class ServiceWorkerClient {
   }
 
   static available() {
-    return 'serviceWorker' in navigator && navigator.serviceWorker.controller.state === 'activated';
+    return 'serviceWorker' in navigator && navigator.serviceWorker.controller && navigator.serviceWorker.controller.state === 'activated';
   }
 
   static getOffline() {
@@ -35,7 +35,7 @@ export default class ServiceWorkerClient {
     return promise;
   }
 
-  static offline(youtubeId) {
+  static offlineYoutube(youtubeId) {
     let res;
     let promise = new Promise(resolve => res = resolve);
     let received = false;
@@ -56,6 +56,26 @@ export default class ServiceWorkerClient {
           format: format
         }
       });
+    });
+    return promise;
+  }
+
+  static offlineSoundcloud(soundcloudId, soundcloudRawFile) {
+    let res;
+    let promise = new Promise(resolve => res = resolve);
+    let received = false;
+    broadcast.onmessage = (message) => {
+      if (!received && message.data.type === 'OFFLINE_ADDED') {
+        res(message.data.payload);
+        received = true;
+      }
+    };
+    broadcast.postMessage({
+      type: 'OFFLINE_RAW_FILE',
+      payload: {
+        songId: soundcloudId,
+        rawFile: soundcloudRawFile
+      }
     });
     return promise;
   }

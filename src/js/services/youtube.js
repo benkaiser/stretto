@@ -1,5 +1,4 @@
 import Utilities from '../utilities';
-import fetchJsonp from 'fetch-jsonp';
 import AccountManager from './account_manager';
 
 let youtubeIdRegex = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -67,7 +66,7 @@ export default class Youtube {
   /**
    * Find the youtube automix for a song
    * @param youtubeId
-   * @returns Promise with the playlistid of the mix 
+   * @returns Promise with the playlistid of the mix
    */
   static findMix(youtubeId) {
     return fetch(`/youtube/watch?v=${youtubeId}`)
@@ -186,7 +185,7 @@ export default class Youtube {
     let seconds = (parseInt(match[3]) || 0);
     return hours * 3600 + minutes * 60 + seconds;
   }
-  
+
   static _getRadioFromPlaylistId(playlistId) {
     return AccountManager.whenYoutubeLoaded
     .then(() => AccountManager.whenLoggedIn)
@@ -205,7 +204,7 @@ export default class Youtube {
 
   static _guessSplitTitle(items) {
     return items.map((item) => {
-      const youtubeTitle = item.title; 
+      const youtubeTitle = item.title;
       const dashIndex = youtubeTitle.indexOf('-');
       if (dashIndex > -1) {
         item.title = youtubeTitle.substr(dashIndex + 1).trim();

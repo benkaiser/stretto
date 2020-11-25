@@ -1,7 +1,6 @@
 import SpotifyWebAPI from 'spotify-web-api-js';
 import async from 'async';
 import autobind from 'autobind-decorator';
-import fetchJsonp from 'fetch-jsonp';
 
 import Country from '../country';
 import Song from '../models/song';
