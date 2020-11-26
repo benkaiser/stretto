@@ -13,6 +13,7 @@ import FirstRunExperience from './services/first_run_experience';
 class Loader {
   static loadAll() {
     TitleUpdater.initialise();
+    FirstRunExperience.initialise();
     AccountManager.initialise();
     Keyboard.initialise();
     Theme.initialise();
@@ -20,7 +21,6 @@ class Loader {
     RootView.initialise();
     Lyrics.initialise();
     ServiceWorkerClient.initialise();
-    FirstRunExperience.initialise();
   }
 }
 

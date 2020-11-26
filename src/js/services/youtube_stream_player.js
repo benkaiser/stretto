@@ -1,3 +1,5 @@
+import ServiceWorkerClient from './service_worker_client';
+
 let player;
 
 export default class YoutubeStreamPlayer {
@@ -27,7 +29,11 @@ export default class YoutubeStreamPlayer {
       type: 'YOUTUBE_AUDIO_FETCH',
       payload: 'https://youtube.com/watch?v=' + song.originalId
     }, (format) => {
-      player.setAttribute('src', `http://localhost:3000/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
+      if (format) {
+        player.setAttribute('src', `http://localhost:3000/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
+      } else {
+        ServiceWorkerClient.youtubeError(song.originalId);
+      }
     });
   }
 

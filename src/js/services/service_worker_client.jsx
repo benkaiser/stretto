@@ -1,3 +1,8 @@
+import * as React from 'react';
+import { Button } from 'react-bootstrap';
+import getHistory from 'react-router-global-history';
+import Alerter from './alerter';
+
 const broadcast = new BroadcastChannel('stretto-sw');
 
 const broadcastListeners = [];
@@ -50,13 +55,17 @@ export default class ServiceWorkerClient {
       type: 'YOUTUBE_AUDIO_FETCH',
       payload: 'https://youtube.com/watch?v=' + youtubeId
     }, (format) => {
-      broadcast.postMessage({
-        type: 'DOWNLOAD',
-        payload: {
-          youtubeId: youtubeId,
-          format: format
-        }
-      });
+      if (format) {
+        broadcast.postMessage({
+          type: 'DOWNLOAD',
+          payload: {
+            youtubeId: youtubeId,
+            format: format
+          }
+        });
+      } else {
+        ServiceWorkerClient.youtubeError(youtubeId);
+      }
     });
   }
 
@@ -76,5 +85,15 @@ export default class ServiceWorkerClient {
         listener(message.data.payload);
       }
     });
+  }
+
+  static youtubeError(id) {
+    Alerter.error(<p>
+      Unable to play youtube backing track.
+      <Button onClick={() => {
+        window.lastRoute = getHistory().location.pathname;
+        getHistory().push('/edit/y_' + id);
+      }}>Edit Track</Button>
+    </p>);
   }
 }

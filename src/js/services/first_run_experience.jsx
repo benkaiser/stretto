@@ -4,13 +4,13 @@ import Bootbox from "./bootbox";
 
 export default class FirstRunExperience {
   static initialise() {
+    const helperExtensionId = localStorage.getItem('helperExtensionId');
+    if (helperExtensionId) {
+      window.helperExtensionId = helperExtensionId;
+      return;
+    }
     // wait for extension to drop variable on page
     setTimeout(() => {
-      const helperExtensionId = localStorage.getItem('helperExtensionId');
-      if (helperExtensionId) {
-        window.helperExtensionId = helperExtensionId;
-        return;
-      }
       if (FirstRunExperience.checkExtensions()) {
         FirstRunExperience.showFirstRun();
       } else {

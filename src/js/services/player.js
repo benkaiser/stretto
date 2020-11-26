@@ -1,7 +1,6 @@
 import DataLayer from '../models/data_layer';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
-import YoutubePlayer from './youtube_player';
 import HTML5AudioPlayer from './html5_audio_player';
 import SoundcloudStreamPlayer from './soundcloud_stream_player';
 import YoutubeStreamPlayer from './youtube_stream_player';
@@ -14,7 +13,6 @@ class Player {
     this.stateListeners = [];
     this.repeat_state = this.REPEAT.ALL;
     this.shuffle_on = false;
-    YoutubePlayer.injectHandlers(this.playstateChange, this.songEnded);
     HTML5AudioPlayer.injectHandlers(this.playstateChange, this.songEnded);
     SoundcloudStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     YoutubeStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
@@ -58,11 +56,7 @@ class Player {
       return new HTML5AudioPlayer(song, options);
     }
     if (song.isYoutube) {
-      if (helperExtensionId) {
-        return new YoutubeStreamPlayer(song, options);
-      } else {
-        return new YoutubePlayer(song, options);
-      }
+      return new YoutubeStreamPlayer(song, options);
     } else if (song.isSoundcloud) {
       return new SoundcloudStreamPlayer(song, options);
     }
