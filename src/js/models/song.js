@@ -72,21 +72,9 @@ export default class Song {
 
   cacheOffline(rawBytes) {
     if (this.isYoutube) {
-      ServiceWorkerClient.offlineYoutube(this.originalId)
-      .then(() => {
-        if (!offlineSongs.includes(this.originalId)) {
-          offlineSongs.push(this.originalId);
-          Song.change();
-        }
-      });
+      ServiceWorkerClient.offlineYoutube(this.originalId);
     } else if (this.isSoundcloud) {
-      ServiceWorkerClient.offlineSoundcloud(this.originalId, rawBytes)
-      .then(() => {
-        if (!offlineSongs.includes(this.originalId)) {
-          offlineSongs.push(this.originalId);
-          Song.change();
-        }
-      });
+      ServiceWorkerClient.offlineSoundcloud(this.originalId, rawBytes);
     }
   }
 
@@ -150,7 +138,13 @@ export default class Song {
     })
     .catch(() => {
       offlineReady();
-    })
+    });
+    ServiceWorkerClient.addOfflineListener((id) => {
+      if (!offlineSongs.includes(id)) {
+        offlineSongs.push(id);
+        Song.change();
+      }
+    });
   }
 
   static waitForOffline() {

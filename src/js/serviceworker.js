@@ -1,5 +1,4 @@
-import ytdl from "react-native-ytdl";
-
+const broadcast = new BroadcastChannel('stretto-sw');
 var CACHE_NAME = 'stretto-cache';
 var MUSIC_CACHE = 'stretto-cache-audio';
 var urlsToCache = [
@@ -73,7 +72,25 @@ self.addEventListener('fetch', function(event) {
   if (self.registration.scope.includes(url.origin) && isOfflineUrl(url.pathname)) {
     return event.respondWith(
       caches.open(MUSIC_CACHE)
-      .then(cache => cache.match(event.request))
+      .then(cache =>
+        cache.match(event.request, { ignoreSearch: true })
+        .then(response => {
+          if (response) {
+            return response;
+          }
+          const url = new URL(event.request.url);
+          const src = url.searchParams.get('src');
+          if (src) {
+            return fetch(src)
+            .then(response => {
+              const originalUrl = event.request.url.split('?')[0];
+              cache.put(originalUrl, response.clone());
+              broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: originalUrl.substring(originalUrl.lastIndexOf('/') + 1) });
+              return response;
+            })
+          }
+        })
+      )
     );
   }
   event.respondWith(
@@ -125,7 +142,6 @@ function cacheRawFile(payload) {
   });
 }
 
-const broadcast = new BroadcastChannel('stretto-sw');
 broadcast.onmessage = (event) => {
   if (!event.data || !event.data.type) {
     return;

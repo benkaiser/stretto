@@ -36,15 +36,6 @@ export default class ServiceWorkerClient {
   }
 
   static offlineYoutube(youtubeId) {
-    let res;
-    let promise = new Promise(resolve => res = resolve);
-    let received = false;
-    broadcast.onmessage = (message) => {
-      if (!received && message.data.type === 'OFFLINE_ADDED') {
-        res(message.data.payload);
-        received = true;
-      }
-    };
     chrome.runtime.sendMessage(youtubeExtractorExtensionId, {
       type: 'YOUTUBE_AUDIO_FETCH',
       payload: 'https://youtube.com/watch?v=' + youtubeId
@@ -57,19 +48,9 @@ export default class ServiceWorkerClient {
         }
       });
     });
-    return promise;
   }
 
   static offlineSoundcloud(soundcloudId, soundcloudRawFile) {
-    let res;
-    let promise = new Promise(resolve => res = resolve);
-    let received = false;
-    broadcast.onmessage = (message) => {
-      if (!received && message.data.type === 'OFFLINE_ADDED') {
-        res(message.data.payload);
-        received = true;
-      }
-    };
     broadcast.postMessage({
       type: 'OFFLINE_RAW_FILE',
       payload: {
@@ -77,6 +58,13 @@ export default class ServiceWorkerClient {
         rawFile: soundcloudRawFile
       }
     });
-    return promise;
+  }
+
+  static addOfflineListener(listener) {
+    broadcast.onmessage = (message) => {
+      if (message.data.type === 'OFFLINE_ADDED') {
+        listener(message.data.payload);
+      }
+    };
   }
 }

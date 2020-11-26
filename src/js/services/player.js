@@ -1,10 +1,10 @@
 import DataLayer from '../models/data_layer';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
-import SoundcloudPlayer from './soundcloud_player';
 import YoutubePlayer from './youtube_player';
 import HTML5AudioPlayer from './html5_audio_player';
 import SoundcloudStreamPlayer from './soundcloud_stream_player';
+import YoutubeStreamPlayer from './youtube_stream_player';
 import autobind from 'autobind-decorator';
 import ServiceWorkerClient from './service_worker_client';
 
@@ -15,9 +15,9 @@ class Player {
     this.repeat_state = this.REPEAT.ALL;
     this.shuffle_on = false;
     YoutubePlayer.injectHandlers(this.playstateChange, this.songEnded);
-    SoundcloudPlayer.injectHandlers(this.playstateChange, this.songEnded);
     HTML5AudioPlayer.injectHandlers(this.playstateChange, this.songEnded);
     SoundcloudStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
+    YoutubeStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     this.setupMediaHandler();
   }
 
@@ -58,14 +58,13 @@ class Player {
       return new HTML5AudioPlayer(song, options);
     }
     if (song.isYoutube) {
-      // if (youtubeExtractorExtensionId) {
-      //   return new HTML5AudioPlayer(song, options);
-      // } else {
+      if (youtubeExtractorExtensionId) {
+        return new YoutubeStreamPlayer(song, options);
+      } else {
         return new YoutubePlayer(song, options);
-      // }
+      }
     } else if (song.isSoundcloud) {
       return new SoundcloudStreamPlayer(song, options);
-      // return new SoundcloudPlayer(song, options);
     }
   }
 
