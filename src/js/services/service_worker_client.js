@@ -1,5 +1,15 @@
 const broadcast = new BroadcastChannel('stretto-sw');
 
+const broadcastListeners = [];
+broadcast.onmessage = (message) => {
+  broadcastListeners.forEach(listener => {
+    listener(message);
+  })
+}
+function addBroadcastListener(listener) {
+  broadcastListeners.push(listener);
+}
+
 export default class ServiceWorkerClient {
   static initialise() {
     if ('serviceWorker' in navigator) {
@@ -23,12 +33,12 @@ export default class ServiceWorkerClient {
     let res;
     let promise = new Promise(resolve => res = resolve);
     let received = false;
-    broadcast.onmessage = (message) => {
+    addBroadcastListener((message) => {
       if (!received && message.data.type === 'OFFLINED') {
         res(message.data.payload);
         received = true;
       }
-    };
+    });
     broadcast.postMessage({
       type: 'EMIT_OFFLINED'
     });
@@ -36,7 +46,7 @@ export default class ServiceWorkerClient {
   }
 
   static offlineYoutube(youtubeId) {
-    chrome.runtime.sendMessage(youtubeExtractorExtensionId, {
+    chrome.runtime.sendMessage(helperExtensionId, {
       type: 'YOUTUBE_AUDIO_FETCH',
       payload: 'https://youtube.com/watch?v=' + youtubeId
     }, (format) => {
@@ -61,10 +71,10 @@ export default class ServiceWorkerClient {
   }
 
   static addOfflineListener(listener) {
-    broadcast.onmessage = (message) => {
+    addBroadcastListener((message) => {
       if (message.data.type === 'OFFLINE_ADDED') {
         listener(message.data.payload);
       }
-    };
+    });
   }
 }

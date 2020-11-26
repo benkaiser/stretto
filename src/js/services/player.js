@@ -58,7 +58,7 @@ class Player {
       return new HTML5AudioPlayer(song, options);
     }
     if (song.isYoutube) {
-      if (youtubeExtractorExtensionId) {
+      if (helperExtensionId) {
         return new YoutubeStreamPlayer(song, options);
       } else {
         return new YoutubePlayer(song, options);

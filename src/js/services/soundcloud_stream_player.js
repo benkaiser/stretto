@@ -42,13 +42,11 @@ export default class SoundcloudStreamPlayer {
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       hls.loadSource(hlsurl);
       hls.on(Hls.Events.BUFFER_APPENDING, (_, data) => {
-        console.log('Appended to buffer');
         this.audioBuffer.push(data.data);
       });
       hls.on(Hls.Events.BUFFER_EOS, () => {
-        console.log('Buffer end of stream');
         if (!this.dirtySeek) {
-          console.log('saving');
+          console.log('Saving soudncloud track, hit EOS and not dirty');
           this._saveForOffline();
         }
       });
