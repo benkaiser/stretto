@@ -29,6 +29,27 @@ export default class Theme {
     ];
   }
 
+  static themeAppColor() {
+    return {
+      cerulean: '#54b4eb',
+      cosmo: '#222222',
+      cyborg: '#060606',
+      darkly: '#375a7f',
+      flatly: '#2c3e50',
+      journal: '#ffffff',
+      lumen: '#f8f8f8',
+      paper: '#ffffff',
+      readable: '#ffffff',
+      sandstone: '#3e3f3a',
+      simplex: '#ffffff',
+      slate: '#484e55',
+      spacelab: '#fff',
+      superhero: '#4e5d6c',
+      united: '#e95420',
+      yeti: '#333333'
+    };
+  }
+
   constructor(themeName) {
     this.name = themeName;
   }
@@ -36,5 +57,6 @@ export default class Theme {
   load() {
     localStorage.setItem('theme', this.name);
     document.getElementById('theme').href = `//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/${this.name}/bootstrap.min.css`;
+    document.querySelector('meta[name=theme-color]').setAttribute('content', Theme.themeAppColor()[this.name]);
   }
 }

@@ -206,6 +206,10 @@ class ContextMenu extends React.Component {
   static open(items, event, playlist) {
     return ContextMenu._component.open(items, event, playlist);
   }
+
+  static hide() {
+    ContextMenu._component.hide();
+  }
 }
 
 export default withRouter(ContextMenu);

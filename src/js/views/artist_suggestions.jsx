@@ -63,10 +63,12 @@ export default class ArtistSuggestions extends React.Component {
     fetch('/suggest/artists')
     .then(Utilities.fetchToJson)
     .then(responseJson => {
-      this.setState({
-        loading: false,
-        artists: responseJson
-      });
+      if (!responseJson.error) {
+        this.setState({
+          loading: false,
+          artists: responseJson
+        });
+      }
     });
   }
 }

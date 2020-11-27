@@ -17,7 +17,7 @@ export default class SoundcloudStreamPlayer {
 
   _setupHLSPlayer(hlsurl) {
     this.audioBuffer = [];
-    player = document.createElement('audio');
+    player = document.createElement('video');
     if (this.options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
@@ -37,10 +37,15 @@ export default class SoundcloudStreamPlayer {
     player.onended = SoundcloudStreamPlayer.endHandler;
     player.onpause = () => SoundcloudStreamPlayer.playstateChangeHandler(false);
     player.onplaying = () => SoundcloudStreamPlayer.playstateChangeHandler(true);
-    var hls = new Hls();
+    var hls = new Hls({
+      debug: true
+    });
     hls.attachMedia(player);
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       hls.loadSource(hlsurl);
+      hls.on(Hls.Events.ERROR, () => {
+        console.log(arguments);
+      })
       hls.on(Hls.Events.BUFFER_APPENDING, (_, data) => {
         this.audioBuffer.push(data.data);
       });

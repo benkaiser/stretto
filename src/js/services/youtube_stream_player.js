@@ -6,6 +6,7 @@ export default class YoutubeStreamPlayer {
   constructor(song, options = {}) {
     if (options.autoPlay === undefined) options.autoPlay = true;
     player = document.createElement('audio');
+    player.setAttribute('class', 'ytaudio');
     if (options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
@@ -42,7 +43,8 @@ export default class YoutubeStreamPlayer {
   }
 
   dispose() {
-    player.parentNode.removeChild(player);
+    player && player.parentNode && player.parentNode.removeChild(player);
+    document.querySelectorAll(".ytaudio").forEach(e => e.parentNode.removeChild(e));
   }
 
   getPosition() {

@@ -46,4 +46,16 @@ export default class Utilities {
     }
     return hashParams;
   }
+
+  static isMobile() {
+    return window.innerWidth < '480';
+  }
+
+  static debounce(func) {
+    var timer;
+    return function(event){
+      if(timer) clearTimeout(timer);
+      timer = setTimeout(func,100,event);
+    };
+  }
 }

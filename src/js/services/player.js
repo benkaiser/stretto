@@ -82,11 +82,6 @@ class Player {
     if (this.currentSong && this.currentSong.id == song.id) {
       return;
     }
-    try {
-      this.tryPlayAudioTag();
-    } catch (_) {
-      // no-op
-    }
     this.updateSong(song);
 
     this.currentPlayer && this.currentPlayer.dispose();
@@ -186,7 +181,6 @@ class Player {
 
   @autobind
   togglePlaying() {
-    this.tryPlayAudioTag();
     this.currentPlayer && this.currentPlayer.toggle();
   }
 
@@ -210,23 +204,8 @@ class Player {
     this.songChange(this.currentSong);
   }
 
-  /**
-   * This is a hack to get the media session controls to use the
-   * methods and information from Stretto rather than the embedded iframe.
-   */
-  tryPlayAudioTag() {
-    try {
-      this.audioTag && this.audioTag.play();
-    } catch (error) {
-      /* no-op */
-    }
-  }
-
   setupMediaHandler() {
     if ('mediaSession' in navigator) {
-      if (!this.audioTag) {
-        this.audioTag = document.getElementById('audioplayer');
-      }
       navigator.mediaSession.setActionHandler('play', () => {
         setTimeout(() => {
           this.togglePlaying();

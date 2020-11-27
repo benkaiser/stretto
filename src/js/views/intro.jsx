@@ -22,8 +22,8 @@ export default class Intro extends React.Component {
             <MenuItem eventKey="/import">From last Stretto version</MenuItem>
           </DropdownButton>
         </div>
-        <Row className='displayFlex'>
-          <Col className='displayFlex' lg={4} md={6} sm={12}>
+        <Row>
+          <Col lg={4} md={6} sm={12}>
             <Panel bsStyle="primary">
               <Panel.Heading>
                 <Panel.Title componentClass="h3" className='introPanelTitle'>
@@ -34,7 +34,7 @@ export default class Intro extends React.Component {
               <Panel.Body>Your music is backed by tracks from youtube and soundcloud, your library is unlimited</Panel.Body>
             </Panel>
           </Col>
-          <Col className='displayFlex' lg={4} md={6} sm={12}>
+          <Col lg={4} md={6} sm={12}>
             <Panel bsStyle="primary">
               <Panel.Heading>
                 <Panel.Title componentClass="h3" className='introPanelTitle'>
@@ -45,7 +45,7 @@ export default class Intro extends React.Component {
               <Panel.Body>With access to the top hits from iTunes and Spotify, you can always find new music</Panel.Body>
             </Panel>
           </Col>
-          <Col className='displayFlex' lg={4} md={6} sm={12}>
+          <Col lg={4} md={6} sm={12}>
             <Panel bsStyle="primary">
               <Panel.Heading>
                 <Panel.Title componentClass="h3" className='introPanelTitle'>
@@ -54,11 +54,7 @@ export default class Intro extends React.Component {
                 </Panel.Title>
               </Panel.Heading>
               <Panel.Body>
-              Listen to the music you love, uninterupted thanks to ad blockers (
-                <a target='_blank' href='https://chrome.google.com/webstore/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm?hl=en'>Chrome</a>
-                {' and '}
-                <a target='_blank' href='https://addons.mozilla.org/en-US/firefox/addon/ublock-origin/'>Firefox</a>
-                ).
+              Listen to the music you love, uninterupted with the <a href='https://github.com/benkaiser/Stretto-Helper-Extension'>Stretto Helper extension</a>.
               </Panel.Body>
             </Panel>
           </Col>

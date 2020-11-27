@@ -4,20 +4,31 @@ import Itunes from '../services/itunes';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
 import PlaylistView from './playlist';
+import MobileOnly from './mobile_only';
+import SearchBox from './search_box';
 import autobind from 'autobind-decorator';
 
 export default class Search extends PlaylistView {
+  playlistHeaderClass() {
+    return super.playlistHeaderClass() + ' search_header';
+  }
+
   getPlaylistFromProps(props) {
-    return this._createPlaylistForSearch(props.match.params.search);
+    if (props.match.params.search) {
+      return this._createPlaylistForSearch(props.match.params.search);
+    } else {
+      return new Playlist({
+        title: 'Enter a Search',
+        songs: []
+      });
+    }
   }
 
   headerButtons() {
     return (
       <div className='buttons'>
-        { /* <Button onClick={this._onCreatePlaylist} title="Create a playlist from these songs">Create Playlist</Button> */ }
-        <Button onClick={this._itunesSearch} title="search iTunes, back with youtube tracks">Search iTunes</Button>
-        { /* <Button onClick={this._youtubeSearch} title="search youtube directly"><i className='fa fa-youtube' aria-hidden='true'></i> Search Youtube</Button> */ }
-        { /* <Button onClick={this._soundcloudSearch} title="search soundcloud directly"><i className='fa fa-soundcloud' aria-hidden='true'></i> Search SoundCloud</Button> */ }
+        <MobileOnly><SearchBox /></MobileOnly>
+        <Button onClick={this._itunesSearch} title="search iTunes, back with youtube tracks" block>Search iTunes</Button>
       </div>
     );
   }
