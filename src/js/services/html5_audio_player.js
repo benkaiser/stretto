@@ -4,7 +4,7 @@ export default class HTML5AudioPlayer {
   constructor(song, options = {}) {
     if (options.autoPlay === undefined) options.autoPlay = true;
     player = document.createElement('audio');
-    player.setAttribute('src', 'http://localhost:3000/offlineaudio/' + song.originalId);
+    player.setAttribute('src', '/offlineaudio/' + song.originalId);
     if (options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }

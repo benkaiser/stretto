@@ -31,7 +31,7 @@ export default class YoutubeStreamPlayer {
       payload: 'https://youtube.com/watch?v=' + song.originalId
     }, (format) => {
       if (format) {
-        player.setAttribute('src', `http://localhost:3000/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
+        player.setAttribute('src', `/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
       } else {
         ServiceWorkerClient.youtubeError(song.originalId);
       }
