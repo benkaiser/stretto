@@ -1,0 +1,22 @@
+{
+  "short_name": "Stretto",
+  "name": "Stretto Music Player",
+  "description": "Listen to your Stretto library on the go",
+  "icons": [
+    {
+      "src": "/static/assets/icon192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/static/assets/icon192.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/playlist/Library",
+  "background_color": "#54b4eb",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#54b4eb"
+}

@@ -5,7 +5,8 @@ const ALERT_OPTIONS = {
   offset: '10px',
   position: 'top right',
   timeout: 5000,
-  transition: 'scale'
+  transition: 'scale',
+  zIndex: 100000,
 }
 
 export default class Alerter extends React.Component {

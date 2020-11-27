@@ -7,16 +7,20 @@ import RootView from './views/root';
 import SCSS from '../scss/main.scss';
 import Theme from './theme';
 import TitleUpdater from './services/title_updater';
+import ServiceWorkerClient from './services/service_worker_client';
+import FirstRunExperience from './services/first_run_experience';
 
 class Loader {
   static loadAll() {
     TitleUpdater.initialise();
+    FirstRunExperience.initialise();
     AccountManager.initialise();
     Keyboard.initialise();
     Theme.initialise();
     ModelInitialiser.initialise();
     RootView.initialise();
     Lyrics.initialise();
+    ServiceWorkerClient.initialise();
   }
 }
 

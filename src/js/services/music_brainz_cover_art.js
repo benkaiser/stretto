@@ -1,6 +1,5 @@
 import Constants from '../constants';
 import Utilities from '../utilities';
-import fetchJsonp from 'fetch-jsonp';
 
 const MUSICBRAINZ_SEARCH_URL = 'http://musicbrainz.org/ws/2/recording/';
 const COVERARTARCHIVE_URL = 'https://coverartarchive.org/release/';

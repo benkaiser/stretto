@@ -7,6 +7,7 @@ import ContextMenu from './context_menu';
 import Itunes from '../services/itunes';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
+import { useLongPress } from '../utilities';
 
 export default class ItunesChart extends React.Component {
   constructor(props) {
@@ -17,6 +18,7 @@ export default class ItunesChart extends React.Component {
     };
     this._fetchChart(props);
     this.isDisposed = false;
+    this._touchStart = 0;
   }
 
   componentWillUnmount() {
@@ -32,19 +34,28 @@ export default class ItunesChart extends React.Component {
       return (
         <div>
           <ListGroup>
-          { this.state.playlist.songData.map((item, index) => 
-            <ListGroupItem key={index} onClick={this._playSong.bind(this, item)} onContextMenu={this._rightSongClick.bind(this, item)}>
-              <div className='chartInnerContainer'>
-                <img className='chartImage' src={item.cover.replace(/600x600/, '50x50')} alt='cover art' />
-                <div className='chartInformation'>
-                  <h4 className='list-group-item-heading'>{item.title}</h4>
-                  <p className='list-group-item-text'>{item.artist}</p>
+          { this.state.playlist.songData.map((item, index) => {
+            return (
+              <ListGroupItem
+                key={index}
+                onTouchStart={this._onTouchStart.bind(this)}
+                onTouchEnd={this._onTouchEnd.bind(this, item)}
+                onMouseDown={this._onTouchStart.bind(this)}
+                onMouseUp={this._onTouchEnd.bind(this, item)}
+                onContextMenu={this._rightSongClick.bind(this, item)}
+              >
+                <div className='chartInnerContainer'>
+                  <img className='chartImage' src={item.cover.replace(/600x600/, '50x50')} alt='cover art' />
+                  <div className='chartInformation'>
+                    <h4 className='list-group-item-heading'>{item.title}</h4>
+                    <p className='list-group-item-text'>{item.artist}</p>
+                  </div>
                 </div>
-              </div>
-            </ListGroupItem>
-            )}
+              </ListGroupItem>
+            );
+          })}
           </ListGroup>
-          { !this.state.loadedAll && 
+          { !this.state.loadedAll &&
             <Button bsStyle="primary" block onClick={this._loadMore}>
               Load All
             </Button>
@@ -59,6 +70,24 @@ export default class ItunesChart extends React.Component {
   @autobind
   _loadMore() {
     this._fetchChart(this.props, true);
+  }
+
+  @autobind
+  _onTouchStart(event) {
+    this._touchStart = event.timeStamp;
+  }
+
+  _onTouchEnd(song, event) {
+    if (event.timeStamp - this._touchStart > 300) {
+      if (event.clientX === undefined) {
+        event.clientX = event.changedTouches[0].clientX;
+        event.clientY = event.changedTouches[0].clientY;
+        event.persist();
+      }
+      this._rightSongClick(song, event);
+    } else {
+      this._playSong(song);
+    }
   }
 
   @autobind

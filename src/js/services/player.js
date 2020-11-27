@@ -1,9 +1,11 @@
 import DataLayer from '../models/data_layer';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
-import SoundcloudPlayer from './soundcloud_player';
-import YoutubePlayer from './youtube_player';
+import HTML5AudioPlayer from './html5_audio_player';
+import SoundcloudStreamPlayer from './soundcloud_stream_player';
+import YoutubeStreamPlayer from './youtube_stream_player';
 import autobind from 'autobind-decorator';
+import ServiceWorkerClient from './service_worker_client';
 
 class Player {
   constructor() {
@@ -11,8 +13,9 @@ class Player {
     this.stateListeners = [];
     this.repeat_state = this.REPEAT.ALL;
     this.shuffle_on = false;
-    YoutubePlayer.injectHandlers(this.playstateChange, this.songEnded);
-    SoundcloudPlayer.injectHandlers(this.playstateChange, this.songEnded);
+    HTML5AudioPlayer.injectHandlers(this.playstateChange, this.songEnded);
+    SoundcloudStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
+    YoutubeStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     this.setupMediaHandler();
   }
 
@@ -49,10 +52,13 @@ class Player {
   }
 
   getPlayerFor(song, options) {
+    if (song.offline) {
+      return new HTML5AudioPlayer(song, options);
+    }
     if (song.isYoutube) {
-      return new YoutubePlayer(song, options);
+      return new YoutubeStreamPlayer(song, options);
     } else if (song.isSoundcloud) {
-      return new SoundcloudPlayer(song, options);
+      return new SoundcloudStreamPlayer(song, options);
     }
   }
 
@@ -76,7 +82,6 @@ class Player {
     if (this.currentSong && this.currentSong.id == song.id) {
       return;
     }
-    this.tryPlayAudioTag();
     this.updateSong(song);
 
     this.currentPlayer && this.currentPlayer.dispose();
@@ -111,14 +116,23 @@ class Player {
       const song = Song.findById(playstate.songId);
       const playlist = Playlist.getByTitle(playstate.playlistTitle) || Playlist.getByTitle(Playlist.LIBRARY);
       if (song && playlist) {
-        this.play(
-          song,
-          playlist,
-          {
-            autoPlay: playstate.playing,
-            currentTime: playstate.currentTime,
-          }
-        );
+        const play = () => {
+          this.play(
+            song,
+            playlist,
+            {
+              autoPlay: playstate.playing,
+              currentTime: playstate.currentTime,
+            }
+          );
+        };
+        if (ServiceWorkerClient.available()) {
+          Song.waitForOffline().then(() => {
+            play();
+          });
+        } else {
+          play();
+        }
       } else {
         this.playlist = playlist;
       }
@@ -167,7 +181,6 @@ class Player {
 
   @autobind
   togglePlaying() {
-    this.tryPlayAudioTag();
     this.currentPlayer && this.currentPlayer.toggle();
   }
 
@@ -191,23 +204,8 @@ class Player {
     this.songChange(this.currentSong);
   }
 
-  /**
-   * This is a hack to get the media session controls to use the
-   * methods and information from Stretto rather than the embedded iframe.
-   */
-  tryPlayAudioTag() {
-    try {
-      this.audioTag && this.audioTag.play();
-    } catch (error) {
-      /* no-op */
-    }
-  }
-
   setupMediaHandler() {
     if ('mediaSession' in navigator) {
-      if (!this.audioTag) {
-        this.audioTag = document.getElementById('audioplayer');
-      }
       navigator.mediaSession.setActionHandler('play', () => {
         setTimeout(() => {
           this.togglePlaying();

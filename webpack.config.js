@@ -1,11 +1,14 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/js/index.js',
+  entry: {
+    main: './src/js/index.js',
+    serviceworker: './src/js/serviceworker.js',
+  },
   mode: 'development',
   output: {
     path: path.join(__dirname, 'static', 'js'),
-    filename: 'bundle.js'
+    filename: '[name].js'
   },
   module: {
     rules: [
@@ -37,5 +40,9 @@ module.exports = {
     alias: {
       'jquery': path.join(__dirname, 'stubs/jquery.js')
     }
+  },
+  watchOptions: {
+      aggregateTimeout: 500,
+      poll: 1000
   }
 };

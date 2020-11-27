@@ -59,6 +59,10 @@ router.get('/spotify_callback', (req, res) => {
   res.render('spotify_callback');
 });
 
+router.get('/serviceworker.js', (req, res) => {
+  res.sendFile('./static/js/serviceworker.js', { root: path.resolve(__dirname, '../') });
+});
+
 router.get('/latestversion', loggedIn, (req, res) => {
   DataMapper.getVersionForUser(req.session.user).then((version) => {
     res.send({ version: version });

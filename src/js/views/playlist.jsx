@@ -10,6 +10,7 @@ import Player from '../services/player';
 import Playlist, { SortDirection } from '../models/playlist';
 import Alerter from '../services/alerter';
 import Utilities from '../utilities';
+import Song from '../models/song';
 
 const ELEMENT_HEIGHT = 40;
 const HEADER_HEIGHT = 50;
@@ -23,6 +24,8 @@ export default class PlaylistView extends React.Component {
     this._lastRenderScrollTop = 0;
     Player.addOnSongChangeListener(this.songChange);
     Playlist.addOnChangeListener(this.songChange);
+    Song.addOnChangeListener(this.songChange);
+    this._touchStart = 0;
   }
 
   componentDidMount() {
@@ -44,6 +47,7 @@ export default class PlaylistView extends React.Component {
     this.contentContainer().removeEventListener('scroll', this.onScroll);
     Player.removeOnSongChangeListener(this.songChange);
     Playlist.removeOnChangeListener(this.songChange);
+    Song.removeOnChangeListener(this.songChange);
     Lyrics.removeListener(this._onLyricsFound);
     this._mounted = false;
   }
@@ -167,11 +171,15 @@ export default class PlaylistView extends React.Component {
 
   header() {
     return (
-      <div className='playlist_header'>
+      <div className={this.playlistHeaderClass()}>
         <h1>{this.state.playlist.title}</h1>
         { this.state.playlist.editable && this.headerButtons() }
       </div>
     );
+  }
+
+  playlistHeaderClass() {
+    return 'playlist_header';
   }
 
   headerButtons() {
@@ -215,6 +223,7 @@ export default class PlaylistView extends React.Component {
           <td className='titleItemColumn' key={key}>
             <div className='cover' style={{'backgroundImage': `url('${song.cover}')`}}></div>
             <div className='titleItemText'>{song.title}</div>
+            { song.offline && this._offlineAirplane() }
             { this.isCurrentlyPlaying(song.id) && Lyrics.lyrics && this._lyricsButton() }
           </td>
         );
@@ -340,13 +349,54 @@ export default class PlaylistView extends React.Component {
   }
 
   @autobind
+  _onTouchStart(event) {
+    this._touchStart = event.timeStamp;
+  }
+
+  @autobind
+  _onTouchMove(event) {
+    this._touchStart = -1;
+    ContextMenu.hide();
+  }
+
+  _onTouchEnd(song, event) {
+    if (this._touchStart === -1) {
+      this._touchStart = 0;
+      return;
+    }
+    if (event.timeStamp - this._touchStart > 300) {
+      if (event.clientX === undefined) {
+        event.clientX = event.changedTouches[0].clientX;
+        event.clientY = event.changedTouches[0].clientY;
+        event.persist();
+      }
+      this.rightClickSong(song, event);
+    } else {
+      this.clickSong(song, event);
+    }
+  }
+
+  @autobind
   sortableItem({value}) {
     return (
       <tr className={ this._classForId(value.id) }
-          onClick={this.clickSong.bind(this, value)}
-          onContextMenu={this.rightClickSong.bind(this, value)}>
+          onTouchStart={this._onTouchStart}
+          onTouchMove={this._onTouchMove}
+          onTouchEnd={this._onTouchEnd.bind(this, value)}
+          onMouseDown={this._onTouchStart}
+          onMouseUp={this._onTouchEnd.bind(this, value)}
+          onContextMenu={this.rightClickSong.bind(this, value)}
+      >
         { this.getColumns().map((column) => this.itemForColumn(column, value)) }
       </tr>
+    );
+  }
+
+  _offlineAirplane() {
+    return (
+      <div className='airplane-label'>
+        <i className="fa fa-plane" aria-hidden="true"></i>
+      </div>
     );
   }
 

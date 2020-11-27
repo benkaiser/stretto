@@ -1,7 +1,11 @@
+import ServiceWorkerClient from '../services/service_worker_client';
 import Youtube from '../services/youtube';
 
 let listeners = [];
 let songs = [];
+let offlineSongs = [];
+let offlineReady;
+const offlineReadyPromise = new Promise(resolve => offlineReady = resolve);
 
 export default class Song {
   constructor(attrs) {
@@ -66,6 +70,14 @@ export default class Song {
     });
   }
 
+  cacheOffline(rawBytes) {
+    if (this.isYoutube) {
+      ServiceWorkerClient.offlineYoutube(this.originalId);
+    } else if (this.isSoundcloud) {
+      ServiceWorkerClient.offlineSoundcloud(this.originalId, rawBytes);
+    }
+  }
+
   get originalId() {
     return this.id.slice(2);
   }
@@ -78,8 +90,16 @@ export default class Song {
     return (this.title + ' ' + this.artist + ' ' + this.album).toLowerCase();
   }
 
+  get offline() {
+    return offlineSongs.includes(this.originalId);
+  }
+
   static addOnChangeListener(listener) {
     listeners.push(listener);
+  }
+
+  static removeOnChangeListener(listener) {
+    listeners.splice(listeners.indexOf(listener), 1);
   }
 
   static change() {
@@ -110,6 +130,25 @@ export default class Song {
     initialData.forEach((item) => {
       songs.push(new Song(item));
     });
+    ServiceWorkerClient.getOffline()
+    .then(offlinedSongs => {
+      offlineSongs = offlinedSongs;
+      Song.change();
+      offlineReady();
+    })
+    .catch(() => {
+      offlineReady();
+    });
+    ServiceWorkerClient.addOfflineListener((id) => {
+      if (!offlineSongs.includes(id)) {
+        offlineSongs.push(id);
+        Song.change();
+      }
+    });
+  }
+
+  static waitForOffline() {
+    return offlineReadyPromise;
   }
 
   static remove(song) {

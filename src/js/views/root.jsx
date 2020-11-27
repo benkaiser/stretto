@@ -37,6 +37,7 @@ class RegularRoutes extends React.Component {
           <Route path='/spotify' component={Spotify} />
           <Route path='/sync' component={Sync} />
           <Route path='/playlist/:playlist' component={Playlist} />
+          <Route path='/search/' exact component={Search} />
           <Route path='/search/:search' component={Search} />
           <Route path='/mix/:playlist' component={YoutubeMix} />
           <Route path='/discover' component={Discover} />

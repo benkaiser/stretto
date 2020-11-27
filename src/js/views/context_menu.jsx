@@ -9,6 +9,7 @@ import Player from '../services/player';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Youtube from '../services/youtube';
+import ServiceWorkerClient from '../services/service_worker_client';
 
 const DROPDOWN_HEIGHT = 400;
 
@@ -53,6 +54,7 @@ class ContextMenu extends React.Component {
           { this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem> }
           { this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>}
           { this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>}
+          { this.state.items.length === 1 && this.state.items[0].isYoutube && helperExtensionId && <MenuItem onClick={this._offline}>Make available offline</MenuItem>}
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>
           { this.state.playlist && this.state.playlist.editable &&
             <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>
@@ -196,8 +198,17 @@ class ContextMenu extends React.Component {
     this.hide();
   }
 
+  @autobind
+  _offline() {
+    this.state.items[0].cacheOffline();
+  }
+
   static open(items, event, playlist) {
     return ContextMenu._component.open(items, event, playlist);
+  }
+
+  static hide() {
+    ContextMenu._component.hide();
   }
 }
 

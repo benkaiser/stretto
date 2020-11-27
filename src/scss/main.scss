@@ -192,8 +192,6 @@ body, html {
   font-family: WisdomScript;
   text-decoration: none;
   font-weight: 300;
-  font-size: 29px;
-  line-height: 1.1;
 
   &:hover, &:active, &:focus {
     text-decoration: none;
@@ -203,6 +201,12 @@ body, html {
 @keyframes fadein {
   from { opacity: 0; }
   to   { opacity: 1; }
+}
+
+.airplane-label {
+  margin-right: 8px;
+  margin-left: 8px;
+  animation: fadein 0.3s;
 }
 
 .lyric-label {
@@ -520,4 +524,83 @@ tbody > tr {
 
 ::-webkit-scrollbar-thumb {
   background: #999;
+}
+
+@media(max-width: 480px) {
+  .mobileFooter {
+    position: fixed;
+    padding-bottom: 10px;
+    bottom: 0;
+    width: 100vw;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .intro {
+    height: auto;
+  }
+
+  .duration-slider {
+    margin-top: -11px;
+  }
+
+  .slider.slider-horizontal {
+    width: 100vw;
+  }
+
+  .root {
+    display: block;
+  }
+
+  .content {
+    padding: 10px;
+    padding-top: 70px;
+    padding-bottom: 70px;
+    bottom: 0;
+  }
+
+  .navbar {
+    margin-bottom: 0px;
+  }
+
+  .search_header {
+    h1 {
+      display: none;
+    }
+
+    .buttons {
+      margin: 0;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .searchContainer {
+      margin: 0;
+      margin-bottom: 10px;
+    }
+
+    .searchBox {
+      max-width: none;
+    }
+  }
+
+  .song-table {
+    width: auto;
+
+    .titleItemColumn {
+      min-width: 100vw;
+      max-width: 100vw;
+    }
+
+    thead > tr {
+      :first-child {
+        min-width: 100vw;
+        max-width: 100vw;
+      }
+
+      :last-child {
+        max-width: 50vw;
+      }
+    }
+  }
 }
