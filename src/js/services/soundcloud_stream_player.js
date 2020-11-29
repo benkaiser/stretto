@@ -5,6 +5,7 @@ let player;
 
 export default class SoundcloudStreamPlayer {
   constructor(song, options = {}) {
+    this.disposed = false;
     if (options.autoPlay === undefined) options.autoPlay = true;
     this.dirtySeek = options.currentTime ? true : false;
     this.options = options;
@@ -16,13 +17,20 @@ export default class SoundcloudStreamPlayer {
   }
 
   _setupHLSPlayer(hlsurl) {
+    if (this.disposed) {
+      return;
+    }
     this.audioBuffer = [];
-    player = document.createElement('video');
+    player = document.createElement('audio');
+    player.setAttribute('class', 'scaudio');
     if (this.options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
     document.body.appendChild(player);
     player.onloadeddata = () => {
+      if (this.disposed) {
+        return;
+      }
       if (this.options.currentTime) {
         player.currentTime = this.options.currentTime;
       }
@@ -37,9 +45,7 @@ export default class SoundcloudStreamPlayer {
     player.onended = SoundcloudStreamPlayer.endHandler;
     player.onpause = () => SoundcloudStreamPlayer.playstateChangeHandler(false);
     player.onplaying = () => SoundcloudStreamPlayer.playstateChangeHandler(true);
-    var hls = new Hls({
-      debug: true
-    });
+    var hls = new Hls();
     hls.attachMedia(player);
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       hls.loadSource(hlsurl);
@@ -80,7 +86,9 @@ export default class SoundcloudStreamPlayer {
   }
 
   dispose() {
-    player && player.parentNode.removeChild(player);
+    this.disposed = true;
+    player && player.parentNode && player.parentNode.removeChild(player);
+    document.querySelectorAll(".scaudio").forEach(e => e.parentNode.removeChild(e));
   }
 
   getPosition() {

@@ -3,11 +3,11 @@ import azlyrics from 'js-azlyrics';
 import Player from '../services/player';
 import Bootbox from './bootbox';
 
-const LYRIC_WAIT_TIMEOUT = 3000;
+const LYRIC_WAIT_TIMEOUT = 500;
 
 const options = {
-  searchEndpoint: '/azlyricssearch',
-  mainEndpoint: '/azlyrics'
+  searchEndpoint: 'https://search.azlyrics.com',
+  mainEndpoint: 'https://azlyrics.com'
 };
 
 const listeners = [];

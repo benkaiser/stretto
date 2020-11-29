@@ -2,14 +2,19 @@ let player;
 
 export default class HTML5AudioPlayer {
   constructor(song, options = {}) {
+    this.disposed = false;
     if (options.autoPlay === undefined) options.autoPlay = true;
     player = document.createElement('audio');
+    player.setAttribute('class', 'html5audio');
     player.setAttribute('src', '/offlineaudio/' + song.originalId);
     if (options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
     document.body.appendChild(player);
     player.onloadeddata = () => {
+      if (this.disposed) {
+        return;
+      }
       if (options.currentTime) {
         player.currentTime = options.currentTime;
       }
@@ -31,7 +36,9 @@ export default class HTML5AudioPlayer {
   }
 
   dispose() {
-    player.parentNode.removeChild(player);
+    this.disposed = true;
+    player && player.parentNode && player.parentNode.removeChild(player);
+    document.querySelectorAll(".html5audio").forEach(e => e.parentNode.removeChild(e));
   }
 
   getPosition() {

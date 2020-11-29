@@ -4,6 +4,7 @@ let player;
 
 export default class YoutubeStreamPlayer {
   constructor(song, options = {}) {
+    this.disposed = false;
     if (options.autoPlay === undefined) options.autoPlay = true;
     player = document.createElement('audio');
     player.setAttribute('class', 'ytaudio');
@@ -30,6 +31,9 @@ export default class YoutubeStreamPlayer {
       type: 'YOUTUBE_AUDIO_FETCH',
       payload: 'https://youtube.com/watch?v=' + song.originalId
     }, (format) => {
+      if (this.disposed) {
+        return;
+      }
       if (format) {
         player.setAttribute('src', `/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
       } else {
@@ -43,6 +47,7 @@ export default class YoutubeStreamPlayer {
   }
 
   dispose() {
+    this.disposed = true;
     player && player.parentNode && player.parentNode.removeChild(player);
     document.querySelectorAll(".ytaudio").forEach(e => e.parentNode.removeChild(e));
   }
