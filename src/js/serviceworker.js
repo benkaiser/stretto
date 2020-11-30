@@ -106,7 +106,6 @@ self.addEventListener('fetch', function(event) {
           return response;
         });
         if (response) {
-          console.log('cache hit for ', event.request);
           return response;
         }
         return refetch;

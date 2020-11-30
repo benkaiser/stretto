@@ -15,7 +15,7 @@ export default class Offline_Mode extends React.Component {
       <div className='form-group'>
         <label className='col-sm-2 control-label' title='Only show songs availabel offline'>Offline Only in Playlists</label>
         <div className='col-sm-10'>
-          <Checkbox checked={ this.state.checked } onClick={this.changeOfflineMode} />
+          <Checkbox checked={ this.state.checked } onChange={this.changeOfflineMode} />
         </div>
       </div>
     );

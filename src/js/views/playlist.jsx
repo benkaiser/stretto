@@ -24,7 +24,7 @@ export default class PlaylistView extends React.Component {
     this._lastRenderScrollTop = 0;
     Player.addOnSongChangeListener(this.songChange);
     Playlist.addOnChangeListener(this.songChange);
-    Song.addOnChangeListener(this.songChange);
+    Song.addOnChangeListener(this.songChange, true);
     this._touchStart = 0;
   }
 

@@ -19,7 +19,7 @@ export default class SyncManager {
 
   @autobind
   _addListeners() {
-    Song.addOnChangeListener(this._uploadTimeout);
+    Song.addOnChangeListener(this._uploadTimeout, false);
     Playlist.addOnChangeListener(this._uploadTimeout);
   }
 

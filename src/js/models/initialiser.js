@@ -13,7 +13,7 @@ export default class ModelInitialiser {
   static initialise() {
     Song.initialise(DataLayer.getItem('songs') || []);
     Playlist.initialise(DataLayer.getItem('playlists') || []);
-    Song.addOnChangeListener(ModelInitialiser.createChangeListener('songs'));
+    Song.addOnChangeListener(ModelInitialiser.createChangeListener('songs'), false);
     Playlist.addOnChangeListener(ModelInitialiser.createChangeListener('playlists'));
     if (Playlist.isEmpty()) {
       ModelInitialiser.seed();

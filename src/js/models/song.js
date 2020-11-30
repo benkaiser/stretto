@@ -1,7 +1,9 @@
+import Alerter from '../services/alerter';
 import ServiceWorkerClient from '../services/service_worker_client';
 import Youtube from '../services/youtube';
 
 let listeners = [];
+let noDataListeners = [];
 let songs = [];
 let offlineSongs = [];
 let offlineReady;
@@ -94,16 +96,28 @@ export default class Song {
     return offlineSongs.includes(this.originalId);
   }
 
-  static addOnChangeListener(listener) {
+  static addOnChangeListener(listener, listenToNoDataChange) {
     listeners.push(listener);
+    if (listenToNoDataChange) {
+      noDataListeners.push(listener);
+    }
   }
 
   static removeOnChangeListener(listener) {
     listeners.splice(listeners.indexOf(listener), 1);
+    if (noDataListeners.indexOf(listener) > -1) {
+      noDataListeners.splice(listeners.indexOf(listener), 1);
+    }
   }
 
   static change() {
     listeners.forEach((listener) => {
+      listener instanceof Function && listener(songs);
+    });
+  }
+
+  static noDataChange() {
+    noDataListeners.forEach((listener) => {
       listener instanceof Function && listener(songs);
     });
   }
@@ -125,15 +139,26 @@ export default class Song {
     return this.fetchAll().filter((song) => song.id === songId)[0];
   }
 
+  static findByOriginalId(songId) {
+    return this.fetchAll().filter((song) => song.originalId === songId)[0];
+  }
+
+  static offlineSongs() {
+    return offlineSongs;
+  }
+
   static initialise(initialData) {
     songs = [];
     initialData.forEach((item) => {
-      songs.push(new Song(item));
+      if (item.id) {
+        songs.push(new Song(item));
+      }
     });
     ServiceWorkerClient.getOffline()
     .then(offlinedSongs => {
       offlineSongs = offlinedSongs;
       Song.change();
+      Song.noDataChange();
       offlineReady();
     })
     .catch(() => {
@@ -142,7 +167,11 @@ export default class Song {
     ServiceWorkerClient.addOfflineListener((id) => {
       if (!offlineSongs.includes(id)) {
         offlineSongs.push(id);
-        Song.change();
+        Song.noDataChange();
+        const song = Song.findByOriginalId(id);
+        if (song && song.title) {
+          Alerter.success('"' + song.title + '" available offline');
+        }
       }
     });
   }

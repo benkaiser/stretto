@@ -27,8 +27,9 @@ export default class Soundcloud {
   }
 
   static search(query) {
-    return fetch(`https://api.soundcloud.com/tracks?q=${encodeURIComponent(query)}&client_id=${Soundcloud.client_id}`)
+    return fetch(`https://api-v2.soundcloud.com/search?q=${encodeURIComponent(query)}&client_id=${Soundcloud.client_id}`)
     .then(Utilities.fetchToJson)
+    .then(response => response.collection.filter(item => item.kind === 'track'))
     .then((tracks) => tracks.map(Soundcloud._convertToStandardTrack));
   }
 
@@ -43,8 +44,7 @@ export default class Soundcloud {
       isYoutube: false,
       thumbnail: Soundcloud._getThumbnail(soundcloudTrack),
       title: soundcloudTrack.title,
-      url: soundcloudTrack.permalink_url,
-      year: soundcloudTrack.release_year
+      url: soundcloudTrack.permalink_url
     };
   }
 

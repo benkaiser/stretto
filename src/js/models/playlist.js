@@ -149,12 +149,17 @@ export default class Playlist {
       (this.songs
         .map((songId) => Song.findById(songId))
         .filter((song) => song !== undefined)
-        .filter((song) => this._cacheKey === 'true' ? song.offline : true)
+        .filter((song) => localStorage.getItem('offlineOnly') === 'true' ? song.offline : true)
      );
   }
 
   _getCacheKey() {
-    return localStorage.getItem('offlineOnly');
+    const offline = localStorage.getItem('offlineOnly');
+    if (offline === 'true') {
+      return offline + '-' + Song.offlineSongs().join(',');
+    } else {
+      return offline;
+    }
   }
 
   exportShare() {
