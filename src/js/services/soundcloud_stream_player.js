@@ -49,8 +49,11 @@ export default class SoundcloudStreamPlayer {
     hls.attachMedia(player);
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       hls.loadSource(hlsurl);
-      hls.on(Hls.Events.ERROR, () => {
+      hls.on(Hls.Events.ERROR, (event, data) => {
         console.log(arguments);
+        if (data.fatal) {
+          SoundcloudStreamPlayer.endHandler();
+        }
       })
       hls.on(Hls.Events.BUFFER_APPENDING, (_, data) => {
         this.audioBuffer.push(data.data);

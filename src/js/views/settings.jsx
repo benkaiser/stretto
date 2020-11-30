@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import CountrySwitcher from './countryswitcher';
 import ThemeSwitcher from './themeswitcher';
+import OfflineMode from './offline_mode';
 
 export default class Intro extends React.Component {
   render() {
@@ -12,6 +13,7 @@ export default class Intro extends React.Component {
         <div className='form-horizontal'>
           <ThemeSwitcher />
           <CountrySwitcher />
+          <OfflineMode />
           <div className='form-group'>
             <div className='col-sm-10 col-sm-offset-2'>
             <Link to='/import/'><Button bsStyle='primary'>Import from Stretto Desktop (old Stretto)</Button></Link>

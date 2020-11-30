@@ -149,7 +149,12 @@ export default class Playlist {
       (this.songs
         .map((songId) => Song.findById(songId))
         .filter((song) => song !== undefined)
+        .filter((song) => this._cacheKey === 'true' ? song.offline : true)
      );
+  }
+
+  _getCacheKey() {
+    return localStorage.getItem('offlineOnly');
   }
 
   exportShare() {
@@ -160,7 +165,8 @@ export default class Playlist {
   }
 
   get songData() {
-    if (!this._songData) {
+    if (!this._songData || this._cacheKey !== this._getCacheKey()) {
+      this._cacheKey = this._getCacheKey();
       this._songData = this._getSongs();
       if (this._sortColumn && this._sortDirection !== SortDirection.NONE) {
         this._songData = this._songData.sort(this.sortSongs);

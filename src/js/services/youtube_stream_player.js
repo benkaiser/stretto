@@ -38,6 +38,7 @@ export default class YoutubeStreamPlayer {
         player.setAttribute('src', `/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
       } else {
         ServiceWorkerClient.youtubeError(song.originalId);
+        YoutubeStreamPlayer.endHandler();
       }
     });
   }

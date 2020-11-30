@@ -62,9 +62,7 @@ self.addEventListener('fetch', function(event) {
     return event.respondWith(
       caches.match('/')
       .then(function(response) {
-        // Cache hit - return response
         if (response) {
-          console.log('cache hit for ', event.request);
           return response;
         }
         return fetch(event.request);
