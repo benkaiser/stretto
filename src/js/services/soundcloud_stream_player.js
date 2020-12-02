@@ -45,7 +45,10 @@ export default class SoundcloudStreamPlayer {
     player.onended = SoundcloudStreamPlayer.endHandler;
     player.onpause = () => SoundcloudStreamPlayer.playstateChangeHandler(false);
     player.onplaying = () => SoundcloudStreamPlayer.playstateChangeHandler(true);
-    var hls = new Hls();
+    var hls = new Hls({
+      maxBufferLength: 60 * 60,
+      maxMaxBufferLength: 60 * 60 * 3
+    });
     hls.attachMedia(player);
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       hls.loadSource(hlsurl);
@@ -54,7 +57,7 @@ export default class SoundcloudStreamPlayer {
         if (data.fatal) {
           SoundcloudStreamPlayer.endHandler();
         }
-      })
+      });
       hls.on(Hls.Events.BUFFER_APPENDING, (_, data) => {
         this.audioBuffer.push(data.data);
       });

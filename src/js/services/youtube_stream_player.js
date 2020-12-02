@@ -35,7 +35,12 @@ export default class YoutubeStreamPlayer {
         return;
       }
       if (format) {
-        player.setAttribute('src', `/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
+        // don't auto-offline a track that is not yet in the users library
+        if (song.inLibrary) {
+          player.setAttribute('src', `/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
+        } else {
+          player.setAttribute('src', format.url);
+        }
       } else {
         ServiceWorkerClient.youtubeError(song.originalId);
         YoutubeStreamPlayer.endHandler();

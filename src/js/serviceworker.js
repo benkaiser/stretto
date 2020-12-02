@@ -27,7 +27,6 @@ function isAppUrl(path) {
     || path.startsWith('/playlist')
     || path.startsWith('/discover')
     || path.startsWith('/add')
-    || path.startsWith('/import')
     || path.startsWith('/backup')
     || path.startsWith('/welcome')
     || path.startsWith('/settings')

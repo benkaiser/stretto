@@ -11,7 +11,7 @@ import Song from '../models/song';
 import Youtube from '../services/youtube';
 import ServiceWorkerClient from '../services/service_worker_client';
 
-const DROPDOWN_HEIGHT = 400;
+const DROPDOWN_MAX_HEIGHT = 400;
 
 class ContextMenu extends React.Component {
   constructor(props) {
@@ -36,7 +36,13 @@ class ContextMenu extends React.Component {
     if (!this.state.items || !this.state.items[0]) {
       return null;
     }
-    return this._allInLibrary() ? this._inLibraryMenu() : this._importMenu();
+    return (
+      <div className={`dropdownContainer`} style={this.dropdownStyle()}>
+        <ul className={`dropdown-menu ${this.openStyle()}`}>
+          { this._options() }
+        </ul>
+      </div>
+    );
   }
 
   _allInLibrary() {
@@ -47,50 +53,62 @@ class ContextMenu extends React.Component {
     return !!Lyrics.lyrics && Player.currentSong.id === this.state.items[0].id;
   }
 
-  _inLibraryMenu() {
-    return (
-      <div className={`dropdownContainer`} style={this.dropdownStyle()}>
-        <ul className={`dropdown-menu ${this.openStyle()}`}>
-          { this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem> }
-          { this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>}
-          { this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>}
-          { this.state.items.length === 1 && this.state.items[0].isYoutube && helperExtensionId && <MenuItem onClick={this._offline}>Make available offline</MenuItem>}
-          <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>
-          { this.state.playlist && this.state.playlist.editable &&
-            <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>
-          }
-          <MenuItem header>Add to playlist</MenuItem>
-          { this.playlists().map((playlist) =>
-            <MenuItem key={'menuItem_' + playlist.title} onClick={this.onItemClick.bind(this, playlist)}>{ playlist.title }</MenuItem>
-          ) }
-        </ul>
-      </div>
-    );
+  _options() {
+    return this._allInLibrary() ? this._inLibraryMenuOptions() : this._importMenuOptions()
   }
 
-  _importMenu() {
-    return (
-      <div className={`dropdownContainer`} style={this.dropdownStyle()}>
-        <ul className={`dropdown-menu ${this.openStyle()}`}>
-          <MenuItem onClick={this.addToLibrary}>Add to library</MenuItem>
-          { this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>}
-        </ul>
-      </div>
-    );
+  _inLibraryMenuOptions() {
+    return [
+          this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem>,
+          this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>,
+          this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>,
+          this.state.items.length === 1 && this.state.items[0].isYoutube && helperExtensionId &&
+            <MenuItem onClick={this._offline}>Make available offline</MenuItem>,
+          <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>,
+          this.state.playlist && this.state.playlist.editable &&
+            <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>,
+          <MenuItem header>Add to playlist</MenuItem>,
+    ].concat(this.playlists().map((playlist) =>
+      <MenuItem key={'menuItem_' + playlist.title} onClick={this.onItemClick.bind(this, playlist)}>{ playlist.title }</MenuItem>
+    ))
+    .filter(option => !!option);
+  }
+
+  _importMenuOptions() {
+    return [
+        (this.state.items.length !== 1 || !this.state.items[0].inLibrary) && <MenuItem onClick={this.addToLibrary}>Add to library</MenuItem>,
+        this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>
+    ].filter(option => !!option);
+  }
+
+  dropdownHeight() {
+    // the specific height of a cell
+    return Math.min(this._options().length * 26, DROPDOWN_MAX_HEIGHT);
   }
 
   dropdownStyle() {
-    const topDistance = this.dropup() ? '' : this.state.yPosition + 'px';
-    const bottomDistance = this.dropup() ? (window.innerHeight - this.state.yPosition) + 'px' : '';
+    let topDistance = '';
+    let bottomDistance = '';
+    if (this.dropup()) {
+      bottomDistance = window.innerHeight - this.state.yPosition;
+      if (this.state.yPosition - this.dropdownHeight() < 0) {
+        bottomDistance = window.innerHeight - this.dropdownHeight();
+      }
+    } else {
+      topDistance = this.state.yPosition;
+      if (this.state.yPosition + this.dropdownHeight() > window.innerHeight) {
+        topDistance = window.innerHeight - this.dropdownHeight();
+      }
+    }
     return {
       left: `${this.state.xPosition}px`,
-      top: `${topDistance}`,
-      bottom: `${bottomDistance}`
+      top: topDistance ? `${topDistance}px` : topDistance,
+      bottom: bottomDistance ? `${bottomDistance}px` : bottomDistance
     };
   }
 
   dropup() {
-    return this.state.yPosition > window.innerHeight - DROPDOWN_HEIGHT;
+    return this.state.yPosition > window.innerHeight - this.dropdownHeight();
   }
 
   @autobind
@@ -98,8 +116,10 @@ class ContextMenu extends React.Component {
     this.state.items.map(song => {
       (song.deferred ? song.getTrack() : Promise.resolve()).then(() => {
         const newSong = Song.create(song);
-        Playlist.getByTitle(Playlist.LIBRARY).addSong(newSong);
-        Alerter.success('Added "' + song.title + '" to Library');
+        if (Playlist.getByTitle(Playlist.LIBRARY).songs.indexOf(newSong.id) === -1) {
+          Playlist.getByTitle(Playlist.LIBRARY).addSong(newSong);
+          Alerter.success('Added "' + song.title + '" to Library');
+        }
       });
     });
   }
@@ -190,7 +210,7 @@ class ContextMenu extends React.Component {
     Alerter.info('Attempting to find mix');
     Youtube.findMix(this.state.items[0].originalId).then((playlistId) => {
       Alerter.success('Found mix, loading');
-      this.props.history.push('/mix/' + playlistId);
+      this.props.history.push(`/mix/${this.state.items[0].originalId}+${playlistId}`);
     }).catch(error => {
       console.log(error);
       Alerter.error('Unable to find mix, see console for more info');

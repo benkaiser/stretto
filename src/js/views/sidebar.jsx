@@ -30,8 +30,6 @@ export default class Sidebar extends React.Component {
                 <MenuItem eventKey="/spotify">From Spotify</MenuItem>
                 <MenuItem eventKey="/add">From Youtube/Soundcloud</MenuItem>
                 <MenuItem eventKey="/discover">From Top Charts</MenuItem>
-                <MenuItem divider />
-                <MenuItem eventKey="/import">From last Stretto version</MenuItem>
               </Dropdown.Menu>
           </Dropdown>
             <Link className='sidebar-icon' to='/sync/' title='Sync to Cloud'><i className="fa fa-refresh"></i></Link>

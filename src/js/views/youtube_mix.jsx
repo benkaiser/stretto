@@ -41,7 +41,7 @@ export default class YoutubeMix extends PlaylistView {
     this.setState(this.getStateFromprops(props));
     this._getYoutubePlaylist();
   }
-    
+
 
   getPlaylistFromProps() {
     return this._youtubePlaylist || new Playlist({
@@ -59,11 +59,8 @@ export default class YoutubeMix extends PlaylistView {
 
   @autobind
   _getYoutubePlaylist() {
-    Youtube.getPlaylistAnonymous(this.props.match.params.playlist)
-    .catch(error => {
-      console.log('Unable to use anonymous playlist: ' + error.message);
-      return Youtube.getPlaylist(this.props.match.params.playlist);
-    })
+    const [ videoId, playlistId ] = this.props.match.params.playlist.split('+');
+    Youtube.getPlaylistAnonymous(videoId, playlistId)
     .then(mixPlaylist => {
       const songs = mixPlaylist.items.map(item => new Song(item));
       this._youtubePlaylist = new Playlist({

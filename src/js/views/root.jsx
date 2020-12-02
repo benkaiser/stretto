@@ -10,7 +10,6 @@ import BackupRestore from './backup_restore';
 import Discover from './discover';
 import Edit from './edit';
 import Intro from './intro';
-import Import from './import';
 import Layout from './layout';
 import Playlist from './playlist';
 import Search from './search';
@@ -30,7 +29,6 @@ class RegularRoutes extends React.Component {
         <Switch>
           <Route path='/add' component={Add} />
           <Route path='/edit/:id' component={Edit} />
-          <Route path='/import' component={Import} />
           <Route path='/backup' component={BackupRestore} />
           <Route path='/welcome' component={Intro} />
           <Route path='/settings' component={Settings} />

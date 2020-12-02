@@ -24,7 +24,7 @@ export default class SpotifyAPI {
   static fetchChart(type, options) {
     type = chartMap[type];
     const requestRealCover = options && options.requestRealCover || false;
-    return fetch(`/spotifycharts/${type}/${Country.current()}/daily/latest/download`)
+    return fetch(`https://spotifycharts.com/${type}/${Country.current()}/daily/latest/download`)
     .then(Utilities.fetchToCSV)
     .then(data => {
       data = data.slice(type === 'regional' ? 2 : 1);
@@ -50,7 +50,7 @@ export default class SpotifyAPI {
 
   static fetchCover(trackId, requestRealCover) {
     if (requestRealCover) {
-      return fetch(`/spotifyoembed/oembed?url=spotify:track:${trackId}`, {
+      return fetch(`https://embed.spotify.com/oembed?url=spotify:track:${trackId}`, {
         jsonpCallbackFunction: `jsonp${Date.now()}${Math.ceil(Math.random() * 100000)}`
       })
       .then(Utilities.fetchToJson)

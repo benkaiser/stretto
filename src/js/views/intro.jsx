@@ -18,8 +18,6 @@ export default class Intro extends React.Component {
             <MenuItem eventKey="/spotify">From Spotify</MenuItem>
             <MenuItem eventKey="/add">From Youtube/Soundcloud</MenuItem>
             <MenuItem eventKey="/discover">From Top Charts</MenuItem>
-            <MenuItem divider />
-            <MenuItem eventKey="/import">From last Stretto version</MenuItem>
           </DropdownButton>
         </div>
         <Row>

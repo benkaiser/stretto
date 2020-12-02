@@ -360,6 +360,9 @@ export default class PlaylistView extends React.Component {
   }
 
   _onTouchEnd(song, event) {
+    if (event.button) {
+      return;
+    }
     if (this._touchStart === -1) {
       this._touchStart = 0;
       return;

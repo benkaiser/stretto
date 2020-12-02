@@ -62,7 +62,7 @@ export default class Song {
   }
 
   getTrack() {
-    return Youtube.search(`${this.title} ${this.artist} lyrics`, { maxResults: 1 }).then(([youtubeItem]) => {
+    return Youtube.search(`${this.title} ${this.artist} lyrics`).then(([youtubeItem]) => {
       if (!youtubeItem) { throw new Error('Unable to find youtube matches'); }
       this.deferred = undefined;
       this.duration = youtubeItem.duration;

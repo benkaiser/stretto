@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Exporter from '../services/exporter';
 import Importer from '../services/importer';
-import { Button, FormControl } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import autobind from 'autobind-decorator';
 
 export default class BackupRestore extends React.Component {

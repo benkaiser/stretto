@@ -1,11 +1,5 @@
-import Constants from '../constants';
-import MusicBrainzCoverArt from './music_brainz_cover_art';
 import Playlist from '../models/playlist';
-import Song from '../models/song';
-import Soundcloud from './/soundcloud';
-import Youtube from './youtube';
-import async from 'async';
-import Importer from './importer';
+import Importer from './importer_old';
 
 export default class SpotifyImporter extends Importer {
   _addSong(song) {

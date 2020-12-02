@@ -24,13 +24,6 @@ var server = http.createServer(app);
 var io = socketio.listen(server);
 
 app.use('/itunes', proxy('https://itunes.apple.com'));
-app.use('/spotifycharts', proxy('https://spotifycharts.com'));
-app.use('/spotifyoembed', proxy('https://embed.spotify.com'));
-app.use('/youtube', proxy('https://www.youtube.com', {
-  userResHeaderDecorator() {
-    return {};
-  }
-}));
 app.use('/scapi', proxy('https://api-v2.soundcloud.com'));
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');

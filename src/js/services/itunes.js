@@ -71,26 +71,6 @@ export default class Itunes {
     });
   }
 
-  static _getYoutubeTrackForSong(song) {
-    return Youtube.search(song.trackName + ' ' + song.artistName, {
-      requestDurations: false,
-      addThumbnail: false,
-      maxResults: 1
-    }).then(items => items[0])
-    .then(item => {
-      if (!item) {
-        return;
-      }
-      item.title = song.trackName;
-      item.artist = song.artistName;
-      item.cover = song.artworkUrl100.replace('100x100', '600x600');
-      item.album = song.collectionName;
-      item.discNumber = song.discNumber;
-      item.trackNumber = song.trackNumber;
-      return new Song(item);
-    });
-  }
-
   static _isResultClose(song, result) {
     let durationSeconds = result.trackTimeMillis / 1000;
     return (
