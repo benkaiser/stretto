@@ -8,10 +8,14 @@ const TYPES = {
   SHOW: 3
 }
 
+let loadedResolve;
+const loadingPromise = new Promise(resolve => loadedResolve = resolve);
+
 export default class Bootbox extends React.Component {
   constructor() {
     super();
     Bootbox._component = this;
+    loadedResolve();
     this.state = {
       value: ''
     };
@@ -46,7 +50,7 @@ export default class Bootbox extends React.Component {
                 <p>{this.state.message}</p> }
               { this.state.type === TYPES.SHOW && this.state.contents }
             </div>
-            { this.state.type !== TYPES.SHOW && 
+            { this.state.type !== TYPES.SHOW &&
               <div className='modal-footer'>
                 <button type='button' className='btn btn-default' onClick={this.onCancel}>Cancel</button>
                 <button type='button' className='btn btn-primary' onClick={this.onSuccess}>OK</button>
@@ -123,14 +127,16 @@ export default class Bootbox extends React.Component {
   }
 
   static confirm(message) {
-    return Bootbox._component.confirm(message);
+    return loadingPromise.then(Bootbox._component.confirm(message));
   }
 
   static prompt(message, options) {
-    return Bootbox._component.prompt(message);
+    return loadingPromise.then(Bootbox._component.prompt(message));
   }
 
   static show(header, contents) {
-    Bootbox._component.show(header, contents);
+    loadingPromise.then(() => {
+      Bootbox._component.show(header, contents);
+    });
   }
 }
