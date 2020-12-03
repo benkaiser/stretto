@@ -41,8 +41,12 @@ export default class Youtube {
     .then(Youtube._extractInitialData)
     .then((parsedJson) => {
       try {
-        const contents = parsedJson.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents;
-        const videos = contents.map(item => item.videoRenderer).filter(videoRenderer => !!videoRenderer);
+        const contents = parsedJson.contents.twoColumnSearchResultsRenderer
+          ? parsedJson.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents
+          : parsedJson.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results;
+
+
+        const videos = contents.map(item => item.videoRenderer || item.compactVideoRenderer).filter(videoRenderer => !!videoRenderer);
         return videos.map(this._convertScrapedSearchResultToCleanTrackInfo);
       } catch (error) {
         console.log('Failed to parse youtube search results')
@@ -104,7 +108,7 @@ export default class Youtube {
       id: track.videoId,
       isSoundcloud: false,
       isYoutube: true,
-      title: track.title.runs[0].text,
+      title: track.title.runs ? track.title.runs[0].text : track.title.simpleText,
       url: `https://www.youtube.com/watch?v=${track.videoId}`,
       duration: track.lengthText.simpleText.split(':').reduce((acc,time) => (60 * acc) + +time)
     };
@@ -142,11 +146,14 @@ export default class Youtube {
   }
 
   static _extractYoutubeHtmlVar(varName, responseText) {
-    const varMarker = responseText.indexOf(`var ${varName}`);
+    let varMarker = responseText.indexOf(`var ${varName}`);
+    if (varMarker === -1) {
+      varMarker = responseText.indexOf(`window["${varName}"]`)
+    }
     const startScriptMarker = responseText.substr(0, varMarker).lastIndexOf('>') + 1;
-    const endScriptMarker = responseText.substr(varMarker).indexOf('</script>');
+    const endScriptMarker = responseText.substr(startScriptMarker).indexOf('</script>');
     const scriptContents = responseText.substr(startScriptMarker, endScriptMarker);
-    const varData = eval(scriptContents + varName);
+    const varData = eval(scriptContents + `;window["${varName}"]||` + varName);
     if (varData) {
       return varData;
     }

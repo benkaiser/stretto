@@ -151,6 +151,7 @@ export default class Add extends React.Component {
   onChange() {
     this.setState({
       loading: !!this.input.value,
+      track: null,
       error: ''
     });
     this.timeout && clearTimeout(this.timeout);

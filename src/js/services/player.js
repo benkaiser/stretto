@@ -80,7 +80,7 @@ class Player {
       this.playlist = playlist;
     }
     if (this.currentSong && this.currentSong.id == song.id) {
-      return;
+      return Promise.resolve();
     }
     this.updateSong(song);
 
