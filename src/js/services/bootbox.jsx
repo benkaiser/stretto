@@ -127,11 +127,11 @@ export default class Bootbox extends React.Component {
   }
 
   static confirm(message) {
-    return loadingPromise.then(Bootbox._component.confirm(message));
+    return loadingPromise.then(() => Bootbox._component.confirm(message));
   }
 
   static prompt(message, options) {
-    return loadingPromise.then(Bootbox._component.prompt(message));
+    return loadingPromise.then(() => Bootbox._component.prompt(message, options));
   }
 
   static show(header, contents) {

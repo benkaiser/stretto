@@ -255,7 +255,7 @@ export default class PlaylistView extends React.Component {
       value: this.state.playlist.title
     }).then((newTitle) => {
       this.state.playlist.update('title', newTitle);
-      this.props.history.push('/playlist/' + newTitle);
+      this.props.history.push('/playlist/' + encodeURIComponent(newTitle));
     });
   }
 
