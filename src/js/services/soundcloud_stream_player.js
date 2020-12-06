@@ -46,8 +46,8 @@ export default class SoundcloudStreamPlayer {
     player.onpause = () => SoundcloudStreamPlayer.playstateChangeHandler(false);
     player.onplaying = () => SoundcloudStreamPlayer.playstateChangeHandler(true);
     var hls = new Hls({
-      maxBufferLength: 60 * 60,
-      maxMaxBufferLength: 60 * 60 * 3
+      maxBufferLength: 60,
+      maxMaxBufferLength: 60 * 3
     });
     hls.attachMedia(player);
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
