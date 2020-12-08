@@ -30,7 +30,7 @@ function isAppUrl(path) {
     || path.startsWith('/backup')
     || path.startsWith('/welcome')
     || path.startsWith('/settings')
-    || path.startsWith('/spotify')
+    || path === '/spotify'
     || path.startsWith('/sync')
     || path.startsWith('/search')
     || path.startsWith('/artists/')
