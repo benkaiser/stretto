@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Alert } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import Spinner from 'react-spinkit';
 import Alerter from '../services/alerter';
 import Playlist from '../models/playlist';
@@ -44,6 +45,11 @@ export default class Add extends React.Component {
           </Alert>
         }
         </div>
+        { this.state.playlistUrl && (
+          <div>
+            <Link className='btn btn-primary' to={this.state.playlistUrl}>View All Songs in Playlist</Link>
+          </div>
+        )}
         { this.state.track &&
         <div className='row'>
           <div className='col-lg-6'>
@@ -138,6 +144,7 @@ export default class Add extends React.Component {
     Alerter.success('Track added to Library');
     this.setState({
       track: null,
+      playlistUrl: null,
       loading: false
     });
     this.album.value = '';
@@ -152,10 +159,17 @@ export default class Add extends React.Component {
     this.setState({
       loading: !!this.input.value,
       track: null,
+      playlistUrl: null,
       error: ''
     });
     this.timeout && clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
+      if (Youtube.isPlaylistUrl(this.input.value)) {
+        const params = new URL(this.input.value).searchParams;
+        this.setState({
+          playlistUrl: `/mix/${params.get('v')}+${params.get('list')}`
+        });
+      }
       (Soundcloud.isSoundcloudURL(this.input.value) ?
         Soundcloud.getInfo(this.input.value) :
         Youtube.getInfo(this.input.value)

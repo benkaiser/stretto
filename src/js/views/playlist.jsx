@@ -158,7 +158,11 @@ export default class PlaylistView extends React.Component {
   }
 
   getStateFromprops(props) {
-    const playlist = this.getPlaylistFromProps(props);
+    let playlist = this.getPlaylistFromProps(props);
+    if (!playlist) {
+      this.props.history.replace(`/playlist/${Playlist.LIBRARY}`);
+      playlist = Playlist.getByTitle(Playlist.LIBRARY);
+    }
     const state = this.determineStateForElementsToShow(0, window.innerHeight, playlist);
     state.sortColumn = playlist.sortColumn || undefined;
     state.sortDirection = playlist.sortDirection || SortDirection.NONE;

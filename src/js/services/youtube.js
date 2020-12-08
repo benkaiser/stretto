@@ -35,6 +35,21 @@ export default class Youtube {
     }
   }
 
+  static isPlaylistUrl(url) {
+    if (Youtube.isYoutubeURL(url)) {
+      try {
+        const searchParams = new URL(url).searchParams;
+        const video = searchParams.get('v');
+        const playlist = searchParams.get('list');
+        return video && playlist;
+      } catch (error) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
   static search(query) {
     return fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`)
     .then((response) => response.text())

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Spinner from 'react-spinkit';
-import { Alert } from 'react-bootstrap';
+import { Alert, DropdownButton, MenuItem } from 'react-bootstrap';
+import Alerter from '../services/alerter';
 import Youtube from '../services/youtube';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
@@ -45,16 +46,40 @@ export default class YoutubeMix extends PlaylistView {
 
   getPlaylistFromProps() {
     return this._youtubePlaylist || new Playlist({
-      title: 'Youtube Mix',
+      title: 'Youtube Playlist: Loading...',
       songs: []
     });
   }
 
   headerButtons() {
     return (
-      <div className='buttons'>
+      <div>
+        <DropdownButton id='playlist-dropdown' title='Options'>
+          <MenuItem onClick={this.addToLibrary}>Add to Library</MenuItem>
+          <MenuItem onClick={this.toStrettoPlaylist}>Create Stretto Playlist</MenuItem>
+        </DropdownButton>
       </div>
     );
+  }
+
+  @autobind
+  addToLibrary() {
+    const nonDupedSongs = this._youtubePlaylist._rawSongs.filter(newSong => !Song.findById(newSong.id));
+    const library = Playlist.getByTitle(Playlist.LIBRARY);
+    nonDupedSongs.forEach(song => {
+      const newSong = Song.create(song)
+      library.addSong(newSong);
+    });
+  }
+
+  @autobind
+  toStrettoPlaylist() {
+    this.addToLibrary();
+    Playlist.create({
+      title: this._youtubePlaylist.title,
+      songs: this._youtubePlaylist._rawSongs.map(song => song.id)
+    });
+    Alerter.success(`Created playlist named ${this._youtubePlaylist.title}`);
   }
 
   @autobind
@@ -64,7 +89,7 @@ export default class YoutubeMix extends PlaylistView {
     .then(mixPlaylist => {
       const songs = mixPlaylist.items.map(item => new Song(item));
       this._youtubePlaylist = new Playlist({
-        title: 'Youtube Mix for: ' + mixPlaylist.title,
+        title: 'Youtube Playlist: ' + mixPlaylist.title,
         rawSongs: songs
       });
       const state = this.determineStateForElementsToShow(0, window.innerHeight, this._youtubePlaylist);

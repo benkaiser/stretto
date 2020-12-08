@@ -75,7 +75,9 @@ export default class Bootbox extends React.Component {
 
   @autobind
   onCancel() {
-    this.reset();
+    setTimeout(() => {
+      this.reset();
+    });
   }
 
   @autobind
@@ -83,7 +85,9 @@ export default class Bootbox extends React.Component {
     if (this.state.successCallback) {
       this.state.successCallback(this.state.value);
     }
-    this.reset();
+    setTimeout(() => {
+      this.reset();
+    });
   }
 
   confirm(message) {

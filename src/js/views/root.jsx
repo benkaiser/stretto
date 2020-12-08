@@ -1,7 +1,7 @@
 import { render } from 'react-dom';
 import * as React from 'react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
-import { ReactRouterGlobalHistory } from 'react-router-global-history';
+import { default as getHistory, ReactRouterGlobalHistory } from 'react-router-global-history';
 import Add from './add';
 import ArtistSuggestions from './artist_suggestions';
 import ArtistsFeed from './artists_feed';
@@ -9,6 +9,7 @@ import ArtistsManage from './artists_manage';
 import BackupRestore from './backup_restore';
 import Discover from './discover';
 import Edit from './edit';
+import Error from './error';
 import Intro from './intro';
 import Layout from './layout';
 import Playlist from './playlist';
@@ -22,11 +23,23 @@ import Remote from './remote';
 import YoutubeMix from './youtube_mix';
 
 class RegularRoutes extends React.Component {
+  static getDerivedStateFromError() {
+    return {};
+  }
+
+  componentDidCatch(error, errorInfo) {
+    getHistory().replace('/error', {
+      error,
+      errorInfo
+    });
+  }
+
   render() {
     return (
       <Layout>
         <ReactRouterGlobalHistory />
         <Switch>
+          <Route exact path='/error' component={Error} />
           <Route path='/add' component={Add} />
           <Route path='/edit/:id' component={Edit} />
           <Route path='/backup' component={BackupRestore} />
