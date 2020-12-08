@@ -434,6 +434,7 @@ body, html {
   margin-bottom: 0;
   table-layout: fixed;
   user-select: none;
+  overflow-anchor: none;
 
   thead > tr {
     :first-child {
@@ -456,6 +457,8 @@ body, html {
 
   tbody > tr {
     &:not(.spacer) {
+      min-height: 40px;
+      max-height: 40px;
       height: 40px;
     }
 
@@ -473,7 +476,7 @@ body, html {
 }
 
 tbody > tr {
-  transition: all 200ms linear;
+  transition: box-shadow 200ms linear;
 
   &:hover {
     box-shadow: 0 0 30px -5px #aaa;

@@ -13,7 +13,7 @@ import Utilities from '../utilities';
 import Song from '../models/song';
 
 const ELEMENT_HEIGHT = 40;
-const HEADER_HEIGHT = 50;
+const HEADER_HEIGHT = 100;
 
 export default class PlaylistView extends React.Component {
   constructor(props) {
@@ -148,7 +148,7 @@ export default class PlaylistView extends React.Component {
       firstIndex: firstIndex,
       songsToRender: songs,
       topSpacerHeight: firstIndex * ELEMENT_HEIGHT,
-      bottomSpacerHeight: (playlist.songData.length - lastIndex) * ELEMENT_HEIGHT,
+      bottomSpacerHeight: (numSongs - lastIndex) * ELEMENT_HEIGHT,
       atBottom: container ? scrollTop > container.scrollHeight - container.offsetHeight - 100 : false
     };
   }
