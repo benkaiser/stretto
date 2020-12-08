@@ -7,7 +7,6 @@ var urlsToCache = [
   '/static/assets/favicon.png',
   '/static/assets/wisdom.otf',
   'https://apis.google.com/js/client.js',
-  'https://www.youtube.com/iframe_api',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
 
 ];
