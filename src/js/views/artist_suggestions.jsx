@@ -23,7 +23,7 @@ export default class ArtistSuggestions extends React.Component {
         <h1>Select Artists to Follow</h1>
         { this.state.loading &&
           <React.Fragment>
-            <p>Loading songs...</p>
+            <p>Loading artists...</p>
             <Spinner />
           </React.Fragment>
         }

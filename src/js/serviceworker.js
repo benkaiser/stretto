@@ -32,7 +32,9 @@ function isAppUrl(path) {
     || path === '/spotify'
     || path.startsWith('/sync')
     || path.startsWith('/search')
-    || path.startsWith('/artists/')
+    || path === '/artists/feed'
+    || path === '/artists/add'
+    || path === '/artists/manage'
     || path.startsWith('/soundcloud');
 }
 

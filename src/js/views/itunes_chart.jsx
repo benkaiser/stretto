@@ -78,6 +78,9 @@ export default class ItunesChart extends React.Component {
   }
 
   _onTouchEnd(song, event) {
+    if (event.button) {
+      return;
+    }
     if (event.timeStamp - this._touchStart > 300) {
       if (event.clientX === undefined) {
         event.clientX = event.changedTouches[0].clientX;

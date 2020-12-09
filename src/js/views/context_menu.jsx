@@ -9,9 +9,9 @@ import Player from '../services/player';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Youtube from '../services/youtube';
-import ServiceWorkerClient from '../services/service_worker_client';
 
 const DROPDOWN_MAX_HEIGHT = 400;
+const DROPDOWN_MAX_WIDTH = 250;
 
 class ContextMenu extends React.Component {
   constructor(props) {
@@ -89,6 +89,7 @@ class ContextMenu extends React.Component {
   dropdownStyle() {
     let topDistance = '';
     let bottomDistance = '';
+    let leftDistance = this.state.xPosition;
     if (this.dropup()) {
       bottomDistance = window.innerHeight - this.state.yPosition;
       if (this.state.yPosition - this.dropdownHeight() < 0) {
@@ -100,8 +101,11 @@ class ContextMenu extends React.Component {
         topDistance = window.innerHeight - this.dropdownHeight();
       }
     }
+    if (leftDistance + DROPDOWN_MAX_WIDTH > window.innerWidth) {
+      leftDistance = window.innerWidth - DROPDOWN_MAX_WIDTH;
+    }
     return {
-      left: `${this.state.xPosition}px`,
+      left: `${leftDistance}px`,
       top: topDistance ? `${topDistance}px` : topDistance,
       bottom: bottomDistance ? `${bottomDistance}px` : bottomDistance
     };

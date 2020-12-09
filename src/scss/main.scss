@@ -122,7 +122,14 @@ body, html {
     display: block;
     position: static;
     max-height: 400px;
+    max-width: 250px;
     overflow-y: scroll;
+    overflow-x: hidden;
+
+    li > a {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 
@@ -532,7 +539,6 @@ tbody > tr {
 @media(max-width: 480px) {
   .mobileFooter {
     position: fixed;
-    padding-bottom: 10px;
     bottom: 0;
     width: 100vw;
     border: 0;
@@ -603,6 +609,39 @@ tbody > tr {
 
       :last-child {
         max-width: 50vw;
+      }
+    }
+  }
+
+  .playerinfo {
+    overflow: hidden;
+    padding: 10px 0px 5px 0px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+
+    .cover {
+      height: 50px;
+      margin-right: 5px;
+      margin-left: 10px;
+      width: 50px;
+    }
+
+    .info {
+      margin-left: 5px;
+      margin-right: 10px;
+      flex-grow: 1;
+      overflow: hidden;
+
+      p {
+        margin: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .title {
+        font-size: 20px;
       }
     }
   }

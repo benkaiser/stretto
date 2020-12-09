@@ -18,8 +18,9 @@ export default class MobileHeader extends React.Component {
         <Navbar.Collapse id='basic-nav'>
           <Nav onSelect={this._onSelect}>
             <NavItem eventKey='/search/'>Search</NavItem>
+            <NavItem eventKey={`/playlist/${Playlist.LIBRARY}`}>{ Playlist.LIBRARY }</NavItem>
             <NavDropdown title='Playlists' id='basic-nav-dropdown' onSelect={this._onSelect}>
-              { Playlist.fetchAll().map((playlist) =>
+              { Playlist.fetchAll().filter(playlist => playlist.title !== Playlist.LIBRARY).map((playlist) =>
                 <MenuItem key={'playlist_' + playlist.title} eventKey={'/playlist/' + encodeURIComponent(playlist.title)}>
                   { playlist.title }
                 </MenuItem>
