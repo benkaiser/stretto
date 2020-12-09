@@ -244,7 +244,9 @@ export default class Playlist {
   }
 
   static removeOnChangeListener(listener) {
-    listeners.splice(listeners.indexOf(listener), 1);
+    if (listeners.indexOf(listener) > -1) {
+      listeners.splice(listeners.indexOf(listener), 1);
+    }
   }
 
   /**

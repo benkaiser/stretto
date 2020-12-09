@@ -23,12 +23,15 @@ export default class Slider extends React.Component {
     }).on('slideStart', this.slideStart.bind(this))
       .on('slide', this.slide.bind(this))
       .on('slideStop', this.slideStop.bind(this));
-    setInterval(() => {
-      if (this.sliding) return;
-      Player.currentTime().then((currentTime) => {
-        this.slider.setValue(currentTime, false, false);
-      })
+    this.updateTime();
+    this.currentTimeInterval = setInterval(() => {
+      this.updateTime();
     }, 1000);
+  }
+
+  componentWillUnmount() {
+    this.disposed = true;
+    this.currentTimeInterval && clearInterval(this.currentTimeInterval);
   }
 
   render() {
@@ -63,6 +66,15 @@ export default class Slider extends React.Component {
     this.sliding = false;
     if (this.scrub_timeout) clearTimeout(this.scrub_timeout);
     this.seek();
+  }
+
+  updateTime() {
+    if (this.sliding) return;
+    Player.currentTime().then((currentTime) => {
+      if (!this.disposed) {
+        this.slider.setValue(currentTime, false, false);
+      }
+    });
   }
 
   @autobind

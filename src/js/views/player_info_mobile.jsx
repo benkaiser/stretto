@@ -1,25 +1,11 @@
 import * as React from 'react';
 import { withRouter } from 'react-router-dom'
+import autobind from 'autobind-decorator';
 import ContextMenu from './context_menu';
 import Player from '../services/player';
-import autobind from 'autobind-decorator';
+import { PlayerInfo } from './player_info';
 
-class PlayerInfoMobile extends React.Component {
-  constructor(props) {
-    super(props);
-    Player.addOnSongChangeListener(this.newSong);
-    this.state = {
-      song: Player.currentSong
-    };
-  }
-
-  @autobind
-  newSong(song) {
-    this.setState({
-      song: song
-    });
-  }
-
+class PlayerInfoMobile extends PlayerInfo {
   render() {
     if (this.state.song) {
       return (
@@ -42,13 +28,13 @@ class PlayerInfoMobile extends React.Component {
         </div>
       );
     } else {
-      return <div className='playerinfo' />;
+      return <div className='playerinfo noSong' />;
     }
   }
 
   @autobind
   _rightSongClick(event) {
-    ContextMenu.open([this.state.song], event, Player.playlist);
+    ContextMenu.open([this.state.song], event);
     event.preventDefault();
   }
 
@@ -70,15 +56,13 @@ class PlayerInfoMobile extends React.Component {
       }
       this._rightSongClick(event);
     } else {
-      // this._showSongView(song);
+      this._playerView(event);
     }
   }
 
-  _search(searchText, event) {
-    this.props.history.push(`/search/${searchText}`);
+  _playerView() {
+    this.props.history.push(`/player`);
     event.preventDefault();
-    event.stopPropagation();
-    return false;
   }
 }
 

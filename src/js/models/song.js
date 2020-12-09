@@ -104,7 +104,9 @@ export default class Song {
   }
 
   static removeOnChangeListener(listener) {
-    listeners.splice(listeners.indexOf(listener), 1);
+    if (listeners.indexOf(listener) > -1) {
+      listeners.splice(listeners.indexOf(listener), 1);
+    }
     if (noDataListeners.indexOf(listener) > -1) {
       noDataListeners.splice(listeners.indexOf(listener), 1);
     }

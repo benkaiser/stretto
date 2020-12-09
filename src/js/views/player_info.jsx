@@ -4,7 +4,7 @@ import ContextMenu from './context_menu';
 import Player from '../services/player';
 import autobind from 'autobind-decorator';
 
-class PlayerInfo extends React.Component {
+export class PlayerInfo extends React.Component {
   constructor(props) {
     super(props);
     Player.addOnSongChangeListener(this.newSong);
@@ -12,6 +12,10 @@ class PlayerInfo extends React.Component {
       hideCover: false,
       song: Player.currentSong
     };
+  }
+
+  componentWillUnmount() {
+    Player.removeOnSongChangeListener(this.newSong);
   }
 
   hideCover(hide) {
@@ -29,7 +33,7 @@ class PlayerInfo extends React.Component {
   render() {
     if (this.state.song) {
       return (
-        <div className='playerinfo' onContextMenu={this.rightSongClick}>
+        <div className={'playerinfo' + (this.state.hideCover ? ' hidePlayer': '')} onContextMenu={this.rightSongClick}>
           <div className='info'>
             <p className='title' title={this.state.song.title}>{this.state.song.title}</p>
             <p className='artist'>
@@ -52,7 +56,7 @@ class PlayerInfo extends React.Component {
         </div>
       );
     } else {
-      return <div className='playerinfo' />;
+      return <div className='playerinfo noSong' />;
     }
   }
 

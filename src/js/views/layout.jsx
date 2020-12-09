@@ -14,11 +14,12 @@ export default class Layout extends React.Component {
   }
 
   render() {
+    const isPlayer = window.location.pathname === '/player';
     return (
       <div className='root'>
         <DesktopOnly><Sidebar /></DesktopOnly>
         <MobileOnly><MobileHeader /></MobileOnly>
-        <div className='content'>
+        <div className={'content' + (isPlayer ? ' fullbleed' : '') }>
           {this.props.children}
         </div>
         <MobileOnly><MobileFooter /></MobileOnly>

@@ -107,7 +107,9 @@ class Player {
   }
 
   removeOnSongChangeListener(listener) {
-    this.songListeners.splice(this.songListeners.indexOf(listener), 1);
+    if (this.songListeners.indexOf(listener) > -1) {
+      this.songListeners.splice(this.songListeners.indexOf(listener), 1);
+    }
   }
 
   resumeOnLoad(listener) {

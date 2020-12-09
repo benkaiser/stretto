@@ -4,7 +4,8 @@ import PlayerInfoMobile from './player_info_mobile';
 
 export default class MobileFooter extends React.Component {
   render() {
-    return <div className='mobileFooter modal-content'>
+    const isPlayer = window.location.pathname === '/player';
+    return <div className={'mobileFooter modal-content' + (isPlayer ? ' footerHidden' : '')}>
       <PlayerControls />
       <PlayerInfoMobile />
     </div>;

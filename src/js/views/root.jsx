@@ -13,6 +13,7 @@ import Error from './error';
 import Intro from './intro';
 import Layout from './layout';
 import Playlist from './playlist';
+import PlayerView from './player_view';
 import Search from './search';
 import Settings from './settings';
 import SharedPlaylist from './shared_playlist';
@@ -42,6 +43,7 @@ class RegularRoutes extends React.Component {
           <Route exact path='/error' component={Error} />
           <Route path='/add' component={Add} />
           <Route path='/edit/:id' component={Edit} />
+          <Route path='/player' component={PlayerView} />
           <Route path='/backup' component={BackupRestore} />
           <Route path='/welcome' component={Intro} />
           <Route path='/settings' component={Settings} />

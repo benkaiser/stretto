@@ -1,21 +1,27 @@
 import * as React from 'react';
+import autobind from 'autobind-decorator';
 import Player from '../services/player';
 import Slider from './slider';
 
 export default class PlayerControls extends React.Component {
   constructor(props) {
     super(props);
-    Player.addOnStateChangeListener(this.stateChange.bind(this));
+    Player.addOnStateChangeListener(this.stateChange);
     this.state = {
-      playing: false,
-      repeat: false,
-      shuffle: false
+      playing: Player.isPlaying,
+      repeat: Player.repeat_state === Player.REPEAT.ONE,
+      shuffle: Player.shuffle_on
     };
+  }
+
+  componentWillUnmount() {
+    this.disposed = true;
+    Player.removeOnSongChangeListener(this.stateChange);
   }
 
   render() {
     return (
-      <div>
+      <div className='mobilePlayerControls'>
         <Slider />
         <div className='control-buttons'>
           <div>
@@ -35,7 +41,11 @@ export default class PlayerControls extends React.Component {
     );
   }
 
+  @autobind
   stateChange() {
+    if (this.disposed) {
+      return;
+    }
     this.setState({
       playing: Player.isPlaying,
       repeat: Player.repeat_state === Player.REPEAT.ONE,
