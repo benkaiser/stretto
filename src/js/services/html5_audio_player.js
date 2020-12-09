@@ -37,8 +37,8 @@ export default class HTML5AudioPlayer {
 
   dispose() {
     this.disposed = true;
-    player && player.parentNode && player.parentNode.removeChild(player);
-    document.querySelectorAll(".html5audio").forEach(e => e.parentNode.removeChild(e));
+    player && player.pause() && player.remove(player);
+    document.querySelectorAll(".html5audio").forEach(e => e.remove());
   }
 
   getPosition() {
