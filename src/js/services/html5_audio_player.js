@@ -57,6 +57,10 @@ export default class HTML5AudioPlayer {
     player.paused ? player.play() : player.pause();
   }
 
+  ensurePlaying() {
+    player && player.play();
+  }
+
   static injectHandlers(playstateChange, onEnded) {
     HTML5AudioPlayer.playstateChangeHandler = playstateChange;
     HTML5AudioPlayer.endHandler = onEnded;

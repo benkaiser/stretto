@@ -1,10 +1,10 @@
+import autobind from 'autobind-decorator';
 import DataLayer from '../models/data_layer';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import HTML5AudioPlayer from './html5_audio_player';
 import SoundcloudStreamPlayer from './soundcloud_stream_player';
 import YoutubeStreamPlayer from './youtube_stream_player';
-import autobind from 'autobind-decorator';
 import ServiceWorkerClient from './service_worker_client';
 
 class Player {
@@ -69,7 +69,8 @@ class Player {
   @autobind
   next() {
     if (this.repeat_state == this.REPEAT.ONE) {
-      this.setCurrentTime(0)
+      this.setCurrentTime(0);
+      this.ensurePlaying();
       return;
     }
     this.play(this.playlist.nextSong(this.currentSong, this.shuffle_on));
@@ -184,6 +185,11 @@ class Player {
   @autobind
   togglePlaying() {
     this.currentPlayer && this.currentPlayer.toggle();
+  }
+
+  @autobind
+  ensurePlaying() {
+    this.currentPlayer && this.currentPlayer.ensurePlaying();
   }
 
   @autobind

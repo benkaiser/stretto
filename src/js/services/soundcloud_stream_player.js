@@ -118,6 +118,10 @@ export default class SoundcloudStreamPlayer {
     }
   }
 
+  ensurePlaying() {
+    player && player.play();
+  }
+
   static injectHandlers(playstateChange, onEnded) {
     SoundcloudStreamPlayer.playstateChangeHandler = playstateChange;
     SoundcloudStreamPlayer.endHandler = onEnded;

@@ -74,6 +74,10 @@ export default class YoutubeStreamPlayer {
     player.paused ? player.play() : player.pause();
   }
 
+  ensurePlaying() {
+    player && player.play();
+  }
+
   static injectHandlers(playstateChange, onEnded) {
     YoutubeStreamPlayer.playstateChangeHandler = playstateChange;
     YoutubeStreamPlayer.endHandler = onEnded;
