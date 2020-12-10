@@ -51,6 +51,7 @@
     "sass-loader": "^6.0.6",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
+    "soundcloud": "^3.3.2",
     "spotify-web-api-js": "^0.22.1",
     "style-loader": "^0.19.0",
     "webpack": "^4.41.2",

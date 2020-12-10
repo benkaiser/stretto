@@ -6,6 +6,7 @@ import Song from '../models/song';
 import PlaylistView from './playlist';
 import autobind from 'autobind-decorator';
 import { default as SoundcloudService } from '../services/soundcloud';
+import SoundcloudOAuth from '../services/soundcloud_oauth';
 
 export default class Soundcloud extends PlaylistView {
   constructor(props) {
@@ -23,7 +24,7 @@ export default class Soundcloud extends PlaylistView {
   render() {
     if (this.state.loading) {
       return <Spinner />;
-    } else if (this.state.error || !this.state.token || !this._soundcloudPlayList) {
+    } else if (this.state.error || (!this.state.token && !SoundcloudOAuth.canOAuth()) || !this._soundcloudPlayList) {
       return (
         <div className='intro'>
           { this.state.error &&
@@ -31,19 +32,39 @@ export default class Soundcloud extends PlaylistView {
               <strong>Oh snap!</strong> {this.state.error.toString()}
             </Alert>
           }
-          <p>We need your soundcloud token to load your stream</p>
-          <p>
-            <FormControl
-              type='text'
-              placeholder='Token'
-              inputRef={this._tokenInput} />
-          </p>
-          <Button onClick={this._onTokenSubmit}>Load Stream</Button>
+          { this.promptView() }
         </div>
       );
     } else {
       return super.render();
     }
+  }
+
+  promptView() {
+    return SoundcloudOAuth.canOAuth() ? this.oauthRequest() : this.tokenRequest();
+  }
+
+  oauthRequest() {
+    return (
+      <div>
+        <Button bsStyle='primary' onClick={this._connectWithOAuth}>Connect with Soundcloud</Button>
+      </div>
+    )
+  }
+
+  tokenRequest() {
+    return (
+      <div>
+        <p>We need your soundcloud token to load your stream</p>
+        <p>
+          <FormControl
+            type='text'
+            placeholder='Token'
+            inputRef={this._tokenInput} />
+        </p>
+        <Button bsStyle='primary' onClick={this._onTokenSubmit}>Load Stream</Button>
+      </div>
+    )
   }
 
   getPlaylistFromProps() {
@@ -58,6 +79,29 @@ export default class Soundcloud extends PlaylistView {
       <div>
       </div>
     );
+  }
+
+  @autobind
+  _connectWithOAuth() {
+    SoundcloudOAuth.login()
+    .then(SoundcloudOAuth.getTracks)
+    .then(json => {
+      const tracks = json.collection.filter(item => item.origin && item.origin.kind === 'track').map(item => ({ track: item.origin, user: item.origin.user }));
+      const songs = this._processTracks(tracks, []);
+      this._soundcloudPlayList = new Playlist({
+        title: 'Soundcloud Stream',
+        rawSongs: songs,
+        editable: false
+      });
+      const scrollContainer = this.contentContainer();
+      const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, this._soundcloudPlayList);
+      this.setState({
+        ...state,
+        playlist: this._soundcloudPlayList,
+        next_href: json.next_href,
+        loading: false
+      });
+    });
   }
 
   @autobind
@@ -95,7 +139,8 @@ export default class Soundcloud extends PlaylistView {
         rawSongs: songs,
         editable: false
       });
-      const state = this.determineStateForElementsToShow(0, window.innerHeight, this._soundcloudPlayList);
+      const scrollContainer = this.contentContainer();
+      const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, this._soundcloudPlayList);
       this.setState({
         ...state,
         playlist: this._soundcloudPlayList,
@@ -117,7 +162,9 @@ export default class Soundcloud extends PlaylistView {
   }
 
   paginationCallback() {
-    fetch(this.state.next_href.replace('https://api-v2.soundcloud.com', '/scapi'),
+    (SoundcloudOAuth.canOAuth()
+      ? SoundcloudOAuth.getNextPage(this.state.next_href)
+      : fetch(this.state.next_href.replace('https://api-v2.soundcloud.com', '/scapi'),
     {
       "credentials":"include",
       "headers":{
@@ -126,11 +173,16 @@ export default class Soundcloud extends PlaylistView {
       },
       "referrer":"https://soundcloud.com/",
       "method":"GET",
-    }).then(response => response.json())
+    })).then(response => SoundcloudOAuth.canOAuth() ? response : response.json())
     .then(json => {
-      const songs = this._processTracks(json.collection, this._soundcloudPlayList._rawSongs);
+      let tracks = json.collection;
+      if (SoundcloudOAuth.canOAuth()) {
+        tracks = json.collection.filter(item => item.origin && item.origin.kind === 'track').map(item => ({ track: item.origin, user: item.origin.user }));
+      }
+      const songs = this._processTracks(tracks, this._soundcloudPlayList._rawSongs);
       this._soundcloudPlayList.rawSongs = songs;
-      const state = this.determineStateForElementsToShow(0, window.innerHeight, this._soundcloudPlayList);
+      const scrollContainer = this.contentContainer();
+      const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, this._soundcloudPlayList);
       this.setState({
         ...state,
         playlist: this._soundcloudPlayList,

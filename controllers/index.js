@@ -276,6 +276,7 @@ function render(res, extraEnv) {
       GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
       SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || '',
       GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID || '',
+      SOUNDCLOUD_CLIENT_ID: process.env.SOUNDCLOUD_CLIENT_ID || '',
       ...extraEnv
     }
   });

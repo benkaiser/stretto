@@ -9,6 +9,7 @@ import Theme from './theme';
 import TitleUpdater from './services/title_updater';
 import ServiceWorkerClient from './services/service_worker_client';
 import FirstRunExperience from './services/first_run_experience';
+import SoundcloudOAuth from './services/soundcloud_oauth';
 
 class Loader {
   static loadAll() {
@@ -21,6 +22,7 @@ class Loader {
     RootView.initialise();
     Lyrics.initialise();
     ServiceWorkerClient.initialise();
+    SoundcloudOAuth.initialise();
   }
 }
 

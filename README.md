@@ -40,6 +40,7 @@ GOOGLE_CLIENT_ID=<...>
 GOOGLE_CLIENT_ID_ANDROID=<...>
 GOOGLE_API_KEY=<...>
 SPOTIFY_CLIENT_ID=<...>
+SOUNDCLOUD_CLIENT_ID=<...>
 ```
 
 #### Running in Docker + Docker Compose
