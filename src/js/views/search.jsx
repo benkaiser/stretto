@@ -1,12 +1,13 @@
 import * as React from 'react';
-import { Button } from 'react-bootstrap';
+import { Label } from 'react-bootstrap';
 import Itunes from '../services/itunes';
-import Player from '../services/player';
 import Playlist from '../models/playlist';
 import PlaylistView from './playlist';
 import MobileOnly from './mobile_only';
 import SearchBox from './search_box';
 import autobind from 'autobind-decorator';
+
+const ITUNES_SEARCH_DELAY = 300;
 
 export default class Search extends PlaylistView {
   playlistHeaderClass() {
@@ -15,7 +16,12 @@ export default class Search extends PlaylistView {
 
   getPlaylistFromProps(props) {
     if (props.match.params.search) {
-      return this._createPlaylistForSearch(props.match.params.search);
+      this._localPlaylist = this._createPlaylistForSearch(props.match.params.search);
+      if (props.match.params.search.length > 3) {
+        this._searchTimeout && clearTimeout(this._searchTimeout);
+        this._searchTimeout = setTimeout(this._itunesSearch, ITUNES_SEARCH_DELAY);
+      }
+      return this._localPlaylist;
     } else {
       return new Playlist({
         title: 'Enter a Search',
@@ -24,11 +30,22 @@ export default class Search extends PlaylistView {
     }
   }
 
+  extraTitleDecoration(song) {
+    return (
+      <>
+        { song.inLibrary && (
+          <div className='lyric-label'>
+            <Label bsStyle="success">In Library</Label>
+          </div>
+        ) }
+      </>
+    )
+  }
+
   headerButtons() {
     return (
       <div className='buttons'>
         <MobileOnly><SearchBox /></MobileOnly>
-        <Button onClick={this._itunesSearch} title="search iTunes, back with youtube tracks" block>Search iTunes</Button>
       </div>
     );
   }
@@ -46,26 +63,16 @@ export default class Search extends PlaylistView {
   @autobind
   _itunesSearch() {
     Itunes.search(this.props.match.params.search).then(songs => {
-      const newPlaylist = this.state.playlist;
-      newPlaylist.rawSongs = songs;
+      songs = songs.filter((song) =>
+        !this._localPlaylist.songData.some(localSong => localSong.title.toLowerCase() === song.title.toLowerCase() && localSong.artist.toLowerCase() === song.artist.toLowerCase())
+      );
+      const newPlaylist = new Playlist({
+        title: this._localPlaylist.title,
+        rawSongs: this._localPlaylist.songData.concat(songs)
+      });
       const state = this.determineStateForElementsToShow(0, window.innerHeight, newPlaylist);
       state.playlist = newPlaylist;
       this.setState(state);
     });
-  }
-
-  @autobind
-  _onCreatePlaylist() {
-    /* no-op */
-  }
-
-  @autobind
-  _soundcloudSearch() {
-    /* no-op */
-  }
-
-  @autobind
-  _youtubeSearch() {
-    /* no-op */
   }
 }

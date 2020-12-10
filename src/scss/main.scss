@@ -211,12 +211,12 @@ body, html {
 }
 
 .airplane-label {
-  margin-right: 8px;
   margin-left: 8px;
   animation: fadein 0.3s;
 }
 
 .lyric-label {
+  margin-left: 8px;
   margin-top: -1px;
   animation: fadein 1s;
 }
@@ -632,7 +632,7 @@ tbody > tr {
   .content {
     padding: 10px;
     padding-top: 70px;
-    padding-bottom: 70px;
+    padding-bottom: 140px;
     bottom: 0;
   }
 

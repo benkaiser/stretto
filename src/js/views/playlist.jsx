@@ -229,6 +229,7 @@ export default class PlaylistView extends React.Component {
             <div className='titleItemText'>{song.title}</div>
             { song.offline && this._offlineAirplane() }
             { this.isCurrentlyPlaying(song.id) && Lyrics.lyrics && this._lyricsButton() }
+            { this.extraTitleDecoration(song) }
           </td>
         );
       case 'releaseDate':
@@ -243,6 +244,10 @@ export default class PlaylistView extends React.Component {
       default:
         return <td key={key}>{song[column]}</td>;
     }
+  }
+
+  extraTitleDecoration() {
+    return <></>;
   }
 
   @autobind
@@ -365,6 +370,9 @@ export default class PlaylistView extends React.Component {
 
   _onTouchEnd(song, event) {
     if (event.button) {
+      return;
+    }
+    if (event.target.classList.contains("searchable")) {
       return;
     }
     if (this._touchStart === -1) {
