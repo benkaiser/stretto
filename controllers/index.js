@@ -190,7 +190,7 @@ router.post('/addsong', loggedIn, (req, res) => {
 });
 
 router.post('/uploaddata', loggedIn, (req, res) => {
-  DataMapper.setDataForUser(req.body, req.session.user)
+  DataMapper.setDataForUser(req.body, req.session.user, req.query && req.query.force)
   .then((newVersion) => {
     console.log(newVersion);
     res.send({ success: true, version: newVersion })

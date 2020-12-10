@@ -1,6 +1,9 @@
+import * as React from 'react';
+import { Button } from 'react-bootstrap';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Utilities from '../utilities';
+import Alerter from './alerter';
 import autobind from 'autobind-decorator';
 
 export default class SyncManager {
@@ -65,13 +68,13 @@ export default class SyncManager {
   }
 
   @autobind
-  _uploadData() {
+  _uploadData(forceUpload) {
     const data = {
       playlists: Playlist.fetchAll(),
       songs: Song.fetchAll(),
       version: this._latestVersion,
     }
-    return fetch('/uploaddata', {
+    return fetch('/uploaddata' + (forceUpload ? '?force=true' : ''), {
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +84,16 @@ export default class SyncManager {
     })
     .then(Utilities.fetchToJson)
     .then((data) => {
-      data.success && this._updateLatestVersion(data.version);
+      if (data.success) {
+        this._updateLatestVersion(data.version);
+      } else if (data.error === 'version mismatch') {
+        Alerter.error(<p>
+          Sync failed version check.
+          <Button onClick={() => {
+            this._uploadData(true);
+          }}>Force Upload</Button>
+        </p>);
+      }
     });
   }
 

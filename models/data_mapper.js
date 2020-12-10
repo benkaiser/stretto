@@ -70,10 +70,10 @@ module.exports = class DataMapper {
     });
   }
 
-  static setDataForUser(data, user) {
+  static setDataForUser(data, user, force) {
     return User.getVersionForUser(user)
     .then((version) => {
-      if (data.version == version || version === -1) {
+      if (force || data.version == version || version === -1) {
         return Promise.all([
           Playlist.updatePlaylists(user.email, data.playlists),
           Song.updateSongs(user.email, data.songs)
