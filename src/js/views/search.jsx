@@ -15,6 +15,8 @@ export default class Search extends PlaylistView {
   }
 
   getPlaylistFromProps(props) {
+    this._needsPagination = false;
+    this._paginationOffset = 0;
     if (props.match.params.search) {
       this._localPlaylist = this._createPlaylistForSearch(props.match.params.search);
       if (props.match.params.search.length > 3) {
@@ -60,9 +62,33 @@ export default class Search extends PlaylistView {
     });
   }
 
+  allowPagination() {
+    return this._needsPagination;
+  }
+
+  paginationCallback() {
+    Itunes.search(this.props.match.params.search, this._paginationOffset).then(songs => {
+      this._needsPagination = songs.length === 50;
+      this._paginationOffset += songs.length;
+      songs = songs.filter((song) =>
+        !this.state.playlist.songData.some(localSong => localSong.title.toLowerCase() === song.title.toLowerCase() && localSong.artist.toLowerCase() === song.artist.toLowerCase())
+      );
+      const newPlaylist = new Playlist({
+        title: this.state.playlist.title,
+        rawSongs: this.state.playlist.songData.concat(songs)
+      });
+      const scrollContainer = this.contentContainer();
+      const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
+      state.playlist = newPlaylist;
+      this.setState(state);
+    });
+  }
+
   @autobind
   _itunesSearch() {
     Itunes.search(this.props.match.params.search).then(songs => {
+      this._needsPagination = songs.length === 50;
+      this._paginationOffset = 50;
       songs = songs.filter((song) =>
         !this._localPlaylist.songData.some(localSong => localSong.title.toLowerCase() === song.title.toLowerCase() && localSong.artist.toLowerCase() === song.artist.toLowerCase())
       );
@@ -70,7 +96,8 @@ export default class Search extends PlaylistView {
         title: this._localPlaylist.title,
         rawSongs: this._localPlaylist.songData.concat(songs)
       });
-      const state = this.determineStateForElementsToShow(0, window.innerHeight, newPlaylist);
+      const scrollContainer = this.contentContainer();
+      const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
       state.playlist = newPlaylist;
       this.setState(state);
     });

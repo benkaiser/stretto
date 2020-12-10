@@ -596,6 +596,11 @@ tbody > tr {
     }
   }
 
+  .paginate {
+    bottom: 150px;
+    left: calc(50vw - 45px);
+  }
+
   .mobileFooter {
     position: fixed;
     bottom: 0;

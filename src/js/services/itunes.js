@@ -2,7 +2,6 @@ import Constants from '../constants';
 import Country from '../country';
 import Song from '../models/song';
 import Utilities from '../utilities';
-import Youtube from './youtube';
 
 export default class Itunes {
   static chartUrl(options) {
@@ -10,12 +9,12 @@ export default class Itunes {
     options.limit = options.limit || 20;
     const countryCode = Country.current();
     const genreSection = options.genreCode ? `/genre=${options.genreCode}` : '';
-    return `/itunes/${countryCode}/rss/topsongs/limit=${options.limit}${genreSection}/json`;
+    return `https://itunes.apple.com/${countryCode}/rss/topsongs/limit=${options.limit}${genreSection}/json`;
   }
 
-  static search(searchTerm) {
+  static search(searchTerm, offset) {
     searchTerm = encodeURI(searchTerm);
-    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=50&country=` + Country.current();
+    let url = `https://itunes.apple.com/search?term=${searchTerm}&entity=song&limit=50${offset ? '&offset=' + offset : ''}&country=` + Country.current();
     return fetch(url)
     .then(Utilities.fetchToJson)
     .then((data) => {
@@ -25,7 +24,7 @@ export default class Itunes {
 
   static fetchCover(song) {
     let searchTerm = encodeURI(`${song.title} ${song.artist}`);
-    let url = `/itunes/search?term=${searchTerm}&entity=song&limit=10&country=` + Country.current();
+    let url = `https://itunes.apple.com/search?term=${searchTerm}&entity=song&limit=10&country=` + Country.current();
     return fetch(url)
     .then(Utilities.fetchToJson)
     .then(data => {

@@ -23,7 +23,6 @@ var app = express();
 var server = http.createServer(app);
 var io = socketio.listen(server);
 
-app.use('/itunes', proxy('https://itunes.apple.com'));
 app.use('/scapi', proxy('https://api-v2.soundcloud.com'));
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
