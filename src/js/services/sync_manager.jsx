@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Button } from 'react-bootstrap';
+import getHistory from 'react-router-global-history';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Utilities from '../utilities';
@@ -54,6 +55,8 @@ export default class SyncManager {
     Playlist.initialise(playlists);
     Song.change();
     Playlist.change();
+    Alerter.success('Library Updated');
+    getHistory().replace(window.location.pathname);
   }
 
   _startSync() {
