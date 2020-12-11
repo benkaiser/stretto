@@ -94,7 +94,7 @@ export default class SoundcloudStreamPlayer {
   dispose() {
     this.disposed = true;
     player && player.pause() && player.remove(player);
-    document.querySelectorAll(".scaudio").forEach(e => e.remove());
+    document.querySelectorAll(".scaudio").forEach(e => e.pause() && e.remove());
   }
 
   getPosition() {
