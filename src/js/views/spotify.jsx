@@ -1,7 +1,9 @@
 import * as React from 'react';
-import { Button, FormGroup, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import Spinner from 'react-spinkit';
+import { Button, FormGroup, ToggleButton, ToggleButtonGroup, ListGroup, ListGroupItem, ProgressBar } from 'react-bootstrap';
 import autobind from 'autobind-decorator';
 import SpotifyAPI from '../services/spotify_api';
+import SpotifyImporter from '../services/spotify_importer';
 
 export default class Spotify extends React.Component {
   constructor(props) {
@@ -11,21 +13,35 @@ export default class Spotify extends React.Component {
     };
 
     if (SpotifyAPI.instance.connected) {
-      this.state = {
-        fetching: true
-      };
-      this._fetchData();
+      if (SpotifyImporter.instance.inProgress()) {
+        this.state = {
+          syncing: true
+        };
+      } else {
+        this.state = {
+          fetching: true
+        };
+        this._fetchData();
+      }
     }
+  }
+
+  componentDidMount() {
+    SpotifyImporter.instance.addEventListener('message', this._onEvent);
+  }
+
+  componentWillUnmount() {
+    SpotifyImporter.instance.removeEventListener('message', this._onEvent);
   }
 
   render() {
     let currentView;
-    if (this.state.fetching) {
+    if (this.state.syncing) {
+      currentView = this.showSyncing();
+    } else if (this.state.fetching) {
       currentView = this.showFetching();
     } else if (!this.state.playlists) {
       currentView = this.showConnect();
-    } else if (this.state.syncing) {
-      currentView = this.showSyncing();
     } else {
       currentView = this.showSync();
     }
@@ -39,6 +55,10 @@ export default class Spotify extends React.Component {
   }
 
   showConnect() {
+    if (SpotifyAPI.instance.connected) {
+      this._fetchData();
+      return <Spinner name='line-scale' />;
+    }
     return (
       <Button bsStyle='primary' onClick={this._login}>Connect to Spotify</Button>
     );
@@ -56,8 +76,9 @@ export default class Spotify extends React.Component {
   showSync() {
     return (
       <div>
+        <h2>Playlists</h2>
         <p>
-          Select which playlists you would like to sync<br/>
+          <Button bsStyle='primary' onClick={this._sync}>Sync</Button>
           <Button bsStyle='link' onClick={this._selectAll}>Check All</Button>
           <Button bsStyle='link' onClick={this._deselectAll}>Uncheck All</Button>
         </p>
@@ -73,17 +94,61 @@ export default class Spotify extends React.Component {
           }) }
           </ToggleButtonGroup>
         </FormGroup>
-        <Button bsStyle='primary' onClick={this._sync}>Sync</Button>
       </div>
     );
   }
 
   showSyncing() {
+    const state = SpotifyImporter.instance.getState();
+    const inProgress = SpotifyImporter.instance.inProgress();
+    let stateText = '';
+    let progress = 0;
+    if (state && Object.keys(state).length > 0) {
+      const completed = Object.values(state).reduce((acc, item) => acc + (item.state ? 1 : 0), 0);
+      const total = Object.values(state).length;
+      if (total > 0) {
+        progress = 100 * (completed / total);
+      }
+      stateText = completed === total ? '(Finished)' : `(${completed}/${total})`;
+    }
     return (
-      <p>
-        Your playlists are now syncing and will start to show up on the sidebar and the songs in your library. Closing the browser window will interrupt the sync.
-      </p>
+      <div>
+        <p>
+          Feel free to browse around while your songs are synced. You can come back to this page to see progress. Closing your browser window will stop the sync.
+        </p>
+        <h2>Progress {stateText}</h2>
+        { state && <ProgressBar now={progress} label={`${progress.toFixed(0)}%`} /> }
+        { (state) ?
+          <>
+            { !inProgress && <Button bsStyle='primary' onClick={this._syncMore}>Sync More Playlists</Button>}
+            <ListGroup>
+              { Object.keys(state).map((songKey) => {
+                const song = state[songKey];
+                let songState = '';
+                if (song.state === undefined) {
+                  songState = <i className="fa fa-refresh" aria-hidden="true"></i>
+                } else if (song.state === 'success') {
+                  songState = <i className="fa fa-check" aria-hidden="true"></i>
+                } else if (song.state === 'error') {
+                  songState = <i title={song.error.message} className="fa fa-times" aria-hidden="true"></i>
+                }
+                return <ListGroupItem key={songKey}>{ songState } { song.artist } - { song.title }</ListGroupItem>;
+              }) }
+            </ListGroup>
+            { !inProgress && <Button bsStyle='primary' onClick={this._syncMore}>Sync More Playlists</Button>}
+          </>
+          : <Spinner name='line-scale' />
+        }
+      </div>
     );
+  }
+
+  @autobind
+  _syncMore() {
+    this.setState({
+      syncing: false,
+      selectedPlaylists: []
+    });
   }
 
   @autobind
@@ -123,9 +188,11 @@ export default class Spotify extends React.Component {
 
   @autobind
   _sync() {
-    SpotifyAPI.instance.startSync(this.state.playlists.filter((playlist) => this.state.selectedPlaylists.indexOf(playlist.id) >= 0));
-    this.setState({
-      syncing: true
+    SpotifyAPI.instance.startSync(this.state.playlists.filter((playlist) => this.state.selectedPlaylists.indexOf(playlist.id) >= 0))
+    .then(() => {
+      this.setState({
+        syncing: true
+      });
     });
   }
 
@@ -134,5 +201,10 @@ export default class Spotify extends React.Component {
     this.setState({
       selectedPlaylists: []
     });
+  }
+
+  @autobind
+  _onEvent(event) {
+    this.forceUpdate();
   }
 }

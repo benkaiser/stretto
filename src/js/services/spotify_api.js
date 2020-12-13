@@ -91,24 +91,27 @@ export default class SpotifyAPI {
   }
 
   startSync(playlists) {
-    async.eachSeries(playlists, (playlist, done) => {
-      let link = playlist.tracks.href;
-      playlist.tracks.items = [];
-      async.until(() => !link, (next) => {
-        fetch(link, {
-          headers: {
-            'Authorization': `Bearer ${this._access_token}`,
-          }
-        })
-        .then(Utilities.fetchToJson)
-        .then((response) => {
-          playlist.tracks.items = playlist.tracks.items.concat(response.items);
-          link = response.next;
-          next();
-        });
-      }, done);
-    }, () => {
-      this._startImportingPlaylists(playlists);
+    return new Promise((resolve) => {
+      async.eachSeries(playlists, (playlist, done) => {
+        let link = playlist.tracks.href;
+        playlist.tracks.items = [];
+        async.until(() => !link, (next) => {
+          fetch(link, {
+            headers: {
+              'Authorization': `Bearer ${this._access_token}`,
+            }
+          })
+          .then(Utilities.fetchToJson)
+          .then((response) => {
+            playlist.tracks.items = playlist.tracks.items.concat(response.items);
+            link = response.next;
+            next();
+          });
+        }, done);
+      }, () => {
+        this._startImportingPlaylists(playlists);
+        resolve();
+      });
     });
   }
 
@@ -173,7 +176,7 @@ export default class SpotifyAPI {
             artist: item.track.artists.map((artist) => artist.name).join(' + '),
             cover: item.track.album.images[0] && item.track.album.images[0].url,
             disc: item.track.disc_number,
-            duration: item.track.duration / 1000,
+            duration: item.track.duration_ms / 1000,
             explicit: item.track.explicit || false,
             track: item.track.track_number,
             title: item.track.name,
@@ -182,7 +185,6 @@ export default class SpotifyAPI {
         }
       });
     });
-    const importer = new SpotifyImporter({ data: { songs } });
-    importer.start();
+    SpotifyImporter.instance.start(songs);
   }
 }
