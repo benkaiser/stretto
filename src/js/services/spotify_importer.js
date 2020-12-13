@@ -3,6 +3,7 @@ import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Youtube from './youtube';
 import async from 'async';
+import Alerter from './alerter';
 
 const PAUSE_INTERVAL = 500;
 
@@ -31,6 +32,7 @@ export default class SpotifyImporter extends EventTarget {
         setTimeout(callback, PAUSE_INTERVAL);
       }).catch((error) => {
         console.log(`FAILED TO RESOLVE TRACK: "${outerSong.title} - ${outerSong.artist}" because ${error}`);
+        Alerter.error(`Failed to add "${outerSong.title}" by "${outerSong.artist}" from Spotify`)
         this._updateProgress(`Failed to find "${outerSong.title} ${outerSong.artist}" item with ${error}`);
         outerSong.state = 'error';
         outerSong.error = error;

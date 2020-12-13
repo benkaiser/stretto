@@ -125,7 +125,7 @@ export default class Youtube {
       isYoutube: true,
       title: track.title.runs ? track.title.runs[0].text : track.title.simpleText,
       url: `https://www.youtube.com/watch?v=${track.videoId}`,
-      duration: track.lengthText.simpleText.split(':').reduce((acc,time) => (60 * acc) + +time)
+      duration: track.lengthText ? track.lengthText.simpleText.split(':').reduce((acc,time) => (60 * acc) + +time) : 0
     };
   }
 
