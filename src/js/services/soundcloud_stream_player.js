@@ -31,9 +31,6 @@ export default class SoundcloudStreamPlayer {
       if (this.disposed) {
         return;
       }
-      if (this.options.currentTime) {
-        player.currentTime = this.options.currentTime;
-      }
       if (this.options.autoPlay) {
         try {
           player.play();
@@ -47,7 +44,8 @@ export default class SoundcloudStreamPlayer {
     player.onplaying = () => SoundcloudStreamPlayer.playstateChangeHandler(true);
     var hls = new Hls({
       maxBufferLength: 60,
-      maxMaxBufferLength: 60 * 3
+      maxMaxBufferLength: 60 * 3,
+      startPosition: this.options.currentTime
     });
     hls.attachMedia(player);
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
@@ -93,8 +91,14 @@ export default class SoundcloudStreamPlayer {
 
   dispose() {
     this.disposed = true;
-    player && player.pause() && player.remove(player);
-    document.querySelectorAll(".scaudio").forEach(e => e.pause() && e.remove());
+    if (player) {
+      player.pause();
+      player.parentNode.removeChild(player);
+    }
+    document.querySelectorAll(".scaudio").forEach(e => {
+      e.pause();
+      e.parentNode.removeChild(e);
+    });
   }
 
   getPosition() {

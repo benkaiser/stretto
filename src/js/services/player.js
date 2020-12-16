@@ -7,6 +7,8 @@ import SoundcloudStreamPlayer from './soundcloud_stream_player';
 import YoutubeStreamPlayer from './youtube_stream_player';
 import ServiceWorkerClient from './service_worker_client';
 
+const AUTOPLAY_RESUME_TIMEOUT = 1000 * 60 * 5; // 5 minutes
+
 class Player {
   constructor() {
     this.songListeners = [];
@@ -63,7 +65,7 @@ class Player {
   }
 
   isPlaying() {
-    return this.isPlaying;
+    return this._isPlaying;
   }
 
   @autobind
@@ -97,8 +99,8 @@ class Player {
 
   @autobind
   playstateChange(isPlaying) {
-    const oldisPlaying = this.isPlaying;
-    this.isPlaying = isPlaying;
+    const oldisPlaying = this._isPlaying;
+    this._isPlaying = isPlaying;
     oldisPlaying != isPlaying && this.stateChange();
   }
 
@@ -120,14 +122,20 @@ class Player {
       const playlist = Playlist.getByTitle(playstate.playlistTitle) || Playlist.getByTitle(Playlist.LIBRARY);
       if (song && playlist) {
         const play = () => {
+          let resumePlaying = false;
+          if (playstate.timestamp && playstate.timestamp > (+new Date() - AUTOPLAY_RESUME_TIMEOUT) && playstate.playing) {
+            resumePlaying = true;
+          }
+          this._isPlaying = resumePlaying;
           this.play(
             song,
             playlist,
             {
-              autoPlay: playstate.playing,
+              autoPlay: resumePlaying,
               currentTime: playstate.currentTime,
             }
           );
+          this.stateChange();
         };
         if (ServiceWorkerClient.available()) {
           Song.waitForOffline().then(() => {
@@ -150,10 +158,11 @@ class Player {
       DataLayer.setItem('playstate', {
         currentTime: currentTime,
         playlistTitle: this.playlist ? this.playlist.title : '',
-        playing: this.isPlaying,
+        playing: this.isPlaying(),
         repeat: this.repeat_state,
         shuffle_on: this.shuffle_on,
-        songId: this.currentSong && this.currentSong.id || undefined
+        songId: this.currentSong && this.currentSong.id || undefined,
+        timestamp: +new Date()
       });
     })
   }

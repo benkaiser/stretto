@@ -54,8 +54,14 @@ export default class YoutubeStreamPlayer {
 
   dispose() {
     this.disposed = true;
-    player && player.pause() && player.remove(player);
-    document.querySelectorAll(".ytaudio").forEach(e => e.pause() && e.remove());
+    if (player) {
+      player.pause();
+      player.parentNode.removeChild(player);
+    }
+    document.querySelectorAll(".ytaudio").forEach(e => {
+      e.pause();
+      e.parentNode.removeChild(player)
+    });
   }
 
   getPosition() {

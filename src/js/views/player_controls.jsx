@@ -8,7 +8,7 @@ export default class PlayerControls extends React.Component {
     super(props);
     Player.addOnStateChangeListener(this.stateChange);
     this.state = {
-      playing: Player.isPlaying,
+      playing: Player.isPlaying(),
       repeat: Player.repeat_state === Player.REPEAT.ONE,
       shuffle: Player.shuffle_on
     };
@@ -47,7 +47,7 @@ export default class PlayerControls extends React.Component {
       return;
     }
     this.setState({
-      playing: Player.isPlaying,
+      playing: Player.isPlaying(),
       repeat: Player.repeat_state === Player.REPEAT.ONE,
       shuffle: Player.shuffle_on
     });

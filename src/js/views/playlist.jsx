@@ -56,7 +56,7 @@ export default class PlaylistView extends React.Component {
     return (
       <div className='intro'>
         { this.header() }
-        <p>{this.state.playlist.songs.length} Songs</p>
+        { this.songsText() }
         <table className='song-table table'>
           <thead>
             <tr>
@@ -84,6 +84,11 @@ export default class PlaylistView extends React.Component {
           </Button> }
       </div>
     );
+  }
+
+  songsText() {
+    const count = this.state.playlist.songs.length;
+    return <p>{count} { count === 1 ? 'Song' : 'Songs' }</p>;
   }
 
   cellWidthForColumn(column) {

@@ -14,6 +14,12 @@ export default class Search extends PlaylistView {
     return super.playlistHeaderClass() + ' search_header';
   }
 
+  getStateFromprops(props) {
+    const state = super.getStateFromprops(props);
+    state.includesNotInLibrary = false;
+    return state;
+  }
+
   getPlaylistFromProps(props) {
     this._needsPagination = false;
     this._paginationOffset = 0;
@@ -52,6 +58,15 @@ export default class Search extends PlaylistView {
     );
   }
 
+  songsText() {
+    if (this.state.includesNotInLibrary) {
+      const localSongsCount = this.state.playlist.songData.filter(song => song.inLibrary).length;
+      return <p>{ localSongsCount } { localSongsCount === 1 ? 'Song' : 'Songs' } in Library - Found more online</p>
+    }
+    const count = this.state.playlist.songs.length;
+    return <p>{count} { count === 1 ? 'Song' : 'Songs' } in Library - Searching for more...</p>;
+  }
+
   _createPlaylistForSearch(searchTerm) {
     const parts = searchTerm.toLowerCase().split(' ');
     const library = Playlist.getByTitle(Playlist.LIBRARY);
@@ -80,6 +95,7 @@ export default class Search extends PlaylistView {
       const scrollContainer = this.contentContainer();
       const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
       state.playlist = newPlaylist;
+      state.includesNotInLibrary = true;
       this.setState(state);
     });
   }
@@ -99,6 +115,7 @@ export default class Search extends PlaylistView {
       const scrollContainer = this.contentContainer();
       const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
       state.playlist = newPlaylist;
+      state.includesNotInLibrary = true;
       this.setState(state);
     });
   }
