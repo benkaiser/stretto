@@ -13,7 +13,7 @@ export default class SoundcloudOAuth {
     SC.initialize({
       client_id: SoundcloudOAuth.client_id,
       // hardcoded until soundcloud update the endpoint to https
-      redirect_uri: 'http://next.kaiserapps.com/redirect'
+      redirect_uri: 'https://next.kaiserapps.com/redirect'
     });
   }
 
