@@ -2,7 +2,7 @@ import Utilities from '../utilities';
 
 export default class Soundcloud {
   static get client_id() {
-    return 'wu1ocdB3SHro8ZtnXx7lC3Hkdte2sutY';
+    return 'gQNnQIZA6cda2jMKQAZPD6Nojbed3yIa';
   }
 
   static extractId(url) {

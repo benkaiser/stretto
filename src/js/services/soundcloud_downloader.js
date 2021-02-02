@@ -1,4 +1,4 @@
-const SOUNDCLOUD_CLIENT_ID = 'NpVHurnc1OKS80l6zlXrEVN4VEXrbZG4';
+const SOUNDCLOUD_CLIENT_ID = 'wu1ocdB3SHro8ZtnXx7lC3Hkdte2sutY';
 export default class SoundcloudDownloader {
     static getInfo(url) {
         return this._resolveInfo(url)
