@@ -11,6 +11,9 @@ export default class YoutubeStreamPlayer {
     if (options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
+    if (options.volume) {
+      player.volume = options.volume;
+    }
     document.body.appendChild(player);
     player.onloadeddata = () => {
       if (options.currentTime) {
@@ -74,6 +77,10 @@ export default class YoutubeStreamPlayer {
 
   setCurrentTime(timeFraction) {
     player.currentTime = player.duration * timeFraction;
+  }
+
+  setVolume(volume) {
+    player.volume = volume;
   }
 
   toggle() {

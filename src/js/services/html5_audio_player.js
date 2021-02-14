@@ -7,6 +7,9 @@ export default class HTML5AudioPlayer {
     player = document.createElement('audio');
     player.setAttribute('class', 'html5audio');
     player.setAttribute('src', '/offlineaudio/' + song.originalId);
+    if (options.volume) {
+      player.volume = options.volume;
+    }
     if (options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
@@ -45,6 +48,10 @@ export default class HTML5AudioPlayer {
       e.pause();
       e.parentNode.removeChild(e)
     });
+  }
+
+  setVolume(volume) {
+    player.volume = volume;
   }
 
   getPosition() {

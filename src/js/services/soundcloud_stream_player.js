@@ -26,6 +26,9 @@ export default class SoundcloudStreamPlayer {
     if (this.options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
+    if (this.options.volume) {
+      player.volume = this.options.volume;
+    }
     document.body.appendChild(player);
     player.onloadeddata = () => {
       if (this.disposed) {
@@ -114,6 +117,10 @@ export default class SoundcloudStreamPlayer {
     if (player) {
       player.currentTime = player.duration * timeFraction;
     }
+  }
+
+  setVolume(volume) {
+    player.volume = volume;
   }
 
   toggle() {

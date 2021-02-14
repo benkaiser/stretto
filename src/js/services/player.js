@@ -15,6 +15,12 @@ class Player {
     this.stateListeners = [];
     this.repeat_state = this.REPEAT.ALL;
     this.shuffle_on = false;
+    this.volume = 1;
+    try {
+      this.volume = parseFloat(DataLayer.getItem('volume'));
+    } catch(error) {
+      // no-op
+    }
     HTML5AudioPlayer.injectHandlers(this.playstateChange, this.songEnded);
     SoundcloudStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     YoutubeStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
@@ -93,7 +99,7 @@ class Player {
       if (song != this.currentSong) {
         return;
       }
-      this.currentPlayer = this.getPlayerFor(this.currentSong, options);
+      this.currentPlayer = this.getPlayerFor(this.currentSong, { ...options, volume: this.volume });
     });
   }
 
@@ -170,6 +176,12 @@ class Player {
   setCurrentTime(timeFraction) {
     this.saveState();
     this.currentPlayer && this.currentPlayer.setCurrentTime(timeFraction);
+  }
+
+  setVolume(volume) {
+    this.volume = volume / 100;
+    this.currentPlayer && this.currentPlayer.setVolume(volume / 100);
+    DataLayer.setItem('volume', volume / 100);
   }
 
   songChange(newSong) {
