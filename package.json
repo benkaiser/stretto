@@ -37,7 +37,7 @@
     "node-fetch": "^2.2.1",
     "node-sass": "^4.7.2",
     "nodemon": "^1.19.4",
-    "pug": "^2.0.4",
+    "pug": "3.0.0",
     "react": "^16.5.0",
     "react-alert": "^4.0.4",
     "react-bootstrap": "^0.32.4",
@@ -54,7 +54,7 @@
     "soundcloud": "^3.3.2",
     "spotify-web-api-js": "^0.22.1",
     "style-loader": "^0.19.0",
-    "webpack": "^4.41.2",
+    "webpack": "^5.21.2",
     "webpack-cli": "^3.3.10",
     "youtube-search": "^1.1.3"
   },

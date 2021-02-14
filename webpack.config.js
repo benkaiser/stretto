@@ -1,11 +1,12 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
     main: './src/js/index.js',
     serviceworker: './src/js/serviceworker.js',
   },
-  mode: 'development',
+  mode: process.env === 'prod' ? 'production' : 'development',
   output: {
     path: path.join(__dirname, 'static', 'js'),
     filename: '[name].js'
@@ -15,23 +16,32 @@ module.exports = {
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['@babel/env'],
-          plugins: [
-            ['@babel/plugin-proposal-decorators', { 'legacy': true }],
-            ['@babel/plugin-transform-react-jsx'],
-            '@babel/plugin-proposal-object-rest-spread'
-          ]
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/env'],
+            plugins: [
+              ['@babel/plugin-proposal-decorators', { 'legacy': true }],
+              ['@babel/plugin-transform-react-jsx'],
+              '@babel/plugin-proposal-object-rest-spread'
+            ]
+          }
         }
       },
       {
         test: /\.css$/,
-        loaders: ['style-loader', 'css-loader']
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+        ]
       },
       {
         test: /\.scss$/,
-        loaders: ['style-loader', 'css-loader', 'sass-loader']
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader' },
+          { loader: 'sass-loader' },
+        ]
       }
     ]
   },
@@ -44,5 +54,12 @@ module.exports = {
   watchOptions: {
       aggregateTimeout: 500,
       poll: 1000
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env": {
+        PRODUCTION: process.env === 'prod',
+      }
+    }),
+  ]
 };
