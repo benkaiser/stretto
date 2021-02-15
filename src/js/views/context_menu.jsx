@@ -9,6 +9,7 @@ import Player from '../services/player';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Youtube from '../services/youtube';
+import SoundcloudDownloader from '../services/soundcloud_downloader';
 
 const DROPDOWN_MAX_HEIGHT = 400;
 const DROPDOWN_MAX_WIDTH = 250;
@@ -62,7 +63,7 @@ class ContextMenu extends React.Component {
           this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem>,
           this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>,
           this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>,
-          this.state.items.length === 1 && this.state.items[0].isYoutube && helperExtensionId &&
+          this.state.items.length === 1 && helperExtensionId &&
             <MenuItem onClick={this._offline}>Make available offline</MenuItem>,
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>,
           this.state.playlist && this.state.playlist.editable &&
@@ -224,7 +225,11 @@ class ContextMenu extends React.Component {
 
   @autobind
   _offline() {
-    this.state.items[0].cacheOffline();
+    if (this.state.items[0].isYoutube) {
+      this.state.items[0].cacheOffline();
+    } else {
+      SoundcloudDownloader.download(this.state.items[0]);
+    }
   }
 
   static open(items, event, playlist) {

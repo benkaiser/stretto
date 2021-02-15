@@ -1,3 +1,6 @@
+import Hls from 'hls.js/dist/hls.light';
+import Utilities from '../utilities';
+
 const LOCAL_STORAGE_KEY = 'SOUNDCLOUD_CLIENT_ID';
 export default class SoundcloudDownloader {
     static getInfo(url, failOnError) {
@@ -17,6 +20,36 @@ export default class SoundcloudDownloader {
             }
             return this._getClientId(true)
             .then(() => SoundcloudDownloader.getInfo(url, true));
+        });
+    }
+
+    static download(song) {
+        const audioBuffer = [];
+        const player = document.createElement('audio');
+        player.volume = 0;
+        SoundcloudDownloader.getInfo(song.url)
+        .then(info => info.stream.url)
+        .then(hlsurl => {
+            var hls = new Hls({
+                maxBufferLength: 60,
+                maxMaxBufferLength: 60 * 3,
+                startPosition: 0
+            });
+            hls.attachMedia(player);
+            hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                hls.loadSource(hlsurl);
+                hls.on(Hls.Events.FRAG_BUFFERED, (_, data) => {
+                    console.log(`Download progress: ${Math.round(data.frag.endPTS / player.duration * 100)}%`);
+                    player.currentTime = data.frag.endPTS;
+                });
+                hls.on(Hls.Events.BUFFER_APPENDING, (_, data) => {
+                    audioBuffer.push(data.data);
+                });
+                hls.on(Hls.Events.BUFFER_EOS, () => {
+                    console.log('Made available for offline');
+                    song.cacheOffline(Utilities.arrayConcat(audioBuffer));
+                });
+            });
         });
     }
 

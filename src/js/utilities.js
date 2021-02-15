@@ -58,4 +58,17 @@ export default class Utilities {
       timer = setTimeout(func,100,event);
     };
   }
+
+  static arrayConcat(inputArray) {
+    const totalLength = inputArray.reduce(function (prev, cur) {
+      return prev + cur.length;
+    }, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    inputArray.forEach(function (element) {
+      result.set(element, offset);
+      offset += element.length;
+    });
+    return result;
+  }
 }

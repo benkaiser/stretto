@@ -1,4 +1,5 @@
 import Hls from 'hls.js/dist/hls.light';
+import Utilities from '../utilities';
 import SoundcloudDownloader from './soundcloud_downloader';
 
 let player;
@@ -59,6 +60,7 @@ export default class SoundcloudStreamPlayer {
         if (data.fatal) {
           if (this._failedCounter < 3) {
             this._failedCounter++;
+            this.dirtySeek = true;
             SoundcloudDownloader.getInfo(this.song.url)
             .then(soundcloudInfo => {
               this.options.currentTime = player.currentTime;
@@ -82,20 +84,7 @@ export default class SoundcloudStreamPlayer {
   }
 
   _saveForOffline() {
-    this.song.cacheOffline(this._arrayConcat(this.audioBuffer));
-  }
-
-  _arrayConcat(inputArray) {
-    const totalLength = inputArray.reduce(function (prev, cur) {
-      return prev + cur.length;
-    }, 0);
-    const result = new Uint8Array(totalLength);
-    let offset = 0;
-    inputArray.forEach(function (element) {
-      result.set(element, offset);
-      offset += element.length;
-    });
-    return result;
+    this.song.cacheOffline(Utilities.arrayConcat(this.audioBuffer));
   }
 
   get durationCacheSeconds() {
