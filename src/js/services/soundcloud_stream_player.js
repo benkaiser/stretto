@@ -10,6 +10,7 @@ export default class SoundcloudStreamPlayer {
     this.dirtySeek = options.currentTime ? true : false;
     this.options = options;
     this.song = song;
+    this._failedCounter = 0;
     SoundcloudDownloader.getInfo(song.url)
     .then(soundcloudInfo => {
       this._setupHLSPlayer(soundcloudInfo.stream.url);
@@ -54,9 +55,18 @@ export default class SoundcloudStreamPlayer {
     hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       hls.loadSource(hlsurl);
       hls.on(Hls.Events.ERROR, (event, data) => {
-        console.log(arguments);
+        console.log([event, data]);
         if (data.fatal) {
-          SoundcloudStreamPlayer.endHandler();
+          if (this._failedCounter < 3) {
+            this._failedCounter++;
+            SoundcloudDownloader.getInfo(this.song.url)
+            .then(soundcloudInfo => {
+              this.options.currentTime = player.currentTime;
+              this._setupHLSPlayer(soundcloudInfo.stream.url);
+            });
+          } else {
+            SoundcloudStreamPlayer.endHandler();
+          }
         }
       });
       hls.on(Hls.Events.BUFFER_APPENDING, (_, data) => {
