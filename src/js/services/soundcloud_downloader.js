@@ -84,7 +84,7 @@ export default class SoundcloudDownloader {
         return fetch('https://soundcloud.com')
         .then(response => response.text())
         .then(pageText => {
-            const scriptUrls = [...pageText.matchAll(/src=\"(.+)\"/g)].map(item => item[1]);
+            const scriptUrls = [...matchAll("src=\"(.+)\"", pageText)].map(item => item[1]);
             return SoundcloudDownloader._fetchAllJoin(scriptUrls)
             .then(allScripts => {
                 const clientIdStart = allScripts.indexOf('?client_id=') + 11;
@@ -100,4 +100,17 @@ export default class SoundcloudDownloader {
         .then(responses => Promise.all(responses.map(response => response.text())))
         .then(allScripts => allScripts.join('\n'));
     }
+}
+
+function matchAll(pattern,haystack){
+    var regex = new RegExp(pattern,"g")
+    var matches = [];
+
+    var match_result = haystack.match(regex);
+
+    for (let index in match_result){
+        var item = match_result[index];
+        matches[index] = item.match(new RegExp(pattern));
+    }
+    return matches;
 }
