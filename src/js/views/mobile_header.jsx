@@ -32,6 +32,7 @@ export default class MobileHeader extends React.Component {
                 <MenuItem eventKey='/discover'>From Top Charts</MenuItem>
                 <MenuItem eventKey='/spotify'>From Spotify</MenuItem>
             </NavDropdown>
+            <NavItem eventKey='/soundcloud'>Soundcloud</NavItem>
             <NavItem eventKey='/artists/feed'>Artists Feed</NavItem>
             <NavItem eventKey='/sync/'>Sync</NavItem>
             <NavItem eventKey='/settings/'>Settings</NavItem>
