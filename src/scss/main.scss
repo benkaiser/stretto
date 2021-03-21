@@ -101,8 +101,7 @@ body, html {
 }
 
 .cover {
-  background-position: center center;
-  background-size: cover;
+  object-fit: cover;
   float: left;
   height: 40px;
   margin-right: 10px;
@@ -152,8 +151,7 @@ body, html {
 }
 
 .image-preview {
-  background-position: center center;
-  background-size: cover;
+  object-fit: cover;
   height: 250px;
   width: 250px;
 }
@@ -555,8 +553,7 @@ tbody > tr {
     height: 100%;
 
     .playerCover {
-      background-position: center center;
-      background-size: cover;
+      object-fit: cover;
       width: 90vw;
       height: 90vw;
       padding: 5vw;

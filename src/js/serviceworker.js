@@ -15,10 +15,17 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
+});
+
+addEventListener('activate', event => {
+  event.waitUntil(async function() {
+    if (self.registration.navigationPreload) {
+      await self.registration.navigationPreload.enable();
+    }
+  }());
 });
 
 function isAppUrl(path) {
@@ -57,16 +64,27 @@ function isRefreshableFirstParty(request) {
   return request.url.includes('/static/js/main.js');
 }
 
+function isOpaqueResponse(response) {
+  return response.type === "opaque";
+}
+
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
   if (self.registration.scope.includes(url.origin) && isAppUrl(url.pathname)) {
     return event.respondWith(
       caches.match('/')
       .then(function(response) {
+        const refetch = event.preloadResponse && event.preloadResponse.then((response) => {
+          if (response) {
+            caches.open(CACHE_NAME).then(cache => cache.put(response));
+          }
+          return response || fetch(event.request.url);
+        });
         if (response) {
+          event.waitUntil(refetch);
           return response;
         }
-        return fetch(event.request);
+        return refetch;
       })
     );
   }
@@ -85,8 +103,14 @@ self.addEventListener('fetch', function(event) {
             return fetch(src)
             .then(response => {
               const originalUrl = event.request.url.split('?')[0];
-              cache.put(originalUrl, response.clone());
-              broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: originalUrl.substring(originalUrl.lastIndexOf('/') + 1) });
+              cache.put(originalUrl, response.clone())
+              .then(() => {
+                broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: originalUrl.substring(originalUrl.lastIndexOf('/') + 1) });
+              })
+              .catch(error => {
+                console.log("Failed to store song in cache");
+                console.error(error);
+              });
               return response;
             })
           }
@@ -99,13 +123,22 @@ self.addEventListener('fetch', function(event) {
     .then(cache =>
       cache.match(event.request)
       .then(function(response) {
-        // Cache hit - return response
         const refetch = fetch(event.request).then(function(response) {
+          if (isOpaqueResponse(response)) {
+            console.warn("Skipping caching of request with opaque response");
+            console.warn(event.request, response);
+           return response;
+          }
           if (isCacheableThirdParty(event.request) || isRefreshableFirstParty(event.request)) {
-            cache.put(event.request, response.clone());
+            cache.put(event.request, response.clone())
+            .catch(error => {
+              console.log("Failed to store resource in cache");
+              console.error(error);
+            });
           }
           return response;
         });
+        // Cache hit - return response
         if (response) {
           return response;
         }
@@ -117,12 +150,14 @@ self.addEventListener('fetch', function(event) {
 
 function cacheYoutubeFile(payload) {
   return fetch(payload.format.url)
-  .then(response => {
+  .then(response =>
     caches.open(MUSIC_CACHE)
-    .then(cache => {
-      cache.put('/offlineaudio/' + payload.youtubeId, response);
-    });
-  });
+    .then(cache => cache.put('/offlineaudio/' + payload.youtubeId, response))
+    .catch(error => {
+      console.log("Failed to store song in cache");
+      console.error(error);
+    })
+  );
 }
 
 function cacheRawFile(payload) {
@@ -137,9 +172,7 @@ function cacheRawFile(payload) {
     headers: headers,
   });
   return caches.open(MUSIC_CACHE)
-  .then(cache => {
-    cache.put('/offlineaudio/' + payload.songId, songResponse);
-  });
+  .then(cache => cache.put('/offlineaudio/' + payload.songId, songResponse));
 }
 
 broadcast.onmessage = (event) => {
@@ -164,6 +197,10 @@ broadcast.onmessage = (event) => {
     cacheRawFile(event.data.payload)
     .then(() => {
       broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: event.data.payload.songId });
+    })
+    .catch(error => {
+      console.log("Failed to cache song");
+      console.error(error);
     });
   }
 };

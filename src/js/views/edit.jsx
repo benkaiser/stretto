@@ -203,7 +203,7 @@ export default class Edit extends React.Component {
         </div>
         <div className='col-sm-6'>
           <h4>Image Preview</h4>
-          <div className='image-preview' style={{'backgroundImage': `url('${this.state.cover}')`}} />
+          <img  className='image-preview' crossOrigin='anonymous' src={this.state.cover} />
           <h4>Backing Track</h4>
           { this.embedPlayer() }
         </div>

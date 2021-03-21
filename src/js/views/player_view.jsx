@@ -29,7 +29,7 @@ export default class PlayerView extends React.Component {
     if (this.state.song) {
       return (
         <div className='player_view'>
-          <div className='playerCover' style={{'backgroundImage': `url('${this.state.song.cover}')`}}></div>
+          <img className='playerCover' crossOrigin='anonymous' src={this.state.song.cover} />
           <div className='info'>
             <p className='title' title={this.state.song.title}>{this.state.song.title}</p>
             { this.state.song.artist &&

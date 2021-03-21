@@ -19,7 +19,9 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/env'],
+            presets: [['@babel/env', {
+              "targets": "last 2 chrome version"
+            }]],
             plugins: [
               ['@babel/plugin-proposal-decorators', { 'legacy': true }],
               ['@babel/plugin-transform-react-jsx'],

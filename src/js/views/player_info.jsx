@@ -44,7 +44,7 @@ export class PlayerInfo extends React.Component {
           </div>
           { (!this.state.hideCover) ?
           <div className='cover-wrapper'>
-            <div className='cover' style={{'backgroundImage': `url('${this.state.song.cover}')`}}></div>
+            <img className='cover' crossOrigin='anonymous' src={this.state.song.cover} />
             <div key='hide' className='btn btn-default btn-sm hide-button' onClick={this.hideCover.bind(this, true)}>
               <i className='fa fa-angle-down' aria-hidden='true'></i>
             </div>

@@ -86,7 +86,7 @@ export default class Add extends React.Component {
                 />
               </div>
             </form>
-            <div className='image-preview' style={{'backgroundImage': `url('${this.state.track.thumbnail}')`}} />
+            <img  className='image-preview' crossOrigin='anonymous' src={this.state.track.thumbnail} />
           </div>
           <div className='col-lg-6'>
             <h3>Actions</h3>
