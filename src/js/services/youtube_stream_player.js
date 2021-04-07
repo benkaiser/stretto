@@ -59,11 +59,11 @@ export default class YoutubeStreamPlayer {
     this.disposed = true;
     if (player) {
       player.pause();
-      player.parentNode.removeChild(player);
+      player.parentNode && player.parentNode.removeChild(player);
     }
     document.querySelectorAll(".ytaudio").forEach(e => {
       e.pause();
-      e.parentNode.removeChild(player)
+      e.parentNode && e.parentNode.removeChild(player)
     });
   }
 

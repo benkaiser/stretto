@@ -42,11 +42,11 @@ export default class HTML5AudioPlayer {
     this.disposed = true;
     if (player) {
       player.pause();
-      player.parentNode.removeChild(player);
+      player.parentNode && player.parentNode.removeChild(player);
     }
     document.querySelectorAll(".html5audio").forEach(e => {
       e.pause();
-      e.parentNode.removeChild(e)
+      e.parentNode && e.parentNode.removeChild(e)
     });
   }
 
