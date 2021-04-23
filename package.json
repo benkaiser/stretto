@@ -64,7 +64,7 @@
     "esversion": 6
   },
   "engines": {
-    "node": "10"
+    "node": "12"
   },
   "jscsConfig": {
     "requireTrailingComma": false
