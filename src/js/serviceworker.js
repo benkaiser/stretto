@@ -49,15 +49,15 @@ function isOfflineUrl(path) {
   return path.startsWith('/offlineaudio/');
 }
 
-function isCacheableThirdParty(request, response) {
-  return (request.url.includes('//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/')
+function isCacheableThirdParty(request) {
+  return request.url.includes('//cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/')
   || request.url.includes('ytimg.com')
   || (request.url.includes('sndcdn.com') && !request.url.includes('media.sndcdn.com'))
   || request.url.includes('i.scdn.co')
   || request.url.includes('mzstatic.com')
   || request.url.includes('cdnjs.cloudflare.com')
   || request.url.includes('azlyrics.com')
-  || request.url.includes('cdnjs.cloudflare.com')) && response.type !== 'opaque';
+  || request.url.includes('cdnjs.cloudflare.com');
 }
 
 function isRefreshableFirstParty(request) {
@@ -129,7 +129,7 @@ self.addEventListener('fetch', function(event) {
             console.warn(event.request, response);
            return response;
           }
-          if (isCacheableThirdParty(event.request, response) || isRefreshableFirstParty(event.request)) {
+          if (isCacheableThirdParty(event.request) || isRefreshableFirstParty(event.request)) {
             cache.put(event.request, response.clone())
             .catch(error => {
               console.log("Failed to store resource in cache");
