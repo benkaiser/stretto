@@ -1,4 +1,5 @@
 import Utilities from '../utilities';
+import SoundcloudDownloader from './soundcloud_downloader';
 
 export default class Soundcloud {
   static get client_id() {
@@ -14,7 +15,8 @@ export default class Soundcloud {
     if (!Soundcloud.isSoundcloudURL(url)) {
       return Promise.reject({ error: 'not a soundcloud track' });
     }
-    return fetch(`https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${Soundcloud.client_id}`)
+    return SoundcloudDownloader.getClientId()
+    .then(clientId => fetch(`https://api-v2.soundcloud.com/resolve?url=${url}&client_id=${clientId}`))
     .then(Utilities.fetchToJson)
     .then((track) => Soundcloud._convertToStandardTrack(track))
     .catch((error) => {
@@ -27,7 +29,8 @@ export default class Soundcloud {
   }
 
   static search(query) {
-    return fetch(`https://api-v2.soundcloud.com/search?q=${encodeURIComponent(query)}&client_id=${Soundcloud.client_id}`)
+    return SoundcloudDownloader.getClientId()
+    .then(clientId => fetch(`https://api-v2.soundcloud.com/search?q=${encodeURIComponent(query)}&client_id=${clientId}`))
     .then(Utilities.fetchToJson)
     .then(response => response.collection.filter(item => item.kind === 'track'))
     .then((tracks) => tracks.map(Soundcloud._convertToStandardTrack));

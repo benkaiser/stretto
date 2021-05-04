@@ -18,7 +18,7 @@ export default class SoundcloudDownloader {
             if (failOnError) {
                 throw error;
             }
-            return this._getClientId(true)
+            return this.getClientId(true)
             .then(() => SoundcloudDownloader.getInfo(url, true));
         });
     }
@@ -54,7 +54,7 @@ export default class SoundcloudDownloader {
     }
 
     static _resolveStream(info) {
-        return SoundcloudDownloader._getClientId().then(CLIENT_ID => {
+        return SoundcloudDownloader.getClientId().then(CLIENT_ID => {
             const mpegFormat = info.media.transcodings.filter((transcoding) => transcoding.format.mime_type === "audio/mpeg" && transcoding.format.protocol === "hls")[0];
             return fetch(mpegFormat.url + `?client_id=${CLIENT_ID}`)
             .then(response => response.json())
@@ -68,13 +68,13 @@ export default class SoundcloudDownloader {
     }
 
     static _resolveInfo(soundcloudUrl) {
-        return SoundcloudDownloader._getClientId().then(CLIENT_ID => {
+        return SoundcloudDownloader.getClientId().then(CLIENT_ID => {
             return fetch(`https://api-v2.soundcloud.com/resolve?url=${encodeURIComponent(soundcloudUrl)}&client_id=${CLIENT_ID}`)
             .then(response => response.json());
         });
     }
 
-    static _getClientId(skipCache) {
+    static getClientId(skipCache) {
         if (!skipCache) {
             const localStorageItem = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (localStorageItem) {
