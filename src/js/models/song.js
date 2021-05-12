@@ -21,6 +21,7 @@ export default class Song {
     this.explicit = attrs.explicit || false;
     this.isSoundcloud = attrs.isSoundcloud || false;
     this.isYoutube = attrs.isYoutube || false;
+    this.isAudius = attrs.isAudius || false;
     this.title = attrs.title || '';
     this.trackNumber = attrs.trackNumber || 0;
     this.url = attrs.url || '';
@@ -43,6 +44,7 @@ export default class Song {
       id: this.id,
       isSoundcloud: this.isSoundcloud,
       isYoutube: this.isYoutube,
+      isAudius: this.isAudius,
       title: this.title,
       trackNumber: this.trackNumber,
       updatedAt: this.updatedAt,
@@ -58,6 +60,8 @@ export default class Song {
       this.id = 'y_' + this.id;
     } else if (this.isSoundcloud && id.indexOf('s_') !== 0) {
       this.id = 's_' + this.id;
+    } else if (this.isAudius && id.indexOf('a_') !== 0) {
+      this.id = 'a_' + this.id;
     }
   }
 
@@ -77,6 +81,8 @@ export default class Song {
       ServiceWorkerClient.offlineYoutube(this.originalId);
     } else if (this.isSoundcloud) {
       ServiceWorkerClient.offlineSoundcloud(this.originalId, rawBytes);
+    } else {
+      console.log('Not implemented');
     }
   }
 

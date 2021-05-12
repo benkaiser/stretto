@@ -1,77 +1,38 @@
-let player;
+import AbstractHTML5AudioPlayer from "./abstract_html5_audio_player";
 
-export default class HTML5AudioPlayer {
+export default class HTML5AudioPlayer extends AbstractHTML5AudioPlayer {
   constructor(song, options = {}) {
+    super();
     this.disposed = false;
     if (options.autoPlay === undefined) options.autoPlay = true;
-    player = document.createElement('audio');
-    player.setAttribute('class', 'html5audio');
-    player.setAttribute('src', '/offlineaudio/' + song.originalId);
+    this.player = document.createElement('audio');
+    this.player.setAttribute('class', 'html5audio');
+    this.player.setAttribute('src', '/offlineaudio/' + song.originalId);
     if (options.volume) {
-      player.volume = options.volume;
+      this.player.volume = options.volume;
     }
     if (options.autoPlay) {
-      player.setAttribute('autoplay', 'true');
+      this.player.setAttribute('autoplay', 'true');
     }
-    document.body.appendChild(player);
-    player.onloadeddata = () => {
+    document.body.appendChild(this.player);
+    this.player.onloadeddata = () => {
       if (this.disposed) {
         return;
       }
       if (options.currentTime) {
-        player.currentTime = options.currentTime;
+        this.player.currentTime = options.currentTime;
       }
       if (options.autoPlay) {
         try {
-          player.play();
+          this.player.play();
         } catch (_) {
           // no-op
         }
       }
     }
-    player.onended = HTML5AudioPlayer.endHandler;
-    player.onpause = () => HTML5AudioPlayer.playstateChangeHandler(false);
-    player.onplaying = () => HTML5AudioPlayer.playstateChangeHandler(true);
-  }
-
-  get durationCacheSeconds() {
-    return player.duration;
-  }
-
-  dispose() {
-    this.disposed = true;
-    if (player) {
-      player.pause();
-      player.parentNode && player.parentNode.removeChild(player);
-    }
-    document.querySelectorAll(".html5audio").forEach(e => {
-      e.pause();
-      e.parentNode && e.parentNode.removeChild(e)
-    });
-  }
-
-  setVolume(volume) {
-    player.volume = volume;
-  }
-
-  getPosition() {
-    return Promise.resolve(player.currentTime);
-  }
-
-  getPositionFraction() {
-    return Promise.resolve(Number.isNaN(player.duration) ? 0 : player.currentTime / player.duration);
-  }
-
-  setCurrentTime(timeFraction) {
-    player.currentTime = player.duration * timeFraction;
-  }
-
-  toggle() {
-    player.paused ? player.play() : player.pause();
-  }
-
-  ensurePlaying() {
-    player && player.play();
+    this.player.onended = HTML5AudioPlayer.endHandler;
+    this.player.onpause = () => HTML5AudioPlayer.playstateChangeHandler(false);
+    this.player.onplaying = () => HTML5AudioPlayer.playstateChangeHandler(true);
   }
 
   static injectHandlers(playstateChange, onEnded) {

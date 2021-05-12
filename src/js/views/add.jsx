@@ -7,6 +7,7 @@ import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Soundcloud from '../services/soundcloud';
 import Youtube from '../services/youtube';
+import Audius from '../services/audius';
 import autobind from 'autobind-decorator';
 
 export default class Add extends React.Component {
@@ -22,13 +23,13 @@ export default class Add extends React.Component {
   render() {
     return (
       <div className='add'>
-        <h1>Add a Song from Youtube or Soundcloud</h1>
+        <h1>Add a Song from Youtube, Soundcloud or Audius</h1>
         <form>
           <div className='form-group'>
             <label htmlFor='songurl'>Song URL</label>
             <input className='form-control'
                    onKeyUp={this.onChange}
-                   placeholder='https://youtube.com/... or https://soundcloud.com/...'
+                   placeholder='https://youtube.com/... or https://soundcloud.com/... or https://audius.co/...'
                    ref={(input) => { this.input = input; }}
                    type='text'
                    name='songurl'
@@ -113,6 +114,7 @@ export default class Add extends React.Component {
   }
 
   getArtist(state = this.state) {
+    if (state.track && state.track.artist) return state.track.artist;
     if (!this.containsDash()) return state.track && (state.track.channel || state.track.title) || '';
     return state.track && state.track.title.split('-')[0].trim() || '';
   }
@@ -133,8 +135,9 @@ export default class Add extends React.Component {
       explicit: false,
       genre: this.state.track.genre || 'Unknown',
       id: this.state.track.id,
-      isSoundcloud: this.state.track.isSoundcloud,
-      isYoutube: this.state.track.isYoutube,
+      isSoundcloud: this.state.track.isSoundcloud || false,
+      isYoutube: this.state.track.isYoutube || false,
+      isAudius: this.state.track.isAudius || false,
       title: this.title.value,
       trackNumber: 0,
       url: this.state.track.url,
@@ -172,10 +175,12 @@ export default class Add extends React.Component {
       }
       (Soundcloud.isSoundcloudURL(this.input.value) ?
         Soundcloud.getInfo(this.input.value) :
-        Youtube.getInfo(this.input.value)
-      ).then((track) => {
+        (Audius.isAudiusURL(this.input.value) ?
+          Audius.getInfo(this.input.value)
+        : Youtube.getInfo(this.input.value)
+      )).then((track) => {
         this.title && (this.title.value = this.getTitle());
-        this.artist && (this.artist.value = this.getArtist());
+        this.artist && (this.artist.value = (track.artist || this.getArtist()));
         this.album && (this.album.value = this.getAlbum());
 
         this.setState({
