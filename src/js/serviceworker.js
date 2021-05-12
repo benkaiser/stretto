@@ -101,7 +101,7 @@ self.addEventListener('fetch', function(event) {
           const url = new URL(event.request.url);
           const src = url.searchParams.get('src');
           if (src) {
-            return fetch(src)
+            return fetch(src, { mode: 'cors'})
             .then(response => {
               const originalUrl = event.request.url.split('?')[0];
               cache.put(originalUrl, response.clone())

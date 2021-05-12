@@ -21,7 +21,7 @@ export default class Audius {
 
   static async getSong(id) {
     const endpoint = await this.getAudiusAPIEndpoint();
-    return `${endpoint}/v1/tracks/${id}/stream?app_name=benkaiser/stretto`;
+    return `https://creatornode2.audius.co/tracks/stream/${id}`;
   }
 
   static isAudiusURL(url) {
@@ -34,15 +34,7 @@ export default class Audius {
   }
 
   static getAudiusAPIEndpoint() {
-    if (this._cachedAudiusEndpoint) {
-      return Promise.resolve(this._cachedAudiusEndpoint);
-    }
-    return fetch('https://api.audius.co')
-    .then(Utilities.fetchToJson)
-    .then(response => {
-      this._cachedAudiusEndpoint = response.data[0];
-      return this._cachedAudiusEndpoint;
-    })
+    return Promise.resolve('https://discoveryprovider.audius.co');
   }
 }
 
