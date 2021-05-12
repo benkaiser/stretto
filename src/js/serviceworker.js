@@ -123,7 +123,7 @@ self.addEventListener('fetch', function(event) {
     .then(cache =>
       cache.match(event.request)
       .then(function(response) {
-        const refetch = fetch(event.request, { mode: 'cors' }).then(function(response) {
+        const refetch = fetch(event.request).then(function(response) {
           if (isOpaqueResponse(response)) {
             console.warn("Skipping caching of request with opaque response");
             console.warn(event.request, response);
