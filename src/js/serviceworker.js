@@ -76,7 +76,7 @@ self.addEventListener('fetch', function(event) {
       .then(function(response) {
         const refetch = event.preloadResponse && event.preloadResponse.then((response) => {
           if (response) {
-            caches.open(CACHE_NAME).then(cache => cache.put(response));
+            caches.open(CACHE_NAME).then(cache => cache.put('/', response));
           }
           return response || fetch(event.request.url);
         });
