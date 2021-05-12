@@ -120,6 +120,7 @@ export default class Add extends React.Component {
   }
 
   getTitle(state = this.state) {
+    if (state.track && state.track.artist && state.track.title) return state.track.title;
     if (!this.containsDash()) return state.track && state.track.title || '';
     return state.track && state.track.title.split('-')[1].trim() || '';
   }

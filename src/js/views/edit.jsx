@@ -6,6 +6,7 @@ import Song from '../models/song';
 import Soundcloud from '../services/soundcloud';
 import Youtube from '../services/youtube';
 import autobind from 'autobind-decorator';
+import Audius from '../services/audius';
 
 export default class Edit extends React.Component {
   constructor(props) {
@@ -139,8 +140,8 @@ export default class Edit extends React.Component {
       return Promise.resolve(Youtube.extractId(url));
     } else if (Soundcloud.isSoundcloudURL(url)) {
       return Soundcloud.extractId(url);
-    } else {
-      return Promise.resolve(this.state.id);
+    } else if (Audius.isAudiusURL(url)) {
+      return Audius.getInfo(url).then(info => info.id);
     }
   }
 
@@ -230,6 +231,7 @@ export default class Edit extends React.Component {
       id: track.id,
       isSoundcloud: track.isSoundcloud,
       isYoutube: track.isYoutube,
+      isAudius: track.isAudius,
       title: track.title,
       url: track.url
     });
@@ -246,6 +248,7 @@ export default class Edit extends React.Component {
     track.url = this.state.url;
     track.isSoundcloud = Soundcloud.isSoundcloudURL(this.state.url);
     track.isYoutube = Youtube.isYoutubeURL(this.state.url);
+    track.isAudius = Audius.isAudiusURL(this.state.url);
     this.findIdForUrl(this.state.url).then((newId) => {
       const oldId = track.id;
       track.setId(newId);
