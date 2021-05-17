@@ -7,6 +7,10 @@ export default class Utilities {
     return response.json();
   }
 
+  static fetchToText(response) {
+    return response.text();
+  }
+
   static fetchToCSV(response) {
     return response.text().then(text => {
       return text.split('\n').map(line => {

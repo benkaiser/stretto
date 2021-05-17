@@ -27,7 +27,7 @@ export default class SpotifyChart extends React.Component {
       return (
         <div>
           <ListGroup>
-          { this.state.playlist.songData.map((item, index) => 
+          { this.state.playlist.songData.map((item, index) =>
             <ListGroupItem key={index} onClick={this._playSong.bind(this, item)} onContextMenu={this._rightSongClick.bind(this, item)}>
               <div className='chartInnerContainer'>
                 <img className='chartImage' src={item.cover} alt='cover art' />
@@ -68,22 +68,6 @@ export default class SpotifyChart extends React.Component {
       });
       this._requestRealCovers(playlist);
     });
-  }
-
-  _requestRealCovers(playlist) {
-    playlist._rawSongs.reduce((lastPromise, song) => {
-      if (this.isDisposed) {
-        return Promise.resolve();
-      }
-      return lastPromise.then(() => {
-        return SpotifyAPI.fetchCover(song.spotifyId, true).then(cover => {
-          song.cover = cover;
-          if (!this.isDisposed) {
-            this.forceUpdate();
-          }
-        });
-      });
-    }, Promise.resolve());
   }
 
   _playSong(item) {

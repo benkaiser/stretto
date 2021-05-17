@@ -11,8 +11,8 @@ import Utilities from '../utilities';
 const SpotifyExternalAPI = new SpotifyWebAPI();
 
 const chartMap = {
-  'top': 'regional',
-  'viral': 'viral'
+  'top': '37i9dQZEVXbMDoHDwVN2tF',
+  'viral': '37i9dQZEVXbLiRSasKsNU9'
 };
 const SPOTIFY_DEFAULT_COVER = 'https://developer.spotify.com/assets/branding-guidelines/icon1@2x.png';
 
@@ -24,27 +24,22 @@ export default class SpotifyAPI {
   static fetchChart(type, options) {
     type = chartMap[type];
     const requestRealCover = options && options.requestRealCover || false;
-    return fetch(`https://spotifycharts.com/${type}/${Country.current()}/daily/latest/download`)
-    .then(Utilities.fetchToCSV)
-    .then(data => {
-      data = data.slice(type === 'regional' ? 2 : 1);
-      return Promise.all(data.map(entry => {
-        const id = entry[entry.length-1].replace('https://open.spotify.com/track/', '');
-        return SpotifyAPI.fetchCover(id, requestRealCover)
-        .then(coverUrl => {
-          return new Song({
-            title: entry[1],
-            artist: entry[2],
-            album: 'Unknown Album',
-            cover: coverUrl,
-            spotifyId: id,
-            deferred: true
-          });
-        }).catch(error => {
-          console.error(error);
-          return undefined;
-        })
-      })).then(results => results.filter(result => !!result));
+    return SpotifyExternalAPI.getPlaylist('spotifycharts', type)
+    .then(function(data) {
+      console.log('Some information about this playlist', data.body);
+      return data.tracks.items.map((item) => {
+        return new Song({
+          cover: item.track?.album?.images[0].url,
+          title: item.track?.name,
+          artist: item.track?.artists.map(artist => artist.name).join(', '),
+          album: item.track?.album.name,
+          spotifyId: item.track?.id,
+          deferred: true
+        });
+      });
+    }, function(err) {
+      console.log(err);
+      return undefined;
     });
   }
 
@@ -160,7 +155,6 @@ export default class SpotifyAPI {
       this._access_token = hashParams.access_token;
       SpotifyExternalAPI.setAccessToken(this._access_token);
       this._resolve();
-      this._setupAPI();
     }
   }
 
