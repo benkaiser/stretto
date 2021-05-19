@@ -5,7 +5,8 @@ import Youtube from '../services/youtube';
 let listeners = [];
 let noDataListeners = [];
 let songs = [];
-let offlineSongs = [];
+let offlineSongs = {};
+let offlineSongsIds = [];
 let offlineReady;
 const offlineReadyPromise = new Promise(resolve => offlineReady = resolve);
 
@@ -99,7 +100,15 @@ export default class Song {
   }
 
   get offline() {
-    return offlineSongs.includes(this.originalId);
+    return offlineSongsIds.includes(this.originalId);
+  }
+
+  get offlineExtension() {
+    const contentType = offlineSongs[this.originalId].contentType;
+    if (contentType === 'audio/webm') {
+      return '.webm';
+    }
+    return '.mp3';
   }
 
   static addOnChangeListener(listener, listenToNoDataChange) {
@@ -151,8 +160,8 @@ export default class Song {
     return this.fetchAll().filter((song) => song.originalId === songId)[0];
   }
 
-  static offlineSongs() {
-    return offlineSongs;
+  static offlineSongIds() {
+    return offlineSongsIds;
   }
 
   static initialise(initialData) {
@@ -164,6 +173,10 @@ export default class Song {
     });
     ServiceWorkerClient.getOffline()
     .then(offlinedSongs => {
+      if (offlinedSongs.length) {
+        offlinedSongs = offlinedSongs.reduce((previous, current) => previous[current.id] = {}, {});
+      }
+      offlineSongsIds = Object.keys(offlinedSongs);
       offlineSongs = offlinedSongs;
       Song.change();
       Song.noDataChange();
@@ -172,11 +185,15 @@ export default class Song {
     .catch(() => {
       offlineReady();
     });
-    ServiceWorkerClient.addOfflineListener((id) => {
-      if (!offlineSongs.includes(id)) {
-        offlineSongs.push(id);
+    ServiceWorkerClient.addOfflineListener((payload) => {
+      if (typeof payload !== 'object') {
+        payload = { id: payload };
+      }
+      if (!offlineSongs[payload.id]) {
+        offlineSongsIds.push(payload.id);
+        offlineSongs[payload.id] = { contentType: payload.contentType };
         Song.noDataChange();
-        const song = Song.findByOriginalId(id);
+        const song = Song.findByOriginalId(payload.id);
         if (song && song.title) {
           Alerter.success('"' + song.title + '" available offline');
         }

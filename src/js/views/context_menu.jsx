@@ -10,6 +10,7 @@ import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Youtube from '../services/youtube';
 import SoundcloudDownloader from '../services/soundcloud_downloader';
+import Utilities from '../utilities';
 
 const DROPDOWN_MAX_HEIGHT = 400;
 const DROPDOWN_MAX_WIDTH = 250;
@@ -63,6 +64,7 @@ class ContextMenu extends React.Component {
           this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem>,
           this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>,
           this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>,
+          this.state.items.some(track => track.offline) && <MenuItem onClick={this._download}>Download</MenuItem>,
           this.state.items.length === 1 && helperExtensionId &&
             <MenuItem onClick={this._offline}>Make available offline</MenuItem>,
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>,
@@ -207,6 +209,17 @@ class ContextMenu extends React.Component {
   @autobind
   _showLyrics() {
     Lyrics.show();
+    this.hide();
+  }
+
+  @autobind
+  _download() {
+    console.log();
+    const downloadableItems = this.state.items.filter(item => item.offline);
+    Utilities.downloadFiles(downloadableItems.map(item => ({
+      url: '/offlineaudio/' + item.originalId,
+      filename: item.title + ' - ' + item.artist + item.offlineExtension
+    })));
     this.hide();
   }
 

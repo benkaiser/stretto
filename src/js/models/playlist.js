@@ -156,7 +156,7 @@ export default class Playlist {
   _getCacheKey() {
     const offline = localStorage.getItem('offlineOnly');
     if (offline === 'true') {
-      return offline + '-' + Song.offlineSongs().join(',');
+      return offline + '-' + Song.offlineSongIds().join(',');
     } else {
       return offline;
     }

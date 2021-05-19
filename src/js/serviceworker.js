@@ -106,7 +106,10 @@ self.addEventListener('fetch', function(event) {
               const originalUrl = event.request.url.split('?')[0];
               cache.put(originalUrl, response.clone())
               .then(() => {
-                broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: originalUrl.substring(originalUrl.lastIndexOf('/') + 1) });
+                broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: {
+                  id: originalUrl.substring(originalUrl.lastIndexOf('/') + 1),
+                  contentType: response.headers.get('Content-Type')
+                }});
               })
               .catch(error => {
                 console.log("Failed to store song in cache");
@@ -154,6 +157,7 @@ function cacheYoutubeFile(payload) {
   .then(response =>
     caches.open(MUSIC_CACHE)
     .then(cache => cache.put('/offlineaudio/' + payload.youtubeId, response))
+    .then(() => response.headers.get('Content-Type'))
     .catch(error => {
       console.log("Failed to store song in cache");
       console.error(error);
@@ -177,28 +181,39 @@ function cacheRawFile(payload) {
   .then(cache => cache.put('/offlineaudio/' + payload.songId, songResponse));
 }
 
-broadcast.onmessage = (event) => {
+broadcast.onmessage = async (event) => {
   if (!event.data || !event.data.type) {
     return;
   }
   if (event.data.type === 'EMIT_OFFLINED') {
-    caches.open(MUSIC_CACHE)
-    .then((cache) => cache.keys())
-    .then(requests => {
-      const offlineItems = requests.map(request => request.url.substring(request.url.lastIndexOf('/') + 1));
-      broadcast.postMessage({ type: 'OFFLINED', payload: offlineItems });
+    const cache = await caches.open(MUSIC_CACHE)
+    const requests = await cache.keys();
+    const requestResponses = await Promise.all(requests.map(request => cache.match(request).then(response => [request, response])))
+    const offlineItems = {};
+    requestResponses.forEach(([request, response]) => {
+      const id = request.url.substring(request.url.lastIndexOf('/') + 1);
+      offlineItems[id] = {
+        contentType: response.headers.get('Content-Type')
+      };
     });
+    broadcast.postMessage({ type: 'OFFLINED', payload: offlineItems });
   }
   if (event.data.type === 'DOWNLOAD') {
     cacheYoutubeFile(event.data.payload)
-    .then(() => {
-      broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: event.data.payload.youtubeId });
+    .then((contentType) => {
+      broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: {
+        id: event.data.payload.youtubeId,
+        contentType: contentType
+      }});
     });
   }
   if (event.data.type === 'OFFLINE_RAW_FILE') {
     cacheRawFile(event.data.payload)
     .then(() => {
-      broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: event.data.payload.songId });
+      broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: {
+        id: event.data.payload.songId,
+        contentType: 'audio/mpeg' // we assume all hls streams from soundcloud return mp3s
+      }});
     })
     .catch(error => {
       console.log("Failed to cache song");

@@ -7,7 +7,7 @@ const LYRIC_WAIT_TIMEOUT = 500;
 
 const options = {
   searchEndpoint: 'https://search.azlyrics.com',
-  mainEndpoint: 'https://azlyrics.com'
+  mainEndpoint: 'https://www.azlyrics.com'
 };
 
 const listeners = [];

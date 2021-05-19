@@ -75,4 +75,19 @@ export default class Utilities {
     });
     return result;
   }
+
+  static downloadFiles(items) {
+    var link = document.createElement('a');
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    items.forEach(item => {
+      fetch(item.url).then(response => response.blob())
+      .then(blob => {
+        link.setAttribute('href', window.URL.createObjectURL(blob));
+        link.setAttribute('download', item.filename);
+        link.click();
+      });
+    });
+    document.body.removeChild(link);
+  }
 }
