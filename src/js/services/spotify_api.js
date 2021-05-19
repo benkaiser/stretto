@@ -2,7 +2,6 @@ import SpotifyWebAPI from 'spotify-web-api-js';
 import async from 'async';
 import autobind from 'autobind-decorator';
 
-import Country from '../country';
 import Song from '../models/song';
 import SpotifyImporter from './spotify_importer';
 import Utilities from '../utilities';
@@ -21,19 +20,17 @@ export default class SpotifyAPI {
     return SpotifyAPI.__instance || (SpotifyAPI.__instance = new SpotifyAPI());
   }
 
-  static fetchChart(type, options) {
+  static fetchChart(type) {
     type = chartMap[type];
-    const requestRealCover = options && options.requestRealCover || false;
     return SpotifyExternalAPI.getPlaylist('spotifycharts', type)
     .then(function(data) {
-      console.log('Some information about this playlist', data.body);
       return data.tracks.items.map((item) => {
         return new Song({
-          cover: item.track?.album?.images[0].url,
-          title: item.track?.name,
-          artist: item.track?.artists.map(artist => artist.name).join(', '),
-          album: item.track?.album.name,
-          spotifyId: item.track?.id,
+          cover: item.track.album.images[0].url,
+          title: item.track.name,
+          artist: item.track.artists.map(artist => artist.name).join(', '),
+          album: item.track.album.name,
+          spotifyId: item.track.id,
           deferred: true
         });
       });
@@ -41,22 +38,6 @@ export default class SpotifyAPI {
       console.log(err);
       return undefined;
     });
-  }
-
-  static fetchCover(trackId, requestRealCover) {
-    if (requestRealCover) {
-      return fetch(`https://embed.spotify.com/oembed?url=spotify:track:${trackId}`, {
-        jsonpCallbackFunction: `jsonp${Date.now()}${Math.ceil(Math.random() * 100000)}`
-      })
-      .then(Utilities.fetchToJson)
-      .then(result => {
-        return result.thumbnail_url;
-      }).catch((error) => {
-        return SPOTIFY_DEFAULT_COVER;
-      });
-    } else {
-      return Promise.resolve(SPOTIFY_DEFAULT_COVER);
-    }
   }
 
   get connected() {
