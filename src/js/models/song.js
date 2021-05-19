@@ -178,7 +178,6 @@ export default class Song {
       }
       offlineSongsIds = Object.keys(offlinedSongs);
       offlineSongs = offlinedSongs;
-      Song.change();
       Song.noDataChange();
       offlineReady();
     })
