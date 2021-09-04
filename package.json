@@ -34,7 +34,7 @@
     "moment": "^2.18.1",
     "mongoose": "^5.7.5",
     "node-cache": "^5.1.0",
-    "node-fetch": "^2.2.1",
+    "node-fetch": "^2.6.1",
     "node-sass": "^4.7.2",
     "nodemailer": "^6.6.3",
     "nodemon": "^1.19.4",
