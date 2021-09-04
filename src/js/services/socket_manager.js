@@ -6,15 +6,15 @@ class SocketManager {
   constructor() {
     this._socket = io();
     this._socket.on( 'connect', () => {
-      if (AccountManager.loggedInGoogle) {
+      if (AccountManager.loggedInStretto) {
         this.join(AccountManager.email)
       }
     } );
-    if (AccountManager.loggedInGoogle) {
+    if (AccountManager.loggedInStretto) {
       this.join(AccountManager.email)
     } else {
       this._removeListener = AccountManager.addListener(() => {
-        if (AccountManager.loggedInGoogle) {
+        if (AccountManager.loggedInStretto) {
           this.join(AccountManager.email)
           this._removeListener();
         }

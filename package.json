@@ -36,6 +36,7 @@
     "node-cache": "^5.1.0",
     "node-fetch": "^2.2.1",
     "node-sass": "^4.7.2",
+    "nodemailer": "^6.6.3",
     "nodemon": "^1.19.4",
     "pug": "3.0.0",
     "react": "^16.5.0",

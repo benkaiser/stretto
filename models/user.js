@@ -1,14 +1,28 @@
 const mongoose = require('mongoose');
+var crypto = require('crypto');
 
 let UserModel;
 
 module.exports = class User {
   static initialize() {
-    UserModel = mongoose.model('user', {
+    const schema = new mongoose.Schema({
       email: String,
+      hash : String,
+      salt : String,
+      resetToken: String,
       version: { type: Number, default: -1 },
       googleObject: mongoose.Schema.Types.Mixed
     });
+    schema.methods.setPassword = function(password) {
+      this.salt = crypto.randomBytes(16).toString('hex');
+      this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, `sha512`).toString(`hex`);
+    };
+    schema.methods.validPassword = function(password) {
+      var hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64, `sha512`).toString(`hex`);
+      return this.hash === hash;
+    };
+
+    UserModel = mongoose.model('user', schema);
   }
 
   static bumpVersionForUser(user) {
@@ -25,6 +39,76 @@ module.exports = class User {
   static getVersionForUser(user) {
     return User._findOrCreate(user.email, user).then((user) => {
       return user.version;
+    });
+  }
+
+  static createAccount(email, password) {
+    return new Promise((resolve, reject) => {
+      UserModel.findOne({ email: email }, (err, user) => {
+        if (user) {
+          reject('User already exists, please login.');
+        } else {
+          let newUser = new UserModel();
+          newUser.email = email;
+          newUser.setPassword(password);
+          newUser.save((err, user) => {
+            if (err) { reject('Failed to create user. ' + err); }
+            return resolve(user);
+          });
+        }
+      });
+    });
+  }
+
+  static login(email, password) {
+    return new Promise((resolve, reject) => {
+      UserModel.findOne({ email: email }, (err, user) => {
+        if (user === null || user === undefined) {
+          reject("Incorrect email or password, please try again.");
+        } else {
+          if (user.validPassword(password)) {
+            return resolve(user);
+          } else {
+            reject('Incorrect email or password, please try again.');
+          }
+        }
+      });
+    });
+  }
+
+  static getPasswordResetForUser(email) {
+    return new Promise((resolve, reject) => {
+      UserModel.findOne({ email: email }, (err, user) => {
+        if (user === null || user === undefined) {
+          reject("Unable to locate user.");
+        } else {
+          user.resetToken = crypto.randomBytes(16).toString('hex');
+          user.save((err, user) => {
+            if (err) { reject('Failed to save reset token to user. ' + err); }
+            return resolve(user.resetToken);
+          });
+        }
+      });
+    });
+  }
+
+  static completePasswordReset(email, password, token) {
+    return new Promise((resolve, reject) => {
+      if (token === '') {
+        return reject('Reset token is empty');
+      }
+      UserModel.findOne({ email: email, resetToken: token }, (err, user) => {
+        if (user === null || user === undefined) {
+          reject("Unable to find user with reset token and email.");
+        } else {
+          user.resetToken = '';
+          user.setPassword(password);
+          user.save((err, user) => {
+            if (err) { reject('Failed to save reset token to user. ' + err); }
+            return resolve();
+          });
+        }
+      });
     });
   }
 

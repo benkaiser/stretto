@@ -2,7 +2,7 @@ const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
 const assert = require('assert');
-var youtubeSearch = require('youtube-search');
+const nodemailer = require('nodemailer');
 
 const router = express.Router();
 const Google = require('../services/google');
@@ -10,7 +10,16 @@ const DataMapper = require('../models/data_mapper');
 const Itunes = require('../services/itunes');
 
 const WebGoogle = new Google(process.env.GOOGLE_CLIENT_ID);
-const AndroidGoogle = new Google(process.env.GOOGLE_CLIENT_ID_ANDROID);
+
+let transporter = nodemailer.createTransport({
+  host: 'smtp.zoho.com',
+  secure: true,
+  port: 465,
+  auth: {
+    user: 'accounts@kaiserapps.com',
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 function loggedIn(req, res, next) {
   if (req.session.loggedIn) {
@@ -29,8 +38,8 @@ function errorHandler(error) {
   });
 }
 
-function googleLogin(req, res) {
-  req.params.googleModule.verifyToken(req.body.token).then((user) => {
+router.post('/googleLogin', (req, res) => {
+  WebGoogle.verifyToken(req.body.token).then((user) => {
     if (user.email === req.body.email) {
       req.session.user = user;
       req.session.loggedIn = true;
@@ -44,16 +53,93 @@ function googleLogin(req, res) {
       });
     }
   }).catch(errorHandler.bind(res));
-}
-
-router.post('/login', (req, res, next) => {
-  req.params.googleModule = WebGoogle;
-  next();
-}, googleLogin);
-router.post('/androidlogin', (req, res, next) => {
-  req.params.googleModule = AndroidGoogle;
-  next();
-}, googleLogin);
+});
+router.post('/login', (req, res) => {
+  DataMapper.loginUser(req.body.email, req.body.password)
+  .then(user => {
+    req.session.user = user;
+    req.session.loggedIn = true;
+    res.send({
+      success: true
+    });
+  })
+  .catch(error => {
+    res.status(403);
+    res.send({
+      success: false,
+      errorMessage: error
+    });
+  })
+});
+router.post('/createaccount', (req, res) => {
+  DataMapper.createAccount(req.body.email, req.body.password)
+  .then(user => {
+    req.session.user = user;
+    req.session.loggedIn = true;
+    res.send({
+      success: true
+    });
+  })
+  .catch(error => {
+    res.status(403);
+    res.send({
+      success: false,
+      errorMessage: error
+    });
+  })
+});
+router.post('/checklogin', (req, res) => {
+  if (req.session.loggedIn && req.session.user) {
+    res.send({
+      loggedIn: true,
+      email: req.session.user.email
+    });
+  } else {
+    res.status(403);
+    res.send({
+      loggedIn: false
+    });
+  }
+});
+router.post('/logout', (req, res) => {
+  req.session.loggedIn = false;
+  delete req.session.user;
+  res.status(204).send({});
+});
+router.post('/forgotpassword', (req, res) => {
+  DataMapper.getPasswordResetForUser(req.body.email)
+  .then(resetToken => {
+    res.status(204).send({});
+    if (!resetToken) {
+      return;
+    }
+    const link = "https://next.kaiserapps.com/reset/?token=" + resetToken;
+    const mailOptions = {
+      from: "accounts@kaiserapps.com",
+      to: req.body.email,
+      subject: "Stretto Password Reset",
+      html: `To reset your password, please go to this link: <a href='${link}'>${link}</a>`,
+    };
+    transporter.sendMail(mailOptions, function(err, info) {
+      if (err) {
+        console.error("Failed to send order email");
+        console.error(err);
+      }
+    });
+  }).catch((error) => {
+    console.error(error);
+    res.status(204).send({});
+  })
+});
+router.post('/completereset', (req, res) => {
+  DataMapper.completePasswordReset(req.body.email, req.body.password, req.body.token)
+  .then(success => {
+    res.status(200).send({ success: true });
+  }).catch((error) => {
+    console.error(error);
+    res.status(400).send({ success: false });
+  })
+});
 
 router.get('/spotify_callback', (req, res) => {
   res.render('spotify_callback');
@@ -198,66 +284,6 @@ router.post('/uploaddata', loggedIn, (req, res) => {
   .catch((error) => {
     res.send({ success: false, error: error });
   });
-});
-
-const searchOptions = {
-  maxResults: 1,
-  key: process.env.GOOGLE_API_KEY
-};
-
-function standardItem(itunesItem, youtubeResult) {
-  return {
-    title: itunesItem.trackName,
-    artist: itunesItem.artistName,
-    album: itunesItem.collectionName,
-    cover: itunesItem.artworkUrl100.replace('100x100', '600x600'),
-    id: 'y_' + youtubeResult.id
-  };
-}
-
-function removeDuplicates(items) {
-  const ids = [];
-  return items.filter(item => {
-    if (ids.indexOf(item.id) != -1) {
-      return false;
-    }
-    ids.push(item.id);
-    return true;
-  });
-}
-
-function findYoutubeVideo(item) {
-  return new Promise((resolve, reject) => {
-    youtubeSearch(item.trackName + ' ' + item.artistName, searchOptions, (error, results) => {
-      if (error) {
-        console.log(error);
-        return reject(error);
-      }
-      if (!results || !results.length) {
-        console.log(results);
-        console.log('no results from youtube search');
-        return resolve(undefined);
-      }
-      resolve(standardItem(item, results[0]));
-    });
-  })
-}
-
-router.post('/search', loggedIn, (req, res) => {
-  if (!req.body || !req.body.query) {
-    return res.send('Missing parameter \'query\' in payload.');
-  }
-  fetch(`https://itunes.apple.com/search?term=${req.body.query}&entity=song&limit=50&country=us`)
-  .then(response => response.json())
-  .then(responseJson => {
-    Promise.all(responseJson.results.map(findYoutubeVideo))
-    .then(results => {
-      results = removeDuplicates(results.filter((result) => !!result));
-      res.send(results);
-    });
-  }).catch(() => {
-    res.send('[]');
-  })
 });
 
 router.post('/share', loggedIn, (req, res) => {

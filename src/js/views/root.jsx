@@ -21,6 +21,7 @@ import Soundcloud from './soundcloud';
 import Spotify from './spotify';
 import Sync from './sync';
 import Remote from './remote';
+import Reset from './reset';
 import YoutubeMix from './youtube_mix';
 
 class RegularRoutes extends React.Component {
@@ -49,6 +50,7 @@ class RegularRoutes extends React.Component {
           <Route path='/settings' component={Settings} />
           <Route path='/spotify' component={Spotify} />
           <Route path='/sync' component={Sync} />
+          <Route path='/reset' component={Reset} />
           <Route path='/playlist/:playlist' component={Playlist} />
           <Route path='/search/' exact component={Search} />
           <Route path='/search/:search' component={Search} />

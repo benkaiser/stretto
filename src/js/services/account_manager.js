@@ -5,12 +5,6 @@ import autobind from 'autobind-decorator';
 class AccountManager {
   constructor() {
     this._listeners = [];
-    this.whenYoutubeLoaded = new Promise((resolve) => {
-      this._resolveYoutubeLoaded = resolve;
-    });
-    this.whenLoggedIn = new Promise((resolve) => {
-      this._resolveLoggedIn = resolve;
-    });
   }
 
   addListener(listener) {
@@ -32,7 +26,7 @@ class AccountManager {
   }
 
   get loggedInGoogle() {
-    return !!this.user;
+    return !!this.googleUser;
   }
 
   get loggedInStretto() {
@@ -44,18 +38,123 @@ class AccountManager {
   }
 
   get email() {
-    return this.user.getBasicProfile().getEmail();
+    return this.strettoEmail;
   }
 
   initialise() {
     this._resolvePromise = this._resolvePromise || new Promise((resolve, _) => { this._onResolveLoad = resolve });
     this.setupGoogleLibrary();
+    this.checkSessionLoggedIn();
     return this._resolvePromise;
+  }
+
+  checkSessionLoggedIn() {
+    return fetch('/checklogin',  { method: 'POST' })
+    .then(Utilities.fetchToJson)
+    .then(responseJson => {
+      if (responseJson.loggedIn) {
+        this._authenticated = true;
+        this.strettoEmail = responseJson.email;
+        this._notifyListeners();
+      }
+    });
+  }
+
+  createAccount(options) {
+    const email = options.email;
+    const password = options.password;
+    console.log(`Creating account for ${email}`);
+    return fetch('/createaccount', {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    })
+    .then(Utilities.fetchToJson)
+    .then((data) => {
+      if (data.success) {
+        this._authenticated = true;
+        this.strettoEmail = email;
+        this._notifyListeners();
+        return this.triggerSync();
+      } else {
+        throw new Error(data.errorMessage);
+      }
+    });
+  }
+
+  login(options) {
+    const email = options.email;
+    const password = options.password;
+    console.log(`Authenticating ${email} with server`);
+    return fetch('/login', {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    })
+    .then(Utilities.fetchToJson)
+    .then((data) => {
+      if (data.success) {
+        this._authenticated = true;
+        this.strettoEmail = email;
+        this._notifyListeners();
+        return this.triggerSync();
+      } else {
+        throw new Error(data.errorMessage);
+      }
+    });
+  }
+
+  logoutFromStretto() {
+    return fetch('/logout',  { method: 'POST' })
+    .then(response => {
+      this._authenticated = false;
+      this.strettoEmail = undefined;
+    });
+  }
+
+  forgotPassword(email) {
+    return fetch('/forgotpassword', {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        email: email
+      })
+    });
+  }
+
+  completeReset(email, password, token) {
+    return fetch('/completereset', {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        token: token
+      })
+    });
   }
 
   authServer() {
     console.log(`Authenticating ${this.email} with server`);
-    fetch('/login', {
+    fetch('/googleLogin', {
       credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json',
@@ -79,9 +178,6 @@ class AccountManager {
   @autobind
   initSigninV2() {
     this._onResolveLoad && this._onResolveLoad();
-    gapi.client.load('youtube', 'v3', () => {
-      this._resolveYoutubeLoaded();
-    });
     this.auth2 = gapi.auth2.init({
       client_id: `${env.GOOGLE_CLIENT_ID}.apps.googleusercontent.com`,
       scope: 'https://www.googleapis.com/auth/youtube.readonly'
@@ -91,8 +187,8 @@ class AccountManager {
 
   @autobind
   setUser(googleUser) {
-    this.user = googleUser;
-    this._resolveLoggedIn();
+    this.googleUser = googleUser;
+    this.strettoEmail = googleUser.getBasicProfile().getEmail();
     this._notifyListeners();
     this.authServer();
     return this.email;
@@ -110,7 +206,7 @@ class AccountManager {
   }
 
   get _authToken() {
-    return this.user.getAuthResponse().id_token;
+    return this.googleUser.getAuthResponse().id_token;
   }
 }
 

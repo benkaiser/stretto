@@ -33,6 +33,22 @@ module.exports = class DataMapper {
     })
   }
 
+  static createAccount(email, password) {
+    return User.createAccount(email, password);
+  }
+
+  static loginUser(email, password) {
+    return User.login(email, password);
+  }
+
+  static getPasswordResetForUser(email) {
+    return User.getPasswordResetForUser(email);
+  }
+
+  static completePasswordReset(email, password, token) {
+    return User.completePasswordReset(email, password, token);
+  }
+
   static getVersionForUser(user) {
     return User.getVersionForUser(user);
   }
