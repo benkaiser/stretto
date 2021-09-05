@@ -62,6 +62,10 @@ function isCacheableThirdParty(request) {
   || request.url.includes('cdnjs.cloudflare.com');
 }
 
+function isOpaqueCacheable(request) {
+  return request.url.includes('fonts.googleapis.com');
+}
+
 function isRefreshableFirstParty(request) {
   return request.url.includes('/static/js/main.js');
 }
@@ -130,8 +134,16 @@ self.addEventListener('fetch', function(event) {
       .then(function(response) {
         const refetch = fetch(event.request).then(function(response) {
           if (isOpaqueResponse(response)) {
-            console.warn("Skipping caching of request with opaque response");
-            console.warn(event.request, response);
+            if (isOpaqueCacheable(event.request)) {
+              cache.put(event.request, response.clone())
+              .catch(error => {
+                console.log("Failed to store resource in cache");
+                console.error(error);
+              });
+            } else {
+              console.warn("Skipping caching of request with opaque response");
+              console.warn(event.request, response);
+            }
            return response;
           }
           if (isCacheableThirdParty(event.request) || isRefreshableFirstParty(event.request)) {
