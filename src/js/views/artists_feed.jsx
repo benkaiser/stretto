@@ -73,8 +73,8 @@ export default class ArtistsFeed extends PlaylistView {
   headerButtons() {
     return (
       <div className='buttons'>
-          <Link className='btn btn-primary' to='/artists/add'>Artist Suggestions</Link>
-          <Link className='btn btn-primary' to='/artists/manage'>Manage Artists</Link>
+        <Link className='btn btn-primary' to='/artists/manage'>Manage Artists</Link>
+        <Link className='btn btn-primary' to='/artists/add'>Artist Suggestions</Link>
       </div>
     );
   }

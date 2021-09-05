@@ -3,6 +3,7 @@ import { Col, Row, Image } from 'react-bootstrap';
 import Spinner from 'react-spinkit';
 import Utilities from '../utilities';
 import Alerter from '../services/alerter';
+import { Link } from 'react-router-dom';
 
 export default class ArtistSuggestions extends React.Component {
   constructor(props) {
@@ -20,7 +21,14 @@ export default class ArtistSuggestions extends React.Component {
   render() {
     return (
       <div className='intro'>
-        <h1>Select Artists to Follow</h1>
+        <div class="playlist_header">
+            <h1>Select Artists to Follow</h1>
+            <div class="buttons">
+              <Link className='btn btn-primary' to='/artists/feed'>Artist Feed</Link>
+              <Link className='btn btn-primary' to='/artists/manage'>Manage Artists</Link>
+            </div>
+        </div>
+
         { this.state.loading &&
           <React.Fragment>
             <p>Loading artists...</p>

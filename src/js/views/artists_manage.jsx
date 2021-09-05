@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button, Col, Row, Image } from 'react-bootstrap';
 import Utilities from '../utilities';
 import Alerter from '../services/alerter';
+import { Link } from 'react-router-dom';
 
 export default class ArtistsManage extends React.Component {
   constructor(props) {
@@ -20,13 +21,19 @@ export default class ArtistsManage extends React.Component {
   render() {
     return (
       <div className='intro'>
-        <h1>Manage Your Followed Artists</h1>
-        <p>Click to unfollow an artist</p>
+        <div class="playlist_header">
+            <h1>Your Followed Artists</h1>
+            <div class="buttons">
+              <Link className='btn btn-primary' to='/artists/feed'>Artist Feed</Link>
+              <Link className='btn btn-primary' to='/artists/add'>Artist Suggestions</Link>
+            </div>
+        </div>
         { this.state.artists &&
           <Row>
             { this.state.artists.map(artist => (
               <Col key={artist.artistId} md={3}>
-                <Image onClick={this._unfollow.bind(this, artist)} className='artistImage' src={artist.artistCover} />
+                <Image onClick={this._searchArtist.bind(this, artist)} className='artistImage' src={artist.artistCover} />
+                <i onClick={this._unfollow.bind(this, artist)} className='fa fa-close fa-2x unfollowClose'></i>
                 <h4 className='artistText'>{artist.artistName}</h4>
               </Col>
             )) }
@@ -36,7 +43,9 @@ export default class ArtistsManage extends React.Component {
     );
   }
 
-  _unfollow(artistToUnfollow) {
+  _unfollow(artistToUnfollow, event) {
+    event.preventDefault();
+    event.stopPropagation();
     this.setState({
       artists: this.state.artists.filter(artist => artist !== artistToUnfollow)
     });
@@ -51,6 +60,13 @@ export default class ArtistsManage extends React.Component {
         artist: artistToUnfollow
       })
     });
+  }
+
+  _searchArtist(artist, event) {
+    this.props.history.push(`/search/${artist.artistName}`);
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
   }
 
   _loadArtists() {

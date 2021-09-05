@@ -7,7 +7,6 @@ import ContextMenu from './context_menu';
 import Itunes from '../services/itunes';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
-import { useLongPress } from '../utilities';
 
 export default class ItunesChart extends React.Component {
   constructor(props) {
@@ -40,6 +39,7 @@ export default class ItunesChart extends React.Component {
                 key={index}
                 onTouchStart={this._onTouchStart.bind(this)}
                 onTouchEnd={this._onTouchEnd.bind(this, item)}
+                onTouchMove={this._onTouchMove.bind(this)}
                 onMouseDown={this._onTouchStart.bind(this)}
                 onMouseUp={this._onTouchEnd.bind(this, item)}
                 onContextMenu={this._rightSongClick.bind(this, item)}
@@ -75,10 +75,16 @@ export default class ItunesChart extends React.Component {
   @autobind
   _onTouchStart(event) {
     this._touchStart = event.timeStamp;
+    this._touchMoved = false;
+  }
+
+  _onTouchMove(event) {
+    this._touchMoved = true;
+    ContextMenu.hide();
   }
 
   _onTouchEnd(song, event) {
-    if (event.button) {
+    if (event.button || this._touchMoved) {
       return;
     }
     if (event.timeStamp - this._touchStart > 300) {
@@ -95,6 +101,7 @@ export default class ItunesChart extends React.Component {
 
   @autobind
   _rightSongClick(song, event) {
+    console.log('RightClick song');
     ContextMenu.open([song], event, Player.playlist);
     event.preventDefault();
   }
@@ -121,6 +128,7 @@ export default class ItunesChart extends React.Component {
   }
 
   _playSong(item) {
+    console.log('Play song');
     Player.play(item, this.state.playlist);
   }
 }

@@ -26,7 +26,7 @@ export default class SpotifyChart extends React.Component {
     if (this.state.loaded) {
       return (
         <div>
-          <ListGroup>
+          <ListGroup onTouchMove={this._closeContextMenu}>
           { this.state.playlist.songData.map((item, index) =>
             <ListGroupItem key={index} onClick={this._playSong.bind(this, item)} onContextMenu={this._rightSongClick.bind(this, item)}>
               <div className='chartInnerContainer'>
@@ -50,6 +50,11 @@ export default class SpotifyChart extends React.Component {
   _rightSongClick(song, event) {
     ContextMenu.open([song], event, Player.playlist);
     event.preventDefault();
+  }
+
+  @autobind
+  _closeContextMenu() {
+    ContextMenu.hide();
   }
 
   _fetchChart(props) {

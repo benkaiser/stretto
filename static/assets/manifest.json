@@ -9,14 +9,14 @@
       "sizes": "192x192"
     },
     {
-      "src": "/static/assets/icon192.png",
+      "src": "/static/assets/icon512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": "/playlist/Library",
   "background_color": "#54b4eb",
-  "display": "standalone",
+  "display": "minimal-ui",
   "scope": "/",
   "theme_color": "#54b4eb"
 }
