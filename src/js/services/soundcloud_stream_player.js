@@ -95,11 +95,11 @@ export default class SoundcloudStreamPlayer {
     this.disposed = true;
     if (player) {
       player.pause();
-      player.parentNode && player.parentNode.removeChild(player);
+      player.remove();
     }
     document.querySelectorAll(".scaudio").forEach(e => {
       e.pause();
-      player.parentNode && e.parentNode.removeChild(e);
+      e.remove();
     });
   }
 

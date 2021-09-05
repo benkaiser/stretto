@@ -11,11 +11,11 @@ export default class AbstractHTML5AudioPlayer {
     this.disposed = true;
     if (this.player) {
       this.player.pause();
-      this.player.parentNode && this.player.parentNode.removeChild(this.player);
+      this.player.remove();
     }
     document.querySelectorAll(".html5audio").forEach(e => {
       e.pause();
-      e.parentNode && e.parentNode.removeChild(e)
+      e.remove();
     });
   }
 
