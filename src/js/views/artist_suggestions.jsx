@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Col, Row, Image } from 'react-bootstrap';
+import { Alert, Col, Row, Image } from 'react-bootstrap';
 import Spinner from 'react-spinkit';
 import Utilities from '../utilities';
 import Alerter from '../services/alerter';
@@ -34,6 +34,11 @@ export default class ArtistSuggestions extends React.Component {
             <p>Loading artists...</p>
             <Spinner />
           </React.Fragment>
+        }
+        { this.state.error &&
+          <Alert bsStyle='danger'>
+            <strong>{this.state.error}</strong>
+          </Alert>
         }
         { this.state.artists &&
           <Row>
@@ -75,6 +80,11 @@ export default class ArtistSuggestions extends React.Component {
         this.setState({
           loading: false,
           artists: responseJson
+        });
+      } else {
+        this.setState({
+          loading: false,
+          error: responseJson.error
         });
       }
     });

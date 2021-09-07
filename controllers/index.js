@@ -25,7 +25,7 @@ function loggedIn(req, res, next) {
   if (req.session.loggedIn) {
     next();
   } else {
-    res.status(403).send({ error: 'User not logged in' });
+    res.status(403).send({ error: 'Please login to continue' });
   }
 }
 

@@ -97,7 +97,7 @@ export default class ArtistsFeed extends PlaylistView {
     }).catch((error) => {
       console.log(error);
       this.setState({
-        error: 'Unable to fetch playlist. Login with Google and try again'
+        error: 'Please login to access your artists feed'
       });
     })
   }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Col, Row, Image } from 'react-bootstrap';
+import { Alert, Col, Row, Image } from 'react-bootstrap';
 import Utilities from '../utilities';
 import Alerter from '../services/alerter';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,7 @@ export default class ArtistsManage extends React.Component {
 
     this.state = {
       loading: true,
+      artists: undefined,
       following: []
     };
   }
@@ -28,6 +29,9 @@ export default class ArtistsManage extends React.Component {
               <Link className='btn btn-primary' to='/artists/add'>Artist Suggestions</Link>
             </div>
         </div>
+        { this.state.error && <Alert bsStyle='danger'>
+          <strong>{this.state.error}</strong>
+        </Alert> }
         { this.state.artists &&
           <Row>
             { this.state.artists.map(artist => (
@@ -38,6 +42,12 @@ export default class ArtistsManage extends React.Component {
               </Col>
             )) }
           </Row>
+        }
+        { !this.state.loading && (!this.state.artists || this.state.artists.length === 0) && !this.state.error &&
+          <div>
+            <p>Looks like you aren't currently following any artists, would you like to add some?</p>
+            <Link className='btn btn-primary' to='/artists/add'>Suggested Artists</Link>
+          </div>
         }
       </div>
     );
@@ -73,10 +83,14 @@ export default class ArtistsManage extends React.Component {
     fetch('/artists/followed/raw')
     .then(Utilities.fetchToJson)
     .then(responseJson => {
-      this.setState({
-        loading: false,
-        artists: responseJson
-      });
+      if (responseJson.error) {
+        this.setState({ error: responseJson.error });
+      } else {
+        this.setState({
+          loading: false,
+          artists: responseJson
+        });
+      }
     });
   }
 }
