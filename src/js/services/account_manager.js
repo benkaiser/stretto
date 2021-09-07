@@ -179,8 +179,7 @@ class AccountManager {
   initSigninV2() {
     this._onResolveLoad && this._onResolveLoad();
     this.auth2 = gapi.auth2.init({
-      client_id: `${env.GOOGLE_CLIENT_ID}.apps.googleusercontent.com`,
-      scope: 'https://www.googleapis.com/auth/youtube.readonly'
+      client_id: `${env.GOOGLE_CLIENT_ID}.apps.googleusercontent.com`
     });
     this.auth2.currentUser.listen(this.setUser);
   }
