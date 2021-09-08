@@ -63,7 +63,7 @@ class ContextMenu extends React.Component {
     return [
           this.state.items.length === 1 && <MenuItem onClick={this.editDetails}>Edit track</MenuItem>,
           this.state.items.length === 1 && this._hasLyrics() && <MenuItem onClick={this._showLyrics}>Show Lyrics</MenuItem>,
-          this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>,
+          this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start YouTube Mix</MenuItem>,
           this.state.items.some(track => track.offline) && <MenuItem onClick={this._download}>Download</MenuItem>,
           this.state.items.length === 1 && helperExtensionId &&
             <MenuItem onClick={this._offline}>Make available offline</MenuItem>,
@@ -80,7 +80,7 @@ class ContextMenu extends React.Component {
   _importMenuOptions() {
     return [
         (this.state.items.length !== 1 || !this.state.items[0].inLibrary) && <MenuItem onClick={this.addToLibrary}>Add to library</MenuItem>,
-        this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start Youtube Mix</MenuItem>
+        this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start YouTube Mix</MenuItem>
     ].filter(option => !!option);
   }
 
