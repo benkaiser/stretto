@@ -23,7 +23,7 @@ export default class Add extends React.Component {
   render() {
     return (
       <div className='add'>
-        <h1>Add a Song from Youtube, Soundcloud or Audius</h1>
+        <h1>Add a Song from YouTube, SoundCloud or Audius</h1>
         <form>
           <div className='form-group'>
             <label htmlFor='songurl'>Song URL</label>

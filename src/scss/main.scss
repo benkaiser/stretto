@@ -167,7 +167,7 @@ body, html {
 
   .titleSpan {
     font-size: 30px;
-    margin-left: 10px;
+    margin-left: 15px;
     vertical-align: text-bottom;
   }
 }
@@ -731,4 +731,28 @@ tbody > tr {
   top: 10px;
   right: 30px;
   color: white;
+}
+
+.panel-cta {
+  margin-top: 16px;
+}
+
+.equalPanelRow {
+  display: flex;
+}
+
+.equalPanel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .panel-body {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+  }
+
+  .panel-body-text {
+    flex-grow: 1;
+  }
 }

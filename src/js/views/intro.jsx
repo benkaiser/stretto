@@ -16,7 +16,7 @@ export default class Intro extends React.Component {
             onSelect={this._onSelect.bind(this)}
           >
             <MenuItem eventKey="/spotify">From Spotify</MenuItem>
-            <MenuItem eventKey="/add">From Youtube/Soundcloud</MenuItem>
+            <MenuItem eventKey="/add">From YouTube/SoundCloud</MenuItem>
             <MenuItem eventKey="/discover">From Top Charts</MenuItem>
           </DropdownButton>
         </div>
@@ -29,7 +29,7 @@ export default class Intro extends React.Component {
                   <span className='titleSpan'>Millions of Songs</span>
                 </Panel.Title>
               </Panel.Heading>
-              <Panel.Body>Your music is backed by tracks from youtube and soundcloud, your library is unlimited</Panel.Body>
+              <Panel.Body>Your music is backed by tracks from YouTube and SoundCloud, your library is unlimited</Panel.Body>
             </Panel>
           </Col>
           <Col lg={4} md={6} sm={12}>

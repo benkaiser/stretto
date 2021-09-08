@@ -55,7 +55,7 @@ export default class YoutubeMix extends PlaylistView {
     return (
       <div>
         <DropdownButton id='playlist-dropdown' title='Options'>
-          <MenuItem onClick={this.addToLibrary}>Add to Library</MenuItem>
+          <MenuItem onClick={this.addToLibrary}>Add all Songs to Library</MenuItem>
           <MenuItem onClick={this.toStrettoPlaylist}>Create Stretto Playlist</MenuItem>
         </DropdownButton>
       </div>

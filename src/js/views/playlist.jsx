@@ -1,5 +1,6 @@
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, Col, Label, DropdownButton, Panel, MenuItem, Row } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import autobind from 'autobind-decorator';
 import moment from 'moment';
 import Bootbox from '../services/bootbox';
@@ -56,23 +57,27 @@ export default class PlaylistView extends React.Component {
     return (
       <div className='intro'>
         { this.header() }
-        { this.songsText() }
-        <table className='song-table table'>
-          <thead>
-            <tr>
-              { this.getColumns().map((column) => this.headerForColumn(column)) }
-            </tr>
-          </thead>
-          <this.SortableContainer
-            getContainer={wrappedInstance => this.contentContainer()}
-            distance={20}
-            helperclassName='sortableElement'
-            items={this.state.songsToRender}
-            onSortEnd={this.onSortEnd}
-            shouldCancelStart={this.shouldCancelSortStart}
-            transitionDuration={0}
-          />
-        </table>
+        { !this.isLibraryAndEmpty() && this.songsText() }
+        {
+          this.isLibraryAndEmpty() ?
+            this.emptyLibraryView() :
+            <table className='song-table table'>
+              <thead>
+                <tr>
+                  { this.getColumns().map((column) => this.headerForColumn(column)) }
+                </tr>
+              </thead>
+              <this.SortableContainer
+                getContainer={wrappedInstance => this.contentContainer()}
+                distance={20}
+                helperclassName='sortableElement'
+                items={this.state.songsToRender}
+                onSortEnd={this.onSortEnd}
+                shouldCancelStart={this.shouldCancelSortStart}
+                transitionDuration={0}
+              />
+            </table>
+        }
         { this.allowPagination &&
           this.allowPagination() &&
           <Button
@@ -82,6 +87,62 @@ export default class PlaylistView extends React.Component {
           >
             Load More
           </Button> }
+      </div>
+    );
+  }
+
+  isLibraryAndEmpty() {
+    return this.state.playlist.title === Playlist.LIBRARY && this.state.playlist.songs.length === 0;
+  }
+
+  emptyLibraryView() {
+    return (
+      <div>
+        <p>There are no songs present in your library, let's add some!</p>
+        <Row className='equalPanelRow'>
+          <Col lg={4} md={6} sm={12}>
+            <Panel className='equalPanel' bsStyle="primary">
+              <Panel.Heading>
+                <Panel.Title componentClass="h3" className='introPanelTitle'>
+                  <i className='fa fa-spotify' aria-hidden='true'></i>
+                  <span className='titleSpan'>From Spotify</span>
+                </Panel.Title>
+              </Panel.Heading>
+              <Panel.Body>
+                <div className='panel-body-text'>Import all your favorite playlists from Spotify</div>
+                <Link className='btn btn-primary btn-block panel-cta' to='/spotify'>Import from Spotify</Link>
+              </Panel.Body>
+            </Panel>
+          </Col>
+          <Col lg={4} md={6} sm={12}>
+            <Panel className='equalPanel' bsStyle="primary">
+              <Panel.Heading>
+                <Panel.Title componentClass="h3" className='introPanelTitle'>
+                  <i className='fa fa-music' aria-hidden='true'></i>
+                  <span className='titleSpan'>Top Charts</span>
+                </Panel.Title>
+              </Panel.Heading>
+              <Panel.Body>
+                <div className='panel-body-text'>With access to the top hits from iTunes and Spotify, you can always find new music</div>
+                <Link className='btn btn-primary btn-block panel-cta' to='/discover'>Discover Music</Link>
+              </Panel.Body>
+            </Panel>
+          </Col>
+          <Col lg={4} md={6} sm={12}>
+            <Panel className='equalPanel' bsStyle="primary">
+              <Panel.Heading>
+                <Panel.Title componentClass="h3" className='introPanelTitle'>
+                  <i className='fa fa-headphones' aria-hidden='true'></i>
+                  <span className='titleSpan'>From URL</span>
+                </Panel.Title>
+              </Panel.Heading>
+              <Panel.Body>
+                <div className='panel-body-text'>You can manually add songs by YouTube or SoundCloud URL. YouTube playlists work too.</div>
+                <Link className='btn btn-primary btn-block panel-cta' to='/add'>Add by URL</Link>
+              </Panel.Body>
+            </Panel>
+          </Col>
+        </Row>
       </div>
     );
   }

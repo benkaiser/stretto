@@ -28,7 +28,7 @@ export default class Sidebar extends React.Component {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <MenuItem eventKey="/spotify">From Spotify</MenuItem>
-                <MenuItem eventKey="/add">From Youtube/Soundcloud/Audius</MenuItem>
+                <MenuItem eventKey="/add">From YouTube/Soundcloud/Audius</MenuItem>
                 <MenuItem eventKey="/discover">From Top Charts</MenuItem>
               </Dropdown.Menu>
           </Dropdown>
