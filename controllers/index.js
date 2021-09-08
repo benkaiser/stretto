@@ -165,7 +165,7 @@ router.get('/latestdata', loggedIn, (req, res) => {
 router.get('/suggest/artists', loggedIn, (req, res) => {
   DataMapper.getFollowedArtists(req.session.user)
   .then(followedArtists => {
-    return DataMapper.getTopArtists(req.session.user, followedArtists, 20, 2)
+    return DataMapper.getTopArtists(req.session.user, followedArtists, 30, 0)
   })
   .then(artists => {
     return Promise.all(

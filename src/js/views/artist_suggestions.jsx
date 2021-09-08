@@ -41,7 +41,7 @@ export default class ArtistSuggestions extends React.Component {
           </Alert>
         }
         { this.state.artists &&
-          <Row>
+          <Row className="artistsBody">
             { this.state.artists.map(artist => (
               <Col key={artist.artistId} md={3}>
                 <Image onClick={this._follow.bind(this, artist)} className='artistImage' src={artist.artistCover} />
@@ -49,6 +49,12 @@ export default class ArtistSuggestions extends React.Component {
               </Col>
             )) }
           </Row>
+        }
+        { (!this.state.artists || this.state.artists.length === 0) && !this.state.error && !this.state.loading &&
+          <div>
+            <h2 className="mt-0">No suggestions found</h2>
+            <p>Artist suggestions are based on the songs in your library, add more songs to see more suggestions!</p>
+          </div>
         }
       </div>
     );
