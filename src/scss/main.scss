@@ -731,6 +731,8 @@ tbody > tr {
   top: 10px;
   right: 30px;
   color: white;
+  opacity: 0;
+  transition: opacity 300ms ease;
 }
 
 .panel-cta {
@@ -755,4 +757,12 @@ tbody > tr {
   .panel-body-text {
     flex-grow: 1;
   }
+}
+
+.artistTile:hover .unfollowClose {
+  opacity: 1;
+}
+
+.artistsBody {
+  margin-top: 15px;
 }

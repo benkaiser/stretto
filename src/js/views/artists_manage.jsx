@@ -33,9 +33,9 @@ export default class ArtistsManage extends React.Component {
           <strong>{this.state.error}</strong>
         </Alert> }
         { this.state.artists &&
-          <Row>
+          <Row className='artistsBody'>
             { this.state.artists.map(artist => (
-              <Col key={artist.artistId} md={3}>
+              <Col className='artistTile' key={artist.artistId} md={3}>
                 <Image onClick={this._searchArtist.bind(this, artist)} className='artistImage' src={artist.artistCover} />
                 <i onClick={this._unfollow.bind(this, artist)} className='fa fa-close fa-2x unfollowClose'></i>
                 <h4 className='artistText'>{artist.artistName}</h4>
@@ -44,7 +44,7 @@ export default class ArtistsManage extends React.Component {
           </Row>
         }
         { !this.state.loading && (!this.state.artists || this.state.artists.length === 0) && !this.state.error &&
-          <div>
+          <div className='artistsBody'>
             <p>Looks like you aren't currently following any artists, would you like to add some?</p>
             <Link className='btn btn-primary' to='/artists/add'>Suggested Artists</Link>
           </div>
