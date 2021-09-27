@@ -16,7 +16,7 @@
   ],
   "start_url": "/playlist/Library",
   "background_color": "#54b4eb",
-  "display": "minimal-ui",
+  "display": "standalone",
   "scope": "/",
   "theme_color": "#54b4eb"
 }
