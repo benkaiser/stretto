@@ -3,7 +3,7 @@ import Utilities from "../utilities";
 export default class Audius {
   static async getInfo(url) {
     const endpoint = await this.getAudiusAPIEndpoint();
-    return fetch(`${endpoint}/v1/resolve?url=${encodeURIComponent(url)}&app_name=benkaiser/stretto`)
+    return fetch(`${endpoint}/v1/resolve?url=${encodeURIComponent(decodeURIComponent(url))}&app_name=benkaiser/stretto`)
     .then(Utilities.fetchToJson)
     .then(info => {
       const data = info.data;
@@ -34,7 +34,13 @@ export default class Audius {
   }
 
   static getAudiusAPIEndpoint() {
-    return Promise.resolve('https://discoveryprovider.audius.co');
+    if (this._cachedEndpoint) {
+      return Promise.resolve(this._cachedEndpoint);
+    } else {
+      return fetch('https://api.audius.co/')
+      .then(Utilities.fetchToJson)
+      .then(json => this._cachedEndpoint = json.data[0]);
+    }
   }
 }
 
