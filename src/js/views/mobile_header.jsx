@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Button, Dropdown, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import getHistory from 'react-router-global-history';
 import autobind from 'autobind-decorator';
 import Playlist from '../models/playlist';
+import FilterMenu from './filter_menu';
 
 export default class MobileHeader extends React.Component {
   render() {
@@ -14,6 +15,7 @@ export default class MobileHeader extends React.Component {
             <Link to='/' className='logoText'>Stretto</Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-nav' />
+          <FilterMenu navbar />
         </Navbar.Header>
         <Navbar.Collapse id='basic-nav'>
           <Nav onSelect={this._onSelect}>

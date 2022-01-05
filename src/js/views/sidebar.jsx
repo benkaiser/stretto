@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Dropdown, Label, MenuItem } from 'react-bootstrap';
 import getHistory from 'react-router-global-history';
 import Bootbox from '../services/bootbox';
+import FilterMenu from './filter_menu';
 import PlayerControls from './player_controls';
 import PlayerInfo from './player_info';
 import Playlist from '../models/playlist';
@@ -22,16 +23,17 @@ export default class Sidebar extends React.Component {
           <h3 className='logo'>
             <Link to='/' className='logoText'>Stretto</Link>
             <Link className='sidebar-icon' to='/settings/' title='Settings'><i className="fa fa-cog"></i></Link>
+            <FilterMenu id='dropdown-import-sidebar' />
             <Dropdown title='Add music' className='pull-right' id={`dropdown-import-sidebar`} onSelect={this._onSelect}>
               <Dropdown.Toggle bsStyle='link'>
                 <i className="fa fa-plus"></i>
               </Dropdown.Toggle>
-              <Dropdown.Menu>
+              <Dropdown.Menu className='dropdown-sidebar-menu'>
                 <MenuItem eventKey="/spotify">From Spotify</MenuItem>
                 <MenuItem eventKey="/add">From YouTube/Soundcloud/Audius</MenuItem>
                 <MenuItem eventKey="/discover">From Top Charts</MenuItem>
               </Dropdown.Menu>
-          </Dropdown>
+            </Dropdown>
             <Link className='sidebar-icon' to='/sync/' title='Sync to Cloud'><i className="fa fa-refresh"></i></Link>
           </h3>
           <SearchBox />

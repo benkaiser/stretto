@@ -1,0 +1,37 @@
+import * as React from 'react';
+import { Dropdown, MenuItem } from 'react-bootstrap';
+import autobind from 'autobind-decorator';
+import Song from '../models/song';
+
+export default class FilterMenu extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      offlineOnly: localStorage.getItem('offlineOnly') === 'true',
+      explicit: true
+    };
+  }
+
+  render() {
+    return (
+      <Dropdown title='Filter' className='pull-right' id={this.props.id} onSelect={this._onFilter}>
+        <Dropdown.Toggle noCaret={this.props.navbar} bsStyle='link' className={this.props.navbar ? 'navbar-toggle' : ''}>
+          <i className="fa fa-filter"></i>
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          <MenuItem eventKey="offlineOnly">{ this.state.offlineOnly ? <i class="fa fa-check"></i> : <i class="fa fa-times"></i> } Offline Only</MenuItem>
+          <MenuItem eventKey="explicit">{ this.state.explicit ? <i class="fa fa-check"></i> : <i class="fa fa-times"></i> } Explicit (coming soon)</MenuItem>
+        </Dropdown.Menu>
+      </Dropdown>
+    );
+  }
+
+  @autobind
+  _onFilter(key) {
+    localStorage.setItem(key, !this.state[key]);
+    this.setState({
+      [key]: !this.state[key]
+    });
+    Song.noDataChange();
+  }
+}

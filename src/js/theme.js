@@ -50,6 +50,14 @@ export default class Theme {
     };
   }
 
+  static themeOverrides() {
+    const overrideNavbarColor = '@media (max-width: 767px) { .navbar .dropdown-menu a { color: #000; } }';
+    return {
+      cerulean: overrideNavbarColor,
+      united: overrideNavbarColor,
+    }
+  }
+
   constructor(themeName) {
     this.name = themeName;
   }
@@ -58,5 +66,7 @@ export default class Theme {
     localStorage.setItem('theme', this.name);
     document.getElementById('theme').href = `https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.7/${this.name}/bootstrap.min.css`;
     document.querySelector('meta[name=theme-color]').setAttribute('content', Theme.themeAppColor()[this.name]);
+    const override = Theme.themeOverrides()[this.name] || '';
+    document.getElementById('theme-overrides').innerHTML = override;
   }
 }

@@ -52,7 +52,10 @@ export default class Utilities {
   }
 
   static isMobile() {
-    return window.innerWidth < '480';
+    if (screen.orientation) {
+      return screen.orientation.type.includes('portrait') && window.innerWidth < 700;
+    }
+    return window.innerWidth < 700;
   }
 
   static debounce(func) {

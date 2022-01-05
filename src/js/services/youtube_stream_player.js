@@ -34,6 +34,7 @@ export default class YoutubeStreamPlayer {
       type: 'YOUTUBE_AUDIO_FETCH',
       payload: 'https://youtube.com/watch?v=' + song.originalId
     }, (format) => {
+      console.log('Format found: ', format);
       if (this.disposed) {
         return;
       }

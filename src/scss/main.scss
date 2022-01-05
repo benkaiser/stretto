@@ -135,10 +135,15 @@ body, html {
 #dropdown-import-sidebar {
   float:right;
   font-size: 17px;
-  height: 32px;
+  height: 30px;
   padding: 0;
-  width: 32px;
+  width: 30px;
   text-decoration: none !important;
+}
+
+.dropdown-sidebar-menu {
+  left: -180px !important;
+  right: auto !important;
 }
 
 .duration-slider {
@@ -429,6 +434,10 @@ body, html {
   font-size: 17px;
   margin-right: 14px;
   margin-top: 5px;
+  padding: 0;
+  line-height: 1;
+  border: none;
+  outline: none !important;
 }
 
 .sidebar-top {
@@ -544,7 +553,7 @@ tbody > tr {
   background: #999;
 }
 
-@media(max-width: 480px) {
+@media(max-width: 700px) {
   .player_view {
     display: flex;
     flex-direction: column;
