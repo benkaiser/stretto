@@ -60,7 +60,7 @@ export default class SpotifyImporter extends EventTarget {
       cover: song.cover || '',
       discNumber: song.disc || 0,
       duration: song.duration,
-      explicit: false,
+      explicit: song.explicit,
       genre: song.genre || 'Unknown',
       id: song.youtubeId,
       isSoundcloud: false,

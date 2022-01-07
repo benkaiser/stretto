@@ -19,8 +19,8 @@ export default class FilterMenu extends React.Component {
           <i className="fa fa-filter"></i>
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          <MenuItem eventKey="offlineOnly">{ this.state.offlineOnly ? <i class="fa fa-check"></i> : <i class="fa fa-times"></i> } Offline Only</MenuItem>
-          <MenuItem eventKey="cleanOnly">{ this.state.cleanOnly ? <i class="fa fa-check"></i> : <i class="fa fa-times"></i> } Clean Only</MenuItem>
+          <MenuItem eventKey="offlineOnly">{ this.state.offlineOnly ? <i className="fa fa-check"></i> : <i className="fa fa-times"></i> } Offline Only</MenuItem>
+          <MenuItem eventKey="cleanOnly">{ this.state.cleanOnly ? <i className="fa fa-check"></i> : <i className="fa fa-times"></i> } Clean Only</MenuItem>
         </Dropdown.Menu>
       </Dropdown>
     );

@@ -31,6 +31,7 @@ export default class SpotifyAPI {
           artist: item.track.artists.map(artist => artist.name).join(', '),
           album: item.track.album.name,
           spotifyId: item.track.id,
+          explicit: item.track.explicit,
           deferred: true
         });
       });

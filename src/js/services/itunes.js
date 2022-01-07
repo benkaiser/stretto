@@ -36,6 +36,20 @@ export default class Itunes {
     });
   }
 
+  static fetchExplicit(song) {
+    let searchTerm = encodeURI(`${song.title} ${song.artist}`);
+    let url = `https://itunes.apple.com/search?term=${searchTerm}&entity=song&limit=10&country=` + Country.current();
+    return fetch(url)
+    .then(Utilities.fetchToJson)
+    .then(data => {
+      if (data.resultCount && this._isResultClose(song, data.results[0])) {
+        return data.results[0].trackExplicitness === 'explicit';
+      } else {
+        throw new Error('Unable to find coverart from itunes');
+      }
+    });
+  }
+
   static fetchChart(options) {
     return fetch(Itunes.chartUrl(options))
     .then(Utilities.fetchToJson)
@@ -66,6 +80,7 @@ export default class Itunes {
       album: song.collectionName,
       discNumber: song.discNumber,
       trackNumber: song.trackNumber,
+      explicit: song.trackExplicitness === 'explicit',
       deferred: true
     });
   }

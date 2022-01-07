@@ -35,6 +35,9 @@ export default class SpotifyChart extends React.Component {
                   <h4 className='list-group-item-heading'>{item.title}</h4>
                   <p className='list-group-item-text'>{item.artist}</p>
                 </div>
+                <div className='chartExtraInfo'>
+                  { item.explicit && <span class="label label-danger">E</span>}
+                </div>
               </div>
             </ListGroupItem>
             )}

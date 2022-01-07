@@ -7,6 +7,7 @@ import ArtistSuggestions from './artist_suggestions';
 import ArtistsFeed from './artists_feed';
 import ArtistsManage from './artists_manage';
 import BackupRestore from './backup_restore';
+import ExplicitScan from './explicit_scan';
 import Discover from './discover';
 import Edit from './edit';
 import Error from './error';
@@ -46,6 +47,7 @@ class RegularRoutes extends React.Component {
           <Route path='/edit/:id' component={Edit} />
           <Route path='/player' component={PlayerView} />
           <Route path='/backup' component={BackupRestore} />
+          <Route path='/explicitscan' component={ExplicitScan} />
           <Route path='/welcome' component={Intro} />
           <Route path='/settings' component={Settings} />
           <Route path='/spotify' component={Spotify} />
