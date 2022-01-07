@@ -151,6 +151,10 @@ body, html {
   margin-bottom: 14px;
 }
 
+input[type="checkbox"].explicitCheckbox {
+  margin-right: 10px;
+}
+
 .genreDropdown {
   float: right;
 }

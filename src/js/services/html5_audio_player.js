@@ -35,6 +35,19 @@ export default class HTML5AudioPlayer extends AbstractHTML5AudioPlayer {
     this.player.onplaying = () => HTML5AudioPlayer.playstateChangeHandler(true);
   }
 
+  dispose() {
+    this.disposed = true;
+    if (this.player) {
+      this.player.pause();
+      this.player.remove();
+      this.player = null;
+    }
+    document.querySelectorAll(".html5audio").forEach(e => {
+      e.pause();
+      e.remove();
+    });
+  }
+
   static injectHandlers(playstateChange, onEnded) {
     HTML5AudioPlayer.playstateChangeHandler = playstateChange;
     HTML5AudioPlayer.endHandler = onEnded;

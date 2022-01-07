@@ -22,6 +22,7 @@ export default class Edit extends React.Component {
       cover: track.cover,
       title: track.title,
       track: track,
+      explicit: track.explicit,
       url: track.url
     };
     this.fetchAlternatesAsync();
@@ -65,7 +66,8 @@ export default class Edit extends React.Component {
       album: this.album.value,
       cover: this.cover.value,
       title: this.title.value,
-      url: this.url.value
+      url: this.url.value,
+      explicit: this.explicit.checked
     });
   }
 
@@ -200,6 +202,18 @@ export default class Edit extends React.Component {
                      defaultValue={this.state.url}
               />
             </div>
+            <div className='form-group'>
+                <label>
+                <input className='explicitCheckbox'
+                  name='explicit'
+                  onChange={this.attributeModified}
+                  ref={(input) => { this.explicit = input; }}
+                  type='checkbox'
+                  defaultChecked={this.state.explicit}
+                />
+                  Explicit
+                </label>
+              </div>
           </form>
         </div>
         <div className='col-sm-6'>
@@ -246,6 +260,7 @@ export default class Edit extends React.Component {
     track.album = this.state.album;
     track.cover = this.state.cover;
     track.url = this.state.url;
+    track.explicit = this.state.explicit;
     track.isSoundcloud = Soundcloud.isSoundcloudURL(this.state.url);
     track.isYoutube = Youtube.isYoutubeURL(this.state.url);
     track.isAudius = Audius.isAudiusURL(this.state.url);

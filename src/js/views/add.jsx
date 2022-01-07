@@ -86,6 +86,17 @@ export default class Add extends React.Component {
                        defaultValue={this.getAlbum()}
                 />
               </div>
+              <div className='form-group'>
+                <label>
+                <input className='explicitCheckbox'
+                  name='explicit'
+                  ref={(input) => { this.explicit = input; }}
+                  type='checkbox'
+                  defaultValue={false}
+                />
+                  Explicit
+                </label>
+              </div>
             </form>
             <img  className='image-preview' crossOrigin='anonymous' src={this.state.track.thumbnail} />
           </div>
@@ -133,7 +144,7 @@ export default class Add extends React.Component {
       cover: this.state.track.thumbnail,
       discNumber: 0,
       duration: this.state.track.duration,
-      explicit: false,
+      explicit: this.explicit.checked || false,
       genre: this.state.track.genre || 'Unknown',
       id: this.state.track.id,
       isSoundcloud: this.state.track.isSoundcloud || false,

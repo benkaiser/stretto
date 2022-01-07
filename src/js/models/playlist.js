@@ -150,15 +150,17 @@ export default class Playlist {
         .map((songId) => Song.findById(songId))
         .filter((song) => song !== undefined)
         .filter((song) => localStorage.getItem('offlineOnly') === 'true' ? song.offline : true)
+        .filter((song) => localStorage.getItem('cleanOnly') === 'true' ? !song.explicit : true)
      );
   }
 
   _getCacheKey() {
     const offline = localStorage.getItem('offlineOnly');
+    const cleanOnly = localStorage.getItem('cleanOnly');
     if (offline === 'true') {
-      return offline + '-' + Song.offlineSongIds().join(',');
+      return cleanOnly + '-' + offline + '-' + Song.offlineSongIds().join(',');
     } else {
-      return offline;
+      return cleanOnly + offline;
     }
   }
 

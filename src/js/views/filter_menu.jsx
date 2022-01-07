@@ -8,7 +8,7 @@ export default class FilterMenu extends React.Component {
     super(props);
     this.state = {
       offlineOnly: localStorage.getItem('offlineOnly') === 'true',
-      explicit: true
+      cleanOnly: localStorage.getItem('cleanOnly') === 'true',
     };
   }
 
@@ -20,7 +20,7 @@ export default class FilterMenu extends React.Component {
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <MenuItem eventKey="offlineOnly">{ this.state.offlineOnly ? <i class="fa fa-check"></i> : <i class="fa fa-times"></i> } Offline Only</MenuItem>
-          <MenuItem eventKey="explicit">{ this.state.explicit ? <i class="fa fa-check"></i> : <i class="fa fa-times"></i> } Explicit (coming soon)</MenuItem>
+          <MenuItem eventKey="cleanOnly">{ this.state.cleanOnly ? <i class="fa fa-check"></i> : <i class="fa fa-times"></i> } Clean Only</MenuItem>
         </Dropdown.Menu>
       </Dropdown>
     );

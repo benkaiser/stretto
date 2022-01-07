@@ -96,6 +96,7 @@ export default class SoundcloudStreamPlayer {
     if (player) {
       player.pause();
       player.remove();
+      player = null;
     }
     document.querySelectorAll(".scaudio").forEach(e => {
       e.pause();

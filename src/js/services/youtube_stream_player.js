@@ -61,6 +61,7 @@ export default class YoutubeStreamPlayer {
     if (player) {
       player.pause();
       player.remove();
+      player = null;
     }
     document.querySelectorAll(".ytaudio").forEach(e => {
       e.pause();

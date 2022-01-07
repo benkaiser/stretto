@@ -293,6 +293,7 @@ export default class PlaylistView extends React.Component {
           <td className='titleItemColumn' key={key}>
             <img className='cover' crossOrigin='anonymous' src={song.cover} />
             <div className='titleItemText'>{song.title}</div>
+            { song.explicit && this._explicitIcon() }
             { song.offline && this._offlineAirplane() }
             { this.isCurrentlyPlaying(song.id) && Lyrics.lyrics && this._lyricsButton() }
             { this.extraTitleDecoration(song) }
@@ -477,6 +478,14 @@ export default class PlaylistView extends React.Component {
     return (
       <div className='airplane-label'>
         <i className="fa fa-plane" aria-hidden="true"></i>
+      </div>
+    );
+  }
+
+  _explicitIcon() {
+    return (
+      <div className='airplane-label'>
+        <span class="label label-danger">E</span>
       </div>
     );
   }
