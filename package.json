@@ -35,7 +35,7 @@
     "mongoose": "^5.7.5",
     "node-cache": "^5.1.0",
     "node-fetch": "^2.2.1",
-    "node-sass": "^4.7.2",
+    "node-sass": "^7.0.0",
     "nodemailer": "^6.6.3",
     "nodemon": "^1.19.4",
     "pug": "3.0.0",
