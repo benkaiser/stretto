@@ -15,8 +15,7 @@ var sessionStore = new MongoDBStore({
 });
 
 sessionStore.on('error', function(error) {
-  assert.ifError(error);
-  assert.ok(false);
+  console.error(error);
 });
 
 var app = express();
