@@ -485,7 +485,7 @@ export default class PlaylistView extends React.Component {
   _explicitIcon() {
     return (
       <div className='airplane-label'>
-        <span class="label label-danger">E</span>
+        <span className="label label-danger">E</span>
       </div>
     );
   }
