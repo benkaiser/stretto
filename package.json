@@ -37,7 +37,7 @@
     "node-fetch": "^2.2.1",
     "nodemailer": "^6.6.3",
     "nodemon": "^2.0.15",
-    "pug": "3.0.0",
+    "pug": "3.0.1",
     "react": "^16.5.0",
     "react-alert": "^4.0.4",
     "react-bootstrap": "^0.32.4",
