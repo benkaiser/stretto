@@ -23,7 +23,7 @@
     "bootstrap.native": "^2.0.10",
     "connect-mongodb-session": "^1.3.0",
     "cookie-parser": "^1.4.3",
-    "css-loader": "^0.28.7",
+    "css-loader": "^6.6.0",
     "dotenv": "^4.0.0",
     "express": "^4.17.1",
     "express-http-proxy": "1.5.1",
