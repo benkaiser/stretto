@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:17
 RUN mkdir /app
 ADD package.json yarn.lock /app/
 WORKDIR /app
