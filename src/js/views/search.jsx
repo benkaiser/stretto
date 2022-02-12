@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Label } from 'react-bootstrap';
+import { Button, Label } from 'react-bootstrap';
 import Itunes from '../services/itunes';
 import Playlist from '../models/playlist';
 import PlaylistView from './playlist';
@@ -54,17 +54,28 @@ export default class Search extends PlaylistView {
     return (
       <div className='buttons'>
         <MobileOnly><SearchBox /></MobileOnly>
+        { this.state.showLibrary
+          ? <Button onClick={this._showLibrary.bind(this, false)} bsStyle='primary'>Include Songs Outside Library</Button>
+          : <Button onClick={this._showLibrary.bind(this, true)} bsStyle='primary'>Show Library Only</Button> }
       </div>
     );
   }
 
   songsText() {
-    if (this.state.includesNotInLibrary) {
-      const localSongsCount = this.state.playlist.songData.filter(song => song.inLibrary).length;
-      return <p>{ localSongsCount } { localSongsCount === 1 ? 'Song' : 'Songs' } in Library - Found more online</p>
-    }
-    const count = this.state.playlist.songs.length;
-    return <p>{count} { count === 1 ? 'Song' : 'Songs' } in Library - Searching for more...</p>;
+    const searchText = this.state.showLibrary ? 'Only showing library' : this.state.includesNotInLibrary ? 'Found more online' : 'Searching for more...';
+    const count = this._localPlaylist.songs.length;
+    return <p>{count} { count === 1 ? 'Song' : 'Songs' } in Library - {searchText}</p>;
+  }
+
+  _showLibrary(showLibrary) {
+    this.setState({
+      showLibrary: showLibrary,
+      playlist: this._localPlaylist
+    }, () => {
+      if (!showLibrary) {
+        this._itunesSearch();
+      }
+    });
   }
 
   _createPlaylistForSearch(searchTerm) {
@@ -78,7 +89,7 @@ export default class Search extends PlaylistView {
   }
 
   allowPagination() {
-    return this._needsPagination;
+    return !this.state.showLibrary && this._needsPagination;
   }
 
   paginationCallback() {
@@ -102,7 +113,13 @@ export default class Search extends PlaylistView {
 
   @autobind
   _itunesSearch() {
+    if (this.state.showLibrary) {
+      return;
+    }
     Itunes.search(this.props.match.params.search).then(songs => {
+      if (this.state.showLibrary) {
+        return;
+      }
       this._needsPagination = songs.length === 50;
       this._paginationOffset = 50;
       songs = songs.filter((song) =>
