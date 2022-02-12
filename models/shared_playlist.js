@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 
 let SharedPlaylistModel;
 

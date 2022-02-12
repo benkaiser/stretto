@@ -1,21 +1,15 @@
-const GoogleAuth = require('google-auth-library');
-const auth = new GoogleAuth;
+const { OAuth2Client } = require('google-auth-library');
 
 module.exports = class Google {
   constructor(client_id) {
-    this.client = new auth.OAuth2(client_id, '', '');
+    this.client = new OAuth2Client(
+      client_id
+    );
     this.client_id = client_id;
   }
 
   verifyToken(token) {
-    return new Promise((resolve, reject) => {
-      this.client.verifyIdToken(
-        token,
-        `${this.client_id}.apps.googleusercontent.com`,
-        function(error, login) {
-          if (error) { return reject(error); }
-          resolve(login.getPayload());
-        });
-    });
+    return this.client.verifyIdToken({ idToken: token })
+    .then(res => res.getPayload());
   }
 }
