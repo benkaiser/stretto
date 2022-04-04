@@ -259,6 +259,7 @@ export default class PlaylistView extends React.Component {
           <MenuItem onClick={this.onDelete}>Delete playlist</MenuItem>
           <MenuItem onClick={this.onRename}>Rename playlist</MenuItem>
           <MenuItem onClick={this.sharePlaylist}>Share Playlist</MenuItem>
+          <MenuItem onClick={this.downloadPlaylist}>Download Offline Items</MenuItem>
         </DropdownButton>
       </div>
     );
@@ -352,6 +353,16 @@ export default class PlaylistView extends React.Component {
     .then((data) => {
       Bootbox.show('Playlist Link', <p>Here is the link to your <a href={'/shared/' + data.guid}>Shared Playlist</a></p>);
     });
+  }
+
+  @autobind
+  downloadPlaylist() {
+    Alerter.info('Prepping download...');
+    const offlineSongs = this.state.playlist.songData.filter(item => item.offline);
+    Utilities.downloadFiles(offlineSongs.map(item => ({
+      url: '/offlineaudio/' + item.originalId,
+      filename: item.title + ' - ' + item.artist + item.offlineExtension
+    })));
   }
 
   @autobind

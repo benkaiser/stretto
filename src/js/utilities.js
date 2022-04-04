@@ -83,14 +83,18 @@ export default class Utilities {
     var link = document.createElement('a');
     link.style.display = 'none';
     document.body.appendChild(link);
-    items.forEach(item => {
-      fetch(item.url).then(response => response.blob())
-      .then(blob => {
+    Promise.all(items.map(item =>
+      fetch(item.url).then(response => response.blob()).then(blob => [item, blob])
+    ))
+    .then(blobItems => {
+      blobItems.forEach(([item, blob]) => {
         link.setAttribute('href', window.URL.createObjectURL(blob));
         link.setAttribute('download', item.filename);
         link.click();
       });
+    })
+    .then(() => {
+      document.body.removeChild(link);
     });
-    document.body.removeChild(link);
   }
 }
