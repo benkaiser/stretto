@@ -87,8 +87,7 @@ export default class SoundcloudDownloader {
             const scriptUrls = [...matchAll("src=\"(.+)\"", pageText)].map(item => item[1]);
             return SoundcloudDownloader._fetchAllJoin(scriptUrls)
             .then(allScripts => {
-                const clientIdStart = allScripts.indexOf('?client_id=') + 11;
-                const clientId = allScripts.slice(clientIdStart, clientIdStart + 32);
+                const clientId = allScripts.match(/client_id\:\"([a-zA-Z0-9]{32})\"/)[1];
                 localStorage.setItem(LOCAL_STORAGE_KEY, clientId);
                 return clientId;
             });
