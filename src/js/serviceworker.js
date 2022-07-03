@@ -220,6 +220,12 @@ broadcast.onmessage = async (event) => {
       }});
     });
   }
+  if (event.data.type === 'REMOVE_OFFLINE') {
+    const cache = await caches.open(MUSIC_CACHE);
+    cache.delete('/offlineaudio/' + event.data.payload.songId)
+    .then(() => console.log('Removed item from cache'))
+    .catch(() => console.error('Failed to remove item from cache'));
+  }
   if (event.data.type === 'OFFLINE_RAW_FILE') {
     cacheRawFile(event.data.payload)
     .then(() => {

@@ -87,6 +87,11 @@ export default class Song {
     }
   }
 
+  removeOffline() {
+    ServiceWorkerClient.removeOffline(this.originalId);
+    offlineSongsIds = offlineSongsIds.filter(offlineId => offlineId !== this.originalId);
+  }
+
   get originalId() {
     return this.id.slice(2);
   }

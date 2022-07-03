@@ -66,7 +66,7 @@ class ContextMenu extends React.Component {
           this.state.items.length === 1 && this.state.items[0].isYoutube && <MenuItem onClick={this._getMix}>Start YouTube Mix</MenuItem>,
           this.state.items.some(track => track.offline) && <MenuItem onClick={this._download}>Download</MenuItem>,
           this.state.items.length === 1 && helperExtensionId &&
-            <MenuItem onClick={this._offline}>Make available offline</MenuItem>,
+            <MenuItem onClick={this._offline}>{this.state.items[0].offline ? 'Re-offline' : 'Make available offline'}</MenuItem>,
           <MenuItem onClick={this.onRemoveFromLibraryClick}>Remove from library</MenuItem>,
           this.state.playlist && this.state.playlist.editable &&
             <MenuItem onClick={this.onRemoveFromPlaylistClick}>Remove from playlist</MenuItem>,

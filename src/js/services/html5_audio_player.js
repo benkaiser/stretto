@@ -1,4 +1,5 @@
 import AbstractHTML5AudioPlayer from "./abstract_html5_audio_player";
+import ServiceWorkerClient from './service_worker_client';
 
 export default class HTML5AudioPlayer extends AbstractHTML5AudioPlayer {
   constructor(song, options = {}) {
@@ -33,6 +34,11 @@ export default class HTML5AudioPlayer extends AbstractHTML5AudioPlayer {
     this.player.onended = HTML5AudioPlayer.endHandler;
     this.player.onpause = () => HTML5AudioPlayer.playstateChangeHandler(false);
     this.player.onplaying = () => HTML5AudioPlayer.playstateChangeHandler(true);
+    this.player.onerror = () => {
+      ServiceWorkerClient.offlineError(song.id);
+      song.removeOffline();
+      HTML5AudioPlayer.endHandler();
+    };
   }
 
   dispose() {

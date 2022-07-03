@@ -79,12 +79,31 @@ export default class ServiceWorkerClient {
     });
   }
 
+  static removeOffline(id) {
+    broadcast.postMessage({
+      type: 'REMOVE_OFFLINE',
+      payload: {
+        songId: id
+      }
+    });
+  }
+
   static addOfflineListener(listener) {
     addBroadcastListener((message) => {
       if (message.data.type === 'OFFLINE_ADDED') {
         listener(message.data.payload);
       }
     });
+  }
+
+  static offlineError(id) {
+    Alerter.error(<p>
+      Unable to play offline track. Removing cached version.
+      <Button onClick={() => {
+        window.lastRoute = getHistory().location.pathname;
+        getHistory().push('/edit/' + id);
+      }}>Edit Track</Button>
+    </p>);
   }
 
   static youtubeError(id) {
