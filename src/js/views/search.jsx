@@ -62,9 +62,13 @@ export default class Search extends PlaylistView {
   }
 
   songsText() {
-    const searchText = this.state.showLibrary ? 'Only showing library' : this.state.includesNotInLibrary ? 'Found more online' : 'Searching for more...';
-    const count = this._localPlaylist.songs.length;
-    return <p>{count} { count === 1 ? 'Song' : 'Songs' } in Library - {searchText}</p>;
+    if (this._localPlaylist) {
+      const searchText = this.state.showLibrary ? 'Only showing library' : this.state.includesNotInLibrary ? 'Found more online' : 'Searching for more...';
+      const count = this._localPlaylist.songs.length;
+      return <p>{count} { count === 1 ? 'Song' : 'Songs' } in Library - {searchText}</p>;
+    } else {
+      return '';
+    }
   }
 
   _showLibrary(showLibrary) {
@@ -72,7 +76,9 @@ export default class Search extends PlaylistView {
       showLibrary: showLibrary,
       playlist: this._localPlaylist
     }, () => {
-      if (!showLibrary) {
+      if (showLibrary) {
+        this._mounted && this.setState(this.determineStateForElementsToShow(0, window.innerHeight, this.state.playlist));
+      } else {
         this._itunesSearch();
       }
     });

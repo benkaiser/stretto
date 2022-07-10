@@ -12,7 +12,7 @@ export default class MobileHeader extends React.Component {
       <Navbar collapseOnSelect fixedTop>
         <Navbar.Header>
           <Navbar.Brand>
-            <Link to='/' className='logoText'>Stretto</Link>
+            <Link to='/playlist/Library' className='logoText'>Stretto</Link>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-nav' />
           <FilterMenu navbar />
