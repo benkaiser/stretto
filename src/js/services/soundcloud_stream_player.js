@@ -1,5 +1,6 @@
 import Hls from 'hls.js/dist/hls.light';
 import Utilities from '../utilities';
+import ServiceWorkerClient from './service_worker_client';
 import SoundcloudDownloader from './soundcloud_downloader';
 
 let player;
@@ -15,6 +16,11 @@ export default class SoundcloudStreamPlayer {
     SoundcloudDownloader.getInfo(song.url)
     .then(soundcloudInfo => {
       this._setupHLSPlayer(soundcloudInfo.stream.url);
+    })
+    .catch(error => {
+      console.error(error);
+      ServiceWorkerClient.soundcloudError(song.originalId);
+      SoundcloudStreamPlayer.endHandler();
     });
   }
 
@@ -47,6 +53,11 @@ export default class SoundcloudStreamPlayer {
     player.onended = SoundcloudStreamPlayer.endHandler;
     player.onpause = () => SoundcloudStreamPlayer.playstateChangeHandler(false);
     player.onplaying = () => SoundcloudStreamPlayer.playstateChangeHandler(true);
+    player.onerror = (error) => {
+      console.error(error);
+      ServiceWorkerClient.streamError(song.id, error);
+      SoundcloudStreamPlayer.endHandler();
+    };
     var hls = new Hls({
       maxBufferLength: 60,
       maxMaxBufferLength: 60 * 3,

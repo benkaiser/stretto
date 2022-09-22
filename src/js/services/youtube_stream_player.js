@@ -30,6 +30,11 @@ export default class YoutubeStreamPlayer {
     player.onended = YoutubeStreamPlayer.endHandler;
     player.onpause = () => YoutubeStreamPlayer.playstateChangeHandler(false);
     player.onplaying = () => YoutubeStreamPlayer.playstateChangeHandler(true);
+    player.onerror = (error) => {
+      console.error(error);
+      ServiceWorkerClient.streamError(song.id, error);
+      YoutubeStreamPlayer.endHandler();
+    };
     chrome.runtime.sendMessage(helperExtensionId, {
       type: 'YOUTUBE_AUDIO_FETCH',
       payload: 'https://youtube.com/watch?v=' + song.originalId

@@ -115,4 +115,25 @@ export default class ServiceWorkerClient {
       }}>Edit Track</Button>
     </p>);
   }
+
+  static soundcloudError(id) {
+    Alerter.error(<p>
+      Unable to play soundcloud backing track.
+      <Button onClick={() => {
+        window.lastRoute = getHistory().location.pathname;
+        getHistory().push('/edit/s_' + id);
+      }}>Edit Track</Button>
+    </p>);
+  }
+
+  static streamError(fullId, error) {
+    Alerter.error(<p>
+      Stream threw an error ({error})
+      <Button onClick={() => {
+        window.lastRoute = getHistory().location.pathname;
+        getHistory().push('/edit/' + fullId);
+      }}>Edit Track</Button>
+    </p>);
+  }
+
 }
