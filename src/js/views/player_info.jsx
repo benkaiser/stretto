@@ -3,11 +3,13 @@ import { withRouter } from 'react-router-dom'
 import ContextMenu from './context_menu';
 import Player from '../services/player';
 import autobind from 'autobind-decorator';
+import Song from '../models/song';
 
 export class PlayerInfo extends React.Component {
   constructor(props) {
     super(props);
     Player.addOnSongChangeListener(this.newSong);
+    Song.addOnChangeListener(this.songChange);
     this.state = {
       hideCover: false,
       song: Player.currentSong
@@ -16,6 +18,7 @@ export class PlayerInfo extends React.Component {
 
   componentWillUnmount() {
     Player.removeOnSongChangeListener(this.newSong);
+    Song.removeOnChangeListener(this.songChange);
   }
 
   hideCover(hide) {
@@ -28,6 +31,11 @@ export class PlayerInfo extends React.Component {
     this.setState({
       song: song
     });
+  }
+
+  @autobind
+  songChange() {
+    this.forceUpdate();
   }
 
   render() {

@@ -10,6 +10,25 @@ let offlineSongsIds = [];
 let offlineReady;
 const offlineReadyPromise = new Promise(resolve => offlineReady = resolve);
 
+function checkImage(url, minWidth) {
+  let resolveFunc;
+  let rejectFunc;
+  let checkImagePromise = new Promise((resolve, reject) => { resolveFunc = resolve; rejectFunc = reject });
+  var image = new Image();
+  image.onload = function() {
+    if (this.width > minWidth) {
+      resolveFunc();
+    } else {
+      rejectFunc();
+    }
+  }
+  image.onerror = function() {
+    rejectFunc();
+  }
+  image.src = url;
+  return checkImagePromise;
+}
+
 export default class Song {
   constructor(attrs) {
     this.album = attrs.album || '';
@@ -94,19 +113,26 @@ export default class Song {
 
   fixCoverArt() {
     if (this.inLibrary && this.isYoutube) {
-      const coverGuess = 'https://img.youtube.com/vi/' + this.originalId + '/maxresdefault.jpg';
-      fetch(coverGuess).then(response => {
-        if (response.ok) {
-          this.cover = coverGuess;
-          this.change();
-        } else {
-          throw "Unable to guess cover";
-        }
-      }).catch((error) => {
+      const coverGuesses = [
+        'https://img.youtube.com/vi/' + this.originalId + '/maxresdefault.jpg',
+        'https://img.youtube.com/vi/' + this.originalId + '/hqdefault.jpg',
+        'https://img.youtube.com/vi/' + this.originalId + '/0.jpg'
+      ];
+      this._setCoverIfValid(coverGuesses[0], 1000)
+      .catch(() => this._setCoverIfValid(coverGuesses[1], 100))
+      .catch(() => this._setCoverIfValid(coverGuesses[2], 1))
+      .catch((error) => {
         console.error(error);
         console.log(`Failed to fetch cover art for: ${this.title}`);
       });
     }
+  }
+
+  _setCoverIfValid(coverGuess, minWidth) {
+    return checkImage(coverGuess, minWidth).then(() => {
+      this.cover = coverGuess;
+      Song.change();
+    });
   }
 
   get originalId() {
