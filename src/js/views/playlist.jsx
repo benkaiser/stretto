@@ -292,7 +292,7 @@ export default class PlaylistView extends React.Component {
       case 'title':
         return (
           <td className='titleItemColumn' key={key}>
-            <img className='cover' crossOrigin='anonymous' src={song.cover} />
+            <img onError={this.onCoverError.bind(this, song)} className='cover' crossOrigin='anonymous' src={song.cover} />
             <div className='titleItemText'>{song.title}</div>
             { song.explicit && this._explicitIcon() }
             { song.offline && this._offlineAirplane() }
@@ -433,6 +433,11 @@ export default class PlaylistView extends React.Component {
         <i className='fa fa-chevron-up' aria-label='Sorting Ascending'></i> :
         <i className='fa fa-chevron-down' aria-label='Sorting Descending'></i>;
     }
+  }
+
+  @autobind
+  onCoverError(song) {
+    song.fixCoverArt();
   }
 
   @autobind

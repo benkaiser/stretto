@@ -92,6 +92,23 @@ export default class Song {
     offlineSongsIds = offlineSongsIds.filter(offlineId => offlineId !== this.originalId);
   }
 
+  fixCoverArt() {
+    if (this.inLibrary && this.isYoutube) {
+      const coverGuess = 'https://img.youtube.com/vi/' + this.originalId + '/maxresdefault.jpg';
+      fetch(coverGuess).then(response => {
+        if (response.ok) {
+          this.cover = coverGuess;
+          this.change();
+        } else {
+          throw "Unable to guess cover";
+        }
+      }).catch((error) => {
+        console.error(error);
+        console.log(`Failed to fetch cover art for: ${this.title}`);
+      });
+    }
+  }
+
   get originalId() {
     return this.id.slice(2);
   }
