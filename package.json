@@ -70,5 +70,8 @@
   },
   "jscsConfig": {
     "requireTrailingComma": false
+  },
+  "resolutions": {
+    "minimist": "^1.2.6"
   }
 }
