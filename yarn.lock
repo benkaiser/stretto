@@ -2694,10 +2694,10 @@ jest-worker@^27.4.5:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-js-azlyrics@^0.2.0:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/js-azlyrics/-/js-azlyrics-0.2.3.tgz#17201b96710edbd53df5c345708d284808434223"
-  integrity sha512-06+2qw4cK2mjA1m4fcDkBpKWcJ+9+yBDGx2ka86lzWlgbdICLkRFOBt+CoK1GEvxehVBYKVB64rRoZVnQmgNYw==
+js-azlyrics@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/js-azlyrics/-/js-azlyrics-0.2.4.tgz#fca84c6f961dd065af02b46c7321873158776f44"
+  integrity sha512-4OW4unZ4wGAr1WdZQ72fWMjhQCjLLDb/OiV5AV/jQI+BTND2KyLEfJOVnlpNn27lrxINh7/WZRg98K467DI3Ww==
   dependencies:
     node-html-parser "^1.1.11"
 
