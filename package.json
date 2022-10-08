@@ -32,7 +32,7 @@
     "hls.js": "^0.14.16",
     "js-azlyrics": "^0.2.4",
     "moment": "^2.18.1",
-    "mongoose": "^6.2.1",
+    "mongoose": "^6.4.6",
     "node-cache": "^5.1.0",
     "node-fetch": "^2.2.1",
     "nodemailer": "^6.6.3",
