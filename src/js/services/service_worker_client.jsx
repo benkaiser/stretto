@@ -127,8 +127,10 @@ export default class ServiceWorkerClient {
   }
 
   static streamError(fullId, error) {
+    console.error(error);
+    let message = error.message || error.toString();
     Alerter.error(<p>
-      Stream threw an error ({error})
+      Stream threw an error ({message})
       <Button onClick={() => {
         window.lastRoute = getHistory().location.pathname;
         getHistory().push('/edit/' + fullId);
