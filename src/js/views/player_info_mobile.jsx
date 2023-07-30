@@ -16,7 +16,7 @@ class PlayerInfoMobile extends PlayerInfo {
           onMouseDown={this._onTouchStart}
           onMouseUp={this._onTouchEnd}
         >
-          <img onError={this.onCoverError} className='cover' crossOrigin='anonymous' src={this.state.song.cover} />
+          <img onError={this.onCoverError} className='cover' crossOrigin='use-credentials' src={this.state.song.cover} />
           <div className='info'>
             <p className='title' title={this.state.song.title}>{this.state.song.title}</p>
             <p className='artist'>

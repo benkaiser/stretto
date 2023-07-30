@@ -292,7 +292,7 @@ export default class PlaylistView extends React.Component {
       case 'title':
         return (
           <td className='titleItemColumn' key={key}>
-            <img onError={this.onCoverError.bind(this, song)} className='cover' crossOrigin='anonymous' src={song.cover} />
+            <img onError={this.onCoverError.bind(this, song)} className='cover' crossOrigin='use-credentials' src={song.cover} />
             <div className='titleItemText'>{song.title}</div>
             { song.explicit && this._explicitIcon() }
             { song.offline && this._offlineAirplane() }
