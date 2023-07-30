@@ -8,6 +8,7 @@ export default class YoutubeStreamPlayer {
     if (options.autoPlay === undefined) options.autoPlay = true;
     player = document.createElement('audio');
     player.setAttribute('class', 'ytaudio');
+    player.setAttribute('crossorigin', 'anonymous');
     if (options.autoPlay) {
       player.setAttribute('autoplay', 'true');
     }
