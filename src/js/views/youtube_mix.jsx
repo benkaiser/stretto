@@ -84,7 +84,8 @@ export default class YoutubeMix extends PlaylistView {
 
   @autobind
   _getYoutubePlaylist() {
-    const [ videoId, playlistId ] = this.props.match.params.playlist.split('+');
+    const videoId = this.props.match.params.playlist;
+    const playlistId = 'RD' + videoId;
     Youtube.getPlaylistAnonymous(videoId, playlistId)
     .then(mixPlaylist => {
       const songs = mixPlaylist.items.map(item => new Song(item));
@@ -100,7 +101,7 @@ export default class YoutubeMix extends PlaylistView {
     }).catch((error) => {
       console.log(error);
       this.setState({
-        error: 'Unable to fetch playlist. Login with Google and try again'
+        error: 'Unable to fetch playlist. Maybe the video is no longer available?'
       });
     })
   }

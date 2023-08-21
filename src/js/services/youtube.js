@@ -71,24 +71,6 @@ export default class Youtube {
     });
   }
 
-  /**
-   * Find the youtube automix for a song
-   * @param youtubeId
-   * @returns Promise with the playlistid of the mix
-   */
-  static findMix(youtubeId) {
-    return fetch(`https://www.youtube.com/watch?v=${youtubeId}`)
-    .then((response) => response.text())
-    .then(responseText => {
-      const results = /0026list=([^"\\]+)/.exec(responseText);
-      if (results && results[1]) {
-        return results[1];
-      } else {
-        return Promise.reject('Unable to find mix id');
-      }
-    });
-  }
-
   static getPlaylistAnonymous(videoId, playlistId) {
     return fetch(this._getPlaylistVideoUrl(videoId, playlistId))
     .then((response) => response.text())

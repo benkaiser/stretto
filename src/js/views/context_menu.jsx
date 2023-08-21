@@ -225,14 +225,7 @@ class ContextMenu extends React.Component {
 
   @autobind
   _getMix() {
-    Alerter.info('Attempting to find mix');
-    Youtube.findMix(this.state.items[0].originalId).then((playlistId) => {
-      Alerter.success('Found mix, loading');
-      this.props.history.push(`/mix/${this.state.items[0].originalId}+${playlistId}`);
-    }).catch(error => {
-      console.log(error);
-      Alerter.error('Unable to find mix, see console for more info');
-    });
+    this.props.history.push(`/mix/${this.state.items[0].originalId}`);
     this.hide();
   }
 
