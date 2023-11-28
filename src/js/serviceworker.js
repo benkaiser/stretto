@@ -98,7 +98,7 @@ self.addEventListener('fetch', function(event) {
     return event.respondWith(
       caches.open(MUSIC_CACHE)
       .then(cache =>
-        cache.match(event.request, { ignoreSearch: true })
+        cache.match(event.request, { ignoreSearch: true, ignoreVary: true })
         .then(response => {
           if (response) {
             return response;

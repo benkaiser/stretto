@@ -233,8 +233,10 @@ class ContextMenu extends React.Component {
   _offline() {
     if (this.state.items[0].isYoutube) {
       this.state.items[0].cacheOffline();
-    } else {
+    } else if (this.state.items[0].isSoundcloud) {
       SoundcloudDownloader.download(this.state.items[0]);
+    } else {
+      Alerter.error('Cannot manually offline this track type');
     }
   }
 
