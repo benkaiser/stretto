@@ -127,12 +127,14 @@ class Player {
 
   resumeOnLoad(listener) {
     let playstate = DataLayer.getItem('playstate');
-    if (playstate) {
+    let autoplayOverride = window.location.search.indexOf('autoplay') > -1;
+    const urlMatches = window.location.pathname.match(/\/playlist\/([^\/]+)/);
+    if (playstate && decodeURIComponent(urlMatches[1]) === playstate.playlistTitle) {
       const song = Song.findById(playstate.songId);
       const playlist = Playlist.getByTitle(playstate.playlistTitle) || Playlist.getByTitle(Playlist.LIBRARY);
       if (song && playlist) {
         const play = () => {
-          let resumePlaying = false;
+          let resumePlaying = autoplayOverride || false;
           if (playstate.timestamp && playstate.timestamp > (+new Date() - AUTOPLAY_RESUME_TIMEOUT) && playstate.playing) {
             resumePlaying = true;
           }
@@ -142,7 +144,7 @@ class Player {
             playlist,
             {
               autoPlay: resumePlaying,
-              currentTime: playstate.currentTime,
+              currentTime: playstate.currentTime || 0,
             }
           );
           this.stateChange();
@@ -157,6 +159,15 @@ class Player {
       } else {
         this.playlist = playlist;
       }
+    } else if (autoplayOverride) {
+      const playlistFromUrl = urlMatches[1] ? Playlist.getByTitle(decodeURIComponent(urlMatches[1])) || Playlist.getByTitle(Playlist.LIBRARY) : Playlist.getByTitle(Playlist.LIBRARY);
+      this.play(
+        playlistFromUrl.songData[0],
+        playlistFromUrl,
+        {
+          autoPlay: true,
+        }
+      );
     }
     playstate && playstate.repeat && (this.repeat_state = playstate.repeat);
     playstate && playstate.shuffle_on && (this.shuffle_on = playstate.shuffle_on);
