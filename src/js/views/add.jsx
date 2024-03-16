@@ -97,6 +97,17 @@ export default class Add extends React.Component {
                   Explicit
                 </label>
               </div>
+              <div className='form-group'>
+                <label>
+                <input className='playInLibraryCheckbox'
+                  name='playInLibrary'
+                  ref={(input) => { this.playInLibrary = input; }}
+                  type='checkbox'
+                  defaultValue={true}
+                />
+                  Play in Library
+                </label>
+              </div>
             </form>
             <img  className='image-preview' crossOrigin='use-credentials' src={this.state.track.thumbnail} />
           </div>
@@ -145,6 +156,7 @@ export default class Add extends React.Component {
       discNumber: 0,
       duration: this.state.track.duration,
       explicit: this.explicit.checked || false,
+      playInLibrary: this.playInLibrary.checked || false,
       genre: this.state.track.genre || 'Unknown',
       id: this.state.track.id,
       isSoundcloud: this.state.track.isSoundcloud || false,

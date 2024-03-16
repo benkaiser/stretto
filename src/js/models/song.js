@@ -39,6 +39,7 @@ export default class Song {
     this.discNumber = attrs.discNumber || 0;
     this.duration = attrs.duration || 0;
     this.explicit = attrs.explicit || false;
+    this.playInLibrary = attrs.playInLibrary === undefined ? true : attrs.playInLibrary;
     this.isSoundcloud = attrs.isSoundcloud || false;
     this.isYoutube = attrs.isYoutube || false;
     this.isAudius = attrs.isAudius || false;
@@ -61,6 +62,7 @@ export default class Song {
       discNumber: this.discNumber,
       duration: this.duration,
       explicit: this.explicit,
+      playInLibrary: this.playInLibrary,
       id: this.id,
       isSoundcloud: this.isSoundcloud,
       isYoutube: this.isYoutube,

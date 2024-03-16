@@ -155,7 +155,8 @@ body, html {
   margin-bottom: 14px;
 }
 
-input[type="checkbox"].explicitCheckbox {
+input[type="checkbox"].explicitCheckbox,
+input[type="checkbox"].playInLibraryCheckbox {
   margin-right: 10px;
 }
 

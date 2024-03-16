@@ -129,7 +129,7 @@ class Player {
     let playstate = DataLayer.getItem('playstate');
     let autoplayOverride = window.location.search.indexOf('autoplay') > -1;
     const urlMatches = window.location.pathname.match(/\/playlist\/([^\/]+)/);
-    if (playstate && decodeURIComponent(urlMatches[1]) === playstate.playlistTitle) {
+    if (playstate && decodeURIComponent(urlMatches ? urlMatches[1] : '') === playstate.playlistTitle) {
       const song = Song.findById(playstate.songId);
       const playlist = Playlist.getByTitle(playstate.playlistTitle) || Playlist.getByTitle(Playlist.LIBRARY);
       if (song && playlist) {

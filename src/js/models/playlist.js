@@ -77,11 +77,27 @@ export default class Playlist {
   }
 
   nextSong(song, isShuffled) {
-    return isShuffled ? this.findNextSongInShuffle(song) : this.findNextSong(song);
+    let nextSong = isShuffled ? this.findNextSongInShuffle(song) : this.findNextSong(song);
+    // logic to skip over songs that are marked as not playing in library, only used if there are some songs marked as able to play
+    // to avoid an infinite loop.
+    if (this.title === Playlist.LIBRARY && this.songData.some(song => song.playInLibrary === true)) {
+      while (nextSong.playInLibrary === false) {
+        nextSong = isShuffled ? this.findNextSongInShuffle(nextSong) : this.findNextSong(nextSong);
+      }
+    }
+    return nextSong;
   }
 
   previousSong(song, isShuffled) {
-    return isShuffled ? this.findPreviousSongInShuffle(song) : this.findPreviousSong(song);
+    let previousSong = isShuffled ? this.findPreviousSongInShuffle(song) : this.findPreviousSong(song);
+    // logic to skip over songs that are marked as not playing in library, only used if there are some songs marked as able to play
+    // to avoid an infinite loop.
+    if (this.title === Playlist.LIBRARY && this.songData.some(song => song.playInLibrary === true)) {
+      while (previousSong.playInLibrary === false) {
+        previousSong = isShuffled ? this.findPreviousSongInShuffle(previousSong) : this.findPreviousSong(previousSong);
+      }
+    }
+    return previousSong;
   }
 
   removeSong(song) {

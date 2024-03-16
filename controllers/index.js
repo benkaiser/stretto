@@ -243,6 +243,7 @@ function validateSong(song) {
   assert.strictEqual(typeof song.isYoutube, 'boolean', 'isYoutube is not a boolean');
   assert.strictEqual(typeof song.isSoundcloud, 'boolean', 'isSoundcloud is not a boolean');
   assert.strictEqual(typeof song.explicit, 'boolean', 'explicit is not a boolean');
+  assert.strictEqual(typeof song.playInLibrary, 'boolean', 'playInLibrary is not a boolean');
 }
 
 function songPresent(song, data) {
