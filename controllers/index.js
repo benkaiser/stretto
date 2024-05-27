@@ -184,7 +184,7 @@ function transformLibraryToPublicJson(library) {
       return {
         "id": song.id,
         "title": song.title,
-        "album": song.album,
+        "album": song.album || "Unknown Album",
         "artist": song.artist,
         "genre": "Unknown",
         "source": azureFuncUrl + (song.isYoutube ? 'youtube' : 'soundcloud') + '?id=' + encodeURIComponent(originalId),
