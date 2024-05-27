@@ -176,7 +176,9 @@ router.post('/publicJsonLibrary', (req, res) => {
 const azureFuncUrl = process.env.AZURE_FUNC_URL;
 function transformLibraryToPublicJson(library) {
   return {
-    music: library.songs.map((song) => {
+    music: library.songs.sort((a,b) => {
+      return b.createdAt - a.createdAt;
+    }).map((song) => {
       const originalId = song.id.split('_').pop();
       return {
         "id": song.id,
