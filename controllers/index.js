@@ -179,7 +179,8 @@ function transformLibraryToPublicJson(library) {
     music: library.songs.sort((a,b) => {
       return b.createdAt - a.createdAt;
     }).map((song) => {
-      const originalId = song.id.split('_').pop();
+      // Remove the prefix from song.id, that looks like a_ or s_ or y_ and just return the rest
+      const originalId = song.id.replace(/^[a-zA-Z]_/, '');
       return {
         "id": song.id,
         "title": song.title,
