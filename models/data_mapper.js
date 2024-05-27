@@ -37,8 +37,16 @@ module.exports = class DataMapper {
     return User.createAccount(email, password);
   }
 
+  static createAccountForGoogleUser(email, googleObject) {
+    return User.createAccountForGoogleUser(email, googleObject);
+  }
+
   static loginUser(email, password) {
     return User.login(email, password);
+  }
+
+  static getUser(email) {
+    return User.getUser(email);
   }
 
   static getPasswordResetForUser(email) {
@@ -84,6 +92,14 @@ module.exports = class DataMapper {
       artistArray = artistArray.filter(artist => filterLookup.indexOf(artist.lowerCase) === -1);
       return artistArray.slice(0, howMany).filter(artist => artist.count > atLeastXSongs);
     });
+  }
+
+  static setPublicJsonLibrary(user, isPublic) {
+    return User.setPublicJsonLibrary(user, isPublic);
+  }
+
+  static isUserJsonLibraryPublic(email) {
+    return User.isPublicJsonLibrary(email);
   }
 
   static setDataForUser(data, user, force) {

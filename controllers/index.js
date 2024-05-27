@@ -41,10 +41,25 @@ function errorHandler(error) {
 router.post('/googleLogin', (req, res) => {
   WebGoogle.verifyToken(req.body.token).then((user) => {
     if (user.email === req.body.email) {
-      req.session.user = user;
-      req.session.loggedIn = true;
-      res.send({
-        success: true
+      DataMapper.getUser(user.email).then((strettoUser) => {
+        req.session.user = strettoUser;
+        req.session.loggedIn = true;
+        res.send({
+          success: true
+        });
+      }).catch(() => {
+        DataMapper.createAccountForGoogleUser(user.email, user).then((strettoUser) => {
+          req.session.user = strettoUser;
+          req.session.loggedIn = true;
+          res.send({
+            success: true
+          });
+        }).catch(() => {
+          res.send({
+            success: false,
+            message: 'failed to create account'
+          });
+        });
       });
     } else {
       res.send({
@@ -139,6 +154,60 @@ router.post('/completereset', (req, res) => {
     console.error(error);
     res.status(400).send({ success: false });
   })
+});
+router.get('/publicJsonLibrary', (req, res) => {
+  res.send({
+    publicJsonLibrary: req.session.user.publicJsonLibrary,
+    libraryUrl: '/public/' + req.session.user.email + '/library.json'
+  });
+});
+router.post('/publicJsonLibrary', (req, res) => {
+  return DataMapper.setPublicJsonLibrary(req.session.user, req.body.publicJsonLibrary).then(() => {
+
+    req.session.user.publicJsonLibrary = req.body.publicJsonLibrary;
+    res.status(200).send({
+      publicJsonLibrary: req.body.publicJsonLibrary
+    });
+  }).catch((error) => {
+    console.error(error);
+    res.status(400).send({});
+  });
+});
+const azureFuncUrl = process.env.AZURE_FUNC_URL;
+function transformLibraryToPublicJson(library) {
+  return {
+    music: library.songs.map((song) => {
+      const originalId = song.id.split('_').pop();
+      return {
+        "id": song.id,
+        "title": song.title,
+        "album": song.album,
+        "artist": song.artist,
+        "genre": "Unknown",
+        "source": azureFuncUrl + (song.isYoutube ? 'youtube' : 'soundcloud') + '?id=' + encodeURIComponent(originalId),
+        "image": song.cover,
+        "trackNumber": song.trackNumber || 1,
+        "totalTrackCount": song.totalTrackCount || 100,
+        "duration": song.duration
+      }
+    }),
+    playlists: library.playlists,
+  }
+}
+router.get('/public/:email/library.json', (req, res) => {
+  if (!req.params || !req.params.email) {
+    return res.send('Missing parameter \'email\' in url.');
+  }
+  return DataMapper.isUserJsonLibraryPublic(req.params.email)
+  .then(isPublic => {
+    if (!isPublic) {
+      res.status(403).send({ error: "No public library available"});
+    }
+    DataMapper.getDataForUser({ email: req.params.email })
+    .then(libraryData => {
+      res.send(transformLibraryToPublicJson(libraryData));
+    });
+  });
 });
 
 router.get('/spotify_callback', (req, res) => {
@@ -270,7 +339,7 @@ router.post('/addsong', loggedIn, (req, res) => {
     });
     return DataMapper.setDataForUser(data, req.session.user)
     .then((newVersion) => {
-      console.log(newVersion);
+      console.log("New version: " + newVersion);
       res.send({ success: true, version: newVersion })
     })
   }).catch(errorHandler.bind(res));
@@ -279,7 +348,7 @@ router.post('/addsong', loggedIn, (req, res) => {
 router.post('/uploaddata', loggedIn, (req, res) => {
   DataMapper.setDataForUser(req.body, req.session.user, req.query && req.query.force)
   .then((newVersion) => {
-    console.log(newVersion);
+    console.log("New version: " + newVersion);
     res.send({ success: true, version: newVersion })
   })
   .catch((error) => {

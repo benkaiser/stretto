@@ -60,6 +60,32 @@ class AccountManager {
     });
   }
 
+  getPublicJsonLibrary() {
+    return fetch('/publicjsonlibrary',  {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'GET'
+    })
+    .then(Utilities.fetchToJson);
+  }
+
+  setPublicJsonLibrary(publicJsonLibrary) {
+    return fetch('/publicJsonLibrary',  {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({ publicJsonLibrary })
+    })
+    .then(Utilities.fetchToJson)
+    .then((responseJson) => {
+      return responseJson.publicJsonLibrary;
+    });
+  }
+
   createAccount(options) {
     const email = options.email;
     const password = options.password;

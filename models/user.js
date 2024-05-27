@@ -10,6 +10,7 @@ module.exports = class User {
       hash : String,
       salt : String,
       resetToken: String,
+      publicJsonLibrary: Boolean,
       version: { type: Number, default: -1 },
       googleObject: mongoose.Schema.Types.Mixed
     });
@@ -45,6 +46,25 @@ module.exports = class User {
     });
   }
 
+  static setPublicJsonLibrary(user, isPublic) {
+    return User._find(user.email).then((user) => {
+      console.log('Saving to user');
+      user.publicJsonLibrary = isPublic;
+      return new Promise((resolve, reject) => {
+        user.save((err) => {
+          if (err) { return reject(err); }
+          resolve();
+        });
+      });
+    });
+  }
+
+  static isPublicJsonLibrary(email) {
+    return User._find(email).then((user) => {
+      return user.publicJsonLibrary;
+    });
+  }
+
   static createAccount(email, password) {
     return new Promise((resolve, reject) => {
       UserModel.findOne({ email: email }, (err, user) => {
@@ -54,6 +74,24 @@ module.exports = class User {
           let newUser = new UserModel();
           newUser.email = email;
           newUser.setPassword(password);
+          newUser.save((err, user) => {
+            if (err) { reject('Failed to create user. ' + err); }
+            return resolve(user);
+          });
+        }
+      });
+    });
+  }
+
+  static createAccountForGoogleUser(email, googleObject) {
+    return new Promise((resolve, reject) => {
+      UserModel.findOne({ email: email }, (err, user) => {
+        if (user) {
+          reject('User already exists, please login.');
+        } else {
+          let newUser = new UserModel();
+          newUser.email = email;
+          newUser.googleObject = googleObject;
           newUser.save((err, user) => {
             if (err) { reject('Failed to create user. ' + err); }
             return resolve(user);
@@ -74,6 +112,20 @@ module.exports = class User {
           } else {
             reject('Incorrect email or password, please try again.');
           }
+        }
+      });
+    });
+  }
+
+  static getUser(email) {
+    return new Promise((resolve, reject) => {
+      UserModel.findOne({ email: email }, (err, user) => {
+        if (err) {
+          reject('Failed to get user. ' + err);
+        } else if (user === null || user === undefined) {
+          reject('No user found with this email.');
+        } else {
+          resolve(user);
         }
       });
     });
@@ -111,6 +163,16 @@ module.exports = class User {
             return resolve();
           });
         }
+      });
+    });
+  }
+
+  static _find(email) {
+    return new Promise((resolve, reject) => {
+      UserModel.findOne({ 'email': email }, (err, user) => {
+        if (err) { return reject(err); }
+        if (user) { return resolve(user); }
+        reject('Unable to find user');
       });
     });
   }

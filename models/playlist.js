@@ -14,7 +14,17 @@ module.exports = class Playlist {
     return new Promise((resolve, reject) => {
       PlaylistModel.findOne({ email: email }, (err, doc) => {
         if (err || !doc) { return reject(err); }
-        resolve(doc.playlistBlob);
+        if (doc.playlistBlob) {
+          resolve(doc.playlistBlob.map(playlist => {
+            return {
+              ...playlist,
+              // ensure this is never sent to the user
+              _songData: undefined
+            };
+          }));
+        } else {
+          resolve([]);
+        }
       });
     });
   }
@@ -23,7 +33,7 @@ module.exports = class Playlist {
     return new Promise((resolve, reject) => {
       PlaylistModel.findOneAndUpdate(
         { email: email },
-        { email: email, playlistBlob: playlists },
+        { email: email, playlistBlob: playlists.map(playlist => ({ ...playlist, _songData: undefined })) },
         { upsert: true },
       (err, doc) => {
         if (err) { return reject(err); }
