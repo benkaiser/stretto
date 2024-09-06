@@ -1,102 +1,48 @@
-import ServiceWorkerClient from './service_worker_client';
+import AbstractHTML5AudioPlayer from './abstract_html5_audio_player';
 
-let player;
-
-export default class YoutubeStreamPlayer {
+export default class YoutubeStreamPlayer extends AbstractHTML5AudioPlayer {
   constructor(song, options = {}) {
+    super();
     this.disposed = false;
+    this.player = document.createElement('audio');
     if (options.autoPlay === undefined) options.autoPlay = true;
-    player = document.createElement('audio');
-    player.setAttribute('class', 'ytaudio');
-    player.setAttribute('crossorigin', 'use-credentials');
-    if (options.autoPlay) {
-      player.setAttribute('autoplay', 'true');
+    const url = env.YOUTUBE_REDIRECT_ENDPOINT + '?id=' + song.originalId;
+    this.startPlayer(url, song, options);
+  }
+
+  startPlayer(songUrl, song, options) {
+    this.player.setAttribute('class', 'html5audio');
+    this.player.setAttribute('src', songUrl);
+    if (song.inLibrary) {
+      this.player.setAttribute('src', `/offlineaudio/${song.originalId}?src=${encodeURIComponent(songUrl)}`);
+    } else {
+      this.player.setAttribute('src', songUrl);
     }
     if (options.volume) {
-      player.volume = options.volume;
+      this.player.volume = options.volume;
     }
-    document.body.appendChild(player);
-    player.onloadeddata = () => {
+    if (options.autoPlay) {
+      this.player.setAttribute('autoplay', 'true');
+    }
+    document.body.appendChild(this.player);
+    this.player.onloadeddata = () => {
+      if (this.disposed) {
+        return;
+      }
       if (options.currentTime) {
-        player.currentTime = options.currentTime;
+        this.player.currentTime = options.currentTime;
       }
       if (options.autoPlay) {
         try {
-          player.play();
+          this.player.play();
         } catch (_) {
           // no-op
         }
       }
     }
-    player.onended = YoutubeStreamPlayer.endHandler;
-    player.onpause = () => YoutubeStreamPlayer.playstateChangeHandler(false);
-    player.onplaying = () => YoutubeStreamPlayer.playstateChangeHandler(true);
-    player.onerror = (error) => {
-      console.error(error);
-      ServiceWorkerClient.streamError(song.id, error);
-      YoutubeStreamPlayer.endHandler();
-    };
-    chrome.runtime.sendMessage(helperExtensionId, {
-      type: 'YOUTUBE_AUDIO_FETCH',
-      payload: 'https://youtube.com/watch?v=' + song.originalId
-    }, (format) => {
-      console.log('Format found: ', format);
-      if (this.disposed) {
-        return;
-      }
-      if (format) {
-        // don't auto-offline a track that is not yet in the users library
-        if (song.inLibrary) {
-          player.setAttribute('src', `/offlineaudio/${song.originalId}?src=${encodeURIComponent(format.url)}`);
-        } else {
-          player.setAttribute('src', format.url);
-        }
-      } else {
-        ServiceWorkerClient.youtubeError(song.originalId);
-        YoutubeStreamPlayer.endHandler();
-      }
-    });
-  }
-
-  get durationCacheSeconds() {
-    return player.duration;
-  }
-
-  dispose() {
-    this.disposed = true;
-    if (player) {
-      player.pause();
-      player.remove();
-      player = null;
-    }
-    document.querySelectorAll(".ytaudio").forEach(e => {
-      e.pause();
-      e.remove();
-    });
-  }
-
-  getPosition() {
-    return Promise.resolve(player.currentTime);
-  }
-
-  getPositionFraction() {
-    return Promise.resolve(Number.isNaN(player.duration) ? 0 : player.currentTime / player.duration);
-  }
-
-  setCurrentTime(timeFraction) {
-    player.currentTime = player.duration * timeFraction;
-  }
-
-  setVolume(volume) {
-    player.volume = volume;
-  }
-
-  toggle() {
-    player.paused ? player.play() : player.pause();
-  }
-
-  ensurePlaying() {
-    player && player.play();
+    this.player.onended = YoutubeStreamPlayer.endHandler;
+    this.player.onpause = () => YoutubeStreamPlayer.playstateChangeHandler(false);
+    this.player.onplaying = () => YoutubeStreamPlayer.playstateChangeHandler(true);
   }
 
   static injectHandlers(playstateChange, onEnded) {

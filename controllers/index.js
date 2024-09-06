@@ -376,6 +376,7 @@ function render(res, extraEnv) {
       SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID || '',
       GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID || '',
       SOUNDCLOUD_CLIENT_ID: process.env.SOUNDCLOUD_CLIENT_ID || '',
+      YOUTUBE_REDIRECT_ENDPOINT: process.env.YOUTUBE_REDIRECT_ENDPOINT || '',
       ...extraEnv
     }
   });
