@@ -108,6 +108,12 @@ self.addEventListener('fetch', function(event) {
           if (src) {
             return fetch(src, { mode: 'cors'})
             .then(response => {
+              if (!response.ok) {
+                console.error("Failed to fetch offline url");
+                console.error(src);
+                console.error(response);
+                return new Response(null, { status: 500 });
+              }
               const originalUrl = event.request.url.split('?')[0];
               cache.put(originalUrl, response.clone())
               .then(() => {
@@ -121,7 +127,7 @@ self.addEventListener('fetch', function(event) {
                 console.error(error);
               });
               return response;
-            })
+            });
           }
         })
       )
@@ -166,7 +172,7 @@ self.addEventListener('fetch', function(event) {
 });
 
 function cacheYoutubeFile(payload) {
-  return fetch(payload.format.url)
+  return fetch(payload.url)
   .then(response =>
     caches.open(MUSIC_CACHE)
     .then(cache => cache.put('/offlineaudio/' + payload.youtubeId, response))

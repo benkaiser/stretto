@@ -51,20 +51,11 @@ export default class ServiceWorkerClient {
   }
 
   static offlineYoutube(youtubeId) {
-    chrome.runtime.sendMessage(helperExtensionId, {
-      type: 'YOUTUBE_AUDIO_FETCH',
-      payload: 'https://youtube.com/watch?v=' + youtubeId
-    }, (format) => {
-      if (format) {
-        broadcast.postMessage({
-          type: 'DOWNLOAD',
-          payload: {
-            youtubeId: youtubeId,
-            format: format
-          }
-        });
-      } else {
-        ServiceWorkerClient.youtubeError(youtubeId);
+    broadcast.postMessage({
+      type: 'DOWNLOAD',
+      payload: {
+        youtubeId: youtubeId,
+        url: env.YOUTUBE_REDIRECT_ENDPOINT + '?id=' + youtubeId,
       }
     });
   }
