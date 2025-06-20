@@ -7,6 +7,7 @@ import SoundcloudStreamPlayer from './soundcloud_stream_player';
 import YoutubeStreamPlayer from './youtube_stream_player';
 import ServiceWorkerClient from './service_worker_client';
 import AudiusStreamPlayer from './audius_stream_player';
+import YoutubeIframePlayer from './youtube_iframe_player';
 
 const AUTOPLAY_RESUME_TIMEOUT = 1000 * 60 * 5; // 5 minutes
 
@@ -25,6 +26,7 @@ class Player {
     HTML5AudioPlayer.injectHandlers(this.playstateChange, this.songEnded);
     SoundcloudStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     YoutubeStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
+    YoutubeIframePlayer.injectHandlers(this.playstateChange, this.songEnded);
     AudiusStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     this.setupMediaHandler();
   }
@@ -66,6 +68,9 @@ class Player {
       return new HTML5AudioPlayer(song, options);
     }
     if (song.isYoutube) {
+      if (!song.inLibrary) {
+        return new YoutubeIframePlayer(song, options);
+      }
       return new YoutubeStreamPlayer(song, options);
     } else if (song.isSoundcloud) {
       return new SoundcloudStreamPlayer(song, options);
