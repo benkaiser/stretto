@@ -1,0 +1,26 @@
+---
+name: 'deploy'
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Cloning repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Push to dokku
+        uses: dokku/github-action@master
+        with:
+          git_remote_url: 'ssh://dokku@kaiserapps.com/stretto-next'
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
