@@ -24,6 +24,7 @@ import Sync from './sync';
 import Remote from './remote';
 import Reset from './reset';
 import YoutubeMix from './youtube_mix';
+import Home from './home';
 
 class RegularRoutes extends React.Component {
   static getDerivedStateFromError() {
@@ -63,6 +64,7 @@ class RegularRoutes extends React.Component {
           <Route path='/artists/manage' component={ArtistsManage} />
           <Route path='/soundcloud' component={Soundcloud} />
           <Route path='/shared/:guid' component={SharedPlaylist} />
+          <Route path='/home' component={Home} />
           <Route exact component={Intro} />
         </Switch>
       </Layout>
