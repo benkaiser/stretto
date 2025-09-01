@@ -173,7 +173,8 @@ router.post('/publicJsonLibrary', (req, res) => {
     res.status(400).send({});
   });
 });
-const azureFuncUrl = process.env.AZURE_FUNC_URL;
+const youtubeRedirectEndpoint = process.env.YOUTUBE_REDIRECT_ENDPOINT;
+const soundcloudRedirectEndpoint = process.env.SOUNDCLOUD_REDIRECT_ENDPOINT;
 function transformLibraryToPublicJson(library) {
   return {
     music: library.songs.sort((a,b) => {
@@ -187,7 +188,7 @@ function transformLibraryToPublicJson(library) {
         "album": song.album || "Unknown Album",
         "artist": song.artist,
         "genre": "Unknown",
-        "source": azureFuncUrl + (song.isYoutube ? 'youtube' : 'soundcloud') + '?id=' + encodeURIComponent(originalId),
+        "source": (song.isYoutube ? youtubeRedirectEndpoint : soundcloudRedirectEndpoint) + '?id=' + encodeURIComponent(originalId),
         "image": song.cover,
         "trackNumber": song.trackNumber || 1,
         "totalTrackCount": song.totalTrackCount || 100,
