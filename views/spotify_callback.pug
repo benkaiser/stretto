@@ -6,5 +6,5 @@ html(lang='en')
   body
   script.
     setTimeout(function() {
-      window.opener.SpotifyCallback(window.location.hash.substring(1));
+      window.opener.SpotifyCallback(window.location.search.substring(1));
     }, 1);

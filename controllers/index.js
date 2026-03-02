@@ -218,6 +218,36 @@ router.get('/spotify_callback', (req, res) => {
   res.render('spotify_callback');
 });
 
+router.post('/spotify_exchange', (req, res) => {
+  const { code, redirect_uri } = req.body;
+  if (!code || !redirect_uri) {
+    return res.status(400).send({ error: 'Missing code or redirect_uri' });
+  }
+  const params = new URLSearchParams();
+  params.append('grant_type', 'authorization_code');
+  params.append('code', code);
+  params.append('redirect_uri', redirect_uri);
+  params.append('client_id', process.env.SPOTIFY_CLIENT_ID);
+  params.append('client_secret', process.env.SPOTIFY_CLIENT_SECRET);
+  fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.access_token) {
+      res.send({ access_token: data.access_token });
+    } else {
+      res.status(400).send({ error: data.error || 'Failed to exchange token' });
+    }
+  })
+  .catch(error => {
+    console.error('Spotify token exchange error:', error);
+    res.status(500).send({ error: 'Internal server error' });
+  });
+});
+
 router.get('/serviceworker.js', (req, res) => {
   res.sendFile('./static/js/serviceworker.js', { root: path.resolve(__dirname, '../') });
 });

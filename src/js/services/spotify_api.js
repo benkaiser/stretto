@@ -96,7 +96,7 @@ export default class SpotifyAPI {
     const state = this._generateAndStoreState();
     const scopes_needed = 'playlist-read-private playlist-read-collaborative user-follow-read user-library-read user-top-read';
     return 'https://accounts.spotify.com/authorize' +
-      `?response_type=token` +
+      `?response_type=code` +
       `&client_id=${encodeURIComponent(env.SPOTIFY_CLIENT_ID)}` +
       `&redirect_uri=${encodeURIComponent(window.location.origin + '/spotify_callback')}` +
       `&state=${encodeURIComponent(state)}` +
@@ -130,13 +130,25 @@ export default class SpotifyAPI {
   }
 
   @autobind
-  _spotifyCallback(hash) {
+  _spotifyCallback(search) {
     this._window && this._window.close();
-    const hashParams = Utilities.getHashParams(hash);
-    if (hashParams.access_token && this._state === hashParams.state) {
-      this._access_token = hashParams.access_token;
-      SpotifyExternalAPI.setAccessToken(this._access_token);
-      this._resolve();
+    const params = new URLSearchParams(search);
+    const code = params.get('code');
+    const state = params.get('state');
+    if (code && this._state === state) {
+      fetch('/spotify_exchange', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, redirect_uri: window.location.origin + '/spotify_callback' })
+      })
+      .then(Utilities.fetchToJson)
+      .then((data) => {
+        if (data.access_token) {
+          this._access_token = data.access_token;
+          SpotifyExternalAPI.setAccessToken(this._access_token);
+          this._resolve();
+        }
+      });
     }
   }
 
