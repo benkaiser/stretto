@@ -52,7 +52,12 @@ export default class Youtube {
 
   static search(query) {
     return fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`)
-    .then((response) => response.text())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`YouTube search request failed with status ${response.status} (${response.statusText})`);
+      }
+      return response.text();
+    })
     .then(Youtube._extractInitialData)
     .then((parsedJson) => {
       try {

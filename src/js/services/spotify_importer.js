@@ -5,7 +5,9 @@ import Youtube from './youtube';
 import async from 'async';
 import Alerter from './alerter';
 
-const PAUSE_INTERVAL = 500;
+const PAUSE_INTERVAL = 2000;
+const MAX_RETRIES = 3;
+const INITIAL_BACKOFF = 5000;
 
 export default class SpotifyImporter extends EventTarget {
   static get instance() {
@@ -24,7 +26,7 @@ export default class SpotifyImporter extends EventTarget {
     this.songs = songs;
     this._acceptingNewRequests = false;
     async.eachLimit(this.songs, 1, (outerSong, callback) => {
-      this._findYoutubeVideo(outerSong)
+      this._findYoutubeVideoWithRetry(outerSong)
       .then((song) => {
         this._addSong(song);
         this._updateProgress(`Added: ${song.title} - ${song.artist}`);
@@ -75,6 +77,19 @@ export default class SpotifyImporter extends EventTarget {
       Playlist.getOrCreateByTitle(playlist).addSong(songModel);
     });
     Playlist.getOrCreateByTitle('Spotify Imports').addSong(songModel);
+  }
+
+  _findYoutubeVideoWithRetry(song, attempt = 0) {
+    return this._findYoutubeVideo(song).catch((error) => {
+      if (attempt < MAX_RETRIES) {
+        const backoff = INITIAL_BACKOFF * Math.pow(2, attempt);
+        console.log(`Retry ${attempt + 1}/${MAX_RETRIES} for "${song.title} - ${song.artist}" after ${backoff}ms`);
+        this._updateProgress(`Rate limited, retrying "${song.title}" in ${backoff / 1000}s...`);
+        return new Promise((resolve) => setTimeout(resolve, backoff))
+          .then(() => this._findYoutubeVideoWithRetry(song, attempt + 1));
+      }
+      throw error;
+    });
   }
 
   _findYoutubeVideo(song) {
