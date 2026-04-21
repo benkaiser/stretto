@@ -271,6 +271,8 @@ export default class Youtube {
   }
 
   static search(query) {
+    let capturedApiKey = null;
+    let capturedClientVersion = null;
     return fetch(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`)
     .then((response) => {
       if (!response.ok) {
@@ -278,21 +280,81 @@ export default class Youtube {
       }
       return response.text();
     })
-    .then(Youtube._extractInitialData)
+    .then((responseText) => {
+      const ytcfg = Youtube._extractYtcfg(responseText);
+      if (ytcfg) {
+        capturedApiKey = ytcfg.INNERTUBE_API_KEY;
+        capturedClientVersion = ytcfg.INNERTUBE_CONTEXT && ytcfg.INNERTUBE_CONTEXT.client && ytcfg.INNERTUBE_CONTEXT.client.clientVersion;
+      }
+      return Youtube._extractInitialData(responseText);
+    })
     .then((parsedJson) => {
       try {
-        const contents = parsedJson.contents.twoColumnSearchResultsRenderer
-          ? parsedJson.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents
+        const sectionList = parsedJson.contents.twoColumnSearchResultsRenderer
+          && parsedJson.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer;
+        const contents = sectionList
+          ? sectionList.contents[0].itemSectionRenderer.contents
           : parsedJson.contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results;
 
-
         const videos = contents.map(item => item.videoRenderer || item.compactVideoRenderer).filter(videoRenderer => !!videoRenderer);
-        return videos.map(this._convertScrapedSearchResultToCleanTrackInfo);
+        const items = videos.map(this._convertScrapedSearchResultToCleanTrackInfo);
+        let continuation = null;
+        if (sectionList && sectionList.contents) {
+          const continuationEntry = sectionList.contents.find(c => c.continuationItemRenderer);
+          if (continuationEntry) {
+            const endpoint = continuationEntry.continuationItemRenderer.continuationEndpoint;
+            continuation = endpoint && endpoint.continuationCommand && endpoint.continuationCommand.token;
+          }
+        }
+        items.continuation = continuation;
+        items.apiKey = capturedApiKey;
+        items.clientVersion = capturedClientVersion;
+        return items;
       } catch (error) {
         console.log('Failed to parse youtube search results')
         console.error(error);
-        return [];
+        const empty = [];
+        empty.continuation = null;
+        return empty;
       }
+    });
+  }
+
+  static searchContinuation(token, apiKey, clientVersion) {
+    return fetch('/youtubei/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ continuation: token, apiKey, clientVersion })
+    })
+    .then(r => r.json())
+    .then(data => {
+      const actions = (data.onResponseReceivedCommands || [])
+        .concat(data.onResponseReceivedActions || [])
+        .concat(data.onResponseReceivedEndpoints || []);
+      let contents = [];
+      for (const action of actions) {
+        const append = action.appendContinuationItemsAction;
+        const reload = action.reloadContinuationItemsCommand;
+        if (append && append.continuationItems) contents = contents.concat(append.continuationItems);
+        if (reload && reload.continuationItems) contents = contents.concat(reload.continuationItems);
+      }
+      let nextContinuation = null;
+      const videos = [];
+      for (const entry of contents) {
+        if (entry.itemSectionRenderer && entry.itemSectionRenderer.contents) {
+          for (const inner of entry.itemSectionRenderer.contents) {
+            const vr = inner.videoRenderer || inner.compactVideoRenderer;
+            if (vr) videos.push(vr);
+          }
+        } else if (entry.continuationItemRenderer) {
+          const endpoint = entry.continuationItemRenderer.continuationEndpoint;
+          if (endpoint && endpoint.continuationCommand) nextContinuation = endpoint.continuationCommand.token;
+        }
+      }
+      const items = videos.map(Youtube._convertScrapedSearchResultToCleanTrackInfo);
+      items.continuation = nextContinuation;
+      return items;
     });
   }
 

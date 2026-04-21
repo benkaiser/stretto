@@ -296,7 +296,7 @@ export default class PlaylistView extends React.Component {
             <div className='titleItemText'>{song.title}</div>
             { song.explicit && this._explicitIcon() }
             { song.offline && this._offlineAirplane() }
-            { this.isCurrentlyPlaying(song.id) && Lyrics.lyrics && this._lyricsButton() }
+            { this.isCurrentlyPlaying(song.id) && (Lyrics.lyrics || Lyrics.status === 'failed') && this._lyricsButton() }
             { this.extraTitleDecoration(song) }
           </td>
         );
@@ -507,9 +507,10 @@ export default class PlaylistView extends React.Component {
   }
 
   _lyricsButton() {
+    const failed = Lyrics.status === 'failed';
     return (
       <div className='lyric-label'>
-        <Label bsStyle="info" onClick={this._onLyricsClick}>Lyrics</Label>
+        <Label bsStyle={failed ? 'warning' : 'info'} onClick={this._onLyricsClick}>Lyrics</Label>
       </div>
     );
   }

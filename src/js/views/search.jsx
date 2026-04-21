@@ -1,13 +1,15 @@
 import * as React from 'react';
 import { Button, Label } from 'react-bootstrap';
 import Itunes from '../services/itunes';
+import Youtube from '../services/youtube';
 import Playlist from '../models/playlist';
+import Song from '../models/song';
 import PlaylistView from './playlist';
 import MobileOnly from './mobile_only';
 import SearchBox from './search_box';
 import autobind from 'autobind-decorator';
 
-const ITUNES_SEARCH_DELAY = 300;
+const SEARCH_DELAY = 300;
 
 export default class Search extends PlaylistView {
   playlistHeaderClass() {
@@ -17,6 +19,7 @@ export default class Search extends PlaylistView {
   getStateFromprops(props) {
     const state = super.getStateFromprops(props);
     state.includesNotInLibrary = false;
+    state.searchSource = (this.state && this.state.searchSource) || 'youtube';
     return state;
   }
 
@@ -27,7 +30,7 @@ export default class Search extends PlaylistView {
       this._localPlaylist = this._createPlaylistForSearch(props.match.params.search);
       if (props.match.params.search.length > 3) {
         this._searchTimeout && clearTimeout(this._searchTimeout);
-        this._searchTimeout = setTimeout(this._itunesSearch, ITUNES_SEARCH_DELAY);
+        this._searchTimeout = setTimeout(this._runOnlineSearch, SEARCH_DELAY);
       }
       return this._localPlaylist;
     } else {
@@ -57,8 +60,25 @@ export default class Search extends PlaylistView {
         { this.state.showLibrary
           ? <Button onClick={this._showLibrary.bind(this, false)} bsStyle='primary'>Include Songs Outside Library</Button>
           : <Button onClick={this._showLibrary.bind(this, true)} bsStyle='primary'>Show Library Only</Button> }
+        { !this.state.showLibrary && (
+          this.state.searchSource === 'youtube'
+            ? <Button onClick={this._setSearchSource.bind(this, 'itunes')} bsStyle='default'>Search iTunes Instead</Button>
+            : <Button onClick={this._setSearchSource.bind(this, 'youtube')} bsStyle='default'>Search YouTube Instead</Button>
+        ) }
       </div>
     );
+  }
+
+  _setSearchSource(source) {
+    this.setState({
+      searchSource: source,
+      playlist: this._localPlaylist,
+      includesNotInLibrary: false
+    }, () => {
+      this._needsPagination = false;
+      this._paginationOffset = 0;
+      this._runOnlineSearch();
+    });
   }
 
   songsText() {
@@ -79,7 +99,7 @@ export default class Search extends PlaylistView {
       if (showLibrary) {
         this._mounted && this.setState(this.determineStateForElementsToShow(0, window.innerHeight, this.state.playlist));
       } else {
-        this._itunesSearch();
+        this._runOnlineSearch();
       }
     });
   }
@@ -95,51 +115,121 @@ export default class Search extends PlaylistView {
   }
 
   allowPagination() {
-    return !this.state.showLibrary && this._needsPagination;
+    if (this.state.showLibrary) return false;
+    if (this.state.searchSource === 'itunes') return this._needsPagination;
+    return !!this._youtubeContinuation;
   }
 
   paginationCallback() {
+    if (this.state.searchSource === 'youtube') {
+      this._youtubePaginate();
+      return;
+    }
     Itunes.search(this.props.match.params.search, this._paginationOffset).then(songs => {
       this._needsPagination = songs.length === 50;
       this._paginationOffset += songs.length;
-      songs = songs.filter((song) =>
-        !this.state.playlist.songData.some(localSong => localSong.title.toLowerCase() === song.title.toLowerCase() && localSong.artist.toLowerCase() === song.artist.toLowerCase())
-      );
-      const newPlaylist = new Playlist({
-        title: this.state.playlist.title,
-        rawSongs: this.state.playlist.songData.concat(songs)
-      });
-      const scrollContainer = this.contentContainer();
-      const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
-      state.playlist = newPlaylist;
-      state.includesNotInLibrary = true;
-      this.setState(state);
+      this._appendPaginatedResults(songs);
     });
   }
 
+  _youtubePaginate() {
+    const token = this._youtubeContinuation;
+    if (!token) return;
+    this._youtubeContinuation = null;
+    Youtube.searchContinuation(token, this._youtubeApiKey, this._youtubeClientVersion).then(results => {
+      if (this.state.showLibrary || this.state.searchSource !== 'youtube') return;
+      this._youtubeContinuation = results.continuation || null;
+      const songs = results.map(r => new Song({
+        id: r.id,
+        title: r.title,
+        artist: r.channel,
+        cover: r.thumbnail,
+        duration: r.duration,
+        url: r.url,
+        isYoutube: true
+      }));
+      this._appendPaginatedResults(songs);
+    });
+  }
+
+  _appendPaginatedResults(songs) {
+    songs = songs.filter((song) =>
+      !this.state.playlist.songData.some(localSong => localSong.title.toLowerCase() === song.title.toLowerCase() && localSong.artist.toLowerCase() === song.artist.toLowerCase())
+    );
+    const newPlaylist = new Playlist({
+      title: this.state.playlist.title,
+      rawSongs: this.state.playlist.songData.concat(songs)
+    });
+    const scrollContainer = this.contentContainer();
+    const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
+    state.playlist = newPlaylist;
+    state.includesNotInLibrary = true;
+    this.setState(state);
+  }
+
   @autobind
+  _runOnlineSearch() {
+    if (this.state.searchSource === 'itunes') {
+      this._itunesSearch();
+    } else {
+      this._youtubeSearch();
+    }
+  }
+
+  _appendOnlineResults(songs) {
+    songs = songs.filter((song) =>
+      !this._localPlaylist.songData.some(localSong => localSong.title.toLowerCase() === song.title.toLowerCase() && localSong.artist.toLowerCase() === song.artist.toLowerCase())
+    );
+    const newPlaylist = new Playlist({
+      title: this._localPlaylist.title,
+      rawSongs: this._localPlaylist.songData.concat(songs)
+    });
+    const scrollContainer = this.contentContainer();
+    const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
+    state.playlist = newPlaylist;
+    state.includesNotInLibrary = true;
+    this.setState(state);
+  }
+
   _itunesSearch() {
-    if (this.state.showLibrary) {
+    if (this.state.showLibrary || this.state.searchSource !== 'itunes') {
       return;
     }
-    Itunes.search(this.props.match.params.search).then(songs => {
-      if (this.state.showLibrary) {
+    const term = this.props.match.params.search;
+    Itunes.search(term).then(songs => {
+      if (this.state.showLibrary || this.state.searchSource !== 'itunes' || this.props.match.params.search !== term) {
         return;
       }
       this._needsPagination = songs.length === 50;
       this._paginationOffset = 50;
-      songs = songs.filter((song) =>
-        !this._localPlaylist.songData.some(localSong => localSong.title.toLowerCase() === song.title.toLowerCase() && localSong.artist.toLowerCase() === song.artist.toLowerCase())
-      );
-      const newPlaylist = new Playlist({
-        title: this._localPlaylist.title,
-        rawSongs: this._localPlaylist.songData.concat(songs)
-      });
-      const scrollContainer = this.contentContainer();
-      const state = this.determineStateForElementsToShow(scrollContainer.scrollTop, window.innerHeight, newPlaylist);
-      state.playlist = newPlaylist;
-      state.includesNotInLibrary = true;
-      this.setState(state);
+      this._appendOnlineResults(songs);
+    });
+  }
+
+  _youtubeSearch() {
+    if (this.state.showLibrary || this.state.searchSource !== 'youtube') {
+      return;
+    }
+    const term = this.props.match.params.search;
+    this._youtubeContinuation = null;
+    Youtube.search(term).then(results => {
+      if (this.state.showLibrary || this.state.searchSource !== 'youtube' || this.props.match.params.search !== term) {
+        return;
+      }
+      this._needsPagination = false;
+      this._youtubeContinuation = results.continuation || null;
+      this._youtubeApiKey = results.apiKey;
+      this._youtubeClientVersion = results.clientVersion;
+      const songs = results.map(r => new Song({
+        id: r.id,
+        title: r.title,
+        artist: r.channel,
+        cover: r.thumbnail,
+        duration: r.duration,
+        url: r.url,
+        isYoutube: true
+      }));
+      this._appendOnlineResults(songs);
     });
   }
 }
