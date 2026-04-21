@@ -24,6 +24,7 @@ import Sync from './sync';
 import Remote from './remote';
 import Reset from './reset';
 import YoutubeMix from './youtube_mix';
+import YoutubeChannel from './youtube_channel';
 import Home from './home';
 
 class RegularRoutes extends React.Component {
@@ -58,6 +59,7 @@ class RegularRoutes extends React.Component {
           <Route path='/search/' exact component={Search} />
           <Route path='/search/:search' component={Search} />
           <Route path='/mix/:playlist' component={YoutubeMix} />
+          <Route path='/channel/:channelUrl' component={YoutubeChannel} />
           <Route path='/discover' component={Discover} />
           <Route path='/artists/feed' component={ArtistsFeed} />
           <Route path='/artists/add' component={ArtistSuggestions} />

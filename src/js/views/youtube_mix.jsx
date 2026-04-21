@@ -14,6 +14,52 @@ export default class YoutubeMix extends PlaylistView {
     this._getYoutubePlaylist();
   }
 
+  getColumns() {
+    return ['title', 'channel', 'views', 'duration'];
+  }
+
+  columnTitleMappings() {
+    return {
+      title: 'Title',
+      channel: 'Channel',
+      views: 'Views',
+      duration: 'Length'
+    };
+  }
+
+  columnWidthMappings() {
+    return {
+      title: 0.45,
+      channel: 0.25,
+      views: 0.15,
+      duration: 0.15
+    };
+  }
+
+  _goToChannel(channelUrl, event) {
+    this.props.history.push(`/channel/${encodeURIComponent(channelUrl)}`);
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+  }
+
+  itemForColumn(column, song) {
+    if (column === 'views') {
+      return <td key='views'>{song.viewsLabel || ''}</td>;
+    }
+    if (column === 'channel') {
+      if (song.channelUrl) {
+        return (
+          <td key='channel' role='link' className='searchable' onClick={this._goToChannel.bind(this, song.channelUrl)}>
+            {song.channel}
+          </td>
+        );
+      }
+      return <td key='channel'>{song.channel || ''}</td>;
+    }
+    return super.itemForColumn(column, song);
+  }
+
   render() {
     if (this.state.error) {
       return (
@@ -84,11 +130,28 @@ export default class YoutubeMix extends PlaylistView {
 
   @autobind
   _getYoutubePlaylist() {
-    const videoId = this.props.match.params.playlist;
-    const playlistId = 'RD' + videoId;
+    const param = this.props.match.params.playlist;
+    let videoId, playlistId;
+    if (param.indexOf('+') !== -1) {
+      [videoId, playlistId] = param.split('+');
+    } else {
+      videoId = param;
+      playlistId = 'RD' + videoId;
+    }
     Youtube.getPlaylistAnonymous(videoId, playlistId)
     .then(mixPlaylist => {
       const songs = mixPlaylist.items.map(item => new Song(item));
+      const byId = {};
+      mixPlaylist.items.forEach(item => { byId[item.id] = item; });
+      songs.forEach(song => {
+        const item = byId[song.originalId];
+        if (item) {
+          song.views = item.views || 0;
+          song.viewsLabel = item.viewsLabel || '';
+          song.channel = item.channel || '';
+          song.channelUrl = item.channelUrl || '';
+        }
+      });
       this._youtubePlaylist = new Playlist({
         title: 'Youtube Playlist: ' + mixPlaylist.title,
         rawSongs: songs

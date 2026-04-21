@@ -428,6 +428,40 @@ router.get('/redirect', (req, res) => {
   res.render('redirect');
 });
 
+router.post('/youtubei/browse', (req, res) => {
+  const { continuation, browseId, params, apiKey, clientVersion } = req.body || {};
+  if (!continuation && !browseId) return res.status(400).json({ error: 'missing continuation or browseId' });
+  const key = apiKey || 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8';
+  const cv = clientVersion || '2.20240101.00.00';
+  const payload = {
+    context: { client: { clientName: 'WEB', clientVersion: cv, hl: 'en', gl: 'US' } }
+  };
+  if (continuation) payload.continuation = continuation;
+  if (browseId) {
+    payload.browseId = browseId;
+    if (params) payload.params = params;
+  }
+  fetch(`https://www.youtube.com/youtubei/v1/browse?key=${encodeURIComponent(key)}&prettyPrint=false`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Origin': 'https://www.youtube.com',
+      'Referer': 'https://www.youtube.com/',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      'X-YouTube-Client-Name': '1',
+      'X-YouTube-Client-Version': cv
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.text().then(text => ({ status: r.status, text })))
+  .then(({ status, text }) => {
+    res.status(status).type('application/json').send(text);
+  })
+  .catch(err => {
+    res.status(500).json({ error: String(err) });
+  });
+});
+
 router.get('/privacy', (req, res) => {
   res.sendFile('./privacy_policy.html', { root: path.resolve(__dirname, '../') });
 });

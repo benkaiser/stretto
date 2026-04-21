@@ -51,6 +51,11 @@ export default class Add extends React.Component {
             <Link className='btn btn-primary' to={this.state.playlistUrl}>View All Songs in Playlist</Link>
           </div>
         )}
+        { this.state.channelUrl && (
+          <div>
+            <Link className='btn btn-primary' to={this.state.channelUrl}>View Channel Videos</Link>
+          </div>
+        )}
         { this.state.track &&
         <div className='row'>
           <div className='col-lg-6'>
@@ -187,6 +192,7 @@ export default class Add extends React.Component {
       loading: !!this.input.value,
       track: null,
       playlistUrl: null,
+      channelUrl: null,
       error: ''
     });
     this.timeout && clearTimeout(this.timeout);
@@ -196,6 +202,13 @@ export default class Add extends React.Component {
         this.setState({
           playlistUrl: `/mix/${params.get('v')}+${params.get('list')}`
         });
+      }
+      if (Youtube.isChannelUrl(this.input.value)) {
+        this.setState({
+          channelUrl: `/channel/${encodeURIComponent(this.input.value)}`,
+          loading: false
+        });
+        return;
       }
       (Soundcloud.isSoundcloudURL(this.input.value) ?
         Soundcloud.getInfo(this.input.value) :

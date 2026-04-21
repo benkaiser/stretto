@@ -1,18 +1,20 @@
-mongo:
-  image: mongo
-web:
-  build: .
-  command: npm run dev
-  dockerfile: Dockerfile.local
-  environment:
-    PORT: 3000
-    ENV: development
-    APP_URL: 'http://localhost:3000'
-    MONGO_URL: 'mongodb://mongo:27017/stretto'
-  links:
-    - mongo
-  ports:
-    - "3000:3000"
-  volumes:
-    - .:/app
-    - /app/node_modules
+services:
+  mongo:
+    image: mongo
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    command: npm run dev
+    environment:
+      PORT: 3000
+      ENV: development
+      APP_URL: 'http://localhost:3000'
+      MONGO_URL: 'mongodb://mongo:27017/stretto'
+    depends_on:
+      - mongo
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
