@@ -3,11 +3,27 @@ import Utilities from '../utilities';
 
 import Bootbox from "./bootbox";
 
+const EXTENSION_DETECT_TIMEOUT = 3000;
+
 export default class FirstRunExperience {
   static initialise() {
-    if (FirstRunExperience.checkExtensions()) {
-      FirstRunExperience.showFirstRun();
+    if (window.helperExtensionId) {
+      return;
     }
+
+    window.onHelperExtensionReady = (extensionId) => {
+      window.helperExtensionId = extensionId;
+      if (FirstRunExperience._timeout) {
+        clearTimeout(FirstRunExperience._timeout);
+        FirstRunExperience._timeout = null;
+      }
+    };
+
+    FirstRunExperience._timeout = setTimeout(() => {
+      if (!window.helperExtensionId) {
+        FirstRunExperience.showFirstRun();
+      }
+    }, EXTENSION_DETECT_TIMEOUT);
   }
 
   static showFirstRun() {
@@ -25,13 +41,5 @@ export default class FirstRunExperience {
         </ol>
       </div>
     );
-  }
-
-  static checkExtensions() {
-    try {
-      return !window.helperExtensionId;
-    } catch (_) {
-      return true;
-    }
   }
 }
