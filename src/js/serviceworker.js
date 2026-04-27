@@ -107,6 +107,7 @@ self.addEventListener('fetch', function(event) {
           const src = url.searchParams.get('src');
           if (src) {
             return fetch(src, { mode: 'cors'})
+            .catch(() => fetch(src, { mode: 'cors'}))
             .then(response => {
               if (!response.ok) {
                 console.error("Failed to fetch offline url");
