@@ -74,6 +74,13 @@ function isOpaqueResponse(response) {
   return response.type === "opaque";
 }
 
+function resolveRedirectUrl(src) {
+  const separator = src.includes('?') ? '&' : '?';
+  return fetch(src + separator + 'format=json')
+    .then(response => response.json())
+    .then(data => data.url);
+}
+
 self.addEventListener('fetch', function(event) {
   const url = new URL(event.request.url);
   if (self.registration.scope.includes(url.origin) && isAppUrl(url.pathname)) {
@@ -106,8 +113,8 @@ self.addEventListener('fetch', function(event) {
           const url = new URL(event.request.url);
           const src = url.searchParams.get('src');
           if (src) {
-            return fetch(src, { mode: 'cors'})
-            .catch(() => fetch(src, { mode: 'cors'}))
+            return resolveRedirectUrl(src)
+            .then(blobUrl => fetch(blobUrl, { mode: 'cors' }))
             .then(response => {
               if (!response.ok) {
                 console.error("Failed to fetch offline url");
@@ -173,7 +180,8 @@ self.addEventListener('fetch', function(event) {
 });
 
 function cacheYoutubeFile(payload) {
-  return fetch(payload.url)
+  return resolveRedirectUrl(payload.url)
+  .then(blobUrl => fetch(blobUrl, { mode: 'cors' }))
   .then(response =>
     caches.open(MUSIC_CACHE)
     .then(cache => cache.put('/offlineaudio/' + payload.youtubeId, response))
