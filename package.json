@@ -25,7 +25,7 @@
     "cookie-parser": "^1.4.3",
     "css-loader": "^6.6.0",
     "dotenv": "^4.0.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-http-proxy": "1.5.1",
     "express-session": "^1.17.0",
     "google-auth-library": "^7.12.0",
