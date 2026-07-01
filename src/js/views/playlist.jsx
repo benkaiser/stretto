@@ -260,9 +260,62 @@ export default class PlaylistView extends React.Component {
           <MenuItem onClick={this.onRename}>Rename playlist</MenuItem>
           <MenuItem onClick={this.sharePlaylist}>Share Playlist</MenuItem>
           <MenuItem onClick={this.downloadPlaylist}>Download Offline Items</MenuItem>
+          <li className='dropdown-submenu'>
+            <a href='#' onClick={this._preventDefault}>Copy song info to clipboard</a>
+            <ul className='dropdown-menu'>
+              <MenuItem onClick={this.copyAsPlainText}>as plain text</MenuItem>
+              <MenuItem onClick={this.copyAsJson}>as JSON</MenuItem>
+            </ul>
+          </li>
         </DropdownButton>
       </div>
     );
+  }
+
+  @autobind
+  _preventDefault(event) {
+    event.preventDefault();
+  }
+
+  @autobind
+  copyAsPlainText() {
+    const text = this.state.playlist.songData.map((song, index) =>
+      `${index + 1}. ${song.title} - ${song.artist}${song.album ? ` (${song.album})` : ''}`
+    ).join('\n');
+    this._copyToClipboard(text);
+  }
+
+  @autobind
+  copyAsJson() {
+    const json = JSON.stringify(this.state.playlist.songData.map((song) => ({
+      title: song.title,
+      artist: song.artist,
+      album: song.album,
+      year: song.year,
+      duration: song.duration
+    })), null, 2);
+    this._copyToClipboard(json);
+  }
+
+  _copyToClipboard(text) {
+    const done = () => Alerter.success('Copied song info to clipboard');
+    const fail = () => Alerter.error('Unable to copy to clipboard');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fail);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy') ? done() : fail();
+      } catch (error) {
+        fail();
+      }
+      document.body.removeChild(textarea);
+    }
   }
 
   headerForColumn(column) {
