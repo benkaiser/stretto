@@ -12,7 +12,7 @@ export default class Intro extends React.Component {
     return (
       <div>
         <h1>Settings</h1>
-        <div className='form-horizontal'>
+        <div>
           <ThemeSwitcher />
           <CountrySwitcher />
           <GlobalVolume />

@@ -19,7 +19,7 @@ export default class Import extends React.Component {
       <div className='sync'>
         <h1>Stretto Account</h1>
         { !this.state.strettoSignedIn ?
-          <div className='form-horizontal'>
+          <div>
             <p>A Stretto account is useful for syncing your music library between devices.</p>
             <div className='form-group row'>
               <label className='col-sm-2 col-form-label'>Email</label>

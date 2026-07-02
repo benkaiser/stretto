@@ -16,7 +16,7 @@ export default class Import extends React.Component {
       <div className='sync'>
         <h1>Password Reset</h1>
         { !this.state.resetCompleted ?
-          <div className='form-horizontal'>
+          <div>
             <div className='form-group row'>
               <label className='col-sm-2 col-form-label'>Confirm Email</label>
               <div className='col-sm-10 col-md-3'>
