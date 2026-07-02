@@ -84,10 +84,14 @@ export default class Theme {
   }
 
   load() {
-    localStorage.setItem('theme', this.name);
-    document.getElementById('theme').href = `https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/${this.name}/bootstrap.min.css`;
-    document.querySelector('meta[name=theme-color]').setAttribute('content', Theme.themeAppColor()[this.name]);
-    const override = Theme.themeOverrides()[this.name] || '';
+    // Only allow known Bootswatch themes to be applied, so a tampered
+    // localStorage value cannot inject an arbitrary URL/markup.
+    const name = Theme.themes().includes(this.name) ? this.name : 'cerulean';
+    this.name = name;
+    localStorage.setItem('theme', name);
+    document.getElementById('theme').href = `https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/${name}/bootstrap.min.css`;
+    document.querySelector('meta[name=theme-color]').setAttribute('content', Theme.themeAppColor()[name]);
+    const override = Theme.themeOverrides()[name] || '';
     document.getElementById('theme-overrides').innerHTML = override;
   }
 }
