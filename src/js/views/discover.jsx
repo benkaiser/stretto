@@ -1,6 +1,6 @@
 import * as React from 'react';
 import autobind from 'autobind-decorator';
-import { Nav, NavItem } from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
 
 import DiscoverItunes from './discover_itunes';
 import DiscoverSpotify from './discover_spotify';
@@ -17,13 +17,17 @@ export default class Discover extends React.Component {
     return (
       <div className='intro'>
         <Nav
-          bsStyle="tabs"
-          justified
+          variant="tabs"
+          justify
           activeKey={this.state.selected}
           onSelect={this._onSelect}
         >
-          <NavItem eventKey={1} title="iTunes Charts">iTunes</NavItem>
-          <NavItem eventKey={2} title="Spotify Charts">Spotify</NavItem>
+          <Nav.Item>
+            <Nav.Link eventKey={1} title="iTunes Charts">iTunes</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link eventKey={2} title="Spotify Charts">Spotify</Nav.Link>
+          </Nav.Item>
         </Nav>
         { this.state.selected === 1 ? <DiscoverItunes /> : <DiscoverSpotify /> }
       </div>
@@ -33,7 +37,7 @@ export default class Discover extends React.Component {
   @autobind
   _onSelect(selected) {
     this.setState({
-      selected
+      selected: Number(selected)
     });
   }
 }

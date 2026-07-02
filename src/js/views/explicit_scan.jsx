@@ -27,7 +27,7 @@ export default class ExplicitScan extends React.Component {
         <p>
           Use this page to do a full scan of your library and automatically mark any tracks as explicit.<br/>
           { !this.state.started &&
-            <Button bsStyle='primary' style={({marginTop: '10px'})} onClick={this._startScan}>Run Scan</Button>
+            <Button variant='primary' style={({marginTop: '10px'})} onClick={this._startScan}>Run Scan</Button>
           }
         </p>
         { ExplicitScanner.instance.inProgress() && <p>

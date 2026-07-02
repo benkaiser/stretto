@@ -29,7 +29,7 @@ export default class ArtistsManage extends React.Component {
               <Link className='btn btn-primary' to='/artists/add'>Artist Suggestions</Link>
             </div>
         </div>
-        { this.state.error && <Alert bsStyle='danger'>
+        { this.state.error && <Alert variant='danger'>
           <strong>{this.state.error}</strong>
         </Alert> }
         { this.state.artists &&

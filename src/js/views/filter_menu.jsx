@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Dropdown, MenuItem } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import autobind from 'autobind-decorator';
 import Song from '../models/song';
 
@@ -14,13 +14,13 @@ export default class FilterMenu extends React.Component {
 
   render() {
     return (
-      <Dropdown title='Filter' className='pull-right' id={this.props.id} onSelect={this._onFilter}>
-        <Dropdown.Toggle noCaret={this.props.navbar} bsStyle='link' className={this.props.navbar ? 'navbar-toggle' : ''}>
+      <Dropdown className='float-end' id={this.props.id} onSelect={this._onFilter}>
+        <Dropdown.Toggle variant='link' className={this.props.navbar ? 'navbar-toggler no-caret' : ''}>
           <i className="fa fa-filter"></i>
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          <MenuItem eventKey="offlineOnly">{ this.state.offlineOnly ? <i className="fa fa-check"></i> : <i className="fa fa-times"></i> } Offline Only</MenuItem>
-          <MenuItem eventKey="cleanOnly">{ this.state.cleanOnly ? <i className="fa fa-check"></i> : <i className="fa fa-times"></i> } Clean Only</MenuItem>
+          <Dropdown.Item eventKey="offlineOnly">{ this.state.offlineOnly ? <i className="fa fa-check"></i> : <i className="fa fa-times"></i> } Offline Only</Dropdown.Item>
+          <Dropdown.Item eventKey="cleanOnly">{ this.state.cleanOnly ? <i className="fa fa-check"></i> : <i className="fa fa-times"></i> } Clean Only</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
     );

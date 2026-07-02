@@ -3,7 +3,6 @@ import { withRouter } from 'react-router-dom'
 import autobind from 'autobind-decorator';
 import Alerter from '../services/alerter';
 import Bootbox from '../services/bootbox';
-import MenuItem from 'react-bootstrap/lib/MenuItem';
 import Lyrics from '../services/lyrics';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
@@ -14,6 +13,19 @@ import Utilities from '../utilities';
 
 const DROPDOWN_MAX_HEIGHT = 400;
 const DROPDOWN_MAX_WIDTH = 250;
+
+// Lightweight Bootstrap 5 dropdown item used inside the manually positioned
+// context menu (this menu is not rendered inside a react-bootstrap Dropdown).
+function MenuItem({ header, onClick, children }) {
+  if (header) {
+    return <li className='dropdown-header'>{ children }</li>;
+  }
+  return (
+    <li>
+      <button type='button' className='dropdown-item' onClick={onClick}>{ children }</button>
+    </li>
+  );
+}
 
 class ContextMenu extends React.Component {
   constructor(props) {

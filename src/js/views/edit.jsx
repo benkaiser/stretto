@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, ButtonToolbar, DropdownButton, Media, MenuItem, Tabs, Tab } from 'react-bootstrap';
+import { Button, ButtonToolbar, DropdownButton, Dropdown, Tabs, Tab } from 'react-bootstrap';
 import Player from '../services/player';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
@@ -39,8 +39,8 @@ export default class Edit extends React.Component {
           <div className='col-sm-12'>
             <h3>
               Edit Track
-              <Button className='pull-right' bsStyle='primary' onClick={this.save}>Save</Button>
-              <Button className='pull-right cancelButton' bsStyle='default' onClick={this.cancel}>Cancel</Button>
+              <Button className='float-end' variant='primary' onClick={this.save}>Save</Button>
+              <Button className='float-end cancelButton' variant='secondary' onClick={this.cancel}>Cancel</Button>
             </h3>
             <Tabs defaultActiveKey={1} id='editingtabs'>
               <Tab eventKey={1} title='Information'>{this.informationTab()}</Tab>
@@ -295,27 +295,27 @@ export default class Edit extends React.Component {
   @autobind
   suggestionItem(item) {
     return (
-      <Media key={'editItem' + item.id}>
-        <Media.Left>
+      <div className='media d-flex' key={'editItem' + item.id}>
+        <div className='flex-shrink-0'>
           <img className='media-object preview-thumbnail' src={item.thumbnail}/>
-        </Media.Left>
-        <Media.Body>
-          <Media.Heading className='media-heading'>{item.title}</Media.Heading>
+        </div>
+        <div className='media-body flex-grow-1 ms-3'>
+          <h4 className='media-heading'>{item.title}</h4>
           <p>
             Artist: {item.channel}
           </p>
           <ButtonToolbar>
-            <Button bsSize='small' bsStyle='primary' onClick={this.playTrack.bind(this, item)}>Play Track</Button>
-            <DropdownButton id='useItemDropdown' bsSize='small' title='Use Metadata'>
-              <MenuItem onClick={this.changeAllInfo.bind(this, item)}>All</MenuItem>
-              <MenuItem onClick={this.changeInfo.bind(this, 'url', item.url)}>Only backing track</MenuItem>
-              <MenuItem onClick={this.changeInfo.bind(this, 'cover', item.thumbnail)}>Only cover</MenuItem>
-              <MenuItem onClick={this.changeInfo.bind(this, 'title', item.title)}>Only title</MenuItem>
-              <MenuItem onClick={this.changeInfo.bind(this, 'artist', item.channel)}>Only channel for artist</MenuItem>
+            <Button size='sm' variant='primary' onClick={this.playTrack.bind(this, item)}>Play Track</Button>
+            <DropdownButton id='useItemDropdown' size='sm' title='Use Metadata'>
+              <Dropdown.Item onClick={this.changeAllInfo.bind(this, item)}>All</Dropdown.Item>
+              <Dropdown.Item onClick={this.changeInfo.bind(this, 'url', item.url)}>Only backing track</Dropdown.Item>
+              <Dropdown.Item onClick={this.changeInfo.bind(this, 'cover', item.thumbnail)}>Only cover</Dropdown.Item>
+              <Dropdown.Item onClick={this.changeInfo.bind(this, 'title', item.title)}>Only title</Dropdown.Item>
+              <Dropdown.Item onClick={this.changeInfo.bind(this, 'artist', item.channel)}>Only channel for artist</Dropdown.Item>
             </DropdownButton>
           </ButtonToolbar>
-        </Media.Body>
-      </Media>
+        </div>
+      </div>
     );
   }
 

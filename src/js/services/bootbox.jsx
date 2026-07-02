@@ -1,6 +1,6 @@
 import * as React from 'react';
 import autobind from 'autobind-decorator';
-import bsn from 'bootstrap.native';
+import { Modal, Button } from 'react-bootstrap';
 
 const TYPES = {
   CONFIRM: 1,
@@ -17,53 +17,35 @@ export default class Bootbox extends React.Component {
     Bootbox._component = this;
     loadedResolve();
     this.state = {
+      show: false,
       value: ''
     };
   }
 
   render() {
-    const closeBtn = (
-      <button
-        aria-label='Close'
-        className='close'
-        onClick={this.onCancel}
-        type='button'>
-        <span aria-hidden='true'>&times;</span>
-      </button>
-    );
-
+    const hasHeader = this.state.type === TYPES.PROMPT || this.state.type === TYPES.SHOW;
     return (
-      <div className='modal fade' ref={(modal) => this.modal = modal} tabIndex='-1' role='dialog' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
-            { (this.state.type === TYPES.PROMPT || this.state.type === TYPES.SHOW) &&
-              <div className='modal-header'>
-                { closeBtn }
-                <h4 className='modal-title'>{this.state.message}</h4>
-              </div>
-            }
-            <div className='modal-body'>
-              { this.state.type === TYPES.CONFIRM  && closeBtn }
-              { this.state.type === TYPES.PROMPT &&
-                <input className='form-control' autoComplete='off' type='text' value={this.state.value} onChange={this.handleChange}  /> }
-              { this.state.type === TYPES.CONFIRM &&
-                <p>{this.state.message}</p> }
-              { this.state.type === TYPES.SHOW && this.state.contents }
-            </div>
-            { this.state.type !== TYPES.SHOW &&
-              <div className='modal-footer'>
-                <button type='button' className='btn btn-default' onClick={this.onCancel}>Cancel</button>
-                <button type='button' className='btn btn-primary' onClick={this.onSuccess}>OK</button>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
+      <Modal show={this.state.show} onHide={this.onCancel}>
+        { hasHeader &&
+          <Modal.Header closeButton>
+            <Modal.Title>{this.state.message}</Modal.Title>
+          </Modal.Header>
+        }
+        <Modal.Body>
+          { this.state.type === TYPES.PROMPT &&
+            <input className='form-control' autoComplete='off' type='text' value={this.state.value} onChange={this.handleChange} /> }
+          { this.state.type === TYPES.CONFIRM &&
+            <p>{this.state.message}</p> }
+          { this.state.type === TYPES.SHOW && this.state.contents }
+        </Modal.Body>
+        { this.state.type !== TYPES.SHOW &&
+          <Modal.Footer>
+            <Button variant='secondary' onClick={this.onCancel}>Cancel</Button>
+            <Button variant='primary' onClick={this.onSuccess}>OK</Button>
+          </Modal.Footer>
+        }
+      </Modal>
     );
-  }
-
-  componentDidMount() {
-    this.bsModal = new bsn.Modal(this.modal);
   }
 
   @autobind
@@ -93,41 +75,41 @@ export default class Bootbox extends React.Component {
   confirm(message) {
     return new Promise((resolve) => {
       this.setState({
+        show: true,
         type: TYPES.CONFIRM,
         message: message,
         successCallback: resolve
       });
-      this.bsModal.show();
     })
   }
 
   prompt(message, options = {}) {
     return new Promise((resolve) => {
       this.setState({
+        show: true,
         type: TYPES.PROMPT,
         message: message,
         successCallback: resolve,
         value: options.value || ''
       });
-      this.bsModal.show();
     });
   }
 
   show(header, contents) {
     this.setState({
+      show: true,
       type: TYPES.SHOW,
       contents: contents,
       message: header
     });
-    this.bsModal.show();
   }
 
   reset() {
     this.setState({
+      show: false,
       message: undefined,
       value: ''
     });
-    this.bsModal.hide();
   }
 
   static confirm(message) {

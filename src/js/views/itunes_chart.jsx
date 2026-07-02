@@ -56,7 +56,7 @@ export default class ItunesChart extends React.Component {
           })}
           </ListGroup>
           { !this.state.loadedAll &&
-            <Button bsStyle="primary" block onClick={this._loadMore}>
+            <Button variant="primary" className="w-100" onClick={this._loadMore}>
               Load All
             </Button>
           }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Label } from 'react-bootstrap';
+import { Button, Badge } from 'react-bootstrap';
 import Itunes from '../services/itunes';
 import Youtube from '../services/youtube';
 import Playlist from '../models/playlist';
@@ -46,7 +46,7 @@ export default class Search extends PlaylistView {
       <>
         { song.inLibrary && (
           <div className='lyric-label'>
-            <Label bsStyle="success">In Library</Label>
+            <Badge bg="success">In Library</Badge>
           </div>
         ) }
       </>
@@ -58,12 +58,12 @@ export default class Search extends PlaylistView {
       <div className='buttons'>
         <MobileOnly><SearchBox /></MobileOnly>
         { this.state.showLibrary
-          ? <Button onClick={this._showLibrary.bind(this, false)} bsStyle='primary'>Include Songs Outside Library</Button>
-          : <Button onClick={this._showLibrary.bind(this, true)} bsStyle='primary'>Show Library Only</Button> }
+          ? <Button onClick={this._showLibrary.bind(this, false)} variant='primary'>Include Songs Outside Library</Button>
+          : <Button onClick={this._showLibrary.bind(this, true)} variant='primary'>Show Library Only</Button> }
         { !this.state.showLibrary && (
           this.state.searchSource === 'youtube'
-            ? <Button onClick={this._setSearchSource.bind(this, 'itunes')} bsStyle='default'>Search iTunes Instead</Button>
-            : <Button onClick={this._setSearchSource.bind(this, 'youtube')} bsStyle='default'>Search YouTube Instead</Button>
+            ? <Button onClick={this._setSearchSource.bind(this, 'itunes')} variant='secondary'>Search iTunes Instead</Button>
+            : <Button onClick={this._setSearchSource.bind(this, 'youtube')} variant='secondary'>Search YouTube Instead</Button>
         ) }
       </div>
     );

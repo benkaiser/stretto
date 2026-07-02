@@ -7,7 +7,7 @@ export default class Intro extends React.Component {
     const message = this.props.location && this.props.location.state && this.props.location.state.error && this.props.location.state.error.message
     return (
       <div className='intro'>
-        <Alert bsStyle='danger'>
+        <Alert variant='danger'>
           <strong>Oh no!</strong> We hit an error: {message}
         </Alert>
       </div>

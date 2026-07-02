@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Dropdown, Label, MenuItem } from 'react-bootstrap';
+import { Dropdown, Badge } from 'react-bootstrap';
 import getHistory from 'react-router-global-history';
 import Bootbox from '../services/bootbox';
 import FilterMenu from './filter_menu';
@@ -24,25 +24,25 @@ export default class Sidebar extends React.Component {
             <Link to='/' className='logoText'>Stretto</Link>
             <Link className='sidebar-icon' to='/settings/' title='Settings'><i className="fa fa-cog"></i></Link>
             <FilterMenu id='dropdown-import-sidebar' />
-            <Dropdown title='Add music' className='pull-right' id={`dropdown-import-sidebar`} onSelect={this._onSelect}>
-              <Dropdown.Toggle bsStyle='link'>
+            <Dropdown className='float-end' id={`dropdown-import-sidebar`} onSelect={this._onSelect}>
+              <Dropdown.Toggle variant='link'>
                 <i className="fa fa-plus"></i>
               </Dropdown.Toggle>
               <Dropdown.Menu className='dropdown-sidebar-menu'>
-                <MenuItem eventKey="/spotify">From Spotify</MenuItem>
-                <MenuItem eventKey="/add">From YouTube/Soundcloud/Audius</MenuItem>
-                <MenuItem eventKey="/discover">From Top Charts</MenuItem>
+                <Dropdown.Item eventKey="/spotify">From Spotify</Dropdown.Item>
+                <Dropdown.Item eventKey="/add">From YouTube/Soundcloud/Audius</Dropdown.Item>
+                <Dropdown.Item eventKey="/discover">From Top Charts</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
             <Link className='sidebar-icon' to='/sync/' title='Sync to Cloud'><i className="fa fa-refresh"></i></Link>
           </h3>
           <SearchBox />
-          <ul className='nav nav-pills nav-stacked'>
+          <ul className='nav nav-pills flex-column'>
             {/* Soundcloud doesn't work currently, remove from sidebar */}
             {/* <li key='soundcloud'><Link to='/soundcloud'>Soundcloud</Link></li> */}
             <li key='discover'><Link to='/discover'>Top Charts</Link></li>
             <li key='artists'><Link to='/artists/manage'>Artists</Link></li>
-            <li className='dropdown-header'>Your Music <Label className='addPlaylist' bsStyle="default" onClick={this.addNewPlaylist}>Add Playlist</Label></li>
+            <li className='dropdown-header'>Your Music <Badge className='addPlaylist' bg="secondary" onClick={this.addNewPlaylist}>Add Playlist</Badge></li>
             { Playlist.fetchAll().map((playlist) =>
               <li key={'playlist_' + playlist.title}>
                 <Link to={'/playlist/' + encodeURIComponent(playlist.title)}>

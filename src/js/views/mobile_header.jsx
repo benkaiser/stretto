@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Dropdown, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import getHistory from 'react-router-global-history';
 import autobind from 'autobind-decorator';
@@ -9,35 +9,33 @@ import FilterMenu from './filter_menu';
 export default class MobileHeader extends React.Component {
   render() {
     return (
-      <Navbar collapseOnSelect fixedTop>
-        <Navbar.Header>
-          <Navbar.Brand>
-            <Link to='/home' className='logoText'>Stretto</Link>
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls='basic-nav' />
-          <FilterMenu navbar />
-        </Navbar.Header>
+      <Navbar collapseOnSelect fixed='top' expand={false}>
+        <Navbar.Brand>
+          <Link to='/home' className='logoText'>Stretto</Link>
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls='basic-nav' />
+        <FilterMenu navbar />
         <Navbar.Collapse id='basic-nav'>
           <Nav onSelect={this._onSelect}>
-            <NavItem eventKey='/search/'>Search</NavItem>
-            <NavItem eventKey={`/playlist/${Playlist.LIBRARY}`}>{ Playlist.LIBRARY }</NavItem>
-            <NavDropdown title='Playlists' id='basic-nav-dropdown' onSelect={this._onSelect}>
+            <Nav.Link eventKey='/search/'>Search</Nav.Link>
+            <Nav.Link eventKey={`/playlist/${Playlist.LIBRARY}`}>{ Playlist.LIBRARY }</Nav.Link>
+            <NavDropdown title='Playlists' id='basic-nav-dropdown'>
               { Playlist.fetchAll().filter(playlist => playlist.title !== Playlist.LIBRARY).map((playlist) =>
-                <MenuItem key={'playlist_' + playlist.title} eventKey={'/playlist/' + encodeURIComponent(playlist.title)}>
+                <NavDropdown.Item key={'playlist_' + playlist.title} eventKey={'/playlist/' + encodeURIComponent(playlist.title)}>
                   { playlist.title }
-                </MenuItem>
+                </NavDropdown.Item>
               ) }
-              <MenuItem divider />
+              <NavDropdown.Divider />
             </NavDropdown>
-            <NavDropdown title='Add from' id='add-from-dropdown' onSelect={this._onSelect}>
-                <MenuItem eventKey='/add'>From Youtube/Soundcloud</MenuItem>
-                <MenuItem eventKey='/discover'>From Top Charts</MenuItem>
-                <MenuItem eventKey='/spotify'>From Spotify</MenuItem>
+            <NavDropdown title='Add from' id='add-from-dropdown'>
+                <NavDropdown.Item eventKey='/add'>From Youtube/Soundcloud</NavDropdown.Item>
+                <NavDropdown.Item eventKey='/discover'>From Top Charts</NavDropdown.Item>
+                <NavDropdown.Item eventKey='/spotify'>From Spotify</NavDropdown.Item>
             </NavDropdown>
-            <NavItem eventKey='/soundcloud'>Soundcloud</NavItem>
-            <NavItem eventKey='/artists/feed'>Artists Feed</NavItem>
-            <NavItem eventKey='/sync/'>Sync</NavItem>
-            <NavItem eventKey='/settings/'>Settings</NavItem>
+            <Nav.Link eventKey='/soundcloud'>Soundcloud</Nav.Link>
+            <Nav.Link eventKey='/artists/feed'>Artists Feed</Nav.Link>
+            <Nav.Link eventKey='/sync/'>Sync</Nav.Link>
+            <Nav.Link eventKey='/settings/'>Settings</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>

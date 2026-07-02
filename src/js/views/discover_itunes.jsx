@@ -1,6 +1,6 @@
 import * as React from 'react';
 import autobind from 'autobind-decorator';
-import { Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
+import { Col, DropdownButton, Dropdown, Row } from 'react-bootstrap';
 import ItunesChart from './itunes_chart';
 
 const genres = {
@@ -54,16 +54,16 @@ export default class DiscoverItunes extends React.Component {
         <Col md={6} xs={12}>
           <h2>Top {genres[this.state.genreNumber]} 
 
-          <div className='pull-right'>
+          <div className='float-end'>
             <DropdownButton
-              pullRight
-              bsStyle='default'
+              align="end"
+              variant='secondary'
               title={'Change Genre'}
               onSelect={this.onSelectGenre}
               id='genre-dropdown'
             >
               { Object.keys(genres).map(key => 
-                <MenuItem key={key} eventKey={key} active={this.state.genreNumber == key}>{genres[key]}</MenuItem>
+                <Dropdown.Item key={key} eventKey={key} active={this.state.genreNumber == key}>{genres[key]}</Dropdown.Item>
               ) }
             </DropdownButton>
           </div>

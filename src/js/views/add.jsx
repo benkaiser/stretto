@@ -41,7 +41,7 @@ export default class Add extends React.Component {
           <div><Spinner name='line-scale' /></div>
         }
         { this.state.error &&
-          <Alert bsStyle='danger'>
+          <Alert variant='danger'>
             <strong>Oh no!</strong> Looks like we are {this.state.error}
           </Alert>
         }

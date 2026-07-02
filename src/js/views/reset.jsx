@@ -17,20 +17,20 @@ export default class Import extends React.Component {
         <h1>Password Reset</h1>
         { !this.state.resetCompleted ?
           <div className='form-horizontal'>
-            <div className='form-group'>
-              <label className='col-sm-2 control-label'>Confirm Email</label>
+            <div className='form-group row'>
+              <label className='col-sm-2 col-form-label'>Confirm Email</label>
               <div className='col-sm-10 col-md-3'>
                 <input type='text' id='email' ref={this._emailRef} className='form-control' placeholder='john@doe.com' />
               </div>
             </div>
-            <div className='form-group'>
-              <label className='col-sm-2 control-label'>New Password</label>
+            <div className='form-group row'>
+              <label className='col-sm-2 col-form-label'>New Password</label>
               <div className='col-sm-10 col-md-3'>
                 <input type='password' id='password' ref={this._passwordRef} className='form-control' />
               </div>
             </div>
-            <div className='form-group'>
-              <div className='col-sm-offset-2 col-sm-10 col-md-3'>
+            <div className='form-group row'>
+              <div className='offset-sm-2 col-sm-10 col-md-3'>
                 <button className='btn btn-primary' onClick={this.resetPassword}>Reset Password</button>
               </div>
             </div>

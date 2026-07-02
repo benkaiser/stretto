@@ -21,20 +21,20 @@ export default class Import extends React.Component {
         { !this.state.strettoSignedIn ?
           <div className='form-horizontal'>
             <p>A Stretto account is useful for syncing your music library between devices.</p>
-            <div className='form-group'>
-              <label className='col-sm-2 control-label'>Email</label>
+            <div className='form-group row'>
+              <label className='col-sm-2 col-form-label'>Email</label>
               <div className='col-sm-10 col-md-3'>
                 <input type='text' id='email' ref={this._emailRef} className='form-control' placeholder='john@doe.com' />
               </div>
             </div>
-            <div className='form-group'>
-              <label className='col-sm-2 control-label'>Password</label>
+            <div className='form-group row'>
+              <label className='col-sm-2 col-form-label'>Password</label>
               <div className='col-sm-10 col-md-3'>
                 <input type='password' id='password' ref={this._passwordRef} className='form-control' />
               </div>
             </div>
-            <div className='form-group'>
-              <div className='col-sm-offset-2 col-sm-10 col-md-3'>
+            <div className='form-group row'>
+              <div className='offset-sm-2 col-sm-10 col-md-3'>
                 { this.state.errorMessage && <div className='sync-info text-danger'>{ this.state.errorMessage }</div> }
                 { this.state.infoMessage && <div className='sync-info text-info'>{ this.state.infoMessage }</div> }
                 <button className='btn btn-primary' onClick={this.loginStretto}>Login</button>
@@ -42,13 +42,13 @@ export default class Import extends React.Component {
                 <button className='btn btn-link' onClick={this.forgotPassword}>Forgot Password</button>
               </div>
             </div>
-            <div className='form-group'>
-              <div className='col-sm-offset-2 col-sm-10 col-md-3'>
+            <div className='form-group row'>
+              <div className='offset-sm-2 col-sm-10 col-md-3'>
                 <p className='text-muted'>Note: To switch to a Stretto account from signing in with Google, enter your email and use the forgot password link</p>
               </div>
             </div>
-            <div className='form-group'>
-              <label className='col-sm-2 control-label'>Login with Google</label>
+            <div className='form-group row'>
+              <label className='col-sm-2 col-form-label'>Login with Google</label>
               <div className='col-sm-10'>
                 <div ref={this.renderGoogleButton} id='google-signin-button'></div>
               </div>

@@ -1,11 +1,14 @@
 export default class Theme {
   static initialise() {
-    const theme = new Theme(localStorage.getItem('theme') || 'cerulean');
+    const theme = new Theme(Theme.currentTheme());
     theme.load();
   }
 
   static currentTheme() {
-    return localStorage.getItem('theme') || 'cerulean';
+    const stored = localStorage.getItem('theme') || 'cerulean';
+    // Some Bootswatch 3 themes (e.g. paper, readable) no longer exist in
+    // Bootswatch 5; fall back to the default for any unknown theme.
+    return Theme.themes().includes(stored) ? stored : 'cerulean';
   }
 
   static themes() {
@@ -16,42 +19,60 @@ export default class Theme {
       'darkly',
       'flatly',
       'journal',
+      'litera',
       'lumen',
-      'paper',
-      'readable',
+      'lux',
+      'materia',
+      'minty',
+      'morph',
+      'pulse',
+      'quartz',
       'sandstone',
       'simplex',
+      'sketchy',
       'slate',
+      'solar',
       'spacelab',
       'superhero',
       'united',
-      'yeti'
+      'vapor',
+      'yeti',
+      'zephyr'
     ];
   }
 
   static themeAppColor() {
     return {
-      cerulean: '#54b4eb',
-      cosmo: '#222222',
+      cerulean: '#2fa4e7',
+      cosmo: '#2780e3',
       cyborg: '#060606',
       darkly: '#375a7f',
       flatly: '#2c3e50',
-      journal: '#ffffff',
-      lumen: '#f8f8f8',
-      paper: '#ffffff',
-      readable: '#ffffff',
-      sandstone: '#3e3f3a',
-      simplex: '#ffffff',
-      slate: '#484e55',
-      spacelab: '#fff',
+      journal: '#eb6864',
+      litera: '#ffffff',
+      lumen: '#158cba',
+      lux: '#1a1a1a',
+      materia: '#2196f3',
+      minty: '#78c2ad',
+      morph: '#378dfc',
+      pulse: '#593196',
+      quartz: '#e83283',
+      sandstone: '#325d88',
+      simplex: '#d9230f',
+      sketchy: '#333333',
+      slate: '#3a3f44',
+      solar: '#002b36',
+      spacelab: '#446e9b',
       superhero: '#4e5d6c',
       united: '#e95420',
-      yeti: '#333333'
+      vapor: '#1a0933',
+      yeti: '#008cba',
+      zephyr: '#3459e6'
     };
   }
 
   static themeOverrides() {
-    const overrideNavbarColor = '@media (max-width: 767px) { .navbar .dropdown-menu a { color: #000; } }';
+    const overrideNavbarColor = '@media (max-width: 767px) { .navbar .dropdown-menu .dropdown-item { color: #000; } }';
     return {
       cerulean: overrideNavbarColor,
       united: overrideNavbarColor,
@@ -64,7 +85,7 @@ export default class Theme {
 
   load() {
     localStorage.setItem('theme', this.name);
-    document.getElementById('theme').href = `https://cdn.jsdelivr.net/npm/bootswatch@3.4.1/${this.name}/bootstrap.min.css`;
+    document.getElementById('theme').href = `https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/${this.name}/bootstrap.min.css`;
     document.querySelector('meta[name=theme-color]').setAttribute('content', Theme.themeAppColor()[this.name]);
     const override = Theme.themeOverrides()[this.name] || '';
     document.getElementById('theme-overrides').innerHTML = override;

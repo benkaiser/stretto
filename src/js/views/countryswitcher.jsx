@@ -6,10 +6,10 @@ export default class CountrySwitcher extends React.Component {
   render() {
     const countries = Country.countries();
     return (
-      <div className='form-group'>
-        <label className='col-sm-2 control-label' title='used for showing top charts and search'>Country</label>
+      <div className='form-group row'>
+        <label className='col-sm-2 col-form-label' title='used for showing top charts and search'>Country</label>
         <div className='col-sm-10'>
-          <select className='form-control input-sm' onChange={this.changeLanguage} defaultValue={Country.current()}>
+          <select className='form-select form-select-sm' onChange={this.changeLanguage} defaultValue={Country.current()}>
           {Object.keys(countries).map(country =>
             <option key={country} value={country}>{countries[country]}</option>
           )}

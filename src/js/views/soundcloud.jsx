@@ -28,7 +28,7 @@ export default class Soundcloud extends PlaylistView {
       return (
         <div className='intro'>
           { this.state.error &&
-            <Alert bsStyle='danger'>
+            <Alert variant='danger'>
               <strong>Oh snap!</strong> {this.state.error.toString()}
             </Alert>
           }
@@ -47,7 +47,7 @@ export default class Soundcloud extends PlaylistView {
   oauthRequest() {
     return (
       <div>
-        <Button bsStyle='primary' onClick={this._connectWithOAuth}>Connect with Soundcloud</Button>
+        <Button variant='primary' onClick={this._connectWithOAuth}>Connect with Soundcloud</Button>
       </div>
     )
   }
@@ -60,9 +60,9 @@ export default class Soundcloud extends PlaylistView {
           <FormControl
             type='text'
             placeholder='Token'
-            inputRef={this._tokenInput} />
+            ref={this._tokenInput} />
         </p>
-        <Button bsStyle='primary' onClick={this._onTokenSubmit}>Load Stream</Button>
+        <Button variant='primary' onClick={this._onTokenSubmit}>Load Stream</Button>
       </div>
     )
   }

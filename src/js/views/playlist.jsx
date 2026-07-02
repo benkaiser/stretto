@@ -1,5 +1,5 @@
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
-import { Button, Col, Label, DropdownButton, Panel, MenuItem, Row } from 'react-bootstrap';
+import { Button, Card, Col, Badge, DropdownButton, Dropdown, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import autobind from 'autobind-decorator';
 import moment from 'moment';
@@ -81,7 +81,7 @@ export default class PlaylistView extends React.Component {
         { this.allowPagination &&
           this.allowPagination() &&
           <Button
-            bsStyle='primary'
+            variant='primary'
             className={'paginate ' + (this.state.atBottom ? 'slideInUp' : 'slideOutDown')}
             onClick={this.paginationCallback.bind(this)}
           >
@@ -101,46 +101,46 @@ export default class PlaylistView extends React.Component {
         <p>There are no songs present in your library, let's add some!</p>
         <Row className='equalPanelRow'>
           <Col lg={4} md={6} sm={12}>
-            <Panel className='equalPanel' bsStyle="primary">
-              <Panel.Heading>
-                <Panel.Title componentClass="h3" className='introPanelTitle'>
+            <Card className='equalPanel' border="primary">
+              <Card.Header>
+                <Card.Title as="h3" className='introPanelTitle'>
                   <i className='fa fa-spotify' aria-hidden='true'></i>
                   <span className='titleSpan'>From Spotify</span>
-                </Panel.Title>
-              </Panel.Heading>
-              <Panel.Body>
+                </Card.Title>
+              </Card.Header>
+              <Card.Body>
                 <div className='panel-body-text'>Import all your favorite playlists from Spotify</div>
-                <Link className='btn btn-primary btn-block panel-cta' to='/spotify'>Import from Spotify</Link>
-              </Panel.Body>
-            </Panel>
+                <Link className='btn btn-primary w-100 panel-cta' to='/spotify'>Import from Spotify</Link>
+              </Card.Body>
+            </Card>
           </Col>
           <Col lg={4} md={6} sm={12}>
-            <Panel className='equalPanel' bsStyle="primary">
-              <Panel.Heading>
-                <Panel.Title componentClass="h3" className='introPanelTitle'>
+            <Card className='equalPanel' border="primary">
+              <Card.Header>
+                <Card.Title as="h3" className='introPanelTitle'>
                   <i className='fa fa-music' aria-hidden='true'></i>
                   <span className='titleSpan'>Top Charts</span>
-                </Panel.Title>
-              </Panel.Heading>
-              <Panel.Body>
+                </Card.Title>
+              </Card.Header>
+              <Card.Body>
                 <div className='panel-body-text'>With access to the top hits from iTunes and Spotify, you can always find new music</div>
-                <Link className='btn btn-primary btn-block panel-cta' to='/discover'>Discover Music</Link>
-              </Panel.Body>
-            </Panel>
+                <Link className='btn btn-primary w-100 panel-cta' to='/discover'>Discover Music</Link>
+              </Card.Body>
+            </Card>
           </Col>
           <Col lg={4} md={6} sm={12}>
-            <Panel className='equalPanel' bsStyle="primary">
-              <Panel.Heading>
-                <Panel.Title componentClass="h3" className='introPanelTitle'>
+            <Card className='equalPanel' border="primary">
+              <Card.Header>
+                <Card.Title as="h3" className='introPanelTitle'>
                   <i className='fa fa-headphones' aria-hidden='true'></i>
                   <span className='titleSpan'>From URL</span>
-                </Panel.Title>
-              </Panel.Heading>
-              <Panel.Body>
+                </Card.Title>
+              </Card.Header>
+              <Card.Body>
                 <div className='panel-body-text'>You can manually add songs by YouTube or SoundCloud URL. YouTube playlists work too.</div>
-                <Link className='btn btn-primary btn-block panel-cta' to='/add'>Add by URL</Link>
-              </Panel.Body>
-            </Panel>
+                <Link className='btn btn-primary w-100 panel-cta' to='/add'>Add by URL</Link>
+              </Card.Body>
+            </Card>
           </Col>
         </Row>
       </div>
@@ -256,15 +256,15 @@ export default class PlaylistView extends React.Component {
     return (
       <div>
         <DropdownButton id='playlist-dropdown' title='Options'>
-          <MenuItem onClick={this.onDelete}>Delete playlist</MenuItem>
-          <MenuItem onClick={this.onRename}>Rename playlist</MenuItem>
-          <MenuItem onClick={this.sharePlaylist}>Share Playlist</MenuItem>
-          <MenuItem onClick={this.downloadPlaylist}>Download Offline Items</MenuItem>
+          <Dropdown.Item onClick={this.onDelete}>Delete playlist</Dropdown.Item>
+          <Dropdown.Item onClick={this.onRename}>Rename playlist</Dropdown.Item>
+          <Dropdown.Item onClick={this.sharePlaylist}>Share Playlist</Dropdown.Item>
+          <Dropdown.Item onClick={this.downloadPlaylist}>Download Offline Items</Dropdown.Item>
           <li className='dropdown-submenu'>
             <a href='#' onClick={this._preventDefault}>Copy song info to clipboard</a>
             <ul className='dropdown-menu'>
-              <MenuItem onClick={this.copyAsPlainText}>as plain text</MenuItem>
-              <MenuItem onClick={this.copyAsJson}>as JSON</MenuItem>
+              <Dropdown.Item onClick={this.copyAsPlainText}>as plain text</Dropdown.Item>
+              <Dropdown.Item onClick={this.copyAsJson}>as JSON</Dropdown.Item>
             </ul>
           </li>
         </DropdownButton>
@@ -554,7 +554,7 @@ export default class PlaylistView extends React.Component {
   _explicitIcon() {
     return (
       <div className='airplane-label'>
-        <span className="label label-danger">E</span>
+        <span className="badge bg-danger">E</span>
       </div>
     );
   }
@@ -563,7 +563,7 @@ export default class PlaylistView extends React.Component {
     const failed = Lyrics.status === 'failed';
     return (
       <div className='lyric-label'>
-        <Label bsStyle={failed ? 'warning' : 'info'} onClick={this._onLyricsClick}>Lyrics</Label>
+        <Badge bg={failed ? 'warning' : 'info'} onClick={this._onLyricsClick}>Lyrics</Badge>
       </div>
     );
   }

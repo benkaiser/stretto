@@ -1,9 +1,6 @@
 import * as React from 'react';
 import {
-  Form,
   FormControl,
-  FormGroup,
-  Glyphicon,
   InputGroup
 } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom'
@@ -30,14 +27,14 @@ class SearchBox extends React.Component {
   render() {
     return (
       <div className='searchContainer'>
-        <InputGroup className='searchBox' bsSize='sm'>
-          <InputGroup.Addon><Glyphicon glyph='search' /></InputGroup.Addon>
+        <InputGroup className='searchBox' size='sm'>
+          <InputGroup.Text><i className="fa fa-search"></i></InputGroup.Text>
           <FormControl
             type='text'
             value={this.state.value}
             placeholder='Search'
             onChange={this._handleChange}
-            inputRef={(ref) => this._inputRef = ref } />
+            ref={(ref) => this._inputRef = ref } />
         </InputGroup>
       </div>
     );

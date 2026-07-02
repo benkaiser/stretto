@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Spinner from 'react-spinkit';
-import { Alert, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Alert, DropdownButton, Dropdown } from 'react-bootstrap';
 import Alerter from '../services/alerter';
 import Youtube from '../services/youtube';
 import Playlist from '../models/playlist';
@@ -65,7 +65,7 @@ export default class YoutubeMix extends PlaylistView {
       return (
         <div className='intro'>
           { this.header() }
-          <Alert bsStyle='danger'>
+          <Alert variant='danger'>
             <strong>Oh snap!</strong> {this.state.error}
           </Alert>
         </div>
@@ -101,8 +101,8 @@ export default class YoutubeMix extends PlaylistView {
     return (
       <div>
         <DropdownButton id='playlist-dropdown' title='Options'>
-          <MenuItem onClick={this.addToLibrary}>Add all Songs to Library</MenuItem>
-          <MenuItem onClick={this.toStrettoPlaylist}>Create Stretto Playlist</MenuItem>
+          <Dropdown.Item onClick={this.addToLibrary}>Add all Songs to Library</Dropdown.Item>
+          <Dropdown.Item onClick={this.toStrettoPlaylist}>Create Stretto Playlist</Dropdown.Item>
         </DropdownButton>
       </div>
     );

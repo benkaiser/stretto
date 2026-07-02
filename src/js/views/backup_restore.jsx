@@ -17,7 +17,7 @@ export default class BackupRestore extends React.Component {
         <p>
           Use this feature to download your raw song and playlist data. It can then be re-imported here also.<br/>
           You may find this useful if you need to move your data between accounts or export it into an editable form to import into other music players.<br/>
-          <Button bsStyle='primary' style={({marginTop: '10px'})} onClick={this._export}>Download your data</Button><br/>
+          <Button variant='primary' style={({marginTop: '10px'})} onClick={this._export}>Download your data</Button><br/>
           <label className='btn btn-primary' style={({marginTop: '10px'})} htmlFor='file'>Import Data</label>
           <input id='file' style={{ visibility: 'hidden' }} type='file' onChange={this._import} />
         </p>

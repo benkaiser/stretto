@@ -60,7 +60,7 @@ export default class Spotify extends React.Component {
       return <Spinner name='line-scale' />;
     }
     return (
-      <Button bsStyle='primary' onClick={this._login}>Connect to Spotify</Button>
+      <Button variant='primary' onClick={this._login}>Connect to Spotify</Button>
     );
   }
 
@@ -78,9 +78,9 @@ export default class Spotify extends React.Component {
       <div>
         <h2>Playlists</h2>
         <p>
-          <Button bsStyle='primary' onClick={this._sync}>Sync</Button>
-          <Button bsStyle='link' onClick={this._selectAll}>Check All</Button>
-          <Button bsStyle='link' onClick={this._deselectAll}>Uncheck All</Button>
+          <Button variant='primary' onClick={this._sync}>Sync</Button>
+          <Button variant='link' onClick={this._selectAll}>Check All</Button>
+          <Button variant='link' onClick={this._deselectAll}>Uncheck All</Button>
         </p>
         <FormGroup>
           <ToggleButtonGroup
@@ -90,7 +90,7 @@ export default class Spotify extends React.Component {
             vertical
           >
           { this.state.playlists.map((playlist) => {
-            return <ToggleButton key={playlist.id} value={playlist.id}>{playlist.name} ({playlist.tracks.total} tracks)</ToggleButton>
+            return <ToggleButton id={`spotify-playlist-${playlist.id}`} key={playlist.id} value={playlist.id}>{playlist.name} ({playlist.tracks.total} tracks)</ToggleButton>
           }) }
           </ToggleButtonGroup>
         </FormGroup>
@@ -120,7 +120,7 @@ export default class Spotify extends React.Component {
         { state && <ProgressBar now={progress} label={`${progress.toFixed(0)}%`} /> }
         { (state) ?
           <>
-            { !inProgress && <Button bsStyle='primary' onClick={this._syncMore}>Sync More Playlists</Button>}
+            { !inProgress && <Button variant='primary' onClick={this._syncMore}>Sync More Playlists</Button>}
             <ListGroup>
               { Object.keys(state).map((songKey) => {
                 const song = state[songKey];
@@ -135,7 +135,7 @@ export default class Spotify extends React.Component {
                 return <ListGroupItem key={songKey}>{ songState } { song.artist } - { song.title }</ListGroupItem>;
               }) }
             </ListGroup>
-            { !inProgress && <Button bsStyle='primary' onClick={this._syncMore}>Sync More Playlists</Button>}
+            { !inProgress && <Button variant='primary' onClick={this._syncMore}>Sync More Playlists</Button>}
           </>
           : <Spinner name='line-scale' />
         }

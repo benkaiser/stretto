@@ -4,10 +4,10 @@ import Theme from '../theme';
 export default class ThemeSwitcher extends React.Component {
   render() {
     return (
-      <div className='form-group'>
-        <label className='col-sm-2 control-label'>Theme</label>
+      <div className='form-group row'>
+        <label className='col-sm-2 col-form-label'>Theme</label>
         <div className='col-sm-10'>
-          <select className='form-control input-sm' onChange={this.loadTheme.bind(this)} defaultValue={Theme.currentTheme()}>
+          <select className='form-select form-select-sm' onChange={this.loadTheme.bind(this)} defaultValue={Theme.currentTheme()}>
           {Theme.themes().map((theme) =>
             <option key={theme} value={theme}>{theme}</option>
           )}

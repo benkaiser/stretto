@@ -19,7 +19,7 @@ export default class ArtistsFeed extends PlaylistView {
       return (
         <div className='intro'>
           { this.header() }
-          <Alert bsStyle='danger'>
+          <Alert variant='danger'>
             <strong>Oh snap!</strong> {this.state.error}
           </Alert>
         </div>

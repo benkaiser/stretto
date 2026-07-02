@@ -37,7 +37,7 @@ export default class DiscoverSpotify extends React.Component {
   showConnect() {
     return (
       <div style={({ marginTop: 20})} className='text-center'>
-        <Button bsStyle='primary' onClick={this._login}>Connect to Spotify</Button>
+        <Button variant='primary' onClick={this._login}>Connect to Spotify</Button>
       </div>
     );
   }

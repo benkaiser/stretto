@@ -36,7 +36,7 @@ export default class ArtistSuggestions extends React.Component {
           </React.Fragment>
         }
         { this.state.error &&
-          <Alert bsStyle='danger'>
+          <Alert variant='danger'>
             <strong>{this.state.error}</strong>
           </Alert>
         }

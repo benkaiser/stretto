@@ -53,8 +53,8 @@ class AlertTemplate extends React.Component {
     let type = options.type;
     type == 'error' && (type = 'danger');
     return (
-      <div style={style} className={'alert alerter-alert alert-dismissable alert-' + type}>
-        <button type="button" className="close" data-dismiss="alert" onClick={close}>×</button>
+      <div style={style} className={'alert alerter-alert alert-dismissible alert-' + type}>
+        <button type="button" className="btn-close" aria-label="Close" onClick={close}></button>
         {message}
       </div>
     );

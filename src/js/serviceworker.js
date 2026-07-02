@@ -51,7 +51,7 @@ function isOfflineUrl(path) {
 }
 
 function isCacheableThirdParty(request) {
-  return request.url.includes('//cdn.jsdelivr.net/npm/bootswatch@3.4.1/')
+  return request.url.includes('//cdn.jsdelivr.net/npm/bootswatch@5.3.3/')
   || request.url.includes('ytimg.com')
   || request.url.includes('audius.co')
   || (request.url.includes('sndcdn.com') && !request.url.includes('media.sndcdn.com'))

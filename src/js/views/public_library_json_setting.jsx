@@ -14,13 +14,13 @@ export default class PublicLibraryJsonSetting extends React.Component {
 
   render() {
     return (
-      <div className='form-group'>
-        <label className='col-sm-2 control-label'>Public JSON Library</label>
+      <div className='form-group row'>
+        <label className='col-sm-2 col-form-label'>Public JSON Library</label>
         <div className='col-sm-10'>
           <input type='checkbox' checked={this.state.isPublicJsonLibrary} onChange={this.setPublicJsonLibrary} />
           { this.state.isPublicJsonLibrary
-            ? <span className='help-block'>Your library is available publicly at <a href={this.state.libraryUrl} target='_blank'>{this.state.libraryUrl}</a></span>
-            : <span className='help-block'>Make your library available at a public URL, useful for Android Auto or other integrations.</span> }
+            ? <span className='form-text'>Your library is available publicly at <a href={this.state.libraryUrl} target='_blank'>{this.state.libraryUrl}</a></span>
+            : <span className='form-text'>Make your library available at a public URL, useful for Android Auto or other integrations.</span> }
         </div>
       </div>
     );

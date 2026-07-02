@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Alert, DropdownButton, Dropdown } from 'react-bootstrap';
 
 import Playlist from '../models/playlist';
 import Song from '../models/song';
@@ -20,7 +20,7 @@ export default class SharedPlaylist extends PlaylistView {
       return (
         <div className='intro'>
           { this.header() }
-          <Alert bsStyle='danger'>
+          <Alert variant='danger'>
             <strong>Oh snap!</strong> We weren't able to fetch the shared playlist for you.
           </Alert>
         </div>
@@ -46,7 +46,7 @@ export default class SharedPlaylist extends PlaylistView {
     return (
       <div>
         <DropdownButton id='playlist-dropdown' title='Options'>
-          <MenuItem onClick={this.addToLibrary}>Add to Library</MenuItem>
+          <Dropdown.Item onClick={this.addToLibrary}>Add to Library</Dropdown.Item>
         </DropdownButton>
       </div>
     );

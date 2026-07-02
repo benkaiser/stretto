@@ -17,14 +17,14 @@ export default class Intro extends React.Component {
           <CountrySwitcher />
           <GlobalVolume />
           { AccountManager.loggedInStretto && <PublicLibraryJsonSetting /> }
-          <div className='form-group'>
-            <div className='col-sm-10 col-sm-offset-2'>
-              <Link to='/explicitscan/'><Button bsStyle='primary'>Scan Library for Explicit Tracks</Button></Link>
+          <div className='form-group row'>
+            <div className='col-sm-10 offset-sm-2'>
+              <Link to='/explicitscan/'><Button variant='primary'>Scan Library for Explicit Tracks</Button></Link>
             </div>
           </div>
-          <div className='form-group'>
-            <div className='col-sm-10 col-sm-offset-2'>
-              <Link to='/backup/'><Button bsStyle='primary'>Backup and Restore data</Button></Link>
+          <div className='form-group row'>
+            <div className='col-sm-10 offset-sm-2'>
+              <Link to='/backup/'><Button variant='primary'>Backup and Restore data</Button></Link>
             </div>
           </div>
         </div>
