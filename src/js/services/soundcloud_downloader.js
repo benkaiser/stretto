@@ -56,8 +56,12 @@ export default class SoundcloudDownloader {
     static _resolveStream(info) {
         return SoundcloudDownloader.getClientId().then(CLIENT_ID => {
             const mpegFormat = info.media.transcodings.filter((transcoding) => transcoding.format.mime_type === "audio/mpeg" && transcoding.format.protocol === "hls")[0];
-            return fetch(mpegFormat.url + `?client_id=${CLIENT_ID}`)
-            .then(response => response.json())
+            let url = mpegFormat.url + `?client_id=${CLIENT_ID}`;
+            if (info.track_authorization && info.track_authorization !== '******') {
+                url += `&track_authorization=${encodeURIComponent(info.track_authorization)}`;
+            }
+            return SoundcloudDownloader._helperFetchText(url)
+            .then(text => JSON.parse(text))
             .then(json => {
                 return {
                     url: json.url,
@@ -69,8 +73,51 @@ export default class SoundcloudDownloader {
 
     static _resolveInfo(soundcloudUrl) {
         return SoundcloudDownloader.getClientId().then(CLIENT_ID => {
-            return fetch(`https://api-v2.soundcloud.com/resolve?url=${encodeURIComponent(soundcloudUrl)}&client_id=${CLIENT_ID}`)
-            .then(response => response.json());
+            return SoundcloudDownloader._helperFetchText(`https://api-v2.soundcloud.com/resolve?url=${encodeURIComponent(soundcloudUrl)}&client_id=${CLIENT_ID}`)
+            .then(text => JSON.parse(text));
+        });
+    }
+
+    // Proxy a GET through the Stretto Helper Chrome extension when available.
+    // The extension's background service worker performs the fetch with
+    // `credentials: 'include'`, which attaches the user's real soundcloud.com
+    // cookies (including Datadome) so the response contains an un-masked
+    // `track_authorization` — required to stream AD_SUPPORTED tracks.
+    // Falls back to a direct fetch when the extension is not installed.
+    static _helperFetchText(url) {
+        const extId = typeof window !== 'undefined' && window.helperExtensionId;
+        const chromeApi = typeof chrome !== 'undefined' ? chrome : null;
+        if (!extId || !chromeApi || !chromeApi.runtime || !chromeApi.runtime.sendMessage) {
+            return fetch(url).then(response => response.text());
+        }
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const fallback = (reason) => {
+                if (settled) return;
+                settled = true;
+                console.warn('SoundCloud helper proxy fell back to direct fetch:', reason);
+                fetch(url).then(response => response.text()).then(resolve, reject);
+            };
+            try {
+                chromeApi.runtime.sendMessage(extId, {
+                    type: 'proxy-fetch',
+                    url,
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json, text/plain, */*' }
+                }, (res) => {
+                    if (settled) return;
+                    if (chromeApi.runtime.lastError || !res) {
+                        return fallback(chromeApi.runtime.lastError && chromeApi.runtime.lastError.message);
+                    }
+                    if (!res.ok) {
+                        return fallback(`status ${res.status}`);
+                    }
+                    settled = true;
+                    resolve(res.body);
+                });
+            } catch (e) {
+                fallback(e && e.message);
+            }
         });
     }
 
