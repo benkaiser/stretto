@@ -56,9 +56,22 @@ export default class SoundcloudDownloader {
     static _resolveStream(info) {
         return SoundcloudDownloader.getClientId().then(CLIENT_ID => {
             const mpegFormat = info.media.transcodings.filter((transcoding) => transcoding.format.mime_type === "audio/mpeg" && transcoding.format.protocol === "hls")[0];
+            // Go+ / premium-only (or removed) tracks expose no playable mp3 hls
+            // transcoding — only encrypted ones — and the endpoint 404s.
+            if (!mpegFormat) {
+                return Promise.reject(new Error('SOUNDCLOUD_UNAVAILABLE'));
+            }
             return fetch(mpegFormat.url + `?client_id=${CLIENT_ID}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('SOUNDCLOUD_UNAVAILABLE');
+                }
+                return response.json();
+            })
             .then(json => {
+                if (!json || !json.url) {
+                    throw new Error('SOUNDCLOUD_UNAVAILABLE');
+                }
                 return {
                     url: json.url,
                     protocol: mpegFormat.format.protocol

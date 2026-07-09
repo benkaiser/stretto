@@ -1,4 +1,5 @@
 import Hls from 'hls.js/dist/hls.light';
+import Alerter from './alerter';
 import Utilities from '../utilities';
 import ServiceWorkerClient from './service_worker_client';
 import SoundcloudDownloader from './soundcloud_downloader';
@@ -19,6 +20,7 @@ export default class SoundcloudStreamPlayer {
     })
     .catch(error => {
       console.error(error);
+      Alerter.error(`Couldn't play "${song.title}" from SoundCloud — it's either a Go+ (premium) track or no longer available.`);
       ServiceWorkerClient.soundcloudError(song.originalId);
       SoundcloudStreamPlayer.endHandler();
     });
