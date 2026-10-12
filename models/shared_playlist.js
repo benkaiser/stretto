@@ -15,7 +15,12 @@ module.exports = class SharedPlaylist {
   static getPlaylist(guid) {
     return new Promise((resolve, reject) => {
       SharedPlaylistModel.findOne({ guid: guid }, (err, doc) => {
-        if (err || !doc) { return reject(err); }
+        if (err) { return reject(err); }
+        if (!doc) {
+          const error = new Error('Shared playlist not found');
+          error.status = 404;
+          return reject(error);
+        }
         resolve(doc.playlistBlob);
       });
     });

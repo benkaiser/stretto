@@ -421,6 +421,12 @@ router.get('/shared/:guid', (req, res) => {
     render(res, {
       playlist: playlistBlob
     });
+  }).catch(error => {
+    if (error && error.status === 404) {
+      return res.status(404).send({ error: 'Shared playlist not found' });
+    }
+    console.error('Failed to load shared playlist:', error);
+    return res.status(500).send({ error: 'Failed to load shared playlist' });
   });
 });
 
