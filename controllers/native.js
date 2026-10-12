@@ -93,6 +93,8 @@ function createRouter(options = {}) {
 
   function renderLogin(req, res, flow) {
     if (!googleClientId && !req.session.loggedIn) throw new NativeError(503, 'google_not_configured');
+    // GIS needs the authorized origin as a referrer, without URL parameters.
+    res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     res.render('native_login', {
       googleClientId, csrf: flow.csrf, nonce: flow.nonce,
       email: req.session.loggedIn && req.session.user && req.session.user.email
