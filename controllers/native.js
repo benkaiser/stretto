@@ -91,6 +91,14 @@ function createRouter(options = {}) {
     return 'stretto-native://' + kind + '?code=' + encodeURIComponent(code) + '&state=' + encodeURIComponent(state);
   }
 
+  function returnToApp(res, kind, code, state) {
+    // Chrome can block custom-scheme redirects after a form POST. Use a real click.
+    res.render('native_callback', {
+      callback: callback(kind, code, state),
+      service: kind === 'auth' ? 'Stretto' : 'Spotify'
+    });
+  }
+
   function renderLogin(req, res, flow) {
     if (!googleClientId && !req.session.loggedIn) throw new NativeError(503, 'google_not_configured');
     // GIS needs the authorized origin as a referrer, without URL parameters.
@@ -214,7 +222,7 @@ function createRouter(options = {}) {
     const code = await grants.issue('auth', flow, { email: user.email });
     delete req.session.nativeFlow;
     await save(req);
-    res.redirect(303, callback('auth', code, flow.state));
+    returnToApp(res, 'auth', code, flow.state);
   }));
 
   router.post('/native/exchange', handle(async (req, res) => {
@@ -264,8 +272,7 @@ function createRouter(options = {}) {
       });
       if (!tokens.refresh_token) throw new NativeError(502, 'spotify_token_failed');
       const code = await grants.issue('spotify', flow, tokens);
-      const location = callback('spotify', code, flow.state);
-      res.status(303).location(location).render('native_spotify_callback', { callback: location });
+      returnToApp(res, 'spotify', code, flow.state);
     })(req, res, next);
   });
 
