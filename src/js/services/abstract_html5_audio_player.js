@@ -3,8 +3,9 @@ export default class AbstractHTML5AudioPlayer {
     /* empty, meant to be inherited */
   }
 
+  // Streams that are still being produced report a growing duration, so subclasses may supply the real one.
   get durationCacheSeconds() {
-    return this.player.duration;
+    return this.knownDuration > 0 ? this.knownDuration : this.player.duration;
   }
 
   dispose() {
@@ -28,11 +29,12 @@ export default class AbstractHTML5AudioPlayer {
   }
 
   getPositionFraction() {
-    return Promise.resolve(Number.isNaN(this.player.duration) ? 0 : this.player.currentTime / this.player.duration);
+    const duration = this.durationCacheSeconds;
+    return Promise.resolve(!duration || Number.isNaN(duration) ? 0 : this.player.currentTime / duration);
   }
 
   setCurrentTime(timeFraction) {
-    this.player.currentTime = this.player.duration * timeFraction;
+    this.player.currentTime = this.durationCacheSeconds * timeFraction;
   }
 
   toggle() {

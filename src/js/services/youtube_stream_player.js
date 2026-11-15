@@ -7,9 +7,33 @@ export default class YoutubeStreamPlayer extends AbstractHTML5AudioPlayer {
     this.disposed = false;
     this.player = document.createElement('audio');
     if (options.autoPlay === undefined) options.autoPlay = true;
-    const endpoint = song.isSoundcloud ? env.SOUNDCLOUD_REDIRECT_ENDPOINT : env.YOUTUBE_REDIRECT_ENDPOINT;
-    const url = endpoint + '?id=' + song.originalId;
-    this.startPlayer(url, song, options);
+    if (song.isSoundcloud) {
+      this.startSoundcloud(song, options);
+    } else {
+      this.startPlayer(env.YOUTUBE_REDIRECT_ENDPOINT + '?id=' + song.originalId, song, options);
+    }
+  }
+
+  // The JSON form of the endpoint also gives the full duration, which the partially streamed audio can't.
+  startSoundcloud(song, options) {
+    const endpoint = `${env.SOUNDCLOUD_REDIRECT_ENDPOINT}?id=${encodeURIComponent(song.originalId)}`;
+    this.knownDuration = song.duration;
+    fetch(`${endpoint}&format=json`)
+    .then(response => {
+      if (!response.ok) throw new Error(`soundcloud endpoint ${response.status}`);
+      return response.json();
+    })
+    .then(info => {
+      if (info.duration > 0) this.knownDuration = info.duration;
+      return info.url || endpoint;
+    })
+    .catch(error => {
+      console.error(error);
+      return endpoint;
+    })
+    .then(url => {
+      if (!this.disposed) this.startPlayer(url, song, options);
+    });
   }
 
   startPlayer(songUrl, song, options) {
