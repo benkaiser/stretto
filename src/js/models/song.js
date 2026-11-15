@@ -158,6 +158,9 @@ export default class Song {
     if (contentType === 'audio/webm') {
       return '.webm';
     }
+    if (contentType === 'audio/mp4') {
+      return '.m4a';
+    }
     return '.mp3';
   }
 
