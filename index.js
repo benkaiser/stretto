@@ -40,6 +40,7 @@ app.use(session({
   secret: 'stretto-secret',
   store: sessionStore
 }));
+app.use(require('./controllers/native'));
 app.use(require('./controllers/lyrics'));
 app.use(require('./controllers'));
 require('./controllers/socketio')(io);

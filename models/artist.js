@@ -23,8 +23,10 @@ module.exports = class Artist {
   static followArtist(email, artist) {
     return new Promise((resolve, reject) => {
       ArtistModel.findOne({ email: email }, (err, doc) => {
+        if (err) { return reject(err); }
         let artists = [];
         if (doc && doc.artists) {
+          artists = doc.artists;
           if (doc.artists.findIndex((item) => item.artistId == artist.artistId) === -1) {
             artists = doc.artists.concat(artist);
           }
@@ -34,7 +36,7 @@ module.exports = class Artist {
         ArtistModel.findOneAndUpdate(
           { email: email },
           { email: email, artists: artists },
-          { upsert: true },
+          { upsert: true, new: true },
         (err, result) => {
           if (err) { return reject(err); }
           resolve(result);
@@ -46,6 +48,7 @@ module.exports = class Artist {
   static unfollowArtist(email, artist) {
     return new Promise((resolve, reject) => {
       ArtistModel.findOne({ email: email }, (err, doc) => {
+        if (err) { return reject(err); }
         let artists = [];
         if (doc && doc.artists) {
           artists = doc.artists.filter((item) => item.artistId !== artist.artistId);
@@ -53,7 +56,7 @@ module.exports = class Artist {
         ArtistModel.findOneAndUpdate(
           { email: email },
           { email: email, artists: artists },
-          { upsert: true },
+          { upsert: true, new: true },
         (err, result) => {
           if (err) { return reject(err); }
           resolve(result);

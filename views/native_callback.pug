@@ -1,0 +1,23 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    meta(name='referrer' content='no-referrer')
+    title Return to Stretto for Mac
+    style.
+      :root { color-scheme: light dark; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: light-dark(#f5f7fa, #15181d); color: light-dark(#19212b, #eef3f8); }
+      main { max-width: 420px; padding: 40px 28px; text-align: center; }
+      h1 { font-size: 28px; letter-spacing: -.6px; }
+      p { line-height: 1.6; }
+      a { display: inline-block; margin: 12px 0; padding: 14px 24px; border-radius: 12px; background: #44bbff; color: #082438; font-weight: 600; text-decoration: none; }
+      a:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+      .note { font-size: 13px; opacity: .7; }
+  body
+    main
+      h1 Return to Stretto
+      p #{service} authorization is ready. Open the Mac app to finish connecting.
+      a#native-callback(href=callback) Open Stretto for Mac
+      p.note If your browser asks, allow it to open Stretto.
+      p.note This link expires in 90 seconds. If it expires, close this window and start again from the app.

@@ -1,0 +1,37 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+    title Connect Stretto for Mac
+    script(src='https://accounts.google.com/gsi/client' async defer)
+  body
+    h1 Connect Stretto for Mac
+    p Authorize the Mac app to access your Stretto account and library.
+    if email
+      form(method='post' action='/native/login/complete')
+        input(type='hidden' name='csrf' value=csrf)
+        input(type='hidden' name='use_session' value='true')
+        button(type='submit') Continue as #{email}
+      p Or choose a Google account:
+    if googleClientId
+      #google-login(data-client=googleClientId data-nonce=nonce)
+      form#google-form(method='post' action='/native/login/complete')
+        input(type='hidden' name='csrf' value=csrf)
+        input#credential(type='hidden' name='credential')
+      script.
+        window.addEventListener('load', function() {
+          var element = document.getElementById('google-login');
+          if (!window.google || !google.accounts) return;
+          google.accounts.id.initialize({
+            client_id: element.dataset.client,
+            nonce: element.dataset.nonce,
+            auto_select: false,
+            callback: function(response) {
+              document.getElementById('credential').value = response.credential;
+              document.getElementById('google-form').submit();
+            }
+          });
+          google.accounts.id.renderButton(element, { type: 'standard', text: 'continue_with' });
+        });
+    p Closing this window cancels authorization.
