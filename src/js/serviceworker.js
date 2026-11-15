@@ -58,7 +58,6 @@ function isCacheableThirdParty(request) {
   || request.url.includes('i.scdn.co')
   || request.url.includes('mzstatic.com')
   || request.url.includes('cdnjs.cloudflare.com')
-  || request.url.includes('azlyrics.com')
   || request.url.includes('cdnjs.cloudflare.com');
 }
 

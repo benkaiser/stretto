@@ -6,6 +6,7 @@ const SharedPlaylists = require('./shared_playlist');
 const Song = require('./song');
 const Artist = require('./artist');
 const User = require('./user');
+const Lyrics = require('./lyrics');
 const mongoose = require('mongoose');
 
 module.exports = class DataMapper {
@@ -16,6 +17,7 @@ module.exports = class DataMapper {
       Playlist.initialize();
       User.initialize();
       SharedPlaylists.initialize();
+      Lyrics.initialize();
     });
   }
 

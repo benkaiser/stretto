@@ -3,78 +3,85 @@ import Player from '../services/player';
 import Bootbox from './bootbox';
 
 const LYRIC_WAIT_TIMEOUT = 500;
-const AZ_TOKEN_STORAGE_KEY = 'azlyrics_token';
-const DEFAULT_AZ_TOKEN = '3880265dbb11b2a53fbce747c6a5c6d668f8274287e0889aad95b16baea8cd20';
+const SYNC_POLL_MS = 250;
 
 const listeners = [];
 
-function getAzToken() {
-  try {
-    return localStorage.getItem(AZ_TOKEN_STORAGE_KEY) || DEFAULT_AZ_TOKEN;
-  } catch (_) {
-    return DEFAULT_AZ_TOKEN;
+function parseSynced(lrc) {
+  if (!lrc) return null;
+  const lines = [];
+  lrc.split('\n').forEach((raw) => {
+    const stamps = raw.match(/\[\d+:\d+(?:\.\d+)?\]/g);
+    if (!stamps) return;
+    const text = raw.replace(/\[[^\]]*\]/g, '').trim();
+    stamps.forEach((stamp) => {
+      const [, min, sec] = stamp.match(/\[(\d+):(\d+(?:\.\d+)?)\]/);
+      lines.push({ time: parseInt(min, 10) * 60 + parseFloat(sec), text });
+    });
+  });
+  lines.sort((a, b) => a.time - b.time);
+  return lines.length ? lines : null;
+}
+
+class LyricsView extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { active: -1 };
+    this._lineRefs = [];
   }
-}
 
-function looksLikeCaptcha(html) {
-  if (!html) return true;
-  const lower = html.toLowerCase();
-  return lower.includes('captcha')
-    || lower.includes('are you a human')
-    || lower.includes('unusual traffic')
-    || lower.includes('cf-challenge');
-}
-
-function sanitizeQuery(query) {
-  return query
-    .replace(/&/g, ' ')
-    .replace(/[()\[\]"']/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function searchUrl(query) {
-  return `https://www.azlyrics.com/search/?q=${encodeURIComponent(sanitizeQuery(query))}&w=songs&p=1&x=${getAzToken()}`;
-}
-
-function userSearchUrl(query) {
-  return `https://www.azlyrics.com/search.php?q=${encodeURIComponent(sanitizeQuery(query))}`;
-}
-
-function hasNoResults(html) {
-  return /alert-warning[^>]*>[^<]*<b>no results<\/b>/i.test(html)
-    || /your search returned <b>no results<\/b>/i.test(html);
-}
-
-function extractFirstSongLink(html) {
-  const doc = new DOMParser().parseFromString(html, 'text/html');
-  const links = doc.querySelectorAll('td.text-left a, .panel a');
-  for (const link of links) {
-    const href = link.getAttribute('href') || '';
-    if (/azlyrics\.com\/lyrics\//.test(href)) {
-      return href;
+  componentDidMount() {
+    if (this.props.synced) {
+      this._interval = setInterval(() => this._poll(), SYNC_POLL_MS);
     }
   }
-  return null;
-}
 
-function extractLyrics(html) {
-  const commentMarker = 'Usage of azlyrics.com content by any third-party lyrics provider';
-  const commentIdx = html.indexOf(commentMarker);
-  if (commentIdx === -1) return null;
-  const commentEnd = html.indexOf('-->', commentIdx);
-  const contentStart = commentEnd !== -1 ? commentEnd + 3 : commentIdx;
-  const divEnd = html.indexOf('</div>', contentStart);
-  if (divEnd === -1) return null;
-  const inner = html.substring(contentStart, divEnd);
-  const text = inner
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<i>|<\/i>|<b>|<\/b>/gi, '')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)))
-    .trim();
-  return text || null;
+  componentWillUnmount() {
+    clearInterval(this._interval);
+  }
+
+  componentDidUpdate(_, prevState) {
+    if (prevState.active !== this.state.active && this._lineRefs[this.state.active]) {
+      this._lineRefs[this.state.active].scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }
+
+  _poll() {
+    const { songId, synced } = this.props;
+    const visible = this._container && this._container.offsetParent !== null;
+    if (!visible || !Player.currentSong || Player.currentSong.id !== songId) {
+      if (this.state.active !== -1) this.setState({ active: -1 });
+      return;
+    }
+    Player.currentTimeAbsolute().then((position) => {
+      let active = -1;
+      for (let i = 0; i < synced.length && synced[i].time <= position; i++) {
+        active = i;
+      }
+      if (active !== this.state.active) this.setState({ active });
+    });
+  }
+
+  render() {
+    const { synced, plain } = this.props;
+    if (!synced) {
+      return <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1 }}>{plain}</div>;
+    }
+    return (
+      <div ref={(el) => this._container = el} style={{ lineHeight: 1.4 }}>
+        {synced.map((line, i) => (
+          <div
+            key={i}
+            ref={(el) => this._lineRefs[i] = el}
+            style={i === this.state.active ?
+              { fontWeight: 'bold', fontSize: '1.15em', color: '#18bc9c' } :
+              { opacity: 0.7 }}>
+            {line.text || '\u00a0'}
+          </div>
+        ))}
+      </div>
+    );
+  }
 }
 
 export default class Lyrics {
@@ -84,10 +91,6 @@ export default class Lyrics {
 
   static get status() {
     return this._status;
-  }
-
-  static get currentQuery() {
-    return this._query;
   }
 
   static initialise() {
@@ -107,34 +110,30 @@ export default class Lyrics {
       this.showFailure();
       return;
     }
-    Bootbox.show('Lyrics', <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1 }}>
-      {this._lyrics}
-    </div>);
+    Bootbox.show('Lyrics', <LyricsView
+      key={this._songId}
+      songId={this._songId}
+      plain={this._lyrics}
+      synced={this._synced} />);
   }
 
   static showFailure() {
-    const query = this._query || '';
     Bootbox.show('Lyrics unavailable', <div>
-      <p>We couldn't fetch lyrics from AZLyrics. They may be asking you to solve a captcha, or the search token may have expired.</p>
-      <p>Open their site directly, solve any captcha, and try again:</p>
-      <p>
-        <a href={userSearchUrl(query)} target="_blank" rel="noopener noreferrer" className="btn btn-warning">
-          Search AZLyrics for "{query}"
-        </a>
-      </p>
+      <p>We couldn't fetch lyrics for this song right now. Please try again later.</p>
     </div>);
   }
 
   static _onSongChange(newSong) {
     this._lyrics = undefined;
+    this._synced = undefined;
     this._status = undefined;
-    this._query = `${newSong.title} ${newSong.artist}`;
+    this._songId = newSong.id;
     this._change();
     this._songTimeout && clearTimeout(this._songTimeout);
-    const requestedQuery = this._query;
+    const requestedId = newSong.id;
     this._songTimeout = setTimeout(() => {
-      this._fetchLyrics(requestedQuery).catch((error) => {
-        if (this._query !== requestedQuery) return;
+      this._fetchLyrics(newSong).catch((error) => {
+        if (this._songId !== requestedId) return;
         console.log('Unable to fetch lyrics for song');
         console.log(error);
         this._status = 'failed';
@@ -143,38 +142,28 @@ export default class Lyrics {
     }, LYRIC_WAIT_TIMEOUT);
   }
 
-  static _fetchLyrics(query) {
-    return fetch(searchUrl(query), { credentials: 'omit' })
-      .then(response => {
-        if (!response.ok) throw new Error(`azlyrics search ${response.status}`);
-        return response.text();
-      })
-      .then(html => {
-        if (looksLikeCaptcha(html)) throw new Error('captcha');
-        if (hasNoResults(html)) {
-          if (this._query === query) {
-            this._status = 'notfound';
-            this._change();
-          }
-          return null;
-        }
-        const songUrl = extractFirstSongLink(html);
-        if (!songUrl) throw new Error('no search results');
-        return fetch(songUrl, { credentials: 'omit' }).then(r => {
-          if (!r.ok) throw new Error(`azlyrics lyrics ${r.status}`);
-          return r.text();
-        });
-      })
-      .then(html => {
-        if (!html) return;
-        if (looksLikeCaptcha(html)) throw new Error('captcha');
-        const lyrics = extractLyrics(html);
-        if (!lyrics) throw new Error('lyrics not found in page');
-        if (this._query !== query) return;
-        this._lyrics = lyrics;
-        this._status = 'found';
-        this._change();
-      });
+  static _fetchLyrics(song) {
+    const params = new URLSearchParams({
+      id: song.id,
+      title: song.title || '',
+      artist: song.artist || '',
+      duration: song.duration || 0
+    });
+    return fetch(`/lyrics?${params}`).then((response) => {
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error(`lyrics ${response.status}`);
+      return response.json();
+    }).then((result) => {
+      if (this._songId !== song.id) return;
+      if (!result) {
+        this._status = 'notfound';
+      } else {
+        this._synced = parseSynced(result.syncedLyrics);
+        this._lyrics = result.lyrics || (this._synced && this._synced.map(l => l.text).join('\n'));
+        this._status = this._lyrics ? 'found' : 'notfound';
+      }
+      this._change();
+    });
   }
 
   static _change() {
