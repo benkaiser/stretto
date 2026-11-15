@@ -3,7 +3,6 @@ import DataLayer from '../models/data_layer';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import HTML5AudioPlayer from './html5_audio_player';
-import SoundcloudStreamPlayer from './soundcloud_stream_player';
 import YoutubeStreamPlayer from './youtube_stream_player';
 import ServiceWorkerClient from './service_worker_client';
 import AudiusStreamPlayer from './audius_stream_player';
@@ -24,7 +23,6 @@ class Player {
       // no-op
     }
     HTML5AudioPlayer.injectHandlers(this.playstateChange, this.songEnded);
-    SoundcloudStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     YoutubeStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
     YoutubeIframePlayer.injectHandlers(this.playstateChange, this.songEnded);
     AudiusStreamPlayer.injectHandlers(this.playstateChange, this.songEnded);
@@ -73,7 +71,7 @@ class Player {
       }
       return new YoutubeStreamPlayer(song, options);
     } else if (song.isSoundcloud) {
-      return new SoundcloudStreamPlayer(song, options);
+      return new YoutubeStreamPlayer(song, options);
     } else if (song.isAudius) {
       return new AudiusStreamPlayer(song, options);
     }

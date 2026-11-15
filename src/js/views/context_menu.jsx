@@ -9,7 +9,6 @@ import Player from '../services/player';
 import Playlist from '../models/playlist';
 import Song from '../models/song';
 import Youtube from '../services/youtube';
-import SoundcloudDownloader from '../services/soundcloud_downloader';
 import Utilities from '../utilities';
 
 const DROPDOWN_MAX_HEIGHT = 400;
@@ -231,10 +230,8 @@ class ContextMenu extends React.Component {
 
   @autobind
   _offline() {
-    if (this.state.items[0].isYoutube) {
+    if (this.state.items[0].isYoutube || this.state.items[0].isSoundcloud) {
       this.state.items[0].cacheOffline();
-    } else if (this.state.items[0].isSoundcloud) {
-      SoundcloudDownloader.download(this.state.items[0]);
     } else {
       Alerter.error('Cannot manually offline this track type');
     }

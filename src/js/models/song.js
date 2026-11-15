@@ -98,11 +98,11 @@ export default class Song {
     });
   }
 
-  cacheOffline(rawBytes) {
+  cacheOffline() {
     if (this.isYoutube) {
       ServiceWorkerClient.offlineYoutube(this.originalId);
     } else if (this.isSoundcloud) {
-      ServiceWorkerClient.offlineSoundcloud(this.originalId, rawBytes);
+      ServiceWorkerClient.offlineSoundcloud(this.originalId);
     } else {
       console.log('Not implemented');
     }

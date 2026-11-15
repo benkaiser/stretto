@@ -7,7 +7,8 @@ export default class YoutubeStreamPlayer extends AbstractHTML5AudioPlayer {
     this.disposed = false;
     this.player = document.createElement('audio');
     if (options.autoPlay === undefined) options.autoPlay = true;
-    const url = env.YOUTUBE_REDIRECT_ENDPOINT + '?id=' + song.originalId;
+    const endpoint = song.isSoundcloud ? env.SOUNDCLOUD_REDIRECT_ENDPOINT : env.YOUTUBE_REDIRECT_ENDPOINT;
+    const url = endpoint + '?id=' + song.originalId;
     this.startPlayer(url, song, options);
   }
 
@@ -16,7 +17,11 @@ export default class YoutubeStreamPlayer extends AbstractHTML5AudioPlayer {
     this.player.onpause = () => YoutubeStreamPlayer.playstateChangeHandler(false);
     this.player.onplaying = () => YoutubeStreamPlayer.playstateChangeHandler(true);
     this.player.onerror = () => {
-      ServiceWorkerClient.offlineError(song.id);
+      if (song.isSoundcloud) {
+        ServiceWorkerClient.soundcloudError(song.originalId);
+      } else {
+        ServiceWorkerClient.offlineError(song.id);
+      }
       song.removeOffline();
       YoutubeStreamPlayer.endHandler();
     };

@@ -193,21 +193,6 @@ function cacheYoutubeFile(payload) {
   );
 }
 
-function cacheRawFile(payload) {
-  const blob = new Blob([payload.rawFile], {
-    type: 'audio/mpeg',
-  });
-  const headers = new Headers();
-  headers.set('content-length', payload.rawFile.length);
-  headers.set('accept-ranges', 'bytes');
-  var songResponse = new Response(blob, {
-    status : 200,
-    headers: headers,
-  });
-  return caches.open(MUSIC_CACHE)
-  .then(cache => cache.put('/offlineaudio/' + payload.songId, songResponse));
-}
-
 broadcast.onmessage = async (event) => {
   if (!event.data || !event.data.type) {
     return;
@@ -239,18 +224,5 @@ broadcast.onmessage = async (event) => {
     cache.delete('/offlineaudio/' + event.data.payload.songId)
     .then(() => console.log('Removed item from cache'))
     .catch(() => console.error('Failed to remove item from cache'));
-  }
-  if (event.data.type === 'OFFLINE_RAW_FILE') {
-    cacheRawFile(event.data.payload)
-    .then(() => {
-      broadcast.postMessage({ type: 'OFFLINE_ADDED', payload: {
-        id: event.data.payload.songId,
-        contentType: 'audio/mpeg' // we assume all hls streams from soundcloud return mp3s
-      }});
-    })
-    .catch(error => {
-      console.log("Failed to cache song");
-      console.error(error);
-    });
   }
 };

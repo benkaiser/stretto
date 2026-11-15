@@ -60,12 +60,12 @@ export default class ServiceWorkerClient {
     });
   }
 
-  static offlineSoundcloud(soundcloudId, soundcloudRawFile) {
+  static offlineSoundcloud(soundcloudId) {
     broadcast.postMessage({
-      type: 'OFFLINE_RAW_FILE',
+      type: 'DOWNLOAD',
       payload: {
-        songId: soundcloudId,
-        rawFile: soundcloudRawFile
+        youtubeId: soundcloudId,
+        url: env.SOUNDCLOUD_REDIRECT_ENDPOINT + '?id=' + soundcloudId,
       }
     });
   }

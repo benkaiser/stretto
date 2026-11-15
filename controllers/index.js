@@ -408,6 +408,7 @@ function render(res, extraEnv) {
       GOOGLE_ANALYTICS_ID: process.env.GOOGLE_ANALYTICS_ID || '',
       SOUNDCLOUD_CLIENT_ID: process.env.SOUNDCLOUD_CLIENT_ID || '',
       YOUTUBE_REDIRECT_ENDPOINT: process.env.YOUTUBE_REDIRECT_ENDPOINT || '',
+      SOUNDCLOUD_REDIRECT_ENDPOINT: process.env.SOUNDCLOUD_REDIRECT_ENDPOINT || '',
       ...extraEnv
     }
   });
