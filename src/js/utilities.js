@@ -111,7 +111,7 @@ export default class Utilities {
           types: [{ description: 'Zip archive', accept: { 'application/zip': ['.zip'] } }]
         });
       } catch (error) {
-        if (error.name === 'AbortError') return false;
+        if (error.name === 'AbortError') return null;
       }
     }
     const usedNames = new Set();
@@ -127,18 +127,25 @@ export default class Utilities {
       usedNames.add(name);
       return name;
     };
+    const skipped = [];
     async function* entries() {
       for (let i = 0; i < items.length; i++) {
-        const response = await fetch(items[i].url);
-        if (response.ok) {
+        try {
+          const response = await fetch(items[i].url);
+          if (!response.ok) throw new Error(`status ${response.status}`);
           yield { name: uniqueName(items[i].filename), lastModified: new Date(), input: await response.blob() };
+        } catch (error) {
+          console.error('Skipping file in zip', items[i], error);
+          skipped.push(items[i].filename);
         }
         onProgress && onProgress(i + 1, items.length);
       }
     }
     const zipResponse = downloadZip(entries());
+    const added = () => items.length - skipped.length;
     if (handle) {
       await zipResponse.body.pipeTo(await handle.createWritable());
+      if (!added() && handle.remove) await handle.remove();
     } else {
       const url = window.URL.createObjectURL(await zipResponse.blob());
       const link = document.createElement('a');
@@ -149,6 +156,6 @@ export default class Utilities {
       document.body.removeChild(link);
       setTimeout(() => window.URL.revokeObjectURL(url), 60000);
     }
-    return true;
+    return { added: added(), skipped };
   }
 }

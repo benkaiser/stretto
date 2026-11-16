@@ -220,7 +220,11 @@ class ContextMenu extends React.Component {
       filename: item.title + ' - ' + item.artist + item.offlineExtension
     }));
     if (files.length > 1) {
-      Utilities.downloadZip(files, 'stretto-songs.zip').catch(error => {
+      Utilities.downloadZip(files, 'stretto-songs.zip').then(result => {
+        if (result && result.skipped.length) {
+          Alerter.error(`${result.skipped.length} songs could not be read from offline storage`);
+        }
+      }).catch(error => {
         console.error(error);
         Alerter.error('Unable to create zip download');
       });

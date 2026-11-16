@@ -419,7 +419,13 @@ export default class PlaylistView extends React.Component {
       url: '/offlineaudio/' + item.originalId,
       filename: item.title + ' - ' + item.artist + item.offlineExtension
     })), `${this.state.playlist.title}.zip`)
-    .then(started => started && Alerter.success('Download ready'))
+    .then(result => {
+      if (!result) return;
+      if (!result.added) return Alerter.error('None of the songs could be read from offline storage');
+      Alerter.success(result.skipped.length ?
+        `Zip saved with ${result.added} songs, ${result.skipped.length} could not be read` :
+        `Zip saved with ${result.added} songs`);
+    })
     .catch(error => {
       console.error(error);
       Alerter.error('Unable to create zip download');
