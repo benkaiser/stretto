@@ -410,12 +410,20 @@ export default class PlaylistView extends React.Component {
 
   @autobind
   downloadPlaylist() {
-    Alerter.info('Prepping download...');
     const offlineSongs = this.state.playlist.songData.filter(item => item.offline);
-    Utilities.downloadFiles(offlineSongs.map(item => ({
+    if (!offlineSongs.length) {
+      return Alerter.info('No offline songs in this playlist to download');
+    }
+    Alerter.info(`Zipping ${offlineSongs.length} songs...`);
+    Utilities.downloadZip(offlineSongs.map(item => ({
       url: '/offlineaudio/' + item.originalId,
       filename: item.title + ' - ' + item.artist + item.offlineExtension
-    })));
+    })), `${this.state.playlist.title}.zip`)
+    .then(started => started && Alerter.success('Download ready'))
+    .catch(error => {
+      console.error(error);
+      Alerter.error('Unable to create zip download');
+    });
   }
 
   @autobind

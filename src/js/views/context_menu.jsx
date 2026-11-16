@@ -215,10 +215,18 @@ class ContextMenu extends React.Component {
   _download() {
     console.log();
     const downloadableItems = this.state.items.filter(item => item.offline);
-    Utilities.downloadFiles(downloadableItems.map(item => ({
+    const files = downloadableItems.map(item => ({
       url: '/offlineaudio/' + item.originalId,
       filename: item.title + ' - ' + item.artist + item.offlineExtension
-    })));
+    }));
+    if (files.length > 1) {
+      Utilities.downloadZip(files, 'stretto-songs.zip').catch(error => {
+        console.error(error);
+        Alerter.error('Unable to create zip download');
+      });
+    } else {
+      Utilities.downloadFiles(files);
+    }
     this.hide();
   }
 

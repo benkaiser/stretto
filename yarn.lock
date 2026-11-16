@@ -1621,6 +1621,11 @@ cli-boxes@^2.2.1:
   resolved "https://registry.npmjs.org/cli-boxes/-/cli-boxes-2.2.1.tgz"
   integrity sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw==
 
+client-zip@^2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/client-zip/-/client-zip-2.5.1.tgz#41f3d796f53ca9026f0fdf86e5812021966f0542"
+  integrity sha512-yOvNSBsQX1B7wtdvIVXJEIIShrlPiX+adhli7sWvQhsx3nX1DjvpSt+AwOxaX+3DCsT/Yx0nRy5hIjRLIYfebw==
+
 clone-deep@^4.0.1:
   version "4.0.1"
   resolved "https://registry.npmjs.org/clone-deep/-/clone-deep-4.0.1.tgz"

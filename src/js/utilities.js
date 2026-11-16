@@ -1,3 +1,5 @@
+import { downloadZip } from 'client-zip';
+
 const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
 const SECONDS_IN_HOUR = SECONDS_IN_MINUTE * MINUTES_IN_HOUR;
@@ -96,5 +98,57 @@ export default class Utilities {
     .then(() => {
       document.body.removeChild(link);
     });
+  }
+
+  // Bundles files into one uncompressed zip (audio is already compressed). On browsers with the File System
+  // Access API the zip streams straight to disk, otherwise it's assembled in memory as a single Blob.
+  static async downloadZip(items, zipName, onProgress) {
+    let handle;
+    if (window.showSaveFilePicker) {
+      try {
+        handle = await window.showSaveFilePicker({
+          suggestedName: zipName,
+          types: [{ description: 'Zip archive', accept: { 'application/zip': ['.zip'] } }]
+        });
+      } catch (error) {
+        if (error.name === 'AbortError') return false;
+      }
+    }
+    const usedNames = new Set();
+    const uniqueName = (filename) => {
+      const clean = filename.replace(/[\\/:*?"<>|]/g, '_');
+      const dot = clean.lastIndexOf('.');
+      const base = dot > 0 ? clean.slice(0, dot) : clean;
+      const extension = dot > 0 ? clean.slice(dot) : '';
+      let name = clean;
+      for (let n = 2; usedNames.has(name); n++) {
+        name = `${base} (${n})${extension}`;
+      }
+      usedNames.add(name);
+      return name;
+    };
+    async function* entries() {
+      for (let i = 0; i < items.length; i++) {
+        const response = await fetch(items[i].url);
+        if (response.ok) {
+          yield { name: uniqueName(items[i].filename), lastModified: new Date(), input: await response.blob() };
+        }
+        onProgress && onProgress(i + 1, items.length);
+      }
+    }
+    const zipResponse = downloadZip(entries());
+    if (handle) {
+      await zipResponse.body.pipeTo(await handle.createWritable());
+    } else {
+      const url = window.URL.createObjectURL(await zipResponse.blob());
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = zipName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+    }
+    return true;
   }
 }
